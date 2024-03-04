@@ -2,20 +2,24 @@
   <v-app>
     <Toolbar />
     <v-main>
-      <v-row class="mt-10 mb-2">
-        <v-col cols="2" v-show="store.isFilterPanelShowing">
-          <FilterPanel />
-        </v-col>
-        <v-col>
-          <router-view></router-view>
-        </v-col>
-      </v-row>
+      <router-view></router-view>
     </v-main>
     <Footer />
   </v-app>
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useFilterStore } from '@/stores/FilterStore';
-const store = useFilterStore();
+
+const filterStore = useFilterStore()
+
+// onMounted(async () => {
+//   try {
+//     await filterStore.loadFilterData();
+//   } catch (error) {
+//     throw new Error("Failed to load filter data:");
+//   }
+// })
+
 </script>

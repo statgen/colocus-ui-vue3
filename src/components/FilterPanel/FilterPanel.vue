@@ -1,29 +1,28 @@
 <template>
-  <FilterPanelSubpanel title="Select">
-    <CtlAutocomplete :propSet="controlConfig.study" />
-    <CtlAutocomplete :propSet="controlConfig.gene" />
-    <CtlTextfield :propSet="controlConfig.region" />
-    <CtlAutocomplete :propSet="controlConfig.phenotype" />
-    <CtlAutocomplete :propSet="controlConfig.tissue" />
-  </FilterPanelSubpanel>
+  <v-sheet class="ml-n2">
+    <FilterPanelSubpanel title="Select" resetButton="true">
+      <CtlAutocomplete :controlSet="controlConfig.study" />
+      <CtlAutocomplete :controlSet="controlConfig.gene" />
+      <CtlTextfield :controlSet="controlConfig.region" />
+      <CtlAutocomplete :controlSet="controlConfig.phenotype" />
+      <CtlAutocomplete :controlSet="controlConfig.tissue" />
+    </FilterPanelSubpanel>
 
-  <FilterPanelSubpanel title="Set threshold">
-    <CtlTextfield :propSet="controlConfig.trait1" />
-    <CtlTextfield :propSet="controlConfig.trait2" />
-    <CtlTextfield :propSet="controlConfig.h4" />
-    <CtlTextfield :propSet="controlConfig.r2" />
-  </FilterPanelSubpanel>
+    <FilterPanelSubpanel title="Set threshold" resetButton="true">
+      <CtlTextfield :controlSet="controlConfig.trait1" />
+      <CtlTextfield :controlSet="controlConfig.trait2" />
+      <CtlTextfield :controlSet="controlConfig.h4" />
+      <CtlTextfield :controlSet="controlConfig.r2" />
+    </FilterPanelSubpanel>
 
-  <FilterPanelSubpanel title="View">
-    <CtlSwitch :propSet="controlConfig.showEnsIDs" />
-    <CtlSwitch :propSet="controlConfig.showEffects" />
-  </FilterPanelSubpanel>
+    <FilterPanelSubpanel title="View">
+      <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
+      <CtlSwitch :controlSet="controlConfig.showEffects" />
+    </FilterPanelSubpanel>
+  </v-sheet>
 </template>
 
 <script setup>
-import { useFilterStore } from '@/stores/FilterStore';
-
-const filterStore = useFilterStore();
 
 const POS_DECIMAL_REGEX = /^\d*\.?\d*$/
 const CHR_REGION_REGEX = /^[12]\d?:\d+-\d+$/
@@ -34,48 +33,31 @@ const rules = {
   chrRegionRule: v => !v || (!!v && CHR_REGION_REGEX.test(v)) || 'Must match chromosome:start-end, all integers',
 }
 
-// fake data for initial build out
-const studies = ['AdipoExpress', 'CARDioGRAMplusC4D', 'DIAGRAM', 'GIANT', 'GLGC', 'ICBP-UKBB', 'MAGIC', 'UKBB']
-const phenotypes = ['phenotype 1', 'phenotype 2', 'phenotype 3', 'phenotype 4',]
-const tissues = ['tissue 1', 'tissue 2', 'tissue 3', 'tissue 4',]
-const genes = ['Gene 1', 'Gene 2', 'Gene 3', 'Gene 4', 'Gene 5', 'Gene 6', 'Gene 7', 'Gene 8', 'Gene 9', 'Gene 10' ]
-
-// data for configuring controls
+/**
+ * controlConfig stores static config data passed down to controls:
+ *   title is the label over the control
+ *   storeKey is the key in the FilterStore where user selections are stored
+ *   rules are validators (only for numeric inputs)
+ *   emptyValue is inserted into the control if the user deletes everything and moves out of the control (for numeric fields)
+ *   defaultValue is used when initially setting up a component or if the user clicks the reset button
+ *   placeholder is displayed inside the control until the user types something
+ *   the switches only need the title and storeKey keys
+ * Dynamic data loaded via API is handled in the controls themselves.
+ */
 const controlConfig = {
-  study: {
-    title: 'Study', storeKey: 'studies', items: studies, rules: null, placeholder: 'Select study(ies)', defValue: null
-  },
-  gene: {
-    title: 'QTL Gene', storeKey: 'genes', items: genes, rules: null, placeholder: 'Select gene(s)', defValue: null
-  },
-  region: {
-    title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], placeholder: 'chr:start-end', defValue: null
-  },
-  phenotype: {
-    title: 'GWAS Phenotype', storeKey: 'phenotypes', items: phenotypes, rules: null, placeholder: 'Select phenotype(s)', defValue: null
-  },
-  tissue: {
-    title: 'QTL Tissue', storeKey: 'tissues', items: tissues, rules: null, placeholder: 'Select tissue(s)', defValue: null
-  },
-  trait1: {
-    title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], placeholder: null, defValue: '0'
-  },
-  trait2: {
-    title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], placeholder: null, defValue: '0'
-  },
-  h4: {
-    title: 'Colocalization PP(H4) ≥', storeKey: 'h4', items: null, rules: [rules.probabilityRule], placeholder: null, defValue: '0'
-  },
-  r2: {
-    title: 'r<sup>2</sup> ≥', storeKey: 'r2', items: null, rules: [rules.probabilityRule], placeholder: null, defValue: '0'
-  },
-  showEnsIDs: {
-    title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', items: null, rules: null, placeholder: null
-  },
-  showEffects: {
-    title: 'Show effect sizes', storeKey: 'showEffects', items: null, rules: null, placeholder: null
-  }
+  study: { title: 'Study', storeKey: 'studies', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select study(ies)' },
+  gene: { title: 'QTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
+  region: { title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], emptyValue: null, defaultValue: '', placeholder: 'chr:start-end' },
+  phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
+  tissue: { title: 'QTL Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
+  trait1: { title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
+  trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
+  h4: { title: 'Colocalization PP(H4) ≥', storeKey: 'h4', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: '0.5', placeholder: null },
+  r2: { title: 'r<sup>2</sup> ≥', storeKey: 'r2', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: '0.3', placeholder: null },
+  showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs' },
+  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects' }
 }
+
 </script>
 
 <style >

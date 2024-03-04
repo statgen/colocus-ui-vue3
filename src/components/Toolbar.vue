@@ -1,33 +1,36 @@
 <template>
     <v-toolbar class="fixed-toolbar" flat density="compact" border>
-      <v-icon icon="mdi-filter-outline" class="mx-3" size="40px" @click="toggleFilterPanel" color="red-darken-3" />
+      <v-icon v-if="isFilterButtonVisible" icon="mdi-filter-outline" @click="toggleFilterPanel" class="mx-3 text-teal-accent-4" size="40px"/>
 
       <AppLogo />
 
       <div class="ml-10">
-        <router-link to="search" class="nav-link">Search</router-link>
-        <router-link to="about" class="nav-link">About</router-link>
-  <!--      <router-link to="/quality" class="nav-link">Quality</router-link>-->
-  <!--      <router-link to="/help" class="nav-link">Help</router-link>-->
-  <!--      <router-link to="/about" class="nav-link">About</router-link>-->
+        <router-link to="/search" class="nav-link text-teal-accent-4">Search</router-link>
+        <router-link to="/studies" class="nav-link text-teal-accent-4">Studies</router-link>
+        <router-link to="/genes" class="nav-link text-teal-accent-4">Genes</router-link>
+        <router-link to="/traits" class="nav-link text-teal-accent-4">Traits</router-link>
+        <router-link to="/help" class="nav-link text-teal-accent-4">Help</router-link>
       </div>
 
       <v-spacer></v-spacer>
 
-      <AmpLogo />
+      <a href="https://forms.gle/9idPsYcUcKDBqS8s6" target="_blank" rel="noopener noreferrer">
+        <v-btn size="small" variant="tonal" color="teal-accent-4" class="btn mx-2">Feedback</v-btn>
+      </a>
+
+      <AmpLogo class="mr-2"/>
 
   </v-toolbar>
 </template>
 
 <script setup>
-import { useFilterStore } from '@/stores/FilterStore';
+import { computed } from 'vue'
+import { useFilterStore } from '@/stores/FilterStore'
 
-const store = useFilterStore();
+const filterStore = useFilterStore();
+const { toggleFilterPanel } = filterStore
+const isFilterButtonVisible = computed(() => filterStore.isFilterButtonShowing)
 
-const toggleFilterPanel = () => {
-  store.isFilterPanelShowing = !store.isFilterPanelShowing
-
-}
 </script>
 
 <style scoped>
@@ -36,22 +39,20 @@ const toggleFilterPanel = () => {
   top: 0;
   width: 100%;
   z-index: 1000;
-  /*height: 60px;*/
 }
 
 .nav-link {
-  color: blue;
   text-decoration: none;
   margin: 0 15px;
-  font-size: 25px;
+  font-size: 1.75rem;
 }
 
 a.router-link-active {
-  color: #FFCB05;
+  /*font-weight: bold;*/
+  border-bottom: 2px solid ;
 }
 
 a:hover {
-  /*color: lawngreen;*/
   font-weight: bold;
 }
 

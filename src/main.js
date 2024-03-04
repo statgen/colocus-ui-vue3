@@ -8,10 +8,12 @@ import router from './router'
 
 const app = createApp(App)
 
+registerPlugins(app)
+
 const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-registerPlugins(app)
+app.config.globalProperties.$log = console.log // use $log(something) inside templates, eg: {{ $log(something) }}
 
 app.mount('#app')

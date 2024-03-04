@@ -43,6 +43,16 @@ export default defineConfig({
     ],
   },
   server: {
-    port: 3000,
+    proxy: {
+      // Proxying API requests similar to the Vue CLI setup
+      '/api/': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true, // required to avoid CORS issues if the target server has CORS enabled
+        // ws: true, // set to true if you want to proxy websockets
+        // Additional configurations if needed
+        // rewrite: (path) => path.replace(/^\/api/, '')
+      },
+    },
   },
+
 })
