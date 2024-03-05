@@ -1,28 +1,33 @@
 <template>
-  <v-sheet class="ml-n2">
-    <FilterPanelSubpanel title="Select" resetButton="true">
-      <CtlAutocomplete :controlSet="controlConfig.study" />
-      <CtlAutocomplete :controlSet="controlConfig.gene" />
-      <CtlTextfield :controlSet="controlConfig.region" />
-      <CtlAutocomplete :controlSet="controlConfig.phenotype" />
-      <CtlAutocomplete :controlSet="controlConfig.tissue" />
-    </FilterPanelSubpanel>
+  <v-scroll-x-transition>
+    <v-sheet v-show="filterStore.isFilterPanelShowing" class="ml-n2" width="300">
+      <FilterPanelSubpanel title="Select" resetButton="true">
+        <CtlAutocomplete :controlSet="controlConfig.study" />
+        <CtlAutocomplete :controlSet="controlConfig.gene" />
+        <CtlTextfield :controlSet="controlConfig.region" />
+        <CtlAutocomplete :controlSet="controlConfig.phenotype" />
+        <CtlAutocomplete :controlSet="controlConfig.tissue" />
+      </FilterPanelSubpanel>
 
-    <FilterPanelSubpanel title="Set threshold" resetButton="true">
-      <CtlTextfield :controlSet="controlConfig.trait1" />
-      <CtlTextfield :controlSet="controlConfig.trait2" />
-      <CtlTextfield :controlSet="controlConfig.h4" />
-      <CtlTextfield :controlSet="controlConfig.r2" />
-    </FilterPanelSubpanel>
+      <FilterPanelSubpanel title="Set threshold" resetButton="true">
+        <CtlTextfield :controlSet="controlConfig.trait1" />
+        <CtlTextfield :controlSet="controlConfig.trait2" />
+        <CtlTextfield :controlSet="controlConfig.h4" />
+        <CtlTextfield :controlSet="controlConfig.r2" />
+      </FilterPanelSubpanel>
 
-    <FilterPanelSubpanel title="View">
-      <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
-      <CtlSwitch :controlSet="controlConfig.showEffects" />
-    </FilterPanelSubpanel>
-  </v-sheet>
+      <FilterPanelSubpanel title="View">
+        <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
+        <CtlSwitch :controlSet="controlConfig.showEffects" />
+      </FilterPanelSubpanel>
+    </v-sheet>
+  </v-scroll-x-transition>
 </template>
 
 <script setup>
+import { useFilterStore } from '@/stores/FilterStore';
+
+const filterStore = useFilterStore();
 
 const POS_DECIMAL_REGEX = /^\d*\.?\d*$/
 const CHR_REGION_REGEX = /^[12]\d?:\d+-\d+$/
