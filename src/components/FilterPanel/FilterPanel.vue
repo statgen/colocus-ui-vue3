@@ -1,6 +1,6 @@
 <template>
   <v-scroll-x-transition>
-    <v-sheet v-show="filterStore.isFilterPanelShowing" class="ml-n2" width="300">
+    <v-sheet v-show="filterStore.isFilterPanelShowing" class="ml-n2" >
       <FilterPanelSubpanel title="Select" resetButton="true">
         <CtlAutocomplete :controlSet="controlConfig.study" />
         <CtlAutocomplete :controlSet="controlConfig.gene" />

@@ -3,7 +3,7 @@
     <v-col cols="2" v-show="filterStore.isFilterPanelShowing">
       <FilterPanel />
     </v-col>
-    <v-col>
+    <v-col class="ml-2">
       <h1>Search</h1>
       <h2>
         <router-link to="/locuszoom" class="nav-link text-teal-accent-4">LocusZoom</router-link>
