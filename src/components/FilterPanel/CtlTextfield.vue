@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, inject, watch, onMounted } from 'vue'
+import { ref, inject, watch, onMounted } from 'vue'
 import { debounce } from 'lodash'
 import { useFilterStore } from '@/stores/FilterStore';
 import router from '@/router'

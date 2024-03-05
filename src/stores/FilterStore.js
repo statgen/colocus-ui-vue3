@@ -10,11 +10,11 @@ export const useFilterStore = defineStore('filterStore', {
     isFilterPanelShowing: true,
     countPairs: 0,
     staticData: {
+      analysisTypes: [],
       genes: [],
       phenotypes: [],
       studies: [],
       tissues: [],
-      traits: [],
     },
     searchPageData: {
       filters: {
@@ -58,13 +58,13 @@ export const useFilterStore = defineStore('filterStore', {
 
       } else {
         const d = data.value
+        console.log(d)
         this.countPairs = d.count_pairs
+        this.staticData.analysisTypes = d.analysis_types.sort()
         this.staticData.genes = d.genes.sort()
         this.staticData.phenotypes = d.phenotypes.sort()
         this.staticData.studies = d.studies.sort()
         this.staticData.tissues = d.tissues.sort()
-        this.staticData.traits = d.trait_types.sort()
-
         this.isFilterDataLoaded = true
       }
     },
