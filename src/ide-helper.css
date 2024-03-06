@@ -1,0 +1,12 @@
+/**
+ * This file serves the purpose of preventing spurious warnings from the WebStorm IDE.
+ * The file is not imported or otherwise used anywhere in the project.
+ * Each custom color added to the custom theme in vuetify.js should have a corresponding entry here.
+ * The value shouldn't matter, as, again, the file is not used by the app.
+ */
+
+:root {
+  --v-theme-clcHeading: #1E88E5; /* Fallback or actual value for IDE hinting */
+  --v-theme-something: '#00ff00';
+  --v-theme-on-something: '#00ff00';
+}

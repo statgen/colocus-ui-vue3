@@ -58,7 +58,6 @@ export const useFilterStore = defineStore('filterStore', {
 
       } else {
         const d = data.value
-        console.log(d)
         this.countPairs = d.count_pairs
         this.staticData.analysisTypes = d.analysis_types.sort()
         this.staticData.genes = d.genes.sort()

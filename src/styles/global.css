@@ -1,0 +1,18 @@
+h1 {
+  font-size: 2rem;
+  color: rgba(var(--v-theme-clcHeading), 1.0);
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: rgba(var(--v-theme-clcHeading), 1.0);
+}
+
+h3 {
+  font-size: 1rem;
+  color: rgba(var(--v-theme-clcHeading), 1.0);
+}
+
+p {
+  color: black;
+}

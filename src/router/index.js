@@ -69,6 +69,15 @@ const routes = [
     }
   },
   {
+    path: '/ss',
+    name: 'ss',
+    component: () => import('@/views/StyleSheetView.vue'),
+    beforeEnter: (to, from, next) => {
+      disableFilterButton()
+      next()
+    }
+  },
+  {
     path: '/studies',
     name: 'studies',
     component: () => import('@/views/StudiesView.vue'),

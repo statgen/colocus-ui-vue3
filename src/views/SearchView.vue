@@ -6,7 +6,7 @@
     <v-col class="ml-2">
       <h1>Search</h1>
       <h2>
-        <router-link to="/locuszoom" class="nav-link text-teal-accent-4">LocusZoom</router-link>
+        <router-link to="/locuszoom" class="text-clcAction text-decoration-none">LocusZoom</router-link>
       </h2>
     </v-col>
   </PageWrapper>

@@ -1,5 +1,5 @@
 <template>
-  <h2 v-html="controlSet.title"></h2>
+  <h3 v-html="controlSet.title"></h3>
   <v-text-field
     @update:model-value="deBouncer"
     @update:focused="trapEmpty"
@@ -73,5 +73,5 @@ const trapEmpty = (focused) => {
 </script>
 
 <style scoped>
-h2 { font-size: 1.1rem; }
+/*h2 { font-size: 1.1rem; }*/
 </style>
