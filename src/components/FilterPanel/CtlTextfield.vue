@@ -31,7 +31,7 @@ const resetInput = inject('resetInput')
 
 watch(resetInput, () => {
   inputValue.value = controlSet.defaultValue
-  filterStore.updateFilters(controlSet.storeKey, controlSet.defaultValue)
+  filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
 const DEBOUNCE_DELAY = 500
@@ -44,7 +44,7 @@ const validateDebouncedInput = (newValue) => {
   const rule = controlSet.rules[0] // assumption: there is only one rule
   // need explicit comparison to true, as the rule returns a string, the error message, which is truthy, if invalid input
   if (rule(newValue) === true) {
-    filterStore.updateFilters(controlSet.storeKey, newValue)
+    filterStore.updateFilter(controlSet.storeKey, newValue)
   } else {
     // do nothing, error message is displayed by the control
   }
@@ -67,7 +67,7 @@ const trapEmpty = (focused) => {
   const ev = controlSet.emptyValue
   if(!focused && inputValue.value.length === 0 ) {
     inputValue.value = ev
-    filterStore.updateFilters(controlSet.storeKey, ev)
+    filterStore.updateFilter(controlSet.storeKey, ev)
   }
 }
 </script>

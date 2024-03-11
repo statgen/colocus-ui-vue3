@@ -67,7 +67,7 @@ export const useFilterStore = defineStore('filterStore', {
         this.isFilterDataLoaded = true
       }
     },
-    updateFilters(key, value) {
+    updateFilter(key, value) {
       const route = router.currentRoute.value
       const routeName = route.name
       const parentKey = pageStoreDataMap[routeName]

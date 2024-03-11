@@ -35,7 +35,7 @@ const { controlSet } = defineProps({
 })
 
 const modelChanged = (newValue) => {
-  filterStore.updateFilters(controlSet.storeKey, newValue)
+  filterStore.updateFilter(controlSet.storeKey, newValue)
 }
 
 const selectedItems = ref([])
@@ -44,7 +44,7 @@ const resetInput = inject('resetInput')
 
 watch(() => resetInput.value, () => {
   selectedItems.value = controlSet.defaultValue
-  filterStore.updateFilters(controlSet.storeKey, controlSet.defaultValue)
+  filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
 const loadFPControls = inject('loadFPControls')
@@ -78,5 +78,4 @@ const mlc = ((itemTitle, queryText, item) => {
 </script>
 
 <style scoped>
-/*h2 { font-size: 1.1rem; }*/
 </style>

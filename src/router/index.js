@@ -25,28 +25,16 @@ const routes = [
     path: '/',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
-    beforeEnter: (to, from, next) => {
-      disableFilterButton()
-      next()
-    }
   },
   {
     path: '/genes',
     name: 'genes',
     component: () => import('@/views/GenesView.vue'),
-    beforeEnter: (to, from, next) => {
-      disableFilterButton()
-      next()
-    }
   },
   {
     path: '/help',
     name: 'help',
     component: () => import('@/views/HelpView.vue'),
-    beforeEnter: (to, from, next) => {
-      disableFilterButton()
-      next()
-    }
   },
   {
     path: '/locuszoom',
@@ -72,28 +60,16 @@ const routes = [
     path: '/ss',
     name: 'ss',
     component: () => import('@/views/StyleSheetView.vue'),
-    beforeEnter: (to, from, next) => {
-      disableFilterButton()
-      next()
-    }
   },
   {
     path: '/studies',
     name: 'studies',
     component: () => import('@/views/StudiesView.vue'),
-    beforeEnter: (to, from, next) => {
-      disableFilterButton()
-      next()
-    }
   },
   {
     path: '/traits',
     name: 'traits',
     component: () => import('@/views/TraitView.vue'),
-    beforeEnter: (to, from, next) => {
-      disableFilterButton()
-      next()
-    }
   },
 ]
 
@@ -103,6 +79,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async(to, from) => {
+  disableFilterButton()
   await loadFilterData()
 })
 

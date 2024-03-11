@@ -5,7 +5,7 @@
     </v-col>
     <v-col class="ml-2">
       <h1>
-        <v-icon icon="mdi-arrow-left-circle" @click="router.back()" class="mx-0 mb-2 text-teal-accent-4" size="28px"/>
+        <v-icon icon="mdi-arrow-left-circle" @click="router.back()" color="clcAction" class="mx-0 mb-2" size="28px"/>
         Locus Zoom
       </h1>
     </v-col>

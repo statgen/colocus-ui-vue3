@@ -27,11 +27,11 @@ const resetInput = inject('resetInput')
 
 watch(resetInput, () => {
   controlValue.value = controlSet.defaultValue
-  filterStore.updateFilters(controlSet.storeKey, controlSet.defaultValue)
+  filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
 const modelChanged = (newValue) => {
-  filterStore.updateFilters(controlSet.storeKey, newValue)
+  filterStore.updateFilter(controlSet.storeKey, newValue)
 }
 
 const populateControlData = () => {
