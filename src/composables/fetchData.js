@@ -28,3 +28,5 @@ export const useFetchData = () => {
     ...toRefs(state), fetchData
   }
 }
+
+export default useFetchData()

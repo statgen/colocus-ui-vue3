@@ -1,15 +1,13 @@
 <template>
-  <PageWrapper>
-    <v-col cols="2" v-show="filterStore.isFilterPanelShowing">
+    <v-col v-show="filterStore.isFilterPanelShowing" class="filter-panel-container">
       <FilterPanel />
     </v-col>
-    <v-col class="ml-2">
+  <v-col :cols="filterStore.isFilterPanelShowing ? 10 : 12" class="ml-2">
       <h1>
-        <v-icon icon="mdi-arrow-left-circle" @click="router.back()" color="clcAction" class="mx-0 mb-2" size="28px"/>
+        <v-icon icon="mdi-arrow-left-circle" @click="router.back()" color="clcAction" class="mx-0 mb-2" size="24px"/>
         Locus Zoom
       </h1>
     </v-col>
-  </PageWrapper>
 </template>
 
 <script setup>
@@ -29,4 +27,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.filter-panel-container {
+  max-width: 275px;
+}
 </style>

@@ -3,9 +3,7 @@
 This is a Vue 3 app built using Vuetify 3. It is loosely based on the Vue 2/Vuetify 2 app.
 
 ## Page structure
-Overall page structure is defined in App.vue, which simply loads the toolbar, provides a <main> section, where router views are displayed, followed by the footer.
-
-Each page of the application pages is defined in a separate file in the src/views folder. A <PageWrapper> component surrounds all content on each page, providing uniform spacing for the global header and footer. <PageWrapper> utilizes a single slot which houses all content for a given page. <PageWrapper> is a Vuetify <v-row> component, which will typically have <v-col> components defined within the page views. For example, the SearchView page has two columns, one for the <FilterPanel> component, and one for the page view content.
+Overall page structure is defined in App.vue, which simply loads the toolbar, provides a <v-main> section, where router views are displayed, followed by the footer. The <v-main> section is a Vuetify <v-row>. Each page of the application pages is defined in a separate file in the src/views folder. Each view file will typically wrap their content in Vuetify <v-col> elements. 
 
 ## FilterPanel
 The <FilterPanel> component is completely defined in a separate folder under src/components. It consists of several subpanels, each of which contains a set of controls. Key elements of the <FilterPanel> component include the following:
