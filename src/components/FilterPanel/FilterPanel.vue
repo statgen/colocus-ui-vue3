@@ -25,12 +25,12 @@
 </template>
 
 <script setup>
-import { useFilterStore } from '@/stores/FilterStore';
+import { useFilterStore } from '@/stores/FilterStore'
 
-const filterStore = useFilterStore();
+const filterStore = useFilterStore()
 
 const POS_DECIMAL_REGEX = /^\d*\.?\d*$/
-const CHR_REGION_REGEX = /^[12]\d?:\d+-\d+$/
+const CHR_REGION_REGEX = /^\d\d?:\d+-\d+$/
 
 const rules = {
   posDecRule: v => (!!v && POS_DECIMAL_REGEX.test(v)) || "Must be positive number ≥ 0",

@@ -9,6 +9,7 @@ export const useFetchData = () => {
   })
 
   const fetchData = async (url, options) => {
+    // console.log('loading url:',url)
     state.isLoading = true
     try {
       const response = await fetch(url, options)
@@ -22,11 +23,10 @@ export const useFetchData = () => {
     } finally {
       state.isLoading = false
     }
+    return !state.hasError
   }
 
   return {
     ...toRefs(state), fetchData
   }
 }
-
-export default useFetchData()

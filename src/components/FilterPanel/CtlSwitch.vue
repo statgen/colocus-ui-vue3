@@ -2,7 +2,7 @@
   <div class="ml-2 mb-n4 pa-0">
     <v-switch
       :label="controlSet.title"
-      @update:model-value="modelChanged"
+      @update:model-value="onModelChanged"
       v-model="controlValue"
       density="compact"
     />
@@ -11,39 +11,35 @@
 
 <script setup>
 import { inject, onMounted, ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore';
-import router from '@/router'
-import { pageStoreDataMap } from '@/constants'
-
-const filterStore = useFilterStore();
-
-const controlValue = ref(false)
+import { useFilterStore } from '@/stores/FilterStore'
+import { PAGE_STORE_DATA_MAP } from '@/constants'
 
 const { controlSet } = defineProps({
   controlSet: {}
 })
 
+const filterStore = useFilterStore()
+const controlValue = ref(false)
+
 const resetInput = inject('resetInput')
 
 watch(resetInput, () => {
   controlValue.value = controlSet.defaultValue
-  filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  filterStore.updateSwitch(controlSet.storeKey, controlSet.defaultValue)
 })
-
-const modelChanged = (newValue) => {
-  filterStore.updateFilter(controlSet.storeKey, newValue)
-}
-
-const populateControlData = () => {
-  const route = router.currentRoute.value
-  const routeName = route.name
-  const parentKey = pageStoreDataMap[routeName]
-  controlValue.value = filterStore[parentKey].filters[controlSet.storeKey]
-}
 
 onMounted(() => {
   populateControlData()
 })
+
+const onModelChanged = (newValue) => {
+  filterStore.updateSwitch(controlSet.storeKey, newValue)
+}
+
+const populateControlData = () => {
+  const parentKey = PAGE_STORE_DATA_MAP[filterStore.currentPageName]
+  controlValue.value = filterStore[parentKey][controlSet.storeKey]
+}
 
 </script>
 

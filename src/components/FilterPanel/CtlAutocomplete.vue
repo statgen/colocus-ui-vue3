@@ -5,7 +5,7 @@
     :custom-filter="mlc"
     :placeholder="controlSet.placeholder"
     v-model="selectedItems"
-    @update:model-value="modelChanged"
+    @update:model-value="onModelChanged"
 
     auto-select-first
     bg-color="white"
@@ -22,59 +22,76 @@
 </template>
 
 <script setup>
-import { watch, ref, inject, onMounted } from 'vue'
+// *** Imports *****************************************************************
+import { inject, onMounted, ref, watch  } from 'vue'
 import { matchLowercase } from '@/util/util'
-import { useFilterStore } from '@/stores/FilterStore';
-import router from '@/router'
-import { pageStoreDataMap } from '@/constants'
+import { useFilterStore } from '@/stores/FilterStore'
+import { PAGE_STORE_DATA_MAP } from '@/constants'
 
-const filterStore = useFilterStore();
+// *** Composables *************************************************************
+const filterStore = useFilterStore()
 
+// *** Props *******************************************************************
 const { controlSet } = defineProps({
   controlSet: {}
 })
 
-const modelChanged = (newValue) => {
-  filterStore.updateFilter(controlSet.storeKey, newValue)
-}
-
+// *** Variables ***************************************************************
 const selectedItems = ref([])
+const selectListItems = ref([])
 
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+const loadFPControls = inject('loadFPControls')
 const resetInput = inject('resetInput')
+const preloadGenes = inject('preloadGenes')
 
+// *** Emits *******************************************************************
+// *** Watches *****************************************************************
 watch(() => resetInput.value, () => {
   selectedItems.value = controlSet.defaultValue
   filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
-const loadFPControls = inject('loadFPControls')
+watch(() => preloadGenes.value, () => {
+  if(controlSet.storeKey === 'genes') {
+    selectedItems.value = preloadGenes.value
+    filterStore.updateFilter(controlSet.storeKey, preloadGenes.value)
+  }
+})
 
 watch(() => loadFPControls.value, (newValue, oldValue) => {
   populateControlSelectList()
 })
 
-const selectListItems = ref([]);
-
-const populateControlSelectList = () => {
-  selectListItems.value = filterStore.staticData[controlSet.storeKey]
-}
-
-const populateControlData = () => {
-  const route = router.currentRoute.value
-  const routeName = route.name
-  const parentKey = pageStoreDataMap[routeName]
-  selectedItems.value = filterStore[parentKey].filters[controlSet.storeKey]
-}
-
+// *** Lifecycle hooks *********************************************************
 onMounted(() => {
   populateControlSelectList()
   populateControlData()
 })
 
+// *** Event handlers **********************************************************
+const onModelChanged = (newValue) => {
+  console.log('model changed')
+  filterStore.updateFilter(controlSet.storeKey, newValue)
+}
+
+// *** Utility functions *******************************************************
 const mlc = ((itemTitle, queryText, item) => {
   return matchLowercase(queryText, itemTitle)
 })
 
+const populateControlSelectList = () => {
+  selectListItems.value = filterStore.filterLists[controlSet.storeKey]
+}
+
+const populateControlData = () => {
+  const parentKey = PAGE_STORE_DATA_MAP[filterStore.currentPageName]
+  selectedItems.value = filterStore[parentKey].filters[controlSet.storeKey]
+}
+
+// *** Configuration data ******************************************************
 </script>
 
 <style scoped>

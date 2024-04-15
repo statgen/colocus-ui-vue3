@@ -1,7 +1,5 @@
 <template>
-  <PageWrapper>
-    <h1>Traits</h1>
-  </PageWrapper>
+  <h1>Traits</h1>
 </template>
 
 <script setup>

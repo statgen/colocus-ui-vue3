@@ -6,7 +6,7 @@ This is a Vue 3 app built using Vuetify 3. It is loosely based on the Vue 2/Vuet
 Overall page structure is defined in App.vue, which simply loads the toolbar, provides a <v-main> section, where router views are displayed, followed by the footer. The <v-main> section is a Vuetify <v-row>. Each page of the application pages is defined in a separate file in the src/views folder. Each view file will typically wrap their content in Vuetify <v-col> elements. 
 
 ## FilterPanel
-The <FilterPanel> component is completely defined in a separate folder under src/components. It consists of several subpanels, each of which contains a set of controls. Key elements of the <FilterPanel> component include the following:
+The <FilterPanel> component is a composite that is defined by a set of nested files in its own folder under src/components. It consists of several subpanels, each of which contains a set of controls. Key elements of the <FilterPanel> component include the following:
 - a template section that defines the component hierarchy.
 - a data structure, controlConfig, that contains configuration data for all of the controls
 - regex patterns used for input validation
@@ -27,29 +27,33 @@ The <CtlSwitch> component is similar, but simpler. It also listens for a reset s
 The <CtlTextfield> component is similar. It also listens for a reset signal, and responds to user input by updating the Pinia store. It also debounces user input, to avoid needlessly triggering API calls upon incomplete input. It also applies the passed-in rule to the user input. On invalid input, a message, which is actually part of the rule definition in <FilterPanel> is displayed in red by the control. The only other thing of note is a function, trapEmpty, that checks whether the control has a value when it loses focus, and if not, provides an 'empty' value, passed in from the data structure in the parent <FilterPanel>.
 
 ## Search metadata loading
-There is a Vue 3 composable, featchData.js, that handles data loading. Getting it working was tricky, so worthy of some explanation. Initially I tried loading the search metadata in the App.vue file, but it actually loads its elements in an async manner. So, for example, you can't assume that the Pinia store is ready when loading a page such as Search. Normally it would be, as you would access it after loading the Home page. But if you force-reload on the Search page, the page will display before the store is ready. This would also occur if a user bookmarked the search page (even though at present their filter settings would not be restored on direct access to the page).
+There is a Vue 3 composable, featchData.js, that handles data loading. Getting it working with the filter controls was tricky, so worthy of some explanation. Initially I tried loading the search metadata in the App.vue file, but it actually appers to load its elements in an async manner. So, for example, you can't assume that the Pinia store is ready when loading a page such as Search. Normally it would be, as you would access it after loading the Home page. But if you force-reload on the Search page, the page will display before the store is ready. This would also occur if a user bookmarked the search page (even though at present their filter settings would not be restored on direct access to the page).
 
-The most reliable way I found to load the search metadata was to use the route guard, beforeEach. It calls a local function, loadFilterData, which checks a flag on the store to see if data is loaded, and if not, calls the store's loadFilterData function.
+The most reliable way I found to load the search metadata was to use the route guard, beforeEach, which loads the filter data if it hasn't already been loaded.
 
 ## Pinia store
 
-Currently, there is one Pinia store, and it holds all app state. At the top level, this includes flags for whether the filter panel and filter button are displayed, and whether data is loaded. Then there is a variable for count_pairs, which is returned by the API call, along with the data for the select lists (analysis types, genes, phenotypes, studies, and tissues). These five latter are stored under the key, staticData. Then there are keys for searchPageData and locusZoomPageData, which store the run-time values entered or selected by the user.
+Currently, there is one Pinia store, and it holds all app state. At the top level, this includes a set of general keys, plus a set of keys for the main views (search, locuszoom, manhattan (probably, assuming it needs filter)). A function provides the data structure to ensure consistency across pages and to avoid repitition. There are also two objects that function as maps between 1) data key names in the app vs those expected by the API, and 2) sort keys expected by the back end.
 
-The most important action method is loadFilterData, which is an async function that in turn relies on the async composable, fetchData.js. LoadFilterData calls the composable and either throws an error or populates the staticData keys for use by the FilterPanel controls.
+This store started off supporting data structures required by the filtering system, but has grown, and may be renamed or split into separate stores as development proceeds.
 
-The action updateFilter is a helper for the filter panel components. updateFilter updates the appropriate value in the appropriate key, depending on which page (Search or LocusZoom) the user is on.
-
-The action toggleFilterPanel is used by the <Toolbar> to show and hide the filter panel.
-
-The action CopySearchFilterToLZ copies the filter panel data for the search page into the corresponding keys for the LocusZoom page, and is called by the router before entering the LocusZoom page.
+### Important action methods
+- buildSearchURL builds a URL based on all filter and sort criteria and formats it for consumption by the Django REST API back end.
+- checkGenes accepts a comma-delimited list of genes and returns an object containt two arrays, badGenes, and goodGenes. This is used in the case where an external entity (such as AMP) specifies a gene as a query string in a URL directed at the search page.
+- copySearchFilterToLZ copies the filter panel data for the search page into the corresponding keys for the LocusZoom page, and is called by the router before entering the LocusZoom page.
+- loadFilterData relies on the async composable, fetchData.js to load the filter data lists and populates the filterLists keys for use by the FilterPanel controls.
+- updateFilter is a helper for the filter panel components. updateFilter updates the appropriate value in the appropriate key, depending on which page (Search or LocusZoom) the user is on.
+- updateSort updates the store key storing sort parameters that end up in the URL.
+- updateSwitch updates the booleans tracking the display of the ensemble IDs and the concordance values.
+- toggleFilterPanel is used by the <Toolbar> to show and hide the filter panel.
 
 ## Router
 For most pages, the router simply provides a link to the corresponding view file. The Search and LocusZoom pages enable the filter panel and button, and the LocusZoom page copies user filter panel selections and entries from the Search page data.
 
-There is a global route guard, beforeEach, which disables the filter panel and calls the local loadFilterData function, which in turn calls the loader in the Pinia store if needed.
+There is a global route guard, beforeEach, which disables the filter panel and loads filter data if needed.
 
 ## Styling
-A key design goal of this iteration of Colocus was to centralize style definitions as much as possible. Vuetify has an extensive color management system, based on Google's Material Design, but it only covers Vuetiy components, not native HTML elements, such as headings. The solution is to define a custom theme in the Vuetify loader, and then have a global css file that references variables from it. (The global css file is imported in main.js.)
+A key design goal of this iteration of Colocus was to centralize style definitions as much as possible. Vuetify has an extensive color management system, based on Google's Material Design, but it only covers Vuetify components, not native HTML elements, such as headings, spans, etc. The solution is to define a custom theme in the Vuetify loader, and then have a global css file that references variables from it. (The global css file is imported in main.js.)
 
 A custom theme may be viewed as an overlay on the built-in theme, where it is possible to override built-in values and add new color keys. Initially, we have chosen the latter approach, defining several color values in plugins/vuetify.js (where the clc prefix stands for Colocus color):
 
@@ -94,3 +98,44 @@ The file src/ide-helper.css functions to prevent spurious warnings from the WebS
 It is unnecessary to explicitly import components in this app. Importing is handled by a plug-in called unplugin-vue-components. This plugin automatically imports .vue files created in the src/components directory, and registers them as global components. Then, when the template is rendered, the appropriate import statement is injected.
 
 This means that you can use any component in the application without having to manually import it. You can add additional folders in the plugins.Components.dirs array in vite.config.mjs. The advantage is that it simplifies refactoring the src/components directory. The WebStorm IDE currently does not understand this, so it highlights non-imported component references as if they were errors. Note: If you move files around while the app is running, you'll have to restart the node server.
+
+## Specific views
+
+### Search view
+The Search View provides a context for displaying a data table. It uses the Vue 'provide' mechanism for three variables.
+- loadFPControls: a Boolean that when toggled tells the underlying controls on the filter panels to load their select lists (from the Pinia store)
+- loadTableDataFlag: a Boolean that when toggled tells the data table to load data.
+- preloadGenes: an array variable that when set tells the underlying Genes control to adopt the provided values as if they had been selected by the user. (The values actually come in through a URL.) Setting this value also triggers a data load of the main data table. The sequence here is:
+  - Extract gene string from URL query string
+  - If there are valid genes, update preLoadGenes
+  - Through provide/inject this causes the underlying AutoComplete to call the updateFilter method on the Pinia store
+  - UpdateFilter adds the selected gene(s) to the filter data, then toggles local variable filterDataChange
+  - The DataTable component watches the variable and triggers a data load when it changes.
+The reason the DataTable has to watch filterStore.filterDataChanged, instead of using provide/inject, is that it is not possible to use that mechanism from within a Pinia store. The effect is the same, it's just a different way of triggering a desired event.
+
+## Misc debugging hints
+- use {{ $log() }} in templates to log local values to console. This is defined in main.js
+
+## Section headings in component files
+```
+// *** Imports *****************************************************************
+// *** Composables *************************************************************
+// *** Props *******************************************************************
+// *** Variables ***************************************************************
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
+// *** Watches *****************************************************************
+// *** Lifecycle hooks *********************************************************
+// *** Event handlers **********************************************************
+// *** Utility functions *******************************************************
+// *** Configuration data ******************************************************
+```
+
+## Naming conventions
+- Name event handlers with preceding 'on', eg onRowClick
+- Prefix booleans with is, eg: isLoading
+- Put destructured imports in alphabetical order, eg import { onMounted, provide, ref, watch } from 'vue'
+- Imports should be in this order: Vue, third-party libraries, app-level imports
+- List variables, props, watches, computeds, etc., within a section, in alphabetical order

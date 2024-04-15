@@ -9,4 +9,8 @@
   --v-theme-clcHeading: #1E88E5; /* Fallback or actual value for IDE hinting */
   --v-theme-something: '#00ff00';
   --v-theme-on-something: '#00ff00';
+  --v-theme-clcEffPos: '#fc8d59';
+  --v-theme-clcEffNeg: '#91bfdb';
+  --v-theme-clcEffZero: '#A9A9A9';
+  --v-theme-clcEffNA: '#ffffff';
 }

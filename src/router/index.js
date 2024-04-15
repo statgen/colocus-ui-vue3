@@ -2,13 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { useFilterStore } from '@/stores/FilterStore'
 
-const loadFilterData = async ()  => {
-  const filterStore = useFilterStore()
-  if(!filterStore.isFilterDataLoaded) {
-    await filterStore.loadFilterData();
-  }
-}
-
 const enableFiltering = (page) => {
   const filterStore = useFilterStore()
   filterStore.isFilterButtonShowing = true
@@ -48,6 +41,11 @@ const routes = [
     }
   },
   {
+    path: '/manhattan',
+    name: 'manhattan',
+    component: () => import('@/views/ManhattanView.vue'),
+  },
+  {
     path: '/search',
     name: 'search',
     component: () => import('@/views/SearchView.vue'),
@@ -79,8 +77,11 @@ const router = createRouter({
 })
 
 router.beforeEach(async(to, from) => {
-  disableFilterButton()
-  await loadFilterData()
+  const filterStore = useFilterStore()
+  const nextPage = to.name
+  filterStore.currentPageName = nextPage
+  if (!['search', 'locuszoom'].includes(nextPage)) disableFilterButton()
+  if (!filterStore.isFilterDataLoaded) await filterStore.loadFilterData()
 })
 
 export default router

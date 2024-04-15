@@ -15,6 +15,6 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-app.config.globalProperties.$log = console.log // use $log(something) inside templates, eg: {{ $log(something) }}
+app.config.globalProperties.$log = console.log // use {{ $log(something) }} inside templates
 
 app.mount('#app')

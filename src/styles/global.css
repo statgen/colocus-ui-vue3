@@ -1,3 +1,10 @@
+/* adding global var colors */
+/*:root {
+  --v-theme-tooltip-background: #333;
+  --v-theme-tooltip-color: #fff;
+}
+*/
+
 h1 {
   font-size: 2rem;
   color: rgba(var(--v-theme-clcHeading), 1.0);
@@ -13,6 +20,9 @@ h3 {
   color: rgba(var(--v-theme-clcHeading), 1.0);
 }
 
+/*
 p {
   color: black;
+  font-size: 1rem;
 }
+*/
