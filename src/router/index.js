@@ -2,15 +2,18 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { useFilterStore } from '@/stores/FilterStore'
 
-const enableFiltering = (page) => {
+const SHOW_FILTER_PANEL = true
+
+const enableFiltering = (panelIsVisible) => {
   const filterStore = useFilterStore()
   filterStore.isFilterButtonShowing = true
-  filterStore.isFilterPanelShowing = true
+  filterStore.isFilterPanelShowing = panelIsVisible
 }
 
-const disableFilterButton = () => {
+const disableFiltering = () => {
   const filterStore = useFilterStore()
   filterStore.isFilterButtonShowing = false
+  filterStore.isFilterPanelShowing = false
 }
 
 const routes = [
@@ -34,23 +37,27 @@ const routes = [
     name: 'locuszoom',
     component: () => import('@/views/LocusZoomView.vue'),
     beforeEnter: (to, from, next) => {
-      enableFiltering('locusZoomPageData')
+      enableFiltering(SHOW_FILTER_PANEL)
       const filterStore = useFilterStore()
       filterStore.copySearchFiltersToLZ()
       next()
     }
   },
   {
-    path: '/manhattan',
+    path: '/manhattan/:analysis_id',
     name: 'manhattan',
     component: () => import('@/views/ManhattanView.vue'),
+    beforeEnter: (to, from, next) => {
+      enableFiltering(!SHOW_FILTER_PANEL)
+      next()
+    }
   },
   {
     path: '/search',
     name: 'search',
     component: () => import('@/views/SearchView.vue'),
     beforeEnter: (to, from, next) => {
-      enableFiltering('searchPageData')
+      enableFiltering(SHOW_FILTER_PANEL)
       next()
     }
   },
@@ -78,9 +85,8 @@ const router = createRouter({
 
 router.beforeEach(async(to, from) => {
   const filterStore = useFilterStore()
-  const nextPage = to.name
-  filterStore.currentPageName = nextPage
-  if (!['search', 'locuszoom'].includes(nextPage)) disableFilterButton()
+  filterStore.currentPageName = to.name
+  disableFiltering()
   if (!filterStore.isFilterDataLoaded) await filterStore.loadFilterData()
 })
 

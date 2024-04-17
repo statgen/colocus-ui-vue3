@@ -1,6 +1,7 @@
 const PAGE_STORE_DATA_MAP = {
   search: 'searchPageData',
-  locuszoom: 'locusZoomPageData'
+  locuszoom: 'locuszoomPageData',
+  manhattan: 'manhattanPageData',
 }
 
 const BIOMARKER_TYPES = Object.freeze({
@@ -12,8 +13,10 @@ const BIOMARKER_TYPES = Object.freeze({
 const VARIANT_COLOR_MAP = [0.7, 0.8, 0.7]
 
 const URLS = {
-  DATA: '/api/v1/coloc/',
-  FILTER_DATA: '/api/v1/internal/search_metadata/'
+  SEARCH_DATA: '/api/v1/coloc/',
+  FILTER_DATA: '/api/v1/internal/search_metadata/',
+  TRAIT_DATA: '/api/v1/analysis/',
+  LZ_DATA: '',
 }
 
 export { BIOMARKER_TYPES, PAGE_STORE_DATA_MAP, VARIANT_COLOR_MAP, URLS

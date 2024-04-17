@@ -73,7 +73,6 @@ onMounted(() => {
 
 // *** Event handlers **********************************************************
 const onModelChanged = (newValue) => {
-  console.log('model changed')
   filterStore.updateFilter(controlSet.storeKey, newValue)
 }
 

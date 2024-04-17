@@ -12,10 +12,10 @@ export const useDataTableHelpers = () => {
   }
 
   watch(() => filterStore.searchPageData.showEnsIDs, newValue => {showEnsIDs.value = newValue})
-  watch(() => filterStore.locusZoomPageData.showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => filterStore.locuszoomPageData.showEnsIDs, newValue => {showEnsIDs.value = newValue})
 
   watch(() => filterStore.searchPageData.showEffects, newValue => {showEffects.value = newValue})
-  watch(() => filterStore.locusZoomPageData.showEffects, newValue => {showEffects.value = newValue})
+  watch(() => filterStore.locuszoomPageData.showEffects, newValue => {showEffects.value = newValue})
 
   const alwaysShow = () => true
 

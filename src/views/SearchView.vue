@@ -82,7 +82,6 @@ onMounted(() => {
 
 // *** Event handlers **********************************************************
 const onDataTableRowClick = () => {
-  console.log('dataTableRowClick')
   router.push({ name: 'locuszoom', params: {} })
 }
 

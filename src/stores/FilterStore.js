@@ -1,12 +1,12 @@
+import { nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import router from '@/router'
 import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
-import { ppURL } from '@/util/util'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
     filterDataChanged: false,
+    lastFilterUpdated: '',
     currentPageName: '',
     isFilterDataLoaded: false,
     isFilterButtonShowing: true,
@@ -25,7 +25,8 @@ export const useFilterStore = defineStore('filterStore', {
       tissues: [],
     },
     searchPageData: getDefaultPageData(),
-    locusZoomPageData: getDefaultPageData(),
+    locuszoomPageData: getDefaultPageData(),
+    manhattanPageData: getDefaultPageData(),
   }),
   actions: {
     buildSearchURL (urlPath) {
@@ -71,12 +72,12 @@ export const useFilterStore = defineStore('filterStore', {
     },
     copySearchFiltersToLZ() {
       for (const [key, value] of Object.entries(this.searchPageData.filters)) {
-        this.locusZoomPageData.filters[key] = value
+        this.locuszoomPageData.filters[key] = value
       }
-      this.locusZoomPageData.filters.showEnsIDs = this.searchPageData.filters.showEnsIDs
-      this.locusZoomPageData.filters.showEffects = this.searchPageData.filters.showEffects
-      this.locusZoomPageData.filters.itemsPerPage = this.searchPageData.filters.itemsPerPage
-      this.locusZoomPageData.filters.pageNum = 1
+      this.locuszoomPageData.filters.showEnsIDs = this.searchPageData.filters.showEnsIDs
+      this.locuszoomPageData.filters.showEffects = this.searchPageData.filters.showEffects
+      this.locuszoomPageData.filters.itemsPerPage = this.searchPageData.filters.itemsPerPage
+      this.locuszoomPageData.filters.pageNum = 1
     },
     async loadFilterData() {
       if(this.isFilterDataLoaded) return
@@ -92,19 +93,27 @@ export const useFilterStore = defineStore('filterStore', {
       }
     },
     async updateFilter(key, value) {
-      console.log('fs: updating filter, loading data')
+      // following is to ignore a double hit when changing page size in <DataTable>; page num also changes
+      if(this.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
+
       const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
-      if(Object.hasOwn(this[parentKey].filters, key)) {
-        this[parentKey].filters[key] = value
-        if(key === 'pageSize') this[parentKey].filters.pageNum = 1
-        if(key !== 'pageSize' && key !=='pageNum') this[parentKey].filters.pageNum = 1
-        this.filterDataChanged = !this.filterDataChanged
+      const filters = this[parentKey].filters
+
+      if(!Object.hasOwn(filters, key)) {
+        throw new Error('bad key specified for filter update')
       } else {
-        throw new Error('bad key specified for update')
+        filters[key] = value
+
+        if(key ==='pageSize' || !['pageSize', 'pageNum'].includes(key) ) {
+          // console.log('uf, ps, pn:', filters.pageSize, filters.pageNum)
+          filters.pageNum = 1
+        }
+
+        this.lastFilterUpdated = key
+        this.filterDataChanged = !this.filterDataChanged
       }
     },
     async updateSort(newSort) {
-      console.log('fs: sort updated, loading data')
       const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
       this[parentKey].sortKeys = newSort
       this.filterDataChanged = !this.filterDataChanged

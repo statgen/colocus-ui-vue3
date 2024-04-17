@@ -5,7 +5,9 @@ This is a Vue 3 app built using Vuetify 3. It is loosely based on the Vue 2/Vuet
 ## Page structure
 Overall page structure is defined in App.vue, which simply loads the toolbar, provides a <v-main> section, where router views are displayed, followed by the footer. The <v-main> section is a Vuetify <v-row>. Each page of the application pages is defined in a separate file in the src/views folder. Each view file will typically wrap their content in Vuetify <v-col> elements. 
 
-## FilterPanel
+## Major components
+
+### FilterPanel
 The <FilterPanel> component is a composite that is defined by a set of nested files in its own folder under src/components. It consists of several subpanels, each of which contains a set of controls. Key elements of the <FilterPanel> component include the following:
 - a template section that defines the component hierarchy.
 - a data structure, controlConfig, that contains configuration data for all of the controls
@@ -14,9 +16,9 @@ The <FilterPanel> component is a composite that is defined by a set of nested fi
 
 Standard Vue props pass key data elements down to the subpanels and individual controls.
 
-Each subpanel has an optional reset button, which will reset its contained controls back to a default state, which is passed to the controls via the controlSet prop, as specified in the top level <FilterPanel>. The subpanels and controls utilize Vue 3's provide/inject mechanism to dynamically pass messages. For example, when the user clicks the Reset button, it flips the value of a local ref variable, resetInput, and that variable is used by the provide mechanism.
+Each subpanel has an optional reset button, which will reset its contained controls back to a default state, which is passed to the controls via the controlSet prop, as specified in the top level <FilterPanel>. The subpanels and controls utilize Vue 3's provide/inject mechanism to dynamically pass messages. For example, when the user clicks the Reset button, it flips the value of a local ref variable, resetInput, and that variable is used by the provide mechanism. 
 
-Then, in the underlying controls, Vue's inject mechanism allows monitoring of that variable's state. When the state changes, the control reloads itself, and updates the Pinia store with the default value.
+Then, in the underlying controls, Vue's inject mechanism allows monitoring of that variable's state. When the state changes, the control reloads itself, and updates the Pinia store with the default value. For example, all the child components of a given filter sub panel respond to the same reset signal.
 
 All of the underlying controls are composites, consisting of a text label, whose value is passed in as a prop (controlSet.title), plus a wrapper around a standard Vuetify control (AutoComplete, TextField, Switch).
 
@@ -26,18 +28,41 @@ The <CtlSwitch> component is similar, but simpler. It also listens for a reset s
 
 The <CtlTextfield> component is similar. It also listens for a reset signal, and responds to user input by updating the Pinia store. It also debounces user input, to avoid needlessly triggering API calls upon incomplete input. It also applies the passed-in rule to the user input. On invalid input, a message, which is actually part of the rule definition in <FilterPanel> is displayed in red by the control. The only other thing of note is a function, trapEmpty, that checks whether the control has a value when it loses focus, and if not, provides an 'empty' value, passed in from the data structure in the parent <FilterPanel>.
 
-## Search metadata loading
+### Search metadata loading
 There is a Vue 3 composable, featchData.js, that handles data loading. Getting it working with the filter controls was tricky, so worthy of some explanation. Initially I tried loading the search metadata in the App.vue file, but it actually appers to load its elements in an async manner. So, for example, you can't assume that the Pinia store is ready when loading a page such as Search. Normally it would be, as you would access it after loading the Home page. But if you force-reload on the Search page, the page will display before the store is ready. This would also occur if a user bookmarked the search page (even though at present their filter settings would not be restored on direct access to the page).
 
 The most reliable way I found to load the search metadata was to use the route guard, beforeEach, which loads the filter data if it hasn't already been loaded.
 
-## Pinia store
+### Data table
+The <DataTable> component, along with all child components, is defined in a subdirectory of /src/components. In order to reduce the complexity of the main file, some routines and configuration data have been moved to a composable, DataTableHelpers, in /src/composables.
+
+### Data loading
+
+The way it currently works:
+
+Search page loads. It has provide flags for:
+- loadFPControls
+- preLoadGenes
+- loadDataTableFlag
+  In onMounted, loadFPControls is flipped to load the filter control lists. Then either preLoadGenes or loadDataTableFlag is flipped, depending on whether there is a gene specified in the url.
+
+The Manhattan page has the same flags.
+
+The DataTable component injects the loadDataTableFlag and watches it. Whenever it changes, the watcher executes loadTableData.
+
+Whenever filter data changes, the associated control calls filterStore.updateFilter. It then flips filterDataChanged. The DataTable watches that, and executes loadTableData whenever it flips.
+
+Whenever the user changes page or page size, filterStore.updateFilter is again called, which flips flag filterDataChanged. There is logic as to when it will do so. Mainly, we want to ignore a page num event immediately after a page size event. Otherwise, the flag if flipped twice in succession, and the watch in the DataTable misses the change, so data is not loaded.
+
+### Pinia store
 
 Currently, there is one Pinia store, and it holds all app state. At the top level, this includes a set of general keys, plus a set of keys for the main views (search, locuszoom, manhattan (probably, assuming it needs filter)). A function provides the data structure to ensure consistency across pages and to avoid repitition. There are also two objects that function as maps between 1) data key names in the app vs those expected by the API, and 2) sort keys expected by the back end.
 
 This store started off supporting data structures required by the filtering system, but has grown, and may be renamed or split into separate stores as development proceeds.
 
-### Important action methods
+The data structure includes global state variables (e.g., isDataLoaded), plus page-specific data for each page that uses a filter panel. The page-specific data includes the values of the controls, plus additional entries for page size and page number, all of which are brought together, along with the sort keys, to build the URL for the Django back end.
+
+#### Important action methods
 - buildSearchURL builds a URL based on all filter and sort criteria and formats it for consumption by the Django REST API back end.
 - checkGenes accepts a comma-delimited list of genes and returns an object containt two arrays, badGenes, and goodGenes. This is used in the case where an external entity (such as AMP) specifies a gene as a query string in a URL directed at the search page.
 - copySearchFilterToLZ copies the filter panel data for the search page into the corresponding keys for the LocusZoom page, and is called by the router before entering the LocusZoom page.
@@ -47,7 +72,7 @@ This store started off supporting data structures required by the filtering syst
 - updateSwitch updates the booleans tracking the display of the ensemble IDs and the concordance values.
 - toggleFilterPanel is used by the <Toolbar> to show and hide the filter panel.
 
-## Router
+### Router
 For most pages, the router simply provides a link to the corresponding view file. The Search and LocusZoom pages enable the filter panel and button, and the LocusZoom page copies user filter panel selections and entries from the Search page data.
 
 There is a global route guard, beforeEach, which disables the filter panel and loads filter data if needed.
@@ -89,7 +114,6 @@ h3 {
   color: rgba(var(--v-theme-clcHeading), 1.0);
 }
 ```
-
 The details will likely change, but this illustrates the principle. The rgba(var(--v-theme-<custom-color>), a.b) expression specifies the color name defined in the Vuetify file, with an optional opacity value of a.b, which may range from 0.0 to 1.0, so tints would be possible.
 
 The file src/ide-helper.css functions to prevent spurious warnings from the WebStorm IDE about these var expressions. The file is not imported or otherwise used anywhere in the project. Each custom color added to the custom theme in vuetify.js should have a corresponding entry here. The value shouldn't matter, as, again, the file is not used by the app. Without this file, the IDE presents a distracting warning wherever a  var expression with a --v-theme-<custom-color> is used.

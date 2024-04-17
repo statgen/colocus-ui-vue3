@@ -30,9 +30,11 @@
     </template>
 
     <!-- params: { analysis_id: item.signal1.analysis.uuid} -->
+     <!--      <router-link @click.stop :to="{name: 'manhattan'}" class="text-decoration-none text-clcAction">-->
+
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <router-link @click.native.stop :to="{name: 'manhattan'}" class="text-decoration-none text-clcAction">
-        <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
+      <router-link @click.stop :to="{name: 'manhattan', params: { analysis_id: item.signal1.analysis.uuid } }">
+      <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
       </router-link>
     </template>
 
@@ -138,7 +140,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { inject, nextTick, ref, shallowRef, watch } from 'vue'
+import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useFilterStore } from '@/stores/FilterStore'
 import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
@@ -161,6 +163,7 @@ const loadingText = ref('Loading data ...')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
+
 // *** Injects *****************************************************************
 const loadTableDataFlag = inject('loadTableDataFlag')
 
@@ -169,13 +172,14 @@ const emit = defineEmits(['row-click'])
 
 // *** Watches *****************************************************************
 watch(() => filterStore.filterDataChanged, async () => {
+// watch(() => needToLoadData.value, async () => {
+//   console.log('watcher: needToLoadData changed, loading data')
   await loadTableData()
-  scrollTop()
 })
 
 watch(() => loadTableDataFlag.value, async () => {
+  // console.log('flipped the data flag, loading data')
   await loadTableData()
-  scrollTop()
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -189,15 +193,16 @@ const onRowClick = (item) => {
 }
 
 const onItemsPerPageChanged = (ipp) => {
-  console.log('dt: items per page changed, updating store', ipp)
+  // console.log('dt: itemsPerPageChanged', ipp)
+  filterStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
   currentPage.value = 1
-  filterStore.updateFilter('pageSize', ipp)
 }
 
 const onPageChanged = (newPageNum) => {
-  currentPage.value = newPageNum
+  // console.log('dt: page changed:', newPageNum)
   filterStore.updateFilter('pageNum', newPageNum)
+  currentPage.value = newPageNum
 }
 
 const onFileDownloadClick = () => {
@@ -220,23 +225,37 @@ const loadTableData = async () => {
   isLoadingData.value = true
   filterStore.isDirEffectReady = false
 
-  const parentKey = PAGE_STORE_DATA_MAP[filterStore.currentPageName]
-  const url = filterStore.buildSearchURL(URLS.DATA)
+  const cpn = filterStore.currentPageName
+
+  let baseURL = ''
+
+  if(cpn === 'search') {
+    baseURL = URLS.SEARCH_DATA
+  } else if(cpn === 'manhattan') {
+    baseURL = URLS.TRAIT_DATA
+  } else if(cpn === 'locuszoom') {
+    baseURL = URLS.LZ_DATA
+  }
+
+  const url = filterStore.buildSearchURL(baseURL)
 
   if(await fetchData(url)) {
     dataItems.value = data.value.results
     filterStore.itemCount = dataItems.value.length
     countPairs.value = data.value.count
     filterStore.countPairs = data.value.count
-    filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
-    filterStore.isDirEffectReady = true
 
-    scrollTop()
+    if(cpn === 'search') {
+      filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
+      filterStore.isDirEffectReady = true
+    }
 
+    const parentKey = PAGE_STORE_DATA_MAP[cpn]
     currentPage.value = filterStore[parentKey].filters.pageNum
     itemsPerPage.value = filterStore[parentKey].filters.pageSize
-  }
 
+    scrollTop()
+  }
   isLoadingData.value = false
 }
 
