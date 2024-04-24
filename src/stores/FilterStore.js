@@ -5,6 +5,7 @@ import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
+    manhattanData: [],
     filterDataChanged: false,
     lastFilterUpdated: '',
     currentPageName: '',
@@ -55,7 +56,7 @@ export const useFilterStore = defineStore('filterStore', {
       if (newOrdering.length > 0) {
         url.searchParams.set('ordering', newOrdering.join(','))
       }
-      return url.href
+      return url
     },
     checkGenes(genes) {
       const testGenes = genes.split(',')
@@ -70,14 +71,15 @@ export const useFilterStore = defineStore('filterStore', {
       })
       return { goodGenes, badGenes }
     },
-    copySearchFiltersToLZ() {
+    copySearchFiltersToNextPage(nextPageName) {
+      const parentKey = PAGE_STORE_DATA_MAP[nextPageName]
       for (const [key, value] of Object.entries(this.searchPageData.filters)) {
-        this.locuszoomPageData.filters[key] = value
+        this[parentKey].filters[key] = value
       }
-      this.locuszoomPageData.filters.showEnsIDs = this.searchPageData.filters.showEnsIDs
-      this.locuszoomPageData.filters.showEffects = this.searchPageData.filters.showEffects
-      this.locuszoomPageData.filters.itemsPerPage = this.searchPageData.filters.itemsPerPage
-      this.locuszoomPageData.filters.pageNum = 1
+      this[parentKey].filters.showEnsIDs = this.searchPageData.filters.showEnsIDs
+      this[parentKey].filters.showEffects = this.searchPageData.filters.showEffects
+      this[parentKey].filters.itemsPerPage = this.searchPageData.filters.itemsPerPage
+      this[parentKey].filters.pageNum = 1
     },
     async loadFilterData() {
       if(this.isFilterDataLoaded) return
@@ -90,14 +92,30 @@ export const useFilterStore = defineStore('filterStore', {
         this.filterLists.studies = d.studies.sort()
         this.filterLists.tissues = d.tissues.sort()
         this.isFilterDataLoaded = true
+      } else {
+        throw new Error('Error loading filter data')
       }
     },
-    async updateFilter(key, value) {
-      // following is to ignore a double hit when changing page size in <DataTable>; page num also changes
+    async loadManhattanData (analysisID) {
+      this.manhattanPageData.filters.analysisID = analysisID
+      const href = `${URLS.TRAIT_DATA}${analysisID}/manhattan/`
+      const url = new URL(href, window.location.origin)
+      // console.log('mh loading url:', url)
+      const { fetchData, data } = useFetchData()
+      if(await fetchData(url)) {
+        // console.log('mh data:', data.value)
+        this.manhattanData = data.value
+      } else {
+        throw new Error('Error loading manhattan data')
+      }
+    },
+    updateFilter(key, value) {
+      // following is to ignore a double hit when changing page size in <DataTable>; page num also changes and generates event
       if(this.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
 
       const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
       const filters = this[parentKey].filters
+      // console.log('uf:', filters)
 
       if(!Object.hasOwn(filters, key)) {
         throw new Error('bad key specified for filter update')
@@ -105,7 +123,7 @@ export const useFilterStore = defineStore('filterStore', {
         filters[key] = value
 
         if(key ==='pageSize' || !['pageSize', 'pageNum'].includes(key) ) {
-          // console.log('uf, ps, pn:', filters.pageSize, filters.pageNum)
+          // console.log('uf: ps, pn:', filters.pageSize, filters.pageNum)
           filters.pageNum = 1
         }
 
@@ -136,6 +154,7 @@ function getDefaultPageData() {
     showEffects: false,
     sortKeys: [],
     filters: {
+      // these are actual filters set by the user in the UI
       studies: [],
       genes: [],
       region: '',
@@ -145,6 +164,10 @@ function getDefaultPageData() {
       trait2log10p: "0",
       h4: "0.5",
       r2: "0.3",
+
+      // these are pseudo filters that get appended to the URL
+      analysisID:'',
+      signals: [],
       pageNum: "1",
       pageSize: "10",
     }
@@ -162,8 +185,10 @@ const dataMapAPI = {
   trait2log10p: 'signal2_min_logp',
   h4: 'min_h4',
   r2: 'min_r2',
+  analysisID: 'analysis',
   pageNum: 'page',
   pageSize: 'page_size',
+  signals: 'signals',
 }
 
 // this maps data keys to the sort keys expected by the back end

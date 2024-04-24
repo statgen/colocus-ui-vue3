@@ -1,11 +1,14 @@
  <template>
    <v-data-table-server
+     :fixed-header="false"
     :headers="visibleColumns"
     :items="dataItems"
     :items-length="countPairs"
     :items-per-page="itemsPerPage"
     :items-per-page-options="ITEMS_PER_PAGE_OPTIONS"
     :loading="isLoadingData"
+    :loading-text="loadingText"
+    :multi-sort="true"
     :page="currentPage"
 
     @click:row="onRowClick"
@@ -13,12 +16,9 @@
     @update:page="onPageChanged"
     @update:sortBy="onSortUpdate"
 
-    :fixed-header="false"
-    :multi-sort="true"
     show-current-page
     density="compact"
     class="table-base"
-    :loading-text="loadingText"
   >
 
     <template v-slot:item.actions="{ item }">
@@ -29,11 +29,8 @@
       <StudyLabel :study="item.signal1.analysis.study.uuid" abbrev/>
     </template>
 
-    <!-- params: { analysis_id: item.signal1.analysis.uuid} -->
-     <!--      <router-link @click.stop :to="{name: 'manhattan'}" class="text-decoration-none text-clcAction">-->
-
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <router-link @click.stop :to="{name: 'manhattan', params: { analysis_id: item.signal1.analysis.uuid } }">
+      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid } }">
       <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
       </router-link>
     </template>
@@ -59,11 +56,11 @@
     </template>
 
     <template v-slot:item.signal1.lead_variant.vid="{item}">
-      <VariantLabel :variant="item.signal1.lead_variant.vid" />
+      <VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" />
     </template>
 
     <template v-slot:item.signal2.lead_variant.vid="{item}">
-      <VariantLabel :variant="item.signal2.lead_variant.vid" />
+      <VariantLabel :variant="item.signal2.lead_variant.vid" :showSplotch="true" />
     </template>
 
     <template v-slot:item.signal1.neg_log_p="{item}">
@@ -140,10 +137,10 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue'
+import { inject, nextTick, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useFilterStore } from '@/stores/FilterStore'
-import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
+import { PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
 import { useDirectionOfEffect } from '@/composables/DirectionOfEffect'
 
@@ -172,8 +169,6 @@ const emit = defineEmits(['row-click'])
 
 // *** Watches *****************************************************************
 watch(() => filterStore.filterDataChanged, async () => {
-// watch(() => needToLoadData.value, async () => {
-//   console.log('watcher: needToLoadData changed, loading data')
   await loadTableData()
 })
 
@@ -193,14 +188,12 @@ const onRowClick = (item) => {
 }
 
 const onItemsPerPageChanged = (ipp) => {
-  // console.log('dt: itemsPerPageChanged', ipp)
   filterStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
   currentPage.value = 1
 }
 
 const onPageChanged = (newPageNum) => {
-  // console.log('dt: page changed:', newPageNum)
   filterStore.updateFilter('pageNum', newPageNum)
   currentPage.value = newPageNum
 }
@@ -215,9 +208,7 @@ const onSortUpdate = (newSort) => {
 
 // *** Utility functions *******************************************************
 const scrollTop = () => {
-  // in some scenarios, nextTick may not allow enough time for the table to update itself, so use the timeout if necessary
   nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
-  // setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100)
 }
 
 const loadTableData = async () => {
@@ -226,17 +217,7 @@ const loadTableData = async () => {
   filterStore.isDirEffectReady = false
 
   const cpn = filterStore.currentPageName
-
-  let baseURL = ''
-
-  if(cpn === 'search') {
-    baseURL = URLS.SEARCH_DATA
-  } else if(cpn === 'manhattan') {
-    baseURL = URLS.TRAIT_DATA
-  } else if(cpn === 'locuszoom') {
-    baseURL = URLS.LZ_DATA
-  }
-
+  const baseURL = URLS[cpn]
   const url = filterStore.buildSearchURL(baseURL)
 
   if(await fetchData(url)) {
@@ -245,7 +226,7 @@ const loadTableData = async () => {
     countPairs.value = data.value.count
     filterStore.countPairs = data.value.count
 
-    if(cpn === 'search') {
+    if([PAGE_NAMES.SEARCH, PAGE_NAMES.MANHATTAN].includes(cpn)) {
       filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
       filterStore.isDirEffectReady = true
     }
@@ -255,6 +236,8 @@ const loadTableData = async () => {
     itemsPerPage.value = filterStore[parentKey].filters.pageSize
 
     scrollTop()
+  } else {
+    throw new Error('Error loading table data')
   }
   isLoadingData.value = false
 }

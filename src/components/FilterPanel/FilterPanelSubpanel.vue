@@ -6,7 +6,7 @@
       <v-spacer v-if="resetButton"></v-spacer>
 
       <v-btn v-if="resetButton" @click="onResetButtonClick" size="small" variant="plain" >
-        <v-icon icon="mdi-close-circle"  class="text-clcAction" size="24px"/>
+        <v-icon icon="mdi-close-circle" class="text-clcAction" size="24px"/>
         <v-tooltip activator="parent" location="end">
           Reset to default values
         </v-tooltip>

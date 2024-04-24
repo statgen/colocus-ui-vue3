@@ -36,11 +36,15 @@ provide('preloadGenes', preloadGenes)
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
-  loadFPControls.value = !loadFPControls.value
+  loadFilterControls()
 })
 
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
+const loadFilterControls = () => {
+  loadFPControls.value = !loadFPControls.value
+}
+
 // *** Configuration data ******************************************************
 </script>
 

@@ -9,7 +9,7 @@ export const useFetchData = () => {
   })
 
   const fetchData = async (url, options) => {
-    // console.log('loading url:',url)
+    console.log('fetching:',url.href)
     state.isLoading = true
     try {
       const response = await fetch(url, options)

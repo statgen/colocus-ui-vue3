@@ -5,7 +5,7 @@
       <AppLogo />
 
       <div class="ml-10">
-        <router-link to="/search" class="nav-link text-clcHeading">Search</router-link>
+        <router-link :to="PAGE_NAMES.SEARCH" class="nav-link text-clcHeading">Search</router-link>
         <router-link to="/studies" class="nav-link text-clcHeading">Studies</router-link>
         <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link>
         <router-link to="/traits" class="nav-link text-clcHeading">Traits</router-link>
@@ -26,6 +26,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useFilterStore } from '@/stores/FilterStore'
+import { PAGE_NAMES } from '@/constants'
 
 const filterStore = useFilterStore()
 const { toggleFilterPanel } = filterStore

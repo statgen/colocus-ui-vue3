@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
 import { useFilterStore } from '@/stores/FilterStore'
+import { PAGE_NAMES } from '@/constants'
 
 const SHOW_FILTER_PANEL = true
 
@@ -19,42 +19,47 @@ const disableFiltering = () => {
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: PAGE_NAMES.HOME,
     component: () => import('@/views/HomeView.vue'),
   },
   {
-    path: '/genes',
-    name: 'genes',
+    path: `/${PAGE_NAMES.GENES}`,
+    name: PAGE_NAMES.GENES,
     component: () => import('@/views/GenesView.vue'),
   },
   {
-    path: '/help',
-    name: 'help',
+    path: `/${PAGE_NAMES.HELP}`,
+    name: PAGE_NAMES.HELP,
     component: () => import('@/views/HelpView.vue'),
   },
   {
-    path: '/locuszoom',
-    name: 'locuszoom',
+    path: `/${PAGE_NAMES.LOCUSZOOM}`,
+    name: PAGE_NAMES.LOCUSZOOM,
     component: () => import('@/views/LocusZoomView.vue'),
     beforeEnter: (to, from, next) => {
       enableFiltering(SHOW_FILTER_PANEL)
       const filterStore = useFilterStore()
-      filterStore.copySearchFiltersToLZ()
+      filterStore.copySearchFiltersToNextPage(to.name)
       next()
     }
   },
   {
-    path: '/manhattan/:analysis_id',
-    name: 'manhattan',
+    path: `/${PAGE_NAMES.MANHATTAN}/:analysisID`,
+    name: PAGE_NAMES.MANHATTAN,
     component: () => import('@/views/ManhattanView.vue'),
-    beforeEnter: (to, from, next) => {
-      enableFiltering(!SHOW_FILTER_PANEL)
+    beforeEnter: async (to, from, next) => {
+      enableFiltering(SHOW_FILTER_PANEL)
+      const filterStore = useFilterStore()
+      filterStore.copySearchFiltersToNextPage(to.name)
+      const analysisID = to.params.analysisID
+      console.log('route aid:', analysisID)
+      await filterStore.loadManhattanData(analysisID)
       next()
     }
   },
   {
-    path: '/search',
-    name: 'search',
+    path: `/${PAGE_NAMES.SEARCH}`,
+    name: PAGE_NAMES.SEARCH,
     component: () => import('@/views/SearchView.vue'),
     beforeEnter: (to, from, next) => {
       enableFiltering(SHOW_FILTER_PANEL)
@@ -67,13 +72,13 @@ const routes = [
     component: () => import('@/views/StyleSheetView.vue'),
   },
   {
-    path: '/studies',
-    name: 'studies',
+    path: `/${PAGE_NAMES.STUDIES}`,
+    name: PAGE_NAMES.STUDIES,
     component: () => import('@/views/StudiesView.vue'),
   },
   {
-    path: '/traits',
-    name: 'traits',
+    path: `/${PAGE_NAMES.TRAITS}`,
+    name: PAGE_NAMES.TRAITS,
     component: () => import('@/views/TraitView.vue'),
   },
 ]
