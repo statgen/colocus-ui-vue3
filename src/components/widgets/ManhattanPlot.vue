@@ -1,33 +1,68 @@
 <template>
-  <div ref="manhattanPlotContainer" class="manhattan-plot"></div>
+  <div ref="manhattanPlotParent" class="manhattan-plot"></div>
 </template>
 
 <script setup>
-import { defineEmits, nextTick, onMounted, ref } from 'vue'
+// *** Imports *****************************************************************
+import { defineEmits, inject, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { create_gwas_plot } from '@/vis/pheweb_plots'
+import { useFilterStore } from '@/stores/FilterStore'
 
-const props = defineProps({
-  binData: Object,
-})
+// *** Composables *************************************************************
+const filterStore = useFilterStore()
+const route = useRoute();
 
+// *** Props *******************************************************************
+// *** Variables ***************************************************************
+const manhattanPlotParent = ref(null)
+const plotContainerID = 'manhattan-plot'
+
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+const loadManhattanDataFlag = inject('loadManhattanDataFlag')
+
+// *** Emits *******************************************************************
 const emit = defineEmits(['onSelectSignals'])
 
-const tooltip_template = `<b><%- d.chrom %>:<%- d.pos.toLocaleString() %> <%- (d.ref && d.alt) ? (d.ref + "/" + d.alt) : "" %></b><br>
-            -log<sub>10</sub>(p): <%- d.neg_log_pvalue && (+d.neg_log_pvalue).toFixed(3) %><br>
-            <%- d.qtl_genes && d.qtl_genes.length ? 'QTL gene(s): ' + d.qtl_genes.map(function(gene) { return gene.symbol; }).join(", ") : "" %>
-            <% if (d.qtl_genes && d.qtl_genes.length) { print('<br>'); } %>
-            Nearest gene(s): <%- d.nearest_genes && d.nearest_genes.length && d.nearest_genes.map(function(gene) { return gene.symbol; }).join(", ") %>`
+// *** Watches *****************************************************************
+watch(() => loadManhattanDataFlag.value, async () => {
+  // console.log('MP watcher')
+  const analysisID = route.params.analysisID
+  // console.log('MP watcher, analysis ID:', analysisID)
 
+  await filterStore.loadManhattanData(analysisID)
+  const { variant_bins, unbinned_variants } = filterStore.manhattanData
+
+  const existingPlot = document.getElementById(plotContainerID)
+  if(existingPlot) existingPlot.remove()
+
+  const newPlot = document.createElement('div')
+  newPlot.id = plotContainerID
+  manhattanPlotParent.value.appendChild(newPlot)
+
+  try {
+    create_gwas_plot(newPlot, tooltip_template, variant_bins, unbinned_variants, onClickSignals)
+  } catch (err) {
+    console.log(err)
+  }
+})
+
+// *** Lifecycle hooks *********************************************************
+// *** Event handlers **********************************************************
 const onClickSignals = (signals) => {
   // ignore click on blue and gray, which yield null signals
   if(signals) emit('onSelectSignals', signals)
 }
 
-const manhattanPlotContainer = ref(null)
-
-onMounted(async () => {
-  create_gwas_plot(manhattanPlotContainer.value, tooltip_template, props.binData.variant_bins, props.binData.unbinned_variants, onClickSignals)
-})
+// *** Utility functions *******************************************************
+// *** Configuration data ******************************************************
+const tooltip_template = `<b><%- d.chrom %>:<%- d.pos.toLocaleString() %> <%- (d.ref && d.alt) ? (d.ref + "/" + d.alt) : "" %></b><br>
+  -log<sub>10</sub>(p): <%- d.neg_log_pvalue && (+d.neg_log_pvalue).toFixed(3) %><br>
+  <%- d.qtl_genes && d.qtl_genes.length ? 'QTL gene(s): ' + d.qtl_genes.map(function(gene) { return gene.symbol; }).join(", ") : "" %>
+  <% if (d.qtl_genes && d.qtl_genes.length) { print('<br>'); } %>
+  Nearest gene(s): <%- d.nearest_genes && d.nearest_genes.length && d.nearest_genes.map(function(gene) { return gene.symbol; }).join(", ") %>`
 </script>
 
 <style>

@@ -48,12 +48,10 @@ const routes = [
     name: PAGE_NAMES.MANHATTAN,
     component: () => import('@/views/ManhattanView.vue'),
     beforeEnter: async (to, from, next) => {
+      // console.log('before enter:', to.name)
       enableFiltering(SHOW_FILTER_PANEL)
       const filterStore = useFilterStore()
       filterStore.copySearchFiltersToNextPage(to.name)
-      const analysisID = to.params.analysisID
-      console.log('route aid:', analysisID)
-      await filterStore.loadManhattanData(analysisID)
       next()
     }
   },
@@ -91,7 +89,7 @@ const router = createRouter({
 router.beforeEach(async(to, from) => {
   const filterStore = useFilterStore()
   filterStore.currentPageName = to.name
-  disableFiltering()
+  if(![PAGE_NAMES.SEARCH, PAGE_NAMES.LOCUSZOOM, PAGE_NAMES.MANHATTAN].includes(to.name)) disableFiltering()
   if (!filterStore.isFilterDataLoaded) await filterStore.loadFilterData()
 })
 

@@ -6,16 +6,15 @@
     <v-row class="mx-0 my-0">
       <h1>
         <v-icon icon="mdi-arrow-left-circle" @click="router.back()" class="text-clcAction mx-0 mb-2" size="24px"/>
-        Manhattan Plot
+        Manhattan Plot <span class="analysis-id">({{ analysisID }})</span>
       </h1>
     </v-row>
-    <v-row class="ml-2 plot-container">
+    <v-row class="ml-2 mt-14 plot-container">
       <ManhattanPlot
-        :binData = manhattanData
         @onSelectSignals="addSignals"
       />
     </v-row>
-    <v-row class="ml-2">
+    <v-row class="ml-2 mt-4">
         <h2 v-if="Object.keys(selectedSignals).length===0">All colocalized signals</h2>
         <div v-else>
           <h2>Selected colocalized signals</h2>
@@ -52,19 +51,24 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import {computed, onMounted, provide, ref} from 'vue'
+import {computed, onMounted, onUpdated, provide, ref} from 'vue'
 import router from '@/router'
-import {useFilterStore} from '@/stores/FilterStore'
+import { useFilterStore } from '@/stores/FilterStore'
+import { useRoute } from 'vue-router'
 import VariantLabel from "@/components/DataTable/labels/VariantLabel.vue";
 
 
 // *** Composables *************************************************************
 const filterStore = useFilterStore()
+const route = useRoute();
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
+const analysisID = ref('')
+const lastAnalysisID = ref('')
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
+const loadManhattanDataFlag = ref(false)
 const manhattanData = filterStore.manhattanData
 const preloadGenes = ref([])
 const selectedSignals = ref({})
@@ -98,15 +102,29 @@ const sortedSignals = computed(() => {
 provide('loadFPControls', loadFPControls)
 provide('preloadGenes', preloadGenes)
 provide('loadTableDataFlag', loadTableDataFlag)
+provide('loadManhattanDataFlag', loadManhattanDataFlag)
 
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
+  // console.log('onMounted')
+  analysisID.value = getAnalysisID()
+  lastAnalysisID.value = analysisID.value
   loadFilterControls()
   loadTableData()
-  // plot data comes from the filterStore, is loaded by the route beforeEnter
+  loadManhattanData()
+})
+
+onUpdated(() => {
+  // console.log('onUpdated')
+  const aid = getAnalysisID()
+  if(aid === lastAnalysisID.value) return
+
+  analysisID.value = aid
+  lastAnalysisID.value = aid
+  loadManhattanData()
 })
 // *** Event handlers **********************************************************
 const onDataTableRowClick = () => {
@@ -114,8 +132,16 @@ const onDataTableRowClick = () => {
 }
 
 // *** Utility functions *******************************************************
+const getAnalysisID = () => {
+  return route.params.analysisID
+}
+
 const loadFilterControls = () => {
   loadFPControls.value = !loadFPControls.value
+}
+
+const loadManhattanData = () => {
+  loadManhattanDataFlag.value = !loadManhattanDataFlag.value
 }
 
 const loadTableData = () => {
@@ -127,7 +153,7 @@ const addSignals = (signals) => {
     const key = signal.signal_uuid
     // console.log('k, v:', key, signal)
     const existingVariants = Object.values(selectedSignals.value).map(item => item.variant)
-    console.log('ev:', existingVariants)
+    // console.log('ev:', existingVariants)
     if (existingVariants.includes(signal.variant)) {
       // console.log('skipping dupe:', signal.variant)
     } else {
@@ -170,8 +196,7 @@ const clearSignals = () => {
   width: 100%;
 }
 
-.custom-chip {
-  background: none !important;
-  background-color: transparent !important;
+.analysis-id {
+  font-size: 1rem;
 }
 </style>

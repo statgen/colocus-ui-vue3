@@ -212,7 +212,7 @@ const scrollTop = () => {
 }
 
 const loadTableData = async () => {
-  const { fetchData, data } = useFetchData()
+  const { data, errorMessage, fetchData } = useFetchData()
   isLoadingData.value = true
   filterStore.isDirEffectReady = false
 
@@ -237,7 +237,7 @@ const loadTableData = async () => {
 
     scrollTop()
   } else {
-    throw new Error('Error loading table data')
+    throw new Error('Error loading table data:\n' + errorMessage)
   }
   isLoadingData.value = false
 }

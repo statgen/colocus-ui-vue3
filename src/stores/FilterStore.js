@@ -83,7 +83,7 @@ export const useFilterStore = defineStore('filterStore', {
     },
     async loadFilterData() {
       if(this.isFilterDataLoaded) return
-      const { data, fetchData } = useFetchData()
+      const { data, errorMessage, fetchData } = useFetchData()
       if(await fetchData(URLS.FILTER_DATA)) {
         const d = data.value
         this.filterLists.analysisTypes = d.analysis_types.sort()
@@ -93,7 +93,7 @@ export const useFilterStore = defineStore('filterStore', {
         this.filterLists.tissues = d.tissues.sort()
         this.isFilterDataLoaded = true
       } else {
-        throw new Error('Error loading filter data')
+        throw new Error('Error loading filter data:\n' + errorMessage)
       }
     },
     async loadManhattanData (analysisID) {
@@ -101,12 +101,12 @@ export const useFilterStore = defineStore('filterStore', {
       const href = `${URLS.TRAIT_DATA}${analysisID}/manhattan/`
       const url = new URL(href, window.location.origin)
       // console.log('mh loading url:', url)
-      const { fetchData, data } = useFetchData()
+      const { data, errorMessage, fetchData } = useFetchData()
       if(await fetchData(url)) {
         // console.log('mh data:', data.value)
         this.manhattanData = data.value
       } else {
-        throw new Error('Error loading manhattan data')
+        throw new Error('Error loading manhattan data:\n' + errorMessage)
       }
     },
     updateFilter(key, value) {
@@ -167,9 +167,9 @@ function getDefaultPageData() {
 
       // these are pseudo filters that get appended to the URL
       analysisID:'',
-      signals: [],
       pageNum: "1",
       pageSize: "10",
+      signals: [],
     }
   }
 }
