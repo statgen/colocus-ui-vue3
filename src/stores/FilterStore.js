@@ -5,6 +5,7 @@ import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
+    // preloadTrait: '',
     manhattanData: [],
     filterDataChanged: false,
     lastFilterUpdated: '',
@@ -84,7 +85,7 @@ export const useFilterStore = defineStore('filterStore', {
     async loadFilterData() {
       if(this.isFilterDataLoaded) return
       const { data, errorMessage, fetchData } = useFetchData()
-      if(await fetchData(URLS.FILTER_DATA)) {
+      if(await fetchData(URLS.FILTER_DATA, 'filter data', this.currentPageName)) {
         const d = data.value
         this.filterLists.analysisTypes = d.analysis_types.sort()
         this.filterLists.genes = d.genes.sort()
@@ -102,7 +103,7 @@ export const useFilterStore = defineStore('filterStore', {
       const url = new URL(href, window.location.origin)
       // console.log('mh loading url:', url)
       const { data, errorMessage, fetchData } = useFetchData()
-      if(await fetchData(url)) {
+      if(await fetchData(url, 'manhattan data', this.currentPageName)) {
         // console.log('mh data:', data.value)
         this.manhattanData = data.value
       } else {
@@ -185,7 +186,7 @@ const dataMapAPI = {
   trait2log10p: 'signal2_min_logp',
   h4: 'min_h4',
   r2: 'min_r2',
-  analysisID: 'analysis',
+  analysisID: 'signal1_analysis', // using signal1_analysis gives the legacy behavior, using just analysis gives the desired? new behavior
   pageNum: 'page',
   pageSize: 'page_size',
   signals: 'signals',

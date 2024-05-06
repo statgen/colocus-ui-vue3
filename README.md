@@ -137,6 +137,15 @@ The Search View provides a context for displaying a data table. It uses the Vue 
   - The DataTable component watches the variable and triggers a data load when it changes.
 The reason the DataTable has to watch filterStore.filterDataChanged, instead of using provide/inject, is that it is not possible to use that mechanism from within a Pinia store. The effect is the same, it's just a different way of triggering a desired event.
 
+### Trait following
+This is a feature added and then disabled. It was originally added due to hope for the Manhattan view to display data in the data table from multiple studies, and allow the user to filter by phenotype. But then it turned out that the back end as presently configured, could not support this. I am disabling the code, but documenting here, in case we decide to go back and correctly implement that feature.
+
+On the Search page, the user clicks a trait link. The router pulls trait from the URL and saves it in the filterStore as a top-level property called preloadTrait. The Manhattan view copies that to a local variable in its onMounted lifecycle method. It `provides` that value for injection where needed, in this case the AutoComplete control. It `watch`es that variable, and when it is updated, assigns it to local variable selectedItems, thus populating the on-screen control, and then calls updateFilter on the filter store with that value, which causes the data table to load.
+
+The Search page also has references to preloadTrait, which are not used, but are required so that the AutoComplete controls will function.
+
+To re-enable the feature, search across files for preloadTrait and remove the comment markers. Also have to add the trait name to the router-link passed by the data table. And add :trait to the path in the route to the Manhattan page in the router.
+
 ## Misc debugging hints
 - use {{ $log() }} in templates to log local values to console. This is defined in main.js
 

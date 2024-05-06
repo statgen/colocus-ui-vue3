@@ -1,4 +1,5 @@
 import { reactive, toRefs } from 'vue'
+import { ppURL } from '@/util/util'
 
 export const useFetchData = () => {
   const state = reactive({
@@ -8,8 +9,9 @@ export const useFetchData = () => {
     errorMessage: '',
   })
 
-  const fetchData = async (url, options) => {
-    // console.log('a:', a)
+  const fetchData = async (url, reason, page, options) => {
+    // const prettyPrint = true
+    // console.log(`fetching ${reason} for ${page} page from:\n`, prettyPrint ? ppURL(url.href) : url.href)
     state.isLoading = true
     try {
       const response = await fetch(url, options)

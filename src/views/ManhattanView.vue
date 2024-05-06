@@ -69,8 +69,8 @@ const lastAnalysisID = ref('')
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const loadManhattanDataFlag = ref(false)
-const manhattanData = filterStore.manhattanData
 const preloadGenes = ref([])
+// const preloadTrait = ref('')
 const selectedSignals = ref({})
 
 // *** Computed ****************************************************************
@@ -100,9 +100,10 @@ const sortedSignals = computed(() => {
 
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
-provide('preloadGenes', preloadGenes)
-provide('loadTableDataFlag', loadTableDataFlag)
 provide('loadManhattanDataFlag', loadManhattanDataFlag)
+provide('loadTableDataFlag', loadTableDataFlag)
+provide('preloadGenes', preloadGenes)
+// provide('preloadTrait', preloadTrait)
 
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
@@ -112,6 +113,9 @@ onMounted(() => {
   // console.log('onMounted')
   analysisID.value = getAnalysisID()
   lastAnalysisID.value = analysisID.value
+
+  // preloadTrait.value = filterStore.preloadTrait
+
   loadFilterControls()
   loadTableData()
   loadManhattanData()

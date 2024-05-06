@@ -44,14 +44,15 @@ const routes = [
     }
   },
   {
+    // path: `/${PAGE_NAMES.MANHATTAN}/:analysisID/:trait`,
     path: `/${PAGE_NAMES.MANHATTAN}/:analysisID`,
     name: PAGE_NAMES.MANHATTAN,
     component: () => import('@/views/ManhattanView.vue'),
     beforeEnter: async (to, from, next) => {
-      // console.log('before enter:', to.name)
       enableFiltering(SHOW_FILTER_PANEL)
       const filterStore = useFilterStore()
       filterStore.copySearchFiltersToNextPage(to.name)
+      // filterStore.preloadTrait = to.params.trait
       next()
     }
   },

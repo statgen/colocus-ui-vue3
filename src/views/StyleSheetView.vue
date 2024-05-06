@@ -1,5 +1,5 @@
 <template>
-  <v-col class="ml-2">
+  <v-col class="ml-2 mb-4">
     <v-row class="d-block mt-2">
       <h1>Heading 1</h1>
       <h2>Heading 2</h2>
@@ -64,9 +64,67 @@
         </table>
       </div>
     </v-row>
-  </v-col>
 
+    <v-row>
+      <h1 :style="{color: '#ffffff'}">header</h1>
+      <br/>
+      <table>
+        <thead>
+          <tr>
+            <td>Original V1</td>
+            <td>Original V2</td>
+            <td>V1 hex</td>
+            <td>V2 hex</td>
+            <td>Formatted V1</td>
+            <td>Formatted V2</td>
+            <td>V1 hex</td>
+            <td>V2 hex</td>
+            <td>V1 MD5</td>
+            <td>V2 MD5</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(v, index) in t1v" :key="index">
+            <td><span class="mx-2" :style="{color: colorHasher.hex(v)}">{{f(v)}}</span></td>
+            <td><span class="mx-2" :style="{color: colorHasher.hex(t2v[index])}">{{f(t2v[index])}}</span></td>
+            <td>{{colorHasher.hex(v)}}</td>
+            <td>{{colorHasher.hex(t2v[index])}}</td>
+            <td><span class="mx-2" :style="{color: myColorHasher(v)}">{{f(v)}}</span></td>
+            <td><span class="mx-2" :style="{color: myColorHasher(t2v[index])}">{{f(t2v[index])}}</span></td>
+            <td>{{colorHasher.hex(f(v))}}</td>
+            <td>{{colorHasher.hex(f(t2v[index]))}}</td>
+            <td><span class="mx-2" :style="{color: myMD5Hasher(v)}">{{f(v)}}</span></td>
+            <td><span class="mx-2" :style="{color: myMD5Hasher(t2v[index])}">{{f(t2v[index])}}</span></td>
+            <td>{{colorHasher.hex(md5(f(v)))}}</td>
+            <td>{{colorHasher.hex(md5(f(t2v[index])))}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </v-row>
+
+  </v-col>
 </template>
+
+<script setup>
+import { md5 } from 'js-md5'
+import { colorHasher, formatVariantString } from '@/util/util'
+
+const t1v = ['5_148572915_G_A','3_36981990_C_CA','19_59056752_G_C','5_57578302_G_A','4_88226231_T_C','2_100838157_C_T','12_4384844_T_G','8_61455861_A_G','12_48180508_C_T','19_4048682_AAAAAAAC_A']
+const t2v = ['5_148564757_A_C','3_37268913_G_T','19_59083594_T_A','5_57607142_A_T','4_88186441_G_A','2_100820431_A_G','12_4384844_T_G','8_61378363_T_A','12_48180508_C_T','19_4083916_G_A']
+
+const f = (value) => {
+  return formatVariantString(value)
+}
+
+const myColorHasher = (value) => {
+  return colorHasher.hex(formatVariantString(value))
+}
+
+const myMD5Hasher = (value) => {
+  return colorHasher.hex(md5(formatVariantString(value)))
+}
+
+</script>
 
 <style scoped>
 .div-size {

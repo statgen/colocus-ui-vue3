@@ -33,6 +33,7 @@ const middleTrim = (s, left=4, right=4) => {
 
 // pretty print url for debugging and reducing eye strain
 const ppURL = (url) => {
+  if(!url) return url
   let s = url.replace('?', '\n  ')
     .replace(/&/g, '\n  ')
     .replace(/%2C/g, ',')

@@ -42,11 +42,13 @@ const alertVisible = ref(false)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const preloadGenes = ref([])
+// const preloadTrait = ref('')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
 provide('preloadGenes', preloadGenes)
+// provide('preloadTrait', preloadTrait)
 provide('loadTableDataFlag', loadTableDataFlag)
 
 // *** Injects *****************************************************************

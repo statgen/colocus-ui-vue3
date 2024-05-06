@@ -30,8 +30,9 @@
     </template>
 
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid } }">
-      <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
+      <!--      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid, trait: item.signal1.analysis.trait.phenotype.name } }">-->
+            <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid } }">
+        <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
       </router-link>
     </template>
 
@@ -169,6 +170,7 @@ const emit = defineEmits(['row-click'])
 
 // *** Watches *****************************************************************
 watch(() => filterStore.filterDataChanged, async () => {
+  // console.log('loading new table data')
   await loadTableData()
 })
 
@@ -220,11 +222,12 @@ const loadTableData = async () => {
   const baseURL = URLS[cpn]
   const url = filterStore.buildSearchURL(baseURL)
 
-  if(await fetchData(url)) {
+  if(await fetchData(url, 'table data', cpn)) {
     dataItems.value = data.value.results
     filterStore.itemCount = dataItems.value.length
     countPairs.value = data.value.count
     filterStore.countPairs = data.value.count
+    // console.log(`Loaded table data (${filterStore.itemCount}/${filterStore.countPairs}):`, dataItems.value)
 
     if([PAGE_NAMES.SEARCH, PAGE_NAMES.MANHATTAN].includes(cpn)) {
       filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
@@ -236,15 +239,14 @@ const loadTableData = async () => {
     itemsPerPage.value = filterStore[parentKey].filters.pageSize
 
     scrollTop()
+    isLoadingData.value = false
   } else {
+    isLoadingData.value = false
     throw new Error('Error loading table data:\n' + errorMessage)
   }
-  isLoadingData.value = false
 }
 
-
 // *** Configuration data ******************************************************
-
 </script>
 
 <style scoped>

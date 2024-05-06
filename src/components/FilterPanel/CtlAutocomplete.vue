@@ -44,8 +44,9 @@ const selectListItems = ref([])
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
 const loadFPControls = inject('loadFPControls')
-const resetInput = inject('resetInput')
 const preloadGenes = inject('preloadGenes')
+// const preloadTrait = inject('preloadTrait')
+const resetInput = inject('resetInput')
 
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
@@ -60,6 +61,13 @@ watch(() => preloadGenes.value, () => {
     filterStore.updateFilter(controlSet.storeKey, preloadGenes.value)
   }
 })
+
+// watch(() => preloadTrait.value, () => {
+//   if(controlSet.storeKey === 'phenotypes') {
+//     selectedItems.value = preloadTrait.value
+//     filterStore.updateFilter(controlSet.storeKey, preloadTrait.value)
+//   }
+// })
 
 watch(() => loadFPControls.value, (newValue, oldValue) => {
   populateControlSelectList()
