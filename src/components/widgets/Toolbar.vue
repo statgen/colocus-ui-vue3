@@ -5,7 +5,7 @@
       <AppLogo />
 
       <div class="ml-10">
-        <router-link :to="PAGE_NAMES.SEARCH" class="nav-link text-clcHeading">Search</router-link>
+        <router-link :to="searchPage" class="nav-link text-clcHeading">Search</router-link>
         <router-link to="/studies" class="nav-link text-clcHeading">Studies</router-link>
         <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link>
         <router-link to="/traits" class="nav-link text-clcHeading">Traits</router-link>
@@ -31,6 +31,7 @@ import { PAGE_NAMES } from '@/constants'
 const filterStore = useFilterStore()
 const { toggleFilterPanel } = filterStore
 const isFilterButtonVisible = computed(() => filterStore.isFilterButtonShowing)
+const searchPage = `/${PAGE_NAMES.SEARCH}`
 
 </script>
 

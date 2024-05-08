@@ -112,17 +112,17 @@
       {{ +item.marg_cond_flip }}
     </template>
 
-    <template v-slot:header.r2="{ column }">
-      <R2Header :title="column.title"/>
-    </template>
+<!--    <template v-slot:header.r2="{ column }">-->
+<!--      <R2Header :title="column.title"/>-->
+<!--    </template>-->
 
     <template v-slot:header.cross_signal.effect="{ column }">
       <ConcordanceHeader :title="column.title"/>
     </template>
 
-    <template v-slot:header.n_coloc_between_traits="{ column }">
-      <ColocHeader :title="column.title"/>
-    </template>
+<!--    <template v-slot:header.n_coloc_between_traits="{ column }">-->
+<!--      <ColocHeader :title="column.title"/>-->
+<!--    </template>-->
 
     <template v-slot:footer.prepend>
       <div>
