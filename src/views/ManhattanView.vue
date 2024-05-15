@@ -4,10 +4,7 @@
   </v-col>
   <v-col :cols="filterStore.isFilterPanelShowing ? 10 : 12" class="ml-2">
     <v-row class="mx-0 my-0">
-      <h1>
-        <v-icon icon="mdi-arrow-left-circle" @click="router.back()" class="text-clcAction mx-0 mb-2" size="24px"/>
-        Manhattan Plot <span class="analysis-id">({{ analysisID }})</span>
-      </h1>
+      <h1><BackButton />Manhattan Plot <span class="analysis-id">({{ analysisID }})</span></h1>
     </v-row>
     <v-row class="ml-2 mt-14 plot-container">
       <ManhattanPlot
@@ -52,11 +49,9 @@
 <script setup>
 // *** Imports *****************************************************************
 import {computed, onMounted, onUpdated, provide, ref} from 'vue'
-import router from '@/router'
 import { useFilterStore } from '@/stores/FilterStore'
 import { useRoute } from 'vue-router'
 import VariantLabel from "@/components/DataTable/labels/VariantLabel.vue";
-
 
 // *** Composables *************************************************************
 const filterStore = useFilterStore()

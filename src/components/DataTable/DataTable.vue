@@ -138,16 +138,17 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { inject, nextTick, ref, shallowRef, watch } from 'vue'
+import { inject, markRaw, nextTick, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useFilterStore } from '@/stores/FilterStore'
 import { PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
 import { useDirectionOfEffect } from '@/composables/DirectionOfEffect'
+import router from '@/router'
 
 // *** Composables ***************************************************************
 const filterStore = useFilterStore()
-const { fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
+const { buildLZTableURL, fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
 
 // *** Props *******************************************************************
 
@@ -171,12 +172,12 @@ const emit = defineEmits(['row-click'])
 // *** Watches *****************************************************************
 watch(() => filterStore.filterDataChanged, async () => {
   // console.log('loading new table data')
-  await loadTableData()
+  await loadData()
 })
 
 watch(() => loadTableDataFlag.value, async () => {
   // console.log('flipped the data flag, loading data')
-  await loadTableData()
+  await loadData()
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -185,8 +186,15 @@ const onAddPlotIconClick = (item) => {
   console.log('dt: add plot for item:', item)
 }
 
-const onRowClick = (item) => {
-  emit('row-click', item)
+const onRowClick = async (event, item) => {
+  // console.log('dt: row-click', item.item.uuid)
+  filterStore.colocID = item.item.uuid
+  if(filterStore.currentPageName === PAGE_NAMES.SEARCH) {
+    router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
+  } else if (filterStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
+    emit('row-click', item)
+    // await loadData()
+  }
 }
 
 const onItemsPerPageChanged = (ipp) => {
@@ -209,41 +217,74 @@ const onSortUpdate = (newSort) => {
 }
 
 // *** Utility functions *******************************************************
-const scrollTop = () => {
-  nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
+const loadColocData = async (cpn, url) => {
+  // console.log(`loading coloc data for ${cpn} page from ${url}`)
+  const { data, errorMessage, fetchData } = useFetchData()
+
+  if(await fetchData(url, 'coloc plot data', cpn)) {
+    // console.log('got coloc data:', data.value)
+    filterStore.colocData = markRaw(data.value)
+    filterStore.colocDataReady = true
+  } else {
+    throw new Error('Error loading coloc plot data:\n' + errorMessage)
+  }
+
+  const url2 = buildLZTableURL(URLS[cpn], filterStore.colocData.signal1, filterStore.colocData.signal2)
+  return url2
 }
 
-const loadTableData = async () => {
+const loadTableData = async (cpn, url) => {
+  // console.log(`loading table data for ${cpn} page from ${url.href}`)
   const { data, errorMessage, fetchData } = useFetchData()
-  isLoadingData.value = true
   filterStore.isDirEffectReady = false
-
-  const cpn = filterStore.currentPageName
-  const baseURL = URLS[cpn]
-  const url = filterStore.buildSearchURL(baseURL)
-
   if(await fetchData(url, 'table data', cpn)) {
+    // console.log('loaded table data:', data.value)
     dataItems.value = data.value.results
     filterStore.itemCount = dataItems.value.length
     countPairs.value = data.value.count
     filterStore.countPairs = data.value.count
-    // console.log(`Loaded table data (${filterStore.itemCount}/${filterStore.countPairs}):`, dataItems.value)
 
-    if([PAGE_NAMES.SEARCH, PAGE_NAMES.MANHATTAN].includes(cpn)) {
-      filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
-      filterStore.isDirEffectReady = true
-    }
+    filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
+    filterStore.isDirEffectReady = true
 
     const parentKey = PAGE_STORE_DATA_MAP[cpn]
     currentPage.value = filterStore[parentKey].filters.pageNum
     itemsPerPage.value = filterStore[parentKey].filters.pageSize
 
-    scrollTop()
-    isLoadingData.value = false
   } else {
-    isLoadingData.value = false
     throw new Error('Error loading table data:\n' + errorMessage)
   }
+}
+
+const loadData = async () => {
+  let url = null
+  isLoadingData.value = true
+  const cpn = filterStore.currentPageName
+
+  try {
+    if (cpn === PAGE_NAMES.LOCUSZOOM) {
+      const colocURL = `${URLS[cpn]}${filterStore.colocID}`
+      // console.log('colocURL:', colocURL)
+      url = await loadColocData(cpn, colocURL)
+    } else { // must be search page or manhattan page
+      url = filterStore.buildSearchURL(URLS[cpn])
+    }
+
+    if(!filterStore.lzPageTableDataLoaded) {
+      await loadTableData(cpn, url)
+      filterStore.lzPageTableDataLoaded = true
+    }
+
+  } catch {
+    // throw new Error('Error loading data:\n' + errorMessage)
+  } finally {
+    isLoadingData.value = false
+    scrollTop()
+  }
+}
+
+const scrollTop = () => {
+  nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
 }
 
 // *** Configuration data ******************************************************

@@ -4,6 +4,8 @@ const BIOMARKER_TYPES = Object.freeze({
   EXON_EXPRESSION: 'exon-expression',
 })
 
+const NEARBY_DIST = 500e3
+
 const PAGE_NAMES = {
   GENES: 'genes',
   HELP: 'help',
@@ -25,11 +27,15 @@ const URLS = {
   // these are for the data tables that exist on the associated pages
   [PAGE_NAMES.SEARCH]: '/api/v1/coloc/',
   [PAGE_NAMES.MANHATTAN]: '/api/v1/coloc/',
+  [PAGE_NAMES.LOCUSZOOM]: '/api/v1/coloc/',
   // these are misc data links
   FILTER_DATA: '/api/v1/internal/search_metadata/',
   TRAIT_DATA: '/api/v1/internal/analysis/',
   LZ_DATA: '',
+  PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
+  SIGNALS_DATA: '/api/v1/signals/',
+  LD_DATA: '/api/v1/ld/',
 }
 
-export { BIOMARKER_TYPES, PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS
+export { BIOMARKER_TYPES, NEARBY_DIST, PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS
 }

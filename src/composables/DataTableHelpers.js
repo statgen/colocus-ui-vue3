@@ -1,5 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { useFilterStore } from '@/stores/FilterStore'
+import { findPlotRegion } from '@/util/util'
 
 export const useDataTableHelpers = () => {
   const filterStore = useFilterStore()
@@ -83,6 +84,34 @@ export const useDataTableHelpers = () => {
     document.body.removeChild(link) // Clean up
   }
 
+  const buildLZTableURL = (baseURL, coloc_signal1, coloc_signal2) => {
+    const base = new URL(baseURL, window.location.origin)
+    const filter_data = filterStore.locuszoomPageData.filters
+    // console.log('filter_data', filter_data)
+
+    if (!coloc_signal1) {
+      console.error('missing coloc signal1')
+      return base
+    }
+
+    const { start, end } = findPlotRegion(
+      coloc_signal1.lead_variant.pos,
+      coloc_signal2.lead_variant.pos
+    )
+
+    const signal1_region = `${coloc_signal1.lead_variant.chrom}:${start}-${end}`
+    const signal2_region = `${coloc_signal2.lead_variant.chrom}:${start}-${end}`
+
+    base.searchParams.set('signal1_region', signal1_region)
+    base.searchParams.set('signal2_region', signal2_region)
+    base.searchParams.set('min_h4', filter_data.h4)
+    base.searchParams.set('min_r2', filter_data.r2)
+    base.searchParams.set('signal1_min_logp', filter_data.trait1log10p)
+    base.searchParams.set('signal2_min_logp', filter_data.trait2log10p)
+
+    return base
+  }
+
   const ITEMS_PER_PAGE_OPTIONS = [
     {value: 10, title: '10'},
     {value: 25, title: '25'},
@@ -93,8 +122,10 @@ export const useDataTableHelpers = () => {
   ]
 
   return {
-    visibleColumns,
+    buildLZTableURL,
+    findPlotRegion,
     fileDownload,
+    visibleColumns,
     ITEMS_PER_PAGE_OPTIONS,
   }
 }

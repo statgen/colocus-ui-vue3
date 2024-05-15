@@ -19,6 +19,7 @@ export const useFetchData = () => {
         throw new Error(response.statusText)
       }
       state.data = await response.json()
+      // console.log('fetchData:', state.data)
     } catch (error) {
       state.hasError = true
       state.errorMessage = error.message

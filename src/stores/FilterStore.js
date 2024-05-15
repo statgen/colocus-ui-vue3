@@ -5,6 +5,10 @@ import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
+    colocID: '',
+    colocData: null,
+    colocDataReady: false,
+    lzPageTableDataLoaded: false,
     // preloadTrait: '',
     manhattanData: [],
     filterDataChanged: false,

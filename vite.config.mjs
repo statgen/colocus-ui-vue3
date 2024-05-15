@@ -19,7 +19,7 @@ export default defineConfig({
     }),
     Vuetify(),
     Components({
-      dirs: ['src/components', 'src/components/widgets', 'src/components/FilterPanel'], // add component directories here
+      dirs: ['src/components', 'src/components/misc widgets', 'src/components/FilterPanel'], // add component directories here
     }),
     ViteFonts({
       google: {

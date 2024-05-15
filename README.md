@@ -146,10 +146,33 @@ The Search page also has references to preloadTrait, which are not used, but are
 
 To re-enable the feature, search across files for preloadTrait and remove the comment markers. Also have to add the trait name to the router-link passed by the data table. And add :trait to the path in the route to the Manhattan page in the router.
 
+### Manhattan plot view
+
+
+### Locuszoom view
+(This is interim info, covering only data loading and the compare(scatter) plot. Will update after adding LZ plot.)
+
+#### Data loading
+Our common idiom for data loading in this app is to set a flag from the source requesting the data, then watch that flag and load data when it changes. That pattern is used in the LZ page as well. The onMounted lifecycle hook calls several functions to initiate data loading.
+
+**loadFilterControls()** flips the value of local variable loadFPControls, which is provided to the AutoComplete control to load the appropriate data from the Pinia store, depending on the type of AutoComplete. This is static data such as gene list, not user selections.
+ 
+**loadData()** sets the colocDataReady flag to false, then flips the data flag, loadTableDataFlag, which is watched by the DataTable component. When that flag changes, the DataTable calls its loadData() function. It in turn loads data for the coloc plot if the user is on the LZ page. Either way, it then loads data for the data table. The coloc data is stored in the filterStore, and its colocDataReadyFlag is set to true. That flag in turn takes us back to the LZ page, where it is watched, and when true, calls buildCompareLayout(), which assembles the data for the plot and generates it.
+
+#### Compare (scatter) plot
+**buildCompareLayout()** in part replaces the template, the dataTableRowClick function, and the setData function in the Vue 2 app. Here, the plot is created dynamically as a Vue vnode, which gets assigned to the initially empty template div, with a ref named comparePlotRef. This avoids having to do a full page reload, as in the Vue 2 version.
+
+There is an additional flag, filterStore.lzPageTableDataLoaded, that controls when table data is loaded on the LZ page. The flag is set to false in the onMounated hook of that page. Thus the loadData() function will load the table data, and set the flag to true, so that if the user clicks others row in the data table, subsequent calls to loadData  will reload only the plot data, not the table data.
+
+#### LZ Plot
+
+
 ## Misc debugging hints
 - use {{ $log() }} in templates to log local values to console. This is defined in main.js
 
-## Section headings in component files
+## Section headings in view and component files
+I find that it helps reduce cognitive load to have the sections in the same order throughout the application. There are some dependencies among them; for example, variables must be defined before watches. Very simple components don't need the overhead. This structure does not fit composables, constants, and helper files. In those cases, we list functions alphabetically. 
+
 ```
 // *** Imports *****************************************************************
 // *** Composables *************************************************************

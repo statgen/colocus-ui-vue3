@@ -31,6 +31,7 @@ import { onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from "vue-router";
 import { useFilterStore } from '@/stores/FilterStore'
 import router from '@/router'
+import { PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
 const filterStore = useFilterStore()
@@ -77,8 +78,9 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
-const onDataTableRowClick = () => {
-  router.push({ name: 'locuszoom', params: {} })
+const onDataTableRowClick = (item) => {
+  console.log('sv: dataTableRowClick')
+  // router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
 }
 
 // *** Utility functions *******************************************************
