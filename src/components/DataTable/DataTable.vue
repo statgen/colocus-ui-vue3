@@ -266,17 +266,16 @@ const loadData = async () => {
       const colocURL = `${URLS[cpn]}${filterStore.colocID}`
       // console.log('colocURL:', colocURL)
       url = await loadColocData(cpn, colocURL)
+      if(!filterStore.lzPageTableDataLoaded) {
+        await loadTableData(cpn, url)
+        filterStore.lzPageTableDataLoaded = true
+      }
     } else { // must be search page or manhattan page
       url = filterStore.buildSearchURL(URLS[cpn])
-    }
-
-    if(!filterStore.lzPageTableDataLoaded) {
       await loadTableData(cpn, url)
-      filterStore.lzPageTableDataLoaded = true
     }
-
   } catch {
-    // throw new Error('Error loading data:\n' + errorMessage)
+    throw new Error('Error loading data:\n' + errorMessage)
   } finally {
     isLoadingData.value = false
     scrollTop()
