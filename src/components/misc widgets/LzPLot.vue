@@ -16,8 +16,11 @@ import LocusZoom from 'locuszoom'
 import 'locuszoom/dist/locuszoom.css'
 import { config_to_sources } from '@/util/lz-layouts';
 import { colorHasher, makePlotTitle,url } from '@/util/util';
+import { useFilterStore } from '@/stores/FilterStore'
 
 // *** Composables *************************************************************
+const filterStore = useFilterStore()
+
 // *** Props *******************************************************************
 const props = defineProps({
   base_layout: { type: Object, default: () => ({}) },
@@ -34,9 +37,10 @@ const props = defineProps({
 })
 
 // *** Variables ***************************************************************
-let uid = 0; // Ensure that every component instance has a unique DOM id, for use by d3
-uid += 1;
-const dom_id = `lz-plot-${uid}`; // DOM element
+// let uid = 0; // Ensure that every component instance has a unique DOM id, for use by d3
+// uid += 1;
+filterStore.plotID += 1
+const dom_id = `lz-plot-${filterStore.plotID}`; // DOM element
 const plot_id = dom_id.replace(/-/g, '_'); // How to expose the plot instance globally
 // This is important: plot must be assigned as a static property. If it were a field in
 //  `data` , vue would recursively wrap it as an observable, and Really Bad Things Happen.

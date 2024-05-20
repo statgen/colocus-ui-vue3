@@ -49,10 +49,12 @@ function makePlotTitle(signal) {
     title += ` - ${signal.analysis.trait.uuid}`;
   } else if (signal.analysis.trait.exon) {
     // This trait is an exon expression trait
-    title += ` - ${signal.analysis.trait.exon.ens_id} (${signal.analysis.trait.gene.symbol})`;
+    // title += ` - ${signal.analysis.trait.exon.ens_id} (${signal.analysis.trait.gene.symbol})`;
+    title += ` - (${signal.analysis.trait.gene.symbol})`;
   } else if (signal.analysis.trait.gene) {
     // This trait is a gene expression trait
-    title += ` - ${signal.analysis.trait.gene.ens_id} (${signal.analysis.trait.gene.symbol})`;
+    // title += ` - ${signal.analysis.trait.gene.ens_id} (${signal.analysis.trait.gene.symbol})`;
+    title += ` - ${signal.analysis.trait.gene.symbol}`;
   }
   title += ` - ${signal.lead_variant.vid}`;
 

@@ -5,6 +5,7 @@ import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
+    plotID: 0,
     colocID: '',
     colocData: null,
     colocDataReady: false,
