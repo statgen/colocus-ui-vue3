@@ -15,7 +15,7 @@ import { computed, defineEmits, onMounted, onBeforeUnmount, ref, watch } from 'v
 import LocusZoom from 'locuszoom'
 import 'locuszoom/dist/locuszoom.css'
 import { config_to_sources } from '@/util/lz-layouts';
-import { colorHasher, makePlotTitle,url } from '@/util/util';
+import { makePlotTitle, url } from '@/util/util';
 import { useFilterStore } from '@/stores/FilterStore'
 
 // *** Composables *************************************************************

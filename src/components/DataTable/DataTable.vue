@@ -22,7 +22,7 @@
   >
 
     <template v-slot:item.actions="{ item }">
-      <v-icon icon="mdi-image-plus-outline" @click="onAddPlotIconClick(item)" class="text-clcAction mx-n2" size="26px"/>
+      <v-icon icon="mdi-image-plus-outline" @click="onAddPlotIconClick(item)" class="text-clcAction mx-n2" size="22px"/>
     </template>
 
     <template v-slot:item.signal1.analysis.study.uuid="{item}">
@@ -190,7 +190,7 @@ const onRowClick = async (event, item) => {
   // console.log('dt: row-click', item.item.uuid)
   filterStore.colocID = item.item.uuid
   if(filterStore.currentPageName === PAGE_NAMES.SEARCH) {
-    router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
+    await router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
   } else if (filterStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
     emit('row-click', item)
     // await loadData()

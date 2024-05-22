@@ -58,7 +58,6 @@ function makePlotTitle(signal) {
   }
   title += ` - ${signal.lead_variant.vid}`;
 
-  const colorHasher = new ColorHash({ lightness: [0.7, 0.8, 0.7] });
   const color = colorHasher.hex(signal.lead_variant.vid);
   return [title, color];
 }

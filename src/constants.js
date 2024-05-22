@@ -1,8 +1,14 @@
+// API endpoint uses generic prefix "t1" and "t2" to refer to the pair of results we get from this endpoint
+const AXIS_OPTIONS = Object.freeze({ MARGINAL: 't1', CONDITIONAL: 't2' });
+
 const BIOMARKER_TYPES = Object.freeze({
   PHENOTYPE: 'phenotype',
   GENE_EXPRESSION: 'gene-expression',
   EXON_EXPRESSION: 'exon-expression',
 })
+
+// Specify which lead variant to use for LD coloring
+const LD_OPTIONS = Object.freeze({ SIGNAL1: 'signal1', SIGNAL2: 'signal2' });
 
 const NEARBY_DIST = 500e3
 
@@ -37,5 +43,5 @@ const URLS = {
   LD_DATA: '/api/v1/ld/',
 }
 
-export { BIOMARKER_TYPES, NEARBY_DIST, PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS
+export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS
 }

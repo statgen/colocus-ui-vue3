@@ -19,8 +19,8 @@
           <h2>LZ Compare plot</h2>
           <div ref="comparePlotRef"></div>
         </v-row>
-        <v-row>
-          <h3>LD Panel</h3>
+        <v-row class="d-flex justify-end mb-2">
+          <LDPanel class="mr-6" :ld_refs="ld_refs" @onConMarChange="onConMarChange" @onLDRadioChange="onLDRadioChange"/>
         </v-row>
       </v-col>
       <v-col cols="6">
@@ -57,7 +57,7 @@ import { normalizeMarker } from 'locuszoom/esm/helpers/parse'
 import { findPlotRegion } from '@/util/util'
 import LzPlot from '@/components/misc widgets/LzPLot.vue'
 import { config_to_sources, get_compare_layout, get_region_layout, get_region_sources, toggle_trait } from '@/util/lz-layouts'
-import { URLS } from '@/constants'
+import { AXIS_OPTIONS, URLS } from '@/constants'
 import * as d3 from 'd3'
 
 // *** Composables *************************************************************
@@ -79,8 +79,15 @@ const loadTableDataFlag = ref(false)
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the variable and injection for the underlying controls
 const preloadGenes = ref([])
-const comparePlotRef = ref(null) //ref<HTMLElement | null>(null);
+
+const comparePlotRef = ref(null)
+let compareVnodeRef = null
+
 const regionPlotRef = ref(null)
+let regionVnodeRef = null
+
+const ld_refs = ref([])
+const conMarIndicator = ref(AXIS_OPTIONS.CONDITIONAL)
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -102,10 +109,57 @@ watch(() => filterStore.colocDataReady, async (newVal) => {
     s1color.value = colorHasher.hex(s1vid.value)
     s2color.value = colorHasher.hex(s2vid.value)
 
+    addLDRef(filterStore.colocData.signal1.lead_variant.vid)
+    addLDRef(filterStore.colocData.signal2.lead_variant.vid)
+
     // build the plots
     buildCompareLayout()
     buildRegionLayout()
   }
+})
+
+watch(() => conMarIndicator.value, (newVal, oldVal) => {
+  console.log('oldVal', oldVal, 'newVal', newVal)
+  // drilling through like this may not be the best approach, but using the proxy object didn't work
+  // theoretically, something like this would make it less implementation dependent: const lzregion = regionVnodeRef?.component?.proxy
+  const lzregion = regionVnodeRef.component.vnode.component.setupState
+  console.log('lzregion:', lzregion)
+
+  if(!lzregion) throw new Error('lzregion not found')
+
+  lzregion.callPlot((plot) => {
+    try {
+      toggle_trait(plot.layout, 'assoc', oldVal, newVal)
+    } catch (e) {
+      console.log('error 1 from toggle_trait', e)
+    }
+    try {
+      plot.applyState()
+    } catch (e) {
+      console.log('error 1 applying state to lzregion:', e)
+    }
+  })
+
+  const lzcompare = compareVnodeRef.component.vnode.component.setupState
+
+  lzcompare.callPlot((plot) => {
+    try {
+      toggle_trait(plot.layout, 'trait1', oldVal, newVal)
+    } catch (e) {
+      console.log('error 2 from toggle_trait', e)
+    }
+    try {
+      toggle_trait(plot.layout, 'trait2', oldVal, newVal)
+    } catch (e) {
+      console.log('error 3 from toggle_trait', e)
+    }
+    try {
+      plot.applyState()
+    } catch (e) {
+      console.log('error 2 applying state to lzregion:', e)
+    }
+  })
+
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -122,17 +176,35 @@ const onTableRowClick = () => {
   loadData()
 }
 
+const onConMarChange = (val) => {
+  console.log('onConMarChange:', val)
+  conMarIndicator.value = val
+}
+
+const onLDRadioChange = (val) => {
+  console.log('LDRadioChange:', val)
+  const marker = normalizeMarker(val)
+
+  const lzregion = regionVnodeRef.component.vnode.component.setupState
+  const lzcompare = compareVnodeRef.component.vnode.component.setupState
+
+  console.log('lzregion:', lzregion, 'lzcompare:', lzcompare)
+
+  lzcompare.callPlot((plot) => plot.applyState({ ldrefvar: marker }))
+  lzregion.callPlot((plot) => plot.applyState({ ldrefvar: marker }))
+}
+
 // *** Utility functions *******************************************************
 function setPanelTitle(layout, title, color, trait) {
   layout.panels.forEach((panel) => {
     if (panel.data_layers) {
       panel.data_layers.forEach((layer) => {
         if (layer.namespace && layer.namespace.assoc === trait) {
-          panel.title = { text: title, style: { fill: color, 'font-size': '1.1rem', 'font-weight': 'normal' } };
+          panel.title = { text: title, style: { fill: color, 'font-size': '1.0rem', 'font-weight': 'normal' } }
         }
-      });
+      })
     }
-  });
+  })
 }
 
 const buildLZProps = (plotType) => {
@@ -151,7 +223,7 @@ const buildLZProps = (plotType) => {
     start,
     end,
     ldrefvar: variant,
-  };
+  }
   // console.log(`s1Label: ${s1Label}, s2Label: ${s2Label} initialState:`, initialState)
 
   let base_layout
@@ -173,7 +245,7 @@ const buildLZProps = (plotType) => {
     `${URLS.SIGNALS_DATA}${signal1.uuid}/region/`,
     `${URLS.SIGNALS_DATA}${signal2.uuid}/region/`,
     `${URLS.LD_DATA}${signal1.analysis.ld}/region/`,
-  );
+  )
 
   const explicit_sources = () => config_to_sources(source_configs) // needs to be a function for LzPlot
   // console.log('explicit_sources:', explicit_sources)
@@ -190,21 +262,21 @@ const buildCompareLayout = () => {
 
   const lzProps = buildLZProps('compare')
   // console.log('lz props:', lzProps)
-  const vnode = createVNode(LzPlot, lzProps)
+  compareVnodeRef = createVNode(LzPlot, lzProps)
   // console.log('vnode:', vnode)
 
   try {
     // console.log('comparePlotRef is ready:', comparePlotRef.value)
     render(null, comparePlotRef.value)
-    render(vnode, comparePlotRef.value)
+    render(compareVnodeRef, comparePlotRef.value)
 
     nextTick(() => {
       requestAnimationFrame(() => {
         // Select and style the axis labels
-        d3.selectAll('.lz-x .lz-label').style('fill', s2color.value).style('font-weight', 'normal').style('font-size', '1.1rem')
-        d3.selectAll('.lz-y .lz-label').style('fill', s1color.value).style('font-weight', 'normal').style('font-size', '1.1rem')
-      });
-    });
+        d3.selectAll('.lz-x .lz-label').style('fill', s2color.value).style('font-weight', 'normal').style('font-size', '1.0rem')
+        d3.selectAll('.lz-y .lz-label').style('fill', s1color.value).style('font-weight', 'normal').style('font-size', '1.0rem')
+      })
+    })
   } catch(e) {
     console.log('LZ Compare plot render error:', e)
   }
@@ -215,17 +287,12 @@ const buildRegionLayout = () => {
 
   const lzProps = buildLZProps('region')
   // console.log('lz props:', lzProps)
-  const vnode = createVNode(LzPlot, lzProps)
+  regionVnodeRef = createVNode(LzPlot, lzProps)
   // console.log('vnode:', vnode)
 
   try {
-    // if(regionPlotRef.value) {
-      // console.log('regionPlotRef is ready:', regionPlotRef.value)
-      render(null, regionPlotRef.value)
-      render(vnode, regionPlotRef.value)
-    // } else {
-    //   console.log('comparePlotRef is not ready:', regionPlotRef.value)
-    // }
+    render(null, regionPlotRef.value)
+    render(regionVnodeRef, regionPlotRef.value)
   } catch(e) {
     console.log('LZ Region plot render error:', e)
   }
@@ -238,6 +305,12 @@ const loadFilterControls = () => {
 const loadData = () => {
   filterStore.colocDataReady = false
   loadTableDataFlag.value = !loadTableDataFlag.value
+}
+
+const addLDRef = (item) => {
+  // console.log('ldRef:', item)
+  if (!ld_refs.value.includes(item)) ld_refs.value.push(item)
+  // console.log('ld_refs.value:', ld_refs.value)
 }
 
 // *** Configuration data ******************************************************
