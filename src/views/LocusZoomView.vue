@@ -13,7 +13,7 @@
         with {{ s2trait }} <span class="mx-1" :style="{color: s2color}">({{ s2vid }})</span>
       </div>
     </v-row>
-    <v-row class="ml-2 mt-2">
+    <v-row class="ml-2 mt-2 pt-2">
       <v-col cols="6">
         <v-row>
           <h2>LZ Compare plot</h2>
@@ -24,8 +24,10 @@
         </v-row>
       </v-col>
       <v-col cols="6">
-        <h2>LZ Region plot</h2>
-        <div ref="regionPlotRef" class="region-plot"></div>
+        <v-row>
+          <h2>LZ Region plot</h2>
+          <div ref="regionPlotRef" class="region-plot"></div>
+        </v-row>
       </v-col>
     </v-row>
     <v-row class="ml-2">
@@ -36,7 +38,8 @@
         <h3>Data table</h3>
         <div class="table-container">
           <DataTable
-            @row-click="onTableRowClick"
+            @onDataTableRowClick="onDataTableRowClick"
+            @onAddPlotIconClick="onAddPlotIconClick"
           ></DataTable>
         </div>
         <p class="mt-8">
@@ -171,8 +174,18 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
-// const onTableRowClick = () => console.log('zzz')
-const onTableRowClick = () => {
+// const onDataTableRowClick = () => console.log('zzz')
+const onAddPlotIconClick = (item) => {
+  console.log('onAddPlotIconClick', item)
+  const { signal1, signal2 } = item
+
+  const lzregion = regionVnodeRef.component.vnode.component.setupState
+  lzregion.addPanelPair(signal1, signal2)
+  addLDRef(signal1.lead_variant.vid)
+  addLDRef(signal2.lead_variant.vid)
+}
+
+const onDataTableRowClick = () => {
   loadData()
 }
 
@@ -296,6 +309,12 @@ const buildRegionLayout = () => {
   } catch(e) {
     console.log('LZ Region plot render error:', e)
   }
+}
+
+const getSignals = () => {
+  const s1 = filterStore.colocData.signal1
+  const s2 = filterStore.colocData.signal2
+  return [s1, s2]
 }
 
 const loadFilterControls = () => {

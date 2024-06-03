@@ -1,7 +1,8 @@
  <template>
-   <v-data-table-server
-     :fixed-header="false"
+  <v-data-table-server
+    :fixed-header="false"
     :headers="visibleColumns"
+    :row-props="({item}) => getRowClass(item)"
     :items="dataItems"
     :items-length="countPairs"
     :items-per-page="itemsPerPage"
@@ -22,7 +23,7 @@
   >
 
     <template v-slot:item.actions="{ item }">
-      <v-icon icon="mdi-image-plus-outline" @click="onAddPlotIconClick(item)" class="text-clcAction mx-n2" size="22px"/>
+      <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction mx-n2" size="22px"/>
     </template>
 
     <template v-slot:item.signal1.analysis.study.uuid="{item}">
@@ -167,7 +168,7 @@ const loadingText = ref('Loading data ...')
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['row-click'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
 watch(() => filterStore.filterDataChanged, async () => {
@@ -184,15 +185,15 @@ watch(() => loadTableDataFlag.value, async () => {
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
   console.log('dt: add plot for item:', item)
+  emit('onAddPlotIconClick', item)
 }
 
 const onRowClick = async (event, item) => {
-  // console.log('dt: row-click', item.item.uuid)
   filterStore.colocID = item.item.uuid
   if(filterStore.currentPageName === PAGE_NAMES.SEARCH) {
     await router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
   } else if (filterStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
-    emit('row-click', item)
+    emit('onDataTableRowClick', item)
     // await loadData()
   }
 }
@@ -282,6 +283,20 @@ const loadData = async () => {
   }
 }
 
+const getRowClass = (item) => {
+  if(filterStore.currentPageName !== PAGE_NAMES.LOCUSZOOM) return
+  if(!filterStore.colocDataReady) return
+
+  const s1 = filterStore.colocData.signal1
+  const s2 = filterStore.colocData.signal2
+
+  if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
+    return { class: 'bg-clcTableHighlight font-weight-bold' }
+  } else {
+    return {}
+  }
+}
+
 const scrollTop = () => {
   nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
 }
@@ -297,6 +312,11 @@ const scrollTop = () => {
 
 a:hover {
   font-weight: bold;
+}
+
+.signal-row {
+  font-weight: bold;
+  background: aliceblue;
 }
 
 </style>

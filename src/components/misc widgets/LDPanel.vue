@@ -78,9 +78,9 @@ const panelStyle = {
 </script>
 
 <style scoped>
-/* The following uses a Vue-specific notation (/deep/) to select child components.
+/* The following uses a Vue-specific notation (:deep()) to select child components.
    Needed to hide an unused subcomponent of the v-select taking up vertical space. */
-/deep/ .v-input__details {
+:deep() .v-input__details {
   display: none !important;
 }
 

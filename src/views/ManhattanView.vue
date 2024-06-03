@@ -38,7 +38,7 @@
     <v-row>
       <div class="table-container mt-2">
         <DataTable
-          @row-click="onDataTableRowClick"
+          @onDataTableRowClick="onDataTableRowClick"
           @select_signals="addSignals"
         ></DataTable>
       </div>

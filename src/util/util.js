@@ -94,7 +94,7 @@ function url(strings, ...values) {
   strings.forEach((seg, i) => {
     res += seg + encodeURIComponent((values[i] || ''));
   });
-  console.log('url:', res)
+  // console.log('url:', res)
   return res;
 }
 

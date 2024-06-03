@@ -19,7 +19,7 @@
     ></v-alert>
     <div class="table-container">
       <DataTable
-        @row-click="onDataTableRowClick"
+        @onDataTableRowClick="onDataTableRowClick"
       ></DataTable>
     </div>
   </v-col>
