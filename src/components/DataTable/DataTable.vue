@@ -184,7 +184,7 @@ watch(() => loadTableDataFlag.value, async () => {
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
-  console.log('dt: add plot for item:', item)
+  // console.log('dt: add plot for item:', item)
   emit('onAddPlotIconClick', item)
 }
 

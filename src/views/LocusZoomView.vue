@@ -174,12 +174,12 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
-// const onDataTableRowClick = () => console.log('zzz')
 const onAddPlotIconClick = (item) => {
   console.log('onAddPlotIconClick', item)
   const { signal1, signal2 } = item
 
   const lzregion = regionVnodeRef.component.vnode.component.setupState
+  console.log('lzregion:', lzregion)
   lzregion.addPanelPair(signal1, signal2)
   addLDRef(signal1.lead_variant.vid)
   addLDRef(signal2.lead_variant.vid)
