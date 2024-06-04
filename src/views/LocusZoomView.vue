@@ -179,7 +179,7 @@ const onAddPlotIconClick = (item) => {
   const { signal1, signal2 } = item
 
   const lzregion = regionVnodeRef.component.vnode.component.setupState
-  console.log('lzregion:', lzregion)
+  console.log('regionVnodeRef:', regionVnodeRef)
   lzregion.addPanelPair(signal1, signal2)
   addLDRef(signal1.lead_variant.vid)
   addLDRef(signal2.lead_variant.vid)
