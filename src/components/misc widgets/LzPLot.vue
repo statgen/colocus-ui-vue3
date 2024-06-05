@@ -11,7 +11,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, defineEmits, onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, defineEmits, onMounted, onBeforeUnmount, watch } from 'vue'
 import LocusZoom from 'locuszoom'
 import 'locuszoom/dist/locuszoom.css'
 import { config_to_sources } from '@/util/lz-layouts';
@@ -217,6 +217,11 @@ const addPanelPair = (signal1, signal2) => {
     plot.addPanel(panel2);
   });
 }
+
+defineExpose({
+  addPanelPair,
+  callPlot
+})
 // *** Configuration data ******************************************************
 
 </script>

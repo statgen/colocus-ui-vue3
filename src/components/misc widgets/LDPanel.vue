@@ -6,7 +6,7 @@
         <h4 class="text-right mt-2">Y-axis:</h4>
       </v-col>
       <v-col class="my-0 py-0">
-        <v-radio-group inline :model-value="selectedMCRadio" @update:model-value="onConMarChange">
+        <v-radio-group inline :model-value="selectedMCRadio" @update:model-value="onCMRadioChange">
           <v-radio value="t2">
             <template v-slot:label>Conditional -log<sub>10</sub> p </template>
           </v-radio>
@@ -48,7 +48,7 @@ const props = defineProps({
 const selectedLDRadio = ref(props.ld_refs[0])
 const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
 
-const emit = defineEmits(['onConMarChange', 'onLDRadioChange'])
+const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange'])
 
 watch(() => filterStore.colocDataReady, async (newVal) => {
   if(newVal) {
@@ -56,9 +56,9 @@ watch(() => filterStore.colocDataReady, async (newVal) => {
   }
 })
 
-const onConMarChange = (value) => {
+const onCMRadioChange = (value) => {
   selectedMCRadio.value = value
-  emit('onConMarChange', value)
+  emit('onCMRadioChange', value)
 }
 
 const onLDRadioChange = (value) => {

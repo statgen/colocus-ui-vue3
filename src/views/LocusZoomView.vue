@@ -20,7 +20,7 @@
           <div ref="comparePlotRef"></div>
         </v-row>
         <v-row class="d-flex justify-end mb-2">
-          <LDPanel class="mr-6" :ld_refs="ld_refs" @onConMarChange="onConMarChange" @onLDRadioChange="onLDRadioChange"/>
+          <LDPanel class="mr-6" :ld_refs="ld_refs" @onCMRadioChange="onCMRadioChange" @onLDRadioChange="onLDRadioChange"/>
         </v-row>
       </v-col>
       <v-col cols="6">
@@ -122,11 +122,9 @@ watch(() => filterStore.colocDataReady, async (newVal) => {
 })
 
 watch(() => conMarIndicator.value, (newVal, oldVal) => {
-  console.log('oldVal', oldVal, 'newVal', newVal)
-  // drilling through like this may not be the best approach, but using the proxy object didn't work
-  // theoretically, something like this would make it less implementation dependent: const lzregion = regionVnodeRef?.component?.proxy
-  const lzregion = regionVnodeRef.component.vnode.component.setupState
-  console.log('lzregion:', lzregion)
+  // console.log('oldVal', oldVal, 'newVal', newVal)
+  const lzregion = regionVnodeRef.component.exposed
+  // console.log('lzregion:', lzregion)
 
   if(!lzregion) throw new Error('lzregion not found')
 
@@ -143,7 +141,7 @@ watch(() => conMarIndicator.value, (newVal, oldVal) => {
     }
   })
 
-  const lzcompare = compareVnodeRef.component.vnode.component.setupState
+  const lzcompare = compareVnodeRef.component.exposed
 
   lzcompare.callPlot((plot) => {
     try {
@@ -175,11 +173,11 @@ onMounted(() => {
 
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
-  console.log('onAddPlotIconClick', item)
+  // console.log('onAddPlotIconClick', regionVnodeRef)
   const { signal1, signal2 } = item
 
-  const lzregion = regionVnodeRef.component.vnode.component.setupState
-  console.log('regionVnodeRef:', JSON.stringify(regionVnodeRef.component.vnode.component))
+  const lzregion = regionVnodeRef.component.exposed
+  //console.log('regionVnodeRef:', JSON.stringify(regionVnodeRef.component.vnode.component))
   lzregion.addPanelPair(signal1, signal2)
   addLDRef(signal1.lead_variant.vid)
   addLDRef(signal2.lead_variant.vid)
@@ -189,19 +187,19 @@ const onDataTableRowClick = () => {
   loadData()
 }
 
-const onConMarChange = (val) => {
-  console.log('onConMarChange:', val)
+const onCMRadioChange = (val) => {
+  // console.log('onCMRadioChange:', val)
   conMarIndicator.value = val
 }
 
 const onLDRadioChange = (val) => {
-  console.log('LDRadioChange:', val)
+  // console.log('LDRadioChange:', val)
   const marker = normalizeMarker(val)
 
-  const lzregion = regionVnodeRef.component.vnode.component.setupState
-  const lzcompare = compareVnodeRef.component.vnode.component.setupState
+  const lzregion = regionVnodeRef.component.exposed
+  const lzcompare = compareVnodeRef.component.exposed
 
-  console.log('lzregion:', lzregion, 'lzcompare:', lzcompare)
+  // console.log('lzregion:', lzregion, 'lzcompare:', lzcompare)
 
   lzcompare.callPlot((plot) => plot.applyState({ ldrefvar: marker }))
   lzregion.callPlot((plot) => plot.applyState({ ldrefvar: marker }))
@@ -309,12 +307,6 @@ const buildRegionLayout = () => {
   } catch(e) {
     console.log('LZ Region plot render error:', e)
   }
-}
-
-const getSignals = () => {
-  const s1 = filterStore.colocData.signal1
-  const s2 = filterStore.colocData.signal2
-  return [s1, s2]
 }
 
 const loadFilterControls = () => {
