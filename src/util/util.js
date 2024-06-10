@@ -28,6 +28,8 @@ const findPlotRegion = (pos1, pos2) => {
 
 // for formatting the text of variant labels
 const formatVariantString = ((variant, truncateLength = 0) => {
+  if(!variant) return ''
+
   const components = variant.split('_')
 
   components[1] = parseInt(components[1]).toLocaleString()

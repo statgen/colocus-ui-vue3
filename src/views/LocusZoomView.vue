@@ -28,14 +28,24 @@
           <h2>LZ Region plot</h2>
           <div ref="regionPlotRef" class="region-plot"></div>
         </v-row>
+        <v-row>
+          <LZSignalError />
+        </v-row>
       </v-col>
     </v-row>
     <v-row class="ml-2">
       <v-col cols="12">
-      <v-row><h2>All colocalized signals in region</h2></v-row>
-      <v-row><p>Colocalized signals within a 500kb window centered around the lead variants...</p></v-row>
       <v-row>
-        <h3>Data table</h3>
+        <h2>Data table</h2>
+      </v-row>
+      <v-row>
+        <p class="my-2">All colocalized signals within a 500kb window centered around the lead variants
+          <span class="mx-1" :style="{color: s1color}">{{ s1vid }}</span> and
+          <span class="mx-1" :style="{color: s2color}">{{ s2vid }}</span>
+          from the originally selected colocalized signals.
+        </p>
+      </v-row>
+      <v-row>
         <div class="table-container">
           <DataTable
             @onDataTableRowClick="onDataTableRowClick"
@@ -53,12 +63,12 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { createVNode, nextTick, onMounted, provide, ref, render, toRaw, watch } from 'vue'
+import { computed, createVNode, nextTick, onMounted, provide, ref, render, toRaw, watch } from 'vue'
 import { useFilterStore } from '@/stores/FilterStore'
 import { colorHasher, makePlotTitle, url } from '@/util/util'
 import { normalizeMarker } from 'locuszoom/esm/helpers/parse'
 import { findPlotRegion } from '@/util/util'
-import LzPlot from '@/components/misc widgets/LzPLot.vue'
+import LZPlot from '@/components/misc widgets/LZPLot.vue'
 import { config_to_sources, get_compare_layout, get_region_layout, get_region_sources, toggle_trait } from '@/util/lz-layouts'
 import { AXIS_OPTIONS, URLS } from '@/constants'
 import * as d3 from 'd3'
@@ -69,11 +79,13 @@ const filterStore = useFilterStore()
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 // template variables
+
 const s1trait = ref({})
 const s1vid = ref({})
+const s1color = ref('')
+
 const s2trait = ref({})
 const s2vid = ref({})
-const s1color = ref('')
 const s2color = ref('')
 
 // functional variables
@@ -104,6 +116,7 @@ provide('preloadGenes', preloadGenes)
 watch(() => filterStore.colocDataReady, async (newVal) => {
   if(newVal) {
     // console.log('watch: coloc data ready flag true; comparePlotRef:', comparePlotRef.value)
+
     // set template variables
     s1trait.value = filterStore.colocData.signal1.analysis.trait.phenotype.name
     s1vid.value = filterStore.colocData.signal1.lead_variant.vid
@@ -224,7 +237,7 @@ const buildLZProps = (plotType) => {
   const [s1Label, s1Color] = makePlotTitle(signal1)
   const [s2Label, s2Color] = makePlotTitle(signal2)
 
-  const variant = normalizeMarker(signal1.lead_variant.vid) // FIXME
+  const variant = normalizeMarker(signal1.lead_variant.vid)
   const chr = signal1.lead_variant.chrom
   const { start, end } = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
   // console.log('chr, start, end, variant:', chr, start, end, variant)
@@ -258,7 +271,7 @@ const buildLZProps = (plotType) => {
     `${URLS.LD_DATA}${signal1.analysis.ld}/region/`,
   )
 
-  const explicit_sources = () => config_to_sources(source_configs) // needs to be a function for LzPlot
+  const explicit_sources = () => config_to_sources(source_configs) // needs to be a function for LZPlot
   // console.log('explicit_sources:', explicit_sources)
 
   return {
@@ -273,7 +286,7 @@ const buildCompareLayout = () => {
 
   const lzProps = buildLZProps('compare')
   // console.log('lz props:', lzProps)
-  compareVnodeRef = createVNode(LzPlot, lzProps)
+  compareVnodeRef = createVNode(LZPlot, lzProps)
   // console.log('vnode:', vnode)
 
   try {
@@ -298,7 +311,7 @@ const buildRegionLayout = () => {
 
   const lzProps = buildLZProps('region')
   // console.log('lz props:', lzProps)
-  regionVnodeRef = createVNode(LzPlot, lzProps)
+  regionVnodeRef = createVNode(LZPlot, lzProps)
   // console.log('vnode:', vnode)
 
   try {
