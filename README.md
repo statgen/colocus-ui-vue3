@@ -159,13 +159,20 @@ Our common idiom for data loading in this app is to set a flag from the source r
  
 **loadData()** sets the colocDataReady flag to false, then flips the data flag, loadTableDataFlag, which is watched by the DataTable component. When that flag changes, the DataTable calls its loadData() function. It in turn loads data for the coloc plot if the user is on the LZ page. Either way, it then loads data for the data table. The coloc data is stored in the filterStore, and its colocDataReadyFlag is set to true. That flag in turn takes us back to the LZ page, where it is watched, and when true, calls buildCompareLayout(), which assembles the data for the plot and generates it.
 
-#### Compare (scatter) plot
+#### LZ Plots
+The compare (scatter) plot and the region plot are defined in the template as empty divs:
+```
+...
+<div ref="comparePlotRef"></div>
+...
+<div ref="regionPlotRef" class="region-plot"></div>
+...
+```
+The `ref` variables are subsequently populated by functions buildCompareLayout and buildRegionLayout. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build...Layout functions create Vnodes based on the underlying LZPlot library. The *Ref variables maintain a Vue reference to these components so that we can do things with them later, such as adding additional plots. 
+
 **buildCompareLayout()** in part replaces the template, the dataTableRowClick function, and the setData function in the Vue 2 app. Here, the plot is created dynamically as a Vue vnode, which gets assigned to the initially empty template div, with a ref named comparePlotRef. This avoids having to do a full page reload, as in the Vue 2 version.
 
-There is an additional flag, filterStore.lzPageTableDataLoaded, that controls when table data is loaded on the LZ page. The flag is set to false in the onMounated hook of that page. Thus the loadData() function will load the table data, and set the flag to true, so that if the user clicks others row in the data table, subsequent calls to loadData  will reload only the plot data, not the table data.
-
-#### LZ Plot
-
+There is an additional flag, filterStore.lzPageTableDataLoaded, that controls when table data is loaded on the LZ page. The flag is set to false in the onMounted hook of that page. Thus the loadData() function will load the table data, and set the flag to true, so that if the user clicks others row in the data table, subsequent calls to loadData  will reload only the plot data, not the table data.
 
 ## Misc debugging hints
 - use {{ $log() }} in templates to log local values to console. This is defined in main.js
