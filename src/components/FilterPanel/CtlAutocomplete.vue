@@ -6,6 +6,7 @@
     :placeholder="controlSet.placeholder"
     v-model="selectedItems"
     @update:model-value="onModelChanged"
+    @paste="onGenesPaste"
 
     auto-select-first
     bg-color="white"
@@ -80,6 +81,13 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
+const onGenesPaste = (event) => {
+  event.preventDefault()
+  const pastedData = event.clipboardData.getData('text')
+  // console.log('Pasted data:', pastedData)
+  filterStore.pastedGenes = pastedData
+}
+
 const onModelChanged = (newValue) => {
   filterStore.updateFilter(controlSet.storeKey, newValue)
 }

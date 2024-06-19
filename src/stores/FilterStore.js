@@ -5,6 +5,7 @@ import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
+    pastedGenes: null,
     plotID: 0,
     colocID: '',
     colocData: null,
@@ -64,15 +65,19 @@ export const useFilterStore = defineStore('filterStore', {
       }
       return url
     },
-    checkGenes(genes) {
-      const testGenes = genes.split(',')
+    checkGenes(geneStr) {
+      const testGenes = geneStr.split(',')
+      // console.log('testGenes:', testGenes)
       const goodGenes = []
       const badGenes = []
       testGenes.forEach(gene => {
-        if(this.filterLists.genes.includes(gene)) {
-          goodGenes.push(gene)
-        } else {
-          badGenes.push(gene)
+        if(gene) {
+          // console.log('checking gene:', gene)
+          if(this.filterLists.genes.includes(gene)) {
+            goodGenes.push(gene)
+          } else {
+            badGenes.push(gene)
+          }
         }
       })
       return { goodGenes, badGenes }

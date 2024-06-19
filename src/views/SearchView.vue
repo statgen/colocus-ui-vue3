@@ -27,11 +27,9 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted, provide, ref, watch } from 'vue'
+import { nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from "vue-router";
 import { useFilterStore } from '@/stores/FilterStore'
-import router from '@/router'
-import { PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
 const filterStore = useFilterStore()
@@ -55,6 +53,12 @@ provide('loadTableDataFlag', loadTableDataFlag)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
+watch(() => filterStore.pastedGenes, (newVal, oldVal) => {
+  // console.log('pasted genes: nv:', newVal, 'ov:', oldVal)
+  if(newVal) geneListHandler(filterStore.pastedGenes)
+  filterStore.pastedGenes = null
+})
+
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
   loadFilterControls()
@@ -64,16 +68,7 @@ onMounted(() => {
   if(!geneStr) {
     loadTableData()
   } else {
-    const { goodGenes, badGenes } = filterStore.checkGenes(geneStr)
-    if(badGenes.length > 0) {
-      alertText.value = `Invalid gene(s): ${badGenes.join(', ')}`
-      alertVisible.value = true
-    }
-    if(goodGenes.length > 0) {
-      preloadGenes.value = goodGenes
-    } else {
-      loadTableData()
-    }
+    geneListHandler(geneStr)
   }
 })
 
@@ -92,6 +87,31 @@ const loadTableData = () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
+/* genes for testing
+   A2M,AAMP,PDF
+   A2M,AAMP,PDF,
+   A2M,AAMP,PDF,x
+   A2M,AAMP,PDF,y
+   A2M,A2ML1-AS1,AAGAB,AAK1,AAMP,ABCA1,ABCA8,ABCG5,ABCG8,ABHD12,ABLIM3,ABTB1,ENSG00000000938,x,y
+*/
+const geneListHandler = (genes) => {
+  const { goodGenes, badGenes } = filterStore.checkGenes(genes.trim())
+  // console.log('bad genes length:', badGenes.length)
+  if(badGenes.length > 0) {
+    // console.log(badGenes)
+    alertText.value = `Invalid gene(s): ${badGenes.join(', ')}`
+    alertVisible.value = false
+    nextTick(() => {
+      alertVisible.value = true
+    })
+    setTimeout(() => { alertVisible.value = false }, 5000)
+  }
+  if(goodGenes.length > 0) {
+    preloadGenes.value = goodGenes
+  } else {
+    loadTableData()
+  }
+}
 
 // *** Configuration data ******************************************************
 </script>
