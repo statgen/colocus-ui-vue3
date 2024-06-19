@@ -6,6 +6,7 @@
  */
 
 :root {
+  --v-theme-clcAction: '#18c11c';
   --v-theme-clcHeading: #1E88E5; /* Fallback or actual value for IDE hinting */
   --v-theme-something: '#00ff00';
   --v-theme-on-something: '#00ff00';

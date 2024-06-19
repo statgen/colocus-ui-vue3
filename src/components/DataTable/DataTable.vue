@@ -17,11 +17,10 @@
     @update:page="onPageChanged"
     @update:sortBy="onSortUpdate"
 
-    show-current-page
-    density="compact"
     class="table-base"
+    density="compact"
+    show-current-page
   >
-
     <template v-slot:item.actions="{ item }">
       <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction mx-n2" size="22px"/>
     </template>
@@ -112,18 +111,6 @@
     <template v-slot:item.marg_cond_flip="{item}">
       {{ +item.marg_cond_flip }}
     </template>
-
-<!--    <template v-slot:header.r2="{ column }">-->
-<!--      <R2Header :title="column.title"/>-->
-<!--    </template>-->
-
-    <template v-slot:header.cross_signal.effect="{ column }">
-      <ConcordanceHeader :title="column.title"/>
-    </template>
-
-<!--    <template v-slot:header.n_coloc_between_traits="{ column }">-->
-<!--      <ColocHeader :title="column.title"/>-->
-<!--    </template>-->
 
     <template v-slot:footer.prepend>
       <div>

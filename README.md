@@ -148,6 +148,16 @@ To re-enable the feature, search across files for preloadTrait and remove the co
 
 ### Manhattan plot view
 
+### Help view
+The help page exists in source code as a markdown file, help.md. It is rendered into HTML by the marked library. The rendering is controlled by Vite, in the vite.config.mjs file. In it is a function, markdownPlugin, which is registered as a plugin in defineConfig. The function is called whenever the underlying markdown file is changed, or when Vite builds for production.
+
+The file HelpView.vue defines two columns, the left for a table contents, the right for the actual content. Clicking a link in the TOC causes the right side to scroll to the associated position in the document.
+
+Note that although the markdown file is referenced, it is the HTML file that is actually rendered.
+
+The TOC must be maintained manually. Its href values are determined by the render function in the vite config file.
+
+A Vue watch is set up to watch the v-sheet that contains the help content. When it is populated, the watcher sets up the event listeners for the links, and when it is being torn down, the event listeners are removed. This is necessary to prevent memory leaks, and to avoid navigation problems with the Vue router.
 
 ### Locuszoom view
 (This is interim info, covering only data loading and the compare(scatter) plot. Will update after adding LZ plot.)
