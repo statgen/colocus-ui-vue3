@@ -91,11 +91,17 @@ const loadTableData = () => {
    A2M,AAMP,PDF
    A2M,AAMP,PDF,
    A2M,AAMP,PDF,x
-   A2M,AAMP,PDF,y
+   A2M,AAMP,\t\r\n\n   PDF,y
    A2M,A2ML1-AS1,AAGAB,AAK1,AAMP,ABCA1,ABCA8,ABCG5,ABCG8,ABHD12,ABLIM3,ABTB1,ENSG00000000938,x,y
+   A2M	A2ML1-AS1	AAGAB	AAK1	AAMP	ABCA1	ABCA8	ABCG5	ABCG8	ABHD12	ABLIM3	ABTB1	ENSG00000000938	x	y
+
+z
+vv
+x1
+
 */
 const geneListHandler = (genes) => {
-  const { goodGenes, badGenes } = filterStore.checkGenes(genes.trim())
+  const { goodGenes, badGenes } = filterStore.checkGenes(genes)
   // console.log('bad genes length:', badGenes.length)
   if(badGenes.length > 0) {
     // console.log(badGenes)
@@ -104,7 +110,7 @@ const geneListHandler = (genes) => {
     nextTick(() => {
       alertVisible.value = true
     })
-    setTimeout(() => { alertVisible.value = false }, 5000)
+    setTimeout(() => { alertVisible.value = false }, 10000)
   }
   if(goodGenes.length > 0) {
     preloadGenes.value = goodGenes

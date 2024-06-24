@@ -66,18 +66,16 @@ export const useFilterStore = defineStore('filterStore', {
       return url
     },
     checkGenes(geneStr) {
-      const testGenes = geneStr.split(',')
-      // console.log('testGenes:', testGenes)
+      let testGenes = geneStr.replace(/ |\t|\r|\n/g, ',') // replace space, tab, newline, return with comma
+      testGenes = testGenes.split(',').filter(z => z)     // make array and remove empty elements
+      testGenes = [... new Set(testGenes)].sort()         // make unique list and sort
       const goodGenes = []
       const badGenes = []
       testGenes.forEach(gene => {
-        if(gene) {
-          // console.log('checking gene:', gene)
-          if(this.filterLists.genes.includes(gene)) {
-            goodGenes.push(gene)
-          } else {
-            badGenes.push(gene)
-          }
+        if(this.filterLists.genes.includes(gene)) {
+          goodGenes.push(gene)
+        } else {
+          badGenes.push(gene)
         }
       })
       return { goodGenes, badGenes }
