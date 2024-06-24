@@ -18,9 +18,9 @@
     "marked": "^12.0.0",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
-    "vue": "^3.4.29",
-    "vue-router": "^4.3.3",
-    "vuetify": "^3.6.9"
+    "vue": "^3.4.30",
+    "vue-router": "^4.4.0",
+    "vuetify": "^3.6.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",

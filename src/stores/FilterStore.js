@@ -210,7 +210,7 @@ const sortKeyMapAPI = {
   'signal1.lead_variant.chrom': 'signal1_chrom',
   'signal1.lead_variant.pos': 'signal1_pos',
   'signal1.analysis.trait.uuid': 'signal1_trait',
-  'signal2.analysis.trait.uuid': 'signal2_trait',
+  'signal2.analysis.trait.uuid': 'signal2_gene_symbol',
   'signal2.lead_variant.chrom': 'signal2_chrom',
   'signal2.lead_variant.pos': 'signal2_pos',
   'signal1.analysis.trait.gene.ens_id': 'signal1_gene_ens_id',
