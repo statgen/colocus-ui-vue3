@@ -11,4 +11,17 @@
 </template>
 
 <script setup>
+import { onMounted, onBeforeUnmount } from 'vue';
+
+const handleBeforeUnload = (event) => {
+  sessionStorage.setItem('isReload', 'true');
+};
+
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+})
 </script>

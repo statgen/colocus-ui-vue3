@@ -87,11 +87,21 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async(to, from) => {
+router.beforeEach(async(to, from, next) => {
   const filterStore = useFilterStore()
   filterStore.currentPageName = to.name
   if(![PAGE_NAMES.SEARCH, PAGE_NAMES.LOCUSZOOM, PAGE_NAMES.MANHATTAN].includes(to.name)) disableFiltering()
   if (!filterStore.isFilterDataLoaded) await filterStore.loadFilterData()
+
+  const isReload = sessionStorage.getItem('isReload');
+  // console.log(`isReload: ${isReload}, to.name: ${to.name}`); // Debug log
+
+  if (isReload) { // && to.name === PAGE_NAMES.LOCUSZOOM) {
+    sessionStorage.removeItem('isReload');
+    return next({ name: PAGE_NAMES.SEARCH });
+  } else {
+    next();
+  }
 })
 
 export default router
