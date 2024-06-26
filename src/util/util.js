@@ -45,21 +45,18 @@ const formatVariantString = ((variant, truncateLength = 0) => {
 })
 
 function makePlotTitle(signal) {
-  let title = `${signal.analysis.study.uuid}`;
-  if (signal.analysis.trait.phenotype) {
-    // This trait is a GWAS phenotype
-    title += ` - ${signal.analysis.trait.uuid}`;
-  } else if (signal.analysis.trait.exon) {
-    // This trait is an exon expression trait
-    // title += ` - ${signal.analysis.trait.exon.ens_id} (${signal.analysis.trait.gene.symbol})`;
-    title += ` - (${signal.analysis.trait.gene.symbol})`;
-  } else if (signal.analysis.trait.gene) {
-    // This trait is a gene expression trait
-    // title += ` - ${signal.analysis.trait.gene.ens_id} (${signal.analysis.trait.gene.symbol})`;
-    title += ` - ${signal.analysis.trait.gene.symbol}`;
+  let part1 = ''
+  if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
+    part1 += signal.analysis.trait.uuid
+  } else if (signal.analysis.trait.exon) { // This trait is an exon expression trait
+    part1 += signal.analysis.trait.gene.symbol
+  } else if (signal.analysis.trait.gene) { // This trait is a gene expression trait
+    part1 += signal.analysis.trait.gene.symbol
   }
-  title += ` - ${signal.lead_variant.vid}`;
-
+  const variant = formatVariantString(signal.lead_variant.vid)
+  const study = signal.analysis.study.uuid
+  const spacer = '_____'
+  const title = `${part1} ${spacer} ${variant} ${spacer} ${study}`
   const color = colorHasher.hex(signal.lead_variant.vid);
   return [title, color];
 }

@@ -223,11 +223,11 @@ LocusZoom.Layouts.add('plot', 'locuscompare', {
         // Most usages of this layout will override these labels
         x: {
           label: 'Trait 1',
-          label_offset: 38,
+          label_offset: 44,
         },
         y1: {
           label: 'Trait 2',
-          label_offset: 50,
+          label_offset: 38,
         },
       },
       data_layers: [
@@ -491,8 +491,8 @@ function get_compare_layout(x_label, y_label, state = {}) {
 
   // We only need to slightly change nested properties for each of these, so...
   // FIXME: Yeah this nomenclature is maximally confusing
-  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.x.label', `${y_label} (-log10 p-value)`);
-  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.y1.label', `${x_label} (-log10 p-value)`);
+  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.x.label', `${y_label}`);
+  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.y1.label', `${x_label}`);
   return layout;
 }
 

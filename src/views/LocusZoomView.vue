@@ -1,26 +1,29 @@
 <template>
-    <v-col v-show="filterStore.isFilterPanelShowing" class="filter-panel-container">
-      <FilterPanel />
-    </v-col>
+  <v-col v-show="filterStore.isFilterPanelShowing" class="filter-panel-container">
+    <FilterPanel />
+  </v-col>
 
   <v-col :cols="filterStore.isFilterPanelShowing ? 10 : 12" class="ml-3">
     <v-row class="mt-1 ml-2">
       <h1><BackButton />Locus Zoom</h1>
     </v-row>
+
     <v-row class="ml-2 mb-2">
       <div class="d-flex align-center flex-nowrap">
         Colocalization of {{ s1trait }} <span class="mx-1" :style="{color: s1color}">({{ s1vid }})</span>
         with {{ s2trait }} <span class="mx-1" :style="{color: s2color}">({{ s2vid }})</span>
       </div>
     </v-row>
+
     <v-row class="ml-2 mt-2 pt-2">
       <v-col cols="6">
         <v-row>
-          <h2>LZ Compare plot</h2>
+          <h2>LZ Compare plot (-log<sub>10</sub> p-values)</h2>
           <div ref="comparePlotRef"></div>
         </v-row>
+
         <v-row class="d-flex justify-end mb-2">
-          <LDPanel class="mr-6" :ld_refs="ld_refs" @onCMRadioChange="onCMRadioChange" @onLDRadioChange="onLDRadioChange"/>
+          <LDPanel class="mr-16" :ld_refs="ld_refs" @onCMRadioChange="onCMRadioChange" @onLDRadioChange="onLDRadioChange"/>
         </v-row>
       </v-col>
       <v-col cols="6">
@@ -28,34 +31,36 @@
           <h2>LZ Region plot</h2>
           <div ref="regionPlotRef" class="region-plot"></div>
         </v-row>
+
         <v-row>
           <LZSignalError />
         </v-row>
       </v-col>
     </v-row>
+
     <v-row class="ml-2">
       <v-col cols="12">
-      <v-row>
-        <h2>Data table</h2>
-      </v-row>
-      <v-row>
-        <p class="my-2">All colocalized signals within a 500kb window centered around the lead variants
-          <span class="mx-1" :style="{color: s1color}">{{ s1vid }}</span> and
-          <span class="mx-1" :style="{color: s2color}">{{ s2vid }}</span>
-          from the originally selected colocalized signals.
-        </p>
-      </v-row>
-      <v-row>
-        <div class="table-container">
-          <DataTable
-            @onDataTableRowClick="onDataTableRowClick"
-            @onAddPlotIconClick="onAddPlotIconClick"
-          ></DataTable>
-        </div>
-        <p class="mt-8">
-          <span class="font-weight-bold">Bold</span> denotes the signals currently being shown in the plots above.
-        </p>
-      </v-row>
+        <v-row>
+          <h2>Data table</h2>
+        </v-row>
+
+        <v-row>
+          <p class="my-2">All colocalized signals within a 500kb window centered around the lead variants
+            <span class="mx-1" :style="{color: s1color}">{{ s1vid }}</span> and
+            <span class="mx-1" :style="{color: s2color}">{{ s2vid }}</span>
+            from the originally selected colocalized signals.
+            <span class="font-weight-bold bg-clcTableHighlight"> Bold denotes </span>the initial signals shown in the plots above.
+          </p>
+        </v-row>
+
+        <v-row>
+          <div class="table-container">
+            <DataTable
+              @onDataTableRowClick="onDataTableRowClick"
+              @onAddPlotIconClick="onAddPlotIconClick"
+            ></DataTable>
+          </div>
+        </v-row>
       </v-col>
     </v-row>
   </v-col>
@@ -63,7 +68,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, createVNode, nextTick, onMounted, provide, ref, render, toRaw, watch } from 'vue'
+import { createVNode, nextTick, onMounted, provide, ref, render, watch } from 'vue'
 import { useFilterStore } from '@/stores/FilterStore'
 import { colorHasher, makePlotTitle, url } from '@/util/util'
 import { normalizeMarker } from 'locuszoom/esm/helpers/parse'
@@ -79,7 +84,6 @@ const filterStore = useFilterStore()
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 // template variables
-
 const s1trait = ref({})
 const s1vid = ref({})
 const s1color = ref('')
@@ -145,12 +149,12 @@ watch(() => conMarIndicator.value, (newVal, oldVal) => {
     try {
       toggle_trait(plot.layout, 'assoc', oldVal, newVal)
     } catch (e) {
-      console.log('error 1 from toggle_trait', e)
+      console.log('error from region toggle_trait:', e)
     }
     try {
       plot.applyState()
     } catch (e) {
-      console.log('error 1 applying state to lzregion:', e)
+      console.log('error applying state to region plot:', e)
     }
   })
 
@@ -160,17 +164,17 @@ watch(() => conMarIndicator.value, (newVal, oldVal) => {
     try {
       toggle_trait(plot.layout, 'trait1', oldVal, newVal)
     } catch (e) {
-      console.log('error 2 from toggle_trait', e)
+      console.log('error from compare toggle_trait trait1:', e)
     }
     try {
       toggle_trait(plot.layout, 'trait2', oldVal, newVal)
     } catch (e) {
-      console.log('error 3 from toggle_trait', e)
+      console.log('error from compare toggle_trait trait2:', e)
     }
     try {
       plot.applyState()
     } catch (e) {
-      console.log('error 2 applying state to lzregion:', e)
+      console.log('error applying state to compare plot:', e)
     }
   })
 

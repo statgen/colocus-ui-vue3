@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div
-      :id="dom_id"
-      class="lz-container-responsive"
-    >
+    <div :id="dom_id" class="lz-container-responsive">
       <slot />
     </div>
   </div>
@@ -37,9 +34,7 @@ const props = defineProps({
 })
 
 // *** Variables ***************************************************************
-// let uid = 0; // Ensure that every component instance has a unique DOM id, for use by d3
-// uid += 1;
-filterStore.plotID += 1
+filterStore.plotID += 1 // Ensure that every component instance has a unique DOM id, for use by d3
 const dom_id = `lz-plot-${filterStore.plotID}`; // DOM element
 const plot_id = dom_id.replace(/-/g, '_'); // How to expose the plot instance globally
 // This is important: plot must be assigned as a static property. If it were a field in
@@ -180,7 +175,7 @@ const addPanelPair = (signal1, signal2) => {
   const panel1 = LocusZoom.Layouts.get('panel', 'association_with_cond', {
     id: `${panel1_label}-${signal1.uuid}`,
     height: 200,
-    title: { text: signal1_label, style: { fill: s1_color } },
+    title: { text: signal1_label, style: { fill: s1_color, 'font-size': '1.0rem', 'font-weight': 'normal' } },
     y_index: -1,
     namespace: {
       assoc: panel1_label,
@@ -191,7 +186,7 @@ const addPanelPair = (signal1, signal2) => {
   const panel2 = LocusZoom.Layouts.get('panel', 'association_with_cond', {
     id: `${panel2_label}-${signal2.uuid}`,
     height: 200,
-    title: { text: signal2_label, style: { fill: s2_color } },
+    title: { text: signal2_label, style: { fill: s2_color, 'font-size': '1.0rem', 'font-weight': 'normal' } },
     y_index: -1,
     namespace: {
       assoc: panel2_label,
