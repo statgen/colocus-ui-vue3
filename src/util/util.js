@@ -55,8 +55,7 @@ function makePlotTitle(signal) {
   }
   const variant = formatVariantString(signal.lead_variant.vid)
   const study = signal.analysis.study.uuid
-  const spacer = '_____'
-  const title = `${part1} ${spacer} ${variant} ${spacer} ${study}`
+  const title = `${part1}    ${variant}    ${study}`
   const color = colorHasher.hex(signal.lead_variant.vid);
   return [title, color];
 }

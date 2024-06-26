@@ -356,4 +356,9 @@ const addLDRef = (item) => {
 .region-plot {
   overflow-x: auto;
 }
+
+/* this updates a class from locuszoom to allow multiple spaces in a string to display as such */
+:deep(.lz-panel-title) {
+  white-space: pre;
+}
 </style>
