@@ -22,7 +22,7 @@
     show-current-page
   >
     <template v-slot:item.actions="{ item }">
-      <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction mx-n2" size="22px"/>
+      <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction" size="22px"/>
     </template>
 
     <template v-slot:item.signal1.analysis.study.uuid="{item}">

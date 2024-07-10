@@ -36,10 +36,8 @@ const formatVariantString = ((variant, truncateLength = 0) => {
 
   let formattedVariant = components.join('_')
 
-  if (truncateLength) {
-    if (formattedVariant.length > truncateLength) {
-      formattedVariant = `${formattedVariant.slice(0, truncateLength - 3)}...`
-    }
+  if (truncateLength && formattedVariant.length > truncateLength) {
+    formattedVariant = `${formattedVariant.slice(0, truncateLength - 3)}...`
   }
   return formattedVariant
 })
@@ -55,7 +53,7 @@ function makePlotTitle(signal) {
   }
   const variant = formatVariantString(signal.lead_variant.vid)
   const study = signal.analysis.study.uuid
-  const title = `${part1}    ${variant}    ${study}`
+  const title = `${part1}    ${study}    ${variant}`
   const color = colorHasher.hex(signal.lead_variant.vid);
   return [title, color];
 }
@@ -80,6 +78,30 @@ const ppURL = (url) => {
   return s
 }
 
+const parseVariant = (variant) => {
+  if(!variant) return
+  const parts = variant.split('_')
+  return {
+    chromosome: parseInt(parts[0]),
+    location: parseInt(parts[1]),
+    rest: parts.slice(2).join('_')
+  }
+}
+
+const sortVariantArray = (variants) => {
+  return variants.sort((a, b) => {
+    const parsedA = parseVariant(a)
+    const parsedB = parseVariant(b)
+    if (parsedA.chromosome !== parsedB.chromosome) {
+      return parsedA.chromosome - parsedB.chromosome
+    }
+    if (parsedA.location !== parsedB.location) {
+      return parsedA.location - parsedB.location
+    }
+    return parsedA.rest.localeCompare(parsedB.rest)
+  })
+}
+
 /**
  * A tagged template function that encodes URL parameters used in path segments / query params
  *   Usage: url`https://website.example/${value1}/?param=${value2}`
@@ -96,4 +118,4 @@ function url(strings, ...values) {
   return res;
 }
 
-export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL, url }
+export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL, sortVariantArray, url }

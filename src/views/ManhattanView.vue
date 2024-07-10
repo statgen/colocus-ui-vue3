@@ -17,7 +17,7 @@
           <h2>Selected colocalized signals</h2>
           <div style="display: flex; flex-wrap: wrap;">
           <VariantLabel v-for="signal in sortedSignals" :key="signal"
-            :variant="signal.variant"
+            :variant="signal"
             :show-splotch="false"
             :show-close="true"
             :margin-left="4"
@@ -51,7 +51,8 @@
 import {computed, onMounted, onUpdated, provide, ref} from 'vue'
 import { useFilterStore } from '@/stores/FilterStore'
 import { useRoute } from 'vue-router'
-import VariantLabel from "@/components/DataTable/labels/VariantLabel.vue";
+import VariantLabel from '@/components/DataTable/labels/VariantLabel.vue'
+import { sortVariantArray } from '@/util/util'
 
 // *** Composables *************************************************************
 const filterStore = useFilterStore()
@@ -69,28 +70,14 @@ const preloadGenes = ref([])
 const selectedSignals = ref({})
 
 // *** Computed ****************************************************************
-function parseVariant(variant) {
-  const parts = variant.split('_')
-  return {
-    chromosome: parseInt(parts[0]),
-    location: parseInt(parts[1]),
-    rest: parts.slice(2).join('_')
-  }
-}
-
 const sortedSignals = computed(() => {
-  const signalsArray = Object.values(selectedSignals.value)
-  return signalsArray.sort((a, b) => {
-    const parsedA = parseVariant(a.variant)
-    const parsedB = parseVariant(b.variant)
-    if (parsedA.chromosome !== parsedB.chromosome) {
-      return parsedA.chromosome - parsedB.chromosome
-    }
-    if (parsedA.location !== parsedB.location) {
-      return parsedA.location - parsedB.location
-    }
-    return parsedA.rest.localeCompare(parsedB.rest)
-  })
+
+  let variants = Object.values(selectedSignals.value).map(item => item.variant)
+
+  // variants = Array.from(variants)
+  variants = sortVariantArray(variants)
+  return variants
+  //return sortVariantArray(Object.values(selectedSignals.value))
 })
 
 // *** Provides ****************************************************************
@@ -163,9 +150,12 @@ const addSignals = (signals) => {
   filterStore.updateFilter('signals', Object.keys(selectedSignals.value))
 }
 
-const removeSignal = (signal) => {
-  delete selectedSignals.value[signal.signal_uuid]
-  filterStore.updateFilter('signals', Object.keys(selectedSignals.value))
+const removeSignal = (variant) => {
+  const keyToDelete = Object.keys(selectedSignals.value).find(key => selectedSignals.value[key].variant === variant);
+  if (keyToDelete) {
+    delete selectedSignals.value[keyToDelete];
+    filterStore.updateFilter('signals', Object.keys(selectedSignals.value))
+  }
 }
 
 const clearSignals = () => {

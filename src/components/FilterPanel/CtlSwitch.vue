@@ -5,6 +5,7 @@
       @update:model-value="onModelChanged"
       v-model="controlValue"
       density="compact"
+      color="clcAction"
     />
   </div>
 </template>

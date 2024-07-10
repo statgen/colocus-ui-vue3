@@ -3,29 +3,45 @@
 
     <v-row class="my-0 py-0">
       <v-col cols="3" class="my-0 py-0">
-        <h4 class="text-right mt-2">Y-axis:</h4>
+        <h4 class="text-right mt-2">Uniques:</h4>
       </v-col>
       <v-col class="my-0 py-0">
-        <v-radio-group inline :model-value="selectedMCRadio" @update:model-value="onCMRadioChange">
-          <v-radio value="t2">
-            <template v-slot:label>Conditional -log<sub>10</sub> p </template>
-          </v-radio>
-          <v-radio value="t1">
-              <template v-slot:label>Marginal -log<sub>10</sub> p </template>
-          </v-radio>
-        </v-radio-group>
+        <v-checkbox
+          @update:model-value="onUniqueCheckboxChange"
+          :label="`When adding plots, only add unique signals`"
+          color="clcAction"
+          density="compact"
+        ></v-checkbox>
       </v-col>
     </v-row>
 
     <v-row class="my-0 py-0">
       <v-col cols="3" class="my-0 py-0">
+        <h4 class="text-right mt-0">Y-axis:</h4>
+      </v-col>
+      <v-col class="my-0 py-0">
+        <v-radio-group inline :model-value="selectedMCRadio" @update:model-value="onCMRadioChange" density="compact">
+          <v-radio value="t2" color="clcAction">
+            <template v-slot:label>Conditional -log<sub>10</sub> p </template>
+          </v-radio>
+          <v-radio value="t1" color="clcAction">
+            <template v-slot:label>Marginal -log<sub>10</sub> p </template>
+          </v-radio>
+        </v-radio-group>
+      </v-col>
+    </v-row>
+
+    <v-row class="my-0 pb-2">
+      <v-col cols="3" class="my-0 py-0">
         <h4 class="text-right my-0 py-0">LD Reference:</h4>
       </v-col>
-      <v-col class="my-0 py-0 ml-2">
+      <v-col class="my-0 py-0">
         <v-radio-group :model-value="selectedLDRadio" @update:model-value="onLDRadioChange" density="compact">
-          <v-radio v-for="(ld_ref, index) in ld_refs" :key="index" :value="ld_ref">
+          <v-radio v-for="(ldRef, index) in filterStore.ldRefs" :key="index" :value="ldRef" color="clcAction">
             <template v-slot:label>
-              <VariantLabel :variant="ld_ref"/>
+                <span :style="{color: colorHasher.hex(ldRef)}">
+                  {{ formatVariantString(ldRef) }}
+                </span>
             </template>
           </v-radio>
         </v-radio-group>
@@ -38,21 +54,30 @@
 import { ref, watch } from 'vue'
 import { AXIS_OPTIONS } from '@/constants'
 import { useFilterStore } from '@/stores/FilterStore'
+import { useLDRefs } from '@/composables/ldRefs'
+import { colorHasher, formatVariantString } from '@/util/util'
 
 const filterStore = useFilterStore()
-
-const props = defineProps({
-  ld_refs: Array,
-})
-
-const selectedLDRadio = ref(props.ld_refs[0])
+const ldRefs = useLDRefs()
+const selectedLDRadio = ref(null)
 const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
 
-const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange'])
+const props = defineProps({
+  regionPanelRemoved: Boolean,
+})
+
+const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange', 'onUniqueCheckboxChange'])
 
 watch(() => filterStore.colocDataReady, async (newVal) => {
   if(newVal) {
     selectedLDRadio.value = filterStore.colocData.signal1.lead_variant.vid
+  }
+})
+
+watch(() => props.regionPanelRemoved, async (newVal) => {
+  if(filterStore.ldRefs.length > 0) {
+    const variant = filterStore.ldRefs[0]
+    selectedLDRadio.value = variant
   }
 })
 
@@ -66,45 +91,23 @@ const onLDRadioChange = (value) => {
   emit('onLDRadioChange', value)
 }
 
-const panelStyle = {
-  width: '525px',
-  left: '500px',
-  /*backgroundColor: '#fafafa',*/
-  borderColor: '#ff3d00',
-  borderWidth: '1px',
-  borderStyle: 'solid',
+const onUniqueCheckboxChange = (value) => {
+  emit('onUniqueCheckboxChange', value)
 }
 
+const panelStyle = {
+  width: '600px',
+  backgroundColor: '#fdfdfd',
+  borderColor: '#18c11c', // 'border-clcAction' doesn't work... FIXME
+  borderWidth: '2px',
+  borderStyle: 'solid',
+}
 </script>
 
 <style scoped>
 /* The following uses a Vue-specific notation (:deep()) to select child components.
-   Needed to hide an unused subcomponent of the v-select taking up vertical space. */
+   Needed to hide an unused subcomponent of the radio group taking up vertical space. */
 :deep() .v-input__details {
   display: none !important;
 }
-
-/* The following uses a Vue-specific notation (/deep/) to select child components.
-   Needed to hide unused subcomponent of v-radio taking up vertical space. */
-/*/deep/ .v-messages.theme--light {
-  min-height: 0;
-  display: none !important;
-}*/
-
-/*
-/deep/ .v-selection-control v-selection-control--dirty v-selection-control--density-default v-radio {
-  height: 20px;
-}
-*/
-
-/*
-.panelStyle {
-  width: 500px;
-  background-color: #fafafa;
-  border-color: #ff3d00;
-  border-width: 1px;
-  border-style: solid;
-}
-*/
 </style>
-

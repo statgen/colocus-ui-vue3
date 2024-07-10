@@ -42,18 +42,15 @@ const plot_id = dom_id.replace(/-/g, '_'); // How to expose the plot instance gl
 let plot = null;
 let _data_sources = null;
 
-let signals_added = [] // 1 signal per plot pair for now
-
 // *** Computed ****************************************************************
 const region = computed(() => {
-  // return allColumns.filter(header => header.visible())
   return { chr: props.chr, start: props.start, end: props.end }
 })
 
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
-const emit = defineEmits(['any_lz_event'])
+const emit = defineEmits(['RegionPanelRemoved', 'RegionPanelAdded'])
 
 // *** Watches *****************************************************************
 watch(() => region,() => {
@@ -74,9 +71,6 @@ watch(() => region,() => {
 
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
-  // console.log('lz plot on mounted')
-  // console.log('region etc:', props.chr, props.start, props.end, props.show_loading)
-  // console.log('base_layout:', props.base_layout, 'base sources:', props.base_sources)
   createLZ(props.base_layout, props.base_sources);
 })
 
@@ -133,7 +127,11 @@ const createLZ = (base_layout, base_sources) => {
 }
 
 const connectListeners = (plot) => {
-  plot.on('any_lz_event', (eventData) => emit('any_lz_event', eventData));
+  plot.on('panel_removed', (eventData) => {
+    // console.log('LZ Event received by LZPLot:', eventData)
+    if(eventData.data === 'genes') return
+    emit('RegionPanelRemoved', eventData)
+  });
 }
 
 const callPlot = (callback) => {
@@ -146,79 +144,48 @@ const callSources = (callback) => {
   return callback(_data_sources);
 }
 
-const clearSignalList = () => {
-  signals_added.length = 0;
-}
+let panelCounter = 0
 
-const addPanelPair = (signal1, signal2) => {
-  // console.log('lzplot adding panels to:', this.signals_added.length);
-  const s1id = signal1.uuid;
-  const s2id = signal2.uuid;
-  const s1s2_key = `${s1id}__${s2id}`;
+const addPanel = (signal) => {
+  panelCounter += 1
+  const signalID = signal.uuid
+  const panelLabel = `assoc_${panelCounter}_${signalID}`
+  const dataSourceURL = url`/api/v1/signals/${signalID}/region/`
+  const [variantLabel, variantColor] = makePlotTitle(signal)
+  const ldSource = `ld_${panelCounter}_${signalID}`
+  const ldURL = url`/api/v1/ld/${signal.analysis.ld}/region/`
 
-  if (signals_added.includes(s1s2_key)) return; // don't add the same signal (pair) more than once
-
-  signals_added.push(s1s2_key);
-
-  const dsu1 = url`/api/v1/signals/${s1id}/region/`;
-  const dsu2 = url`/api/v1/signals/${s2id}/region/`;
-
-  const panel1_label = `signal_panel${signals_added.length * 2 - 1}`;
-  const panel2_label = `signal_panel${signals_added.length * 2}`;
-
-  const [signal1_label, s1_color] = makePlotTitle(signal1);
-  const [signal2_label, s2_color] = makePlotTitle(signal2);
-
-  const ld1_source = `ld${signals_added.length * 2 - 1}`;
-  const ld2_source = `ld${signals_added.length * 2}`;
-
-  const panel1 = LocusZoom.Layouts.get('panel', 'association_with_cond', {
-    id: `${panel1_label}-${signal1.uuid}`,
+  const panel = LocusZoom.Layouts.get('panel', 'association_with_cond', {
+    id: panelLabel,
     height: 200,
-    title: { text: signal1_label, style: { fill: s1_color, 'font-size': '1.0rem', 'font-weight': 'normal' } },
+    title: { text: variantLabel, style: { fill: variantColor, 'font-size': '1.0rem', 'font-weight': 'normal' } },
     y_index: -1,
     namespace: {
-      assoc: panel1_label,
-      ld: ld1_source
+      assoc: panelLabel,
+      ld: ldSource
     }
   });
 
-  const panel2 = LocusZoom.Layouts.get('panel', 'association_with_cond', {
-    id: `${panel2_label}-${signal2.uuid}`,
-    height: 200,
-    title: { text: signal2_label, style: { fill: s2_color, 'font-size': '1.0rem', 'font-weight': 'normal' } },
-    y_index: -1,
-    namespace: {
-      assoc: panel2_label,
-      ld: ld2_source
-    }
-  });
-
-  const ld1_url = url`/api/v1/ld/${signal1.analysis.ld}/region/`;
-  const ld2_url = url`/api/v1/ld/${signal2.analysis.ld}/region/`;
+  emit('RegionPanelAdded', { signalID: signal.uuid, panelID: panelLabel, variantID: signal.lead_variant.vid })
 
   callSources((ds) => {
-    ds.add(panel1_label, ['ColocRegionAdapter', { url: dsu1 }]);
-    ds.add(panel2_label, ['ColocRegionAdapter', { url: dsu2 }]);
-  });
+    ds.add(panelLabel, ['ColocRegionAdapter', { url: dataSourceURL }])
+  })
 
   callSources((ds) => {
-    ds.add(ld1_source, ['ColocLDAdapter', { url: ld1_url }]);
-    ds.add(ld2_source, ['ColocLDAdapter', { url: ld2_url }]);
-  });
+    ds.add(ldSource, ['ColocLDAdapter', { url: ldURL }]);
+  })
 
   callPlot((plot) => {
-    plot.addPanel(panel1);
-    plot.addPanel(panel2);
-  });
+    plot.addPanel(panel)
+  })
 }
 
 defineExpose({
-  addPanelPair,
+  addPanel,
   callPlot
 })
 // *** Configuration data ******************************************************
-
 </script>
 
 <style scoped>

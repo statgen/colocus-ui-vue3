@@ -167,7 +167,7 @@ Our common idiom for data loading in this app is to set a flag from the source r
 
 **loadFilterControls()** flips the value of local variable loadFPControls, which is provided to the AutoComplete control to load the appropriate data from the Pinia store, depending on the type of AutoComplete. This is static data such as gene list, not user selections.
  
-**loadData()** sets the colocDataReady flag to false, then flips the data flag, loadTableDataFlag, which is watched by the DataTable component. When that flag changes, the DataTable calls its loadData() function. It in turn loads data for the coloc plot if the user is on the LZ page. Either way, it then loads data for the data table. The coloc data is stored in the filterStore, and its colocDataReadyFlag is set to true. That flag in turn takes us back to the LZ page, where it is watched, and when true, calls buildCompareLayout(), which assembles the data for the plot and generates it.
+**loadData()** sets the colocDataReady flag to false, then flips the data flag, loadTableDataFlag, which is watched by the DataTable component. When that flag changes, the DataTable calls its loadData() function. It in turn loads data for the coloc plot if the user is on the LZ page. Either way, it then loads data for the data table. The coloc data is stored in the filterStore, and its colocDataReady lag is set to true. That flag in turn takes us back to the LZ page, where it is watched, and when true, calls buildCompareLayout(), which assembles the data for the scatter plot and generates it, and likewise with buildRegionLayout().
 
 #### LZ Plots
 The compare (scatter) plot and the region plot are defined in the template as empty divs:
@@ -178,11 +178,21 @@ The compare (scatter) plot and the region plot are defined in the template as em
 <div ref="regionPlotRef" class="region-plot"></div>
 ...
 ```
-The `ref` variables are subsequently populated by functions buildCompareLayout and buildRegionLayout. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build...Layout functions create Vnodes based on the underlying LZPlot library. The *Ref variables maintain a Vue reference to these components so that we can do things with them later, such as adding additional plots. 
+The `ref` variables are populated by functions buildCompareLayout and buildRegionLayout. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build...Layout functions create Vnodes based on the underlying LZPlot library. The *Ref variables maintain a Vue reference to these components so that we can do things with them later, such as adding additional plots. 
 
 **buildCompareLayout()** in part replaces the template, the dataTableRowClick function, and the setData function in the Vue 2 app. Here, the plot is created dynamically as a Vue vnode, which gets assigned to the initially empty template div, with a ref named comparePlotRef. This avoids having to do a full page reload, as in the Vue 2 version.
 
 There is an additional flag, filterStore.lzPageTableDataLoaded, that controls when table data is loaded on the LZ page. The flag is set to false in the onMounted hook of that page. Thus the loadData() function will load the table data, and set the flag to true, so that if the user clicks others row in the data table, subsequent calls to loadData  will reload only the plot data, not the table data.
+
+#### The LD panel
+The LDPanel is component that displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. LDPanel depends on a composable, ldRefs.js. Initially the composable was used to provide a list of unique variant values, which were then rendered as a set of radio buttons formatted by VariantLabels. For unknown reasons, it stopped working, and would display duplicates of the initial pair of values and no others. Using a variety of watchers and computed properties in various files did not improve the issue, and in some cases made the problem worse (e.g., displaying no values at all). The workaround I found was to generate the list of unique variant IDs and push them to the filterStore, then pull them from there for display as radio buttons. However, using the VariantLabel component also caused erroneous behavior. The solution was to render and format the values directly. The downside to this is that it is partially redundant with code in the VariantLabel component. My hunch is that Vue's reactivity system was failing with all the nesting. Perhaps a new version of Vue, Vuetify, or both will help. As of this writing (2024-07-10), we are using the following key libraries, which are the latest as of this date:
+
+```
+    "pinia": "^2.1.7",
+    "vue": "^3.4.31",
+    "vue-router": "^4.4.0",
+    "vuetify": "^3.6.12"
+```
 
 ## Misc debugging hints
 - use {{ $log() }} in templates to log local values to console. This is defined in main.js
