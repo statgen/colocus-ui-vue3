@@ -40,7 +40,7 @@ const routes = [
       enableFiltering(SHOW_FILTER_PANEL)
       const filterStore = useFilterStore()
       filterStore.copySearchFiltersToNextPage(to.name)
-      filterStore.ldRefs = []
+      filterStore.uniqueLDrefs.length = 0
       next()
     }
   },

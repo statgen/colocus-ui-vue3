@@ -37,7 +37,7 @@
       </v-col>
       <v-col class="my-0 py-0">
         <v-radio-group :model-value="selectedLDRadio" @update:model-value="onLDRadioChange" density="compact">
-          <v-radio v-for="(ldRef, index) in filterStore.ldRefs" :key="index" :value="ldRef" color="clcAction">
+          <v-radio v-for="(ldRef, index) in filterStore.uniqueLDrefs" :key="index" :value="ldRef" color="clcAction">
             <template v-slot:label>
                 <span :style="{color: colorHasher.hex(ldRef)}">
                   {{ formatVariantString(ldRef) }}
@@ -54,11 +54,9 @@
 import { ref, watch } from 'vue'
 import { AXIS_OPTIONS } from '@/constants'
 import { useFilterStore } from '@/stores/FilterStore'
-import { useLDRefs } from '@/composables/ldRefs'
 import { colorHasher, formatVariantString } from '@/util/util'
 
 const filterStore = useFilterStore()
-const ldRefs = useLDRefs()
 const selectedLDRadio = ref(null)
 const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
 
@@ -74,9 +72,9 @@ watch(() => filterStore.colocDataReady, async (newVal) => {
   }
 })
 
-watch(() => props.regionPanelRemoved, async (newVal) => {
-  if(filterStore.ldRefs.length > 0) {
-    const variant = filterStore.ldRefs[0]
+watch(() => filterStore.regionPanelRemoved, async (newVal) => {
+  if(filterStore.uniqueLDrefs.length > 0) {
+    const variant = filterStore.uniqueLDrefs[0]
     selectedLDRadio.value = variant
   }
 })

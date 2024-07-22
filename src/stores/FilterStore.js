@@ -1,11 +1,11 @@
-import { nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
 
 export const useFilterStore = defineStore('filterStore', {
   state: () => ({
-    ldRefs: [],
+    regionPanelRemoved: false,
+    uniqueLDrefs: [],
     pastedGenes: null,
     plotID: 0,
     colocID: '',

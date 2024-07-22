@@ -364,102 +364,10 @@ function get_region_layout(trait1, trait2, state = {}) {
   //   1. Allow showing both conditional and marginal p values (toggle button; ask for more data)
   //   2. show two tracks
   //   3. (future) Some mechanism for highlighting which items are part of this particular signal cluster. We use shape for dir of effect and color for LD. Toggle menu? Size?
-  const { id: t1_id, label: t1_label } = trait1;
-  const { id: t2_id, label: t2_label } = trait2;
-  const t1_name = _get_assoc_id(t1_id);
-  const t2_name = _get_assoc_id(t2_id);
+  const { id: t1_id } = trait1;
+  const { id: t2_id } = trait2;
 
-  const gene_selector_menu = {
-    type: 'display_options',
-    tag: 'gene_filter',
-    custom_event_name: 'widget_gene_filter_choice',
-    position: 'right',
-    color: 'blue',
-    // Below: special config specific to this widget
-    button_html: 'Gene Filter',
-    button_title: 'Choose which genes to show',
-    layer_name: 'genes',
-    default_config_display_name: 'Protein coding genes',
-    options: [
-      {
-        display_name: 'Protein coding and all non-coding RNA genes',
-        display: {
-          filters: [
-            {
-              field: 'gene_type',
-              operator: 'in',
-              value: [
-                'protein_coding',
-                'lincRNA',
-                'snRNA',
-                'snoRNA',
-                'miRNA',
-                'rRNA',
-                'scRNA',
-                'scaRNA',
-                'sRNA',
-                'misc_RNA',
-                'Mt_rRNA',
-                'Mt_tRNA'
-              ],
-            },
-          ],
-        }
-      },
-      {
-        display_name: 'All features',
-        display: {
-          filters: null,
-        },
-      },
-    ],
-  };
-
-  const genes_layer_filtered = merge({
-    filters: [
-      {
-        field: 'gene_type',
-        operator: 'in',
-
-        value: [
-          'protein_coding',
-        ],
-      },
-    ],
-  }, deepCopy(LocusZoom.Layouts.get('data_layer', 'genes')));
-
-  const panels = [
-    LocusZoom.Layouts.get('panel', 'association_with_cond', {
-      id: t1_name,
-      height: 200,
-      title: { text: t1_label },
-      namespace: { assoc: 'trait1' }
-    }),
-    LocusZoom.Layouts.get('panel', 'association_with_cond', {
-      id: t2_name,
-      title: { text: t2_label },
-      namespace: { assoc: 'trait2' },
-      height: 200,
-    }),
-    LocusZoom.Layouts.get('panel', 'genes', {
-      height: 150,
-      toolbar: (function () {
-        const base = LocusZoom.Layouts.get('toolbar', 'standard_panel');
-        base.widgets.push(
-          {
-            type: 'resize_to_data',
-            position: 'right',
-            button_html: 'Resize',
-          },
-          deepCopy(gene_selector_menu)
-        );
-        return base;
-      })(),
-      data_layers: [
-        genes_layer_filtered,
-      ],
-    }),
-  ];
+  const panels = [];
 
   return LocusZoom.Layouts.get('plot', 'standard_association', {
     panels,
@@ -491,8 +399,8 @@ function get_compare_layout(x_label, y_label, state = {}) {
 
   // We only need to slightly change nested properties for each of these, so...
   // FIXME: Yeah this nomenclature is maximally confusing
-  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.x.label', `${y_label}`);
-  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.y1.label', `${x_label}`);
+  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.x.label', y_label);
+  LocusZoom.Layouts.mutate_attrs(layout, '$.panels[?(@.tag === "locuscompare")].axes.y1.label', x_label);
   return layout;
 }
 

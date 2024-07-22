@@ -54,8 +54,8 @@ function makePlotTitle(signal) {
   const variant = formatVariantString(signal.lead_variant.vid)
   const study = signal.analysis.study.uuid
   const title = `${part1}    ${study}    ${variant}`
-  const color = colorHasher.hex(signal.lead_variant.vid);
-  return [title, color];
+  const color = colorHasher.hex(signal.lead_variant.vid)
+  return [title, color]
 }
 
 // return true if s2 starts with s1 case-insensitive
@@ -88,6 +88,14 @@ const parseVariant = (variant) => {
   }
 }
 
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+
+// call with await sleeper(n); this is only for analysis/debugging, not production use
+const sleeper = async (sec = 5) => {
+  await sleep(1000 * sec)
+  console.log(`sleeper done after ${sec} seconds`)
+}
+
 const sortVariantArray = (variants) => {
   return variants.sort((a, b) => {
     const parsedA = parseVariant(a)
@@ -118,4 +126,5 @@ function url(strings, ...values) {
   return res;
 }
 
-export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL, sortVariantArray, url }
+export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL,
+  sleeper, sortVariantArray, url }

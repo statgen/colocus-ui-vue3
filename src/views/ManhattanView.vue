@@ -114,7 +114,7 @@ onUpdated(() => {
 })
 // *** Event handlers **********************************************************
 const onDataTableRowClick = () => {
-  console.log('DataTableRowClick')
+  // console.log('mv: DataTableRowClick')
 }
 
 // *** Utility functions *******************************************************

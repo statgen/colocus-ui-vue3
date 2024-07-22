@@ -160,17 +160,30 @@ The TOC must be maintained manually. Its href values are determined by the rende
 A Vue watch is set up to watch the v-sheet that contains the help content. When it is populated, the watcher sets up the event listeners for the links, and when it is being torn down, the event listeners are removed. This is necessary to prevent memory leaks, and to avoid navigation problems with the Vue router.
 
 ### Locuszoom view
-(This is interim info, covering only data loading and the compare(scatter) plot. Will update after adding LZ plot.)
+This is the most complicated page of the app thus far. It consists of five main files, plus references to the filterStore, utils, etc. The main files are:
+- LocusZoomView.vue: This is the top-level page definition linked to by the router. It primarily consists of the Vue template definition, plus event handlers. 
+- lzPageHelpers.js: This is a composable that contains the meat of the functionality required by the page.
+- LzPlot.vue: This is a wrapper, lightly mofified from the Vue 2 app, that allows creation of the main containers for the compare and region plots.
+- lz-layouts.js: This is a configuration file, more heavily modifed from the Vue 2 app, to provide more flexitilty in creation containers and plots.
+- LDPanel.vue: This ia Vue single-file component, the provides the UI controls for operating the page. 
 
 #### Data loading
-Our common idiom for data loading in this app is to set a flag from the source requesting the data, then watch that flag and load data when it changes. That pattern is used in the LZ page as well. The onMounted lifecycle hook calls several functions to initiate data loading.
+Our common idiom for data loading in this app is to set a flag from the source requesting the data, then watch that flag and load data when it changes. That pattern is used in the LZ page as well. The onMounted lifecycle hook initiates data loading.
 
-**loadFilterControls()** flips the value of local variable loadFPControls, which is provided to the AutoComplete control to load the appropriate data from the Pinia store, depending on the type of AutoComplete. This is static data such as gene list, not user selections.
+First we set the filterStore.lzPageTableDataLoaded to false. Later, when the data table's loadData is called, this alerts it that the data is needed.
+
+Then we flip the value of local variable, loadFPControls. This is provided to controls in the filter panel to alert them to load their static data, such as the gene list, not user selections.
+
+Next we set the flag filterStore.colocDataReady to false. The data table's loadData function sets that flag to true when the coloc data is ready. Then we have several watchers that take appropriate action when the colocalization data is ready:
+- the LDPanel component, which allows to set the correct radio button for the initial LD reference
+- the LocusZoom page, and this is what kicks off loading of the compare and region plots.
+
+This version of the code programmatically creates the compare container and plot, plus the region container and plots, including the gene panel. To accomplish this, we removed the static configuration data from the definitions in lz-layouts. Most of it was discarded, but we needed to use two static defintions (gene_selector_menu, and genes_layer_filtered), which we embedded in the LZPLot.vue file. We replaced the static definitions of the region plot and the gene panel with a programmatic approach. See the functions addRegionPanel() and addGenePanel in LZPLot for details.
+
+We also refactored almost everything except the template definitions and event handlers out of the main page view (LocusZoomView.vue), and into the composable lzPageHelpers.js.
  
-**loadData()** sets the colocDataReady flag to false, then flips the data flag, loadTableDataFlag, which is watched by the DataTable component. When that flag changes, the DataTable calls its loadData() function. It in turn loads data for the coloc plot if the user is on the LZ page. Either way, it then loads data for the data table. The coloc data is stored in the filterStore, and its colocDataReady lag is set to true. That flag in turn takes us back to the LZ page, where it is watched, and when true, calls buildCompareLayout(), which assembles the data for the scatter plot and generates it, and likewise with buildRegionLayout().
-
 #### LZ Plots
-The compare (scatter) plot and the region plot are defined in the template as empty divs:
+Placeholders for the compare plot and the region plot are defined in the template as empty divs:
 ```
 ...
 <div ref="comparePlotRef"></div>
@@ -178,24 +191,28 @@ The compare (scatter) plot and the region plot are defined in the template as em
 <div ref="regionPlotRef" class="region-plot"></div>
 ...
 ```
-The `ref` variables are populated by functions buildCompareLayout and buildRegionLayout. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build...Layout functions create Vnodes based on the underlying LZPlot library. The *Ref variables maintain a Vue reference to these components so that we can do things with them later, such as adding additional plots. 
+Then the `ref` variables are populated by functions buildCompareLayout and buildRegionLayout in the composable. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build*Layout functions create Vnodes based on the underlying LZPlot library. The *VnodeRef variables maintain Vue references to these components so that we can do things with them later, such as adding additional plots.
 
-**buildCompareLayout()** in part replaces the template, the dataTableRowClick function, and the setData function in the Vue 2 app. Here, the plot is created dynamically as a Vue vnode, which gets assigned to the initially empty template div, with a ref named comparePlotRef. This avoids having to do a full page reload, as in the Vue 2 version.
+A key function in the composable, **assembleLayout()**, builds the overall containers (compare and region), then adds the initial plots to the region panel.
 
-There is an additional flag, filterStore.lzPageTableDataLoaded, that controls when table data is loaded on the LZ page. The flag is set to false in the onMounted hook of that page. Thus the loadData() function will load the table data, and set the flag to true, so that if the user clicks others row in the data table, subsequent calls to loadData  will reload only the plot data, not the table data.
+**buildRegionLayout()**, which, replaces the old static configuration, builds the container that will hold the region plots, saves a ref to the Vnode, and populates the regionPlotRef, which is passed in from the LZ page, and is thus displayed by Vue's reactivity system.
+
+Similarly, **buildCompareLayout()**, builds the container, and also creates the scatter plot directly.
 
 #### The LD panel
-The LDPanel is component that displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. LDPanel depends on a composable, ldRefs.js. Initially the composable was used to provide a list of unique variant values, which were then rendered as a set of radio buttons formatted by VariantLabels. For unknown reasons, it stopped working, and would display duplicates of the initial pair of values and no others. Using a variety of watchers and computed properties in various files did not improve the issue, and in some cases made the problem worse (e.g., displaying no values at all). The workaround I found was to generate the list of unique variant IDs and push them to the filterStore, then pull them from there for display as radio buttons. However, using the VariantLabel component also caused erroneous behavior. The solution was to render and format the values directly. The downside to this is that it is partially redundant with code in the VariantLabel component. My hunch is that Vue's reactivity system was failing with all the nesting. Perhaps a new version of Vue, Vuetify, or both will help. As of this writing (2024-07-10), we are using the following key libraries, which are the latest as of this date:
+The LDPanel is component that displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. The list is generated in the composable and then pushed to the filterStore. Earlier, I tried supply the list directly to the LDPanel, but it would not display correctly. In different scenarios, it would display only the first two elements, or duplicate the first two elements as panels were added, or display nothing in the label slot. The functional workaround was to push the list to the filterStore.
+
+So LDPanel  pulls the list from there for display as radio buttons. Using our VariantLabel component caused erroneous behavior. The solution was to render and format the values directly. The downside to this is that it is partially redundant with code in the VariantLabel component. My hunch is that Vue's reactivity system was failing with all the nesting. Perhaps a new version of Vue, Vuetify, or both will help. As of this writing (2024-07-22), we are using the following key libraries, which are the latest as of this date:
 
 ```
     "pinia": "^2.1.7",
-    "vue": "^3.4.31",
+    "vue": "^3.4.33",
     "vue-router": "^4.4.0",
-    "vuetify": "^3.6.12"
+    "vuetify": "^3.6.13"
 ```
 
 ## Misc debugging hints
-- use {{ $log() }} in templates to log local values to console. This is defined in main.js
+- use {{ $log() }} in templates to log local values to console. This is defined in main.js.
 
 ## Section headings in view and component files
 I find that it helps reduce cognitive load to have the sections in the same order throughout the application. There are some dependencies among them; for example, variables must be defined before watches. Very simple components don't need the overhead. This structure does not fit composables, constants, and helper files. In those cases, we list functions alphabetically. 

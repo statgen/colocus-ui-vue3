@@ -159,12 +159,12 @@ const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
 watch(() => filterStore.filterDataChanged, async () => {
-  // console.log('loading new table data')
+  // console.log('dt: loading new table data from filterDataChanged flag')
   await loadData()
 })
 
 watch(() => loadTableDataFlag.value, async () => {
-  // console.log('flipped the data flag, loading data')
+  // console.log('dt: loading new data from loadTableDataFlag')
   await loadData()
 })
 
@@ -176,10 +176,13 @@ const onAddPlotIconClick = (item) => {
 }
 
 const onRowClick = async (event, item) => {
+  const cpn = filterStore.currentPageName
+  // console.log('dt: onRowClick, page:', cpn)
   filterStore.colocID = item.item.uuid
-  if(filterStore.currentPageName === PAGE_NAMES.SEARCH) {
+  if(cpn === PAGE_NAMES.SEARCH) {
     await router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
   } else if (filterStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
+    // console.log('dt: onRowClick, from lz page')
     emit('onDataTableRowClick', item)
     // await loadData()
   }
@@ -206,7 +209,7 @@ const onSortUpdate = (newSort) => {
 
 // *** Utility functions *******************************************************
 const loadColocData = async (cpn, url) => {
-  // console.log(`loading coloc data for ${cpn} page from ${url}`)
+  // console.log(`dt: loading coloc data for page: ${cpn} from: ${url}`)
   const { data, errorMessage, fetchData } = useFetchData()
 
   if(await fetchData(url, 'coloc plot data', cpn)) {
@@ -245,6 +248,7 @@ const loadTableData = async (cpn, url) => {
 }
 
 const loadData = async () => {
+  // console.log('dt: doing loadData')
   let url = null
   isLoadingData.value = true
   const cpn = filterStore.currentPageName
