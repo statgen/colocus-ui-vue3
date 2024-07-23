@@ -1,22 +1,23 @@
 import { computed, ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 import { findPlotRegion } from '@/util/util'
+import { PAGE_NAMES } from '@/constants'
 
 export const useDataTableHelpers = () => {
-  const filterStore = useFilterStore()
+  const appStore = useAppStore()
 
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
 
   const showAddPlotIcon = () => {
-    return ['locuszoom'].includes(filterStore.currentPageName)
+    return ['locuszoom'].includes(appStore.currentPageName)
   }
 
-  watch(() => filterStore.searchPageData.showEnsIDs, newValue => {showEnsIDs.value = newValue})
-  watch(() => filterStore.locuszoomPageData.showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => appStore[PAGE_NAMES.SEARCH].showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => appStore[PAGE_NAMES.LOCUSZOOM].showEnsIDs, newValue => {showEnsIDs.value = newValue})
 
-  watch(() => filterStore.searchPageData.showEffects, newValue => {showEffects.value = newValue})
-  watch(() => filterStore.locuszoomPageData.showEffects, newValue => {showEffects.value = newValue})
+  watch(() => appStore[PAGE_NAMES.SEARCH].showEffects, newValue => {showEffects.value = newValue})
+  watch(() => appStore[PAGE_NAMES.LOCUSZOOM].showEffects, newValue => {showEffects.value = newValue})
 
   const alwaysShow = () => true
 
@@ -86,7 +87,7 @@ export const useDataTableHelpers = () => {
 
   const buildLZTableURL = (baseURL, coloc_signal1, coloc_signal2) => {
     const base = new URL(baseURL, window.location.origin)
-    const filter_data = filterStore.locuszoomPageData.filters
+    const filter_data = appStore[PAGE_NAMES.LOCUSZOOM].filters
     // console.log('filter_data', filter_data)
 
     if (!coloc_signal1) {

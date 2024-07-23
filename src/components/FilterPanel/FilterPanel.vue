@@ -1,6 +1,6 @@
 <template>
   <v-scroll-x-transition>
-    <v-sheet v-show="filterStore.isFilterPanelShowing" class="ml-n2" >
+    <v-sheet v-show="appStore.filterControls.isFilterPanelShowing" class="ml-n2" >
       <FilterPanelSubpanel title="Select" resetButton="true">
         <CtlAutocomplete :controlSet="controlConfig.study" />
         <CtlAutocomplete :controlSet="controlConfig.gene" />
@@ -25,9 +25,9 @@
 </template>
 
 <script setup>
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 const POS_DECIMAL_REGEX = /^\d*\.?\d*$/
 const CHR_REGION_REGEX = /^\d\d?:\d+-\d+$/
@@ -41,7 +41,7 @@ const rules = {
 /**
  * controlConfig stores static config data passed down to controls:
  *   title is the label over the control
- *   storeKey is the key in the FilterStore where user selections are stored
+ *   storeKey is the key in the appStore where user selections are stored
  *   rules are validators (only for numeric inputs)
  *   emptyValue is inserted into the control if the user deletes everything and moves out of the control (for numeric fields)
  *   defaultValue is used when initially setting up a component or if the user clicks the reset button

@@ -26,11 +26,11 @@
 // *** Imports *****************************************************************
 import { inject, onMounted, ref, watch  } from 'vue'
 import { matchLowercase } from '@/util/util'
-import { useFilterStore } from '@/stores/FilterStore'
-import { PAGE_STORE_DATA_MAP } from '@/constants'
+import { useAppStore } from '@/stores/AppStore'
+import { PAGE_NAMES } from "@/constants";
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 const { controlSet } = defineProps({
@@ -53,20 +53,20 @@ const resetInput = inject('resetInput')
 // *** Watches *****************************************************************
 watch(() => resetInput.value, () => {
   selectedItems.value = controlSet.defaultValue
-  filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
 watch(() => preloadGenes.value, () => {
   if(controlSet.storeKey === 'genes') {
     selectedItems.value = preloadGenes.value
-    filterStore.updateFilter(controlSet.storeKey, preloadGenes.value)
+    appStore.updateFilter(controlSet.storeKey, preloadGenes.value)
   }
 })
 
 // watch(() => preloadTrait.value, () => {
 //   if(controlSet.storeKey === 'phenotypes') {
 //     selectedItems.value = preloadTrait.value
-//     filterStore.updateFilter(controlSet.storeKey, preloadTrait.value)
+//     appStore.updateFilter(controlSet.storeKey, preloadTrait.value)
 //   }
 // })
 
@@ -85,11 +85,11 @@ const onGenesPaste = (event) => {
   event.preventDefault()
   const pastedData = event.clipboardData.getData('text')
   // console.log('Pasted data:', pastedData)
-  filterStore.pastedGenes = pastedData
+  appStore[PAGE_NAMES.SEARCH].pastedGenes = pastedData
 }
 
 const onModelChanged = (newValue) => {
-  filterStore.updateFilter(controlSet.storeKey, newValue)
+  appStore.updateFilter(controlSet.storeKey, newValue)
 }
 
 // *** Utility functions *******************************************************
@@ -98,12 +98,12 @@ const mlc = ((itemTitle, queryText, item) => {
 })
 
 const populateControlSelectList = () => {
-  selectListItems.value = filterStore.filterLists[controlSet.storeKey]
+  selectListItems.value = appStore.filterControls[controlSet.storeKey]
 }
 
 const populateControlData = () => {
-  const parentKey = PAGE_STORE_DATA_MAP[filterStore.currentPageName]
-  selectedItems.value = filterStore[parentKey].filters[controlSet.storeKey]
+  const parentKey = appStore.currentPageName
+  selectedItems.value = appStore[parentKey].filters[controlSet.storeKey]
 }
 
 // *** Configuration data ******************************************************

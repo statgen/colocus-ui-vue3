@@ -1,11 +1,11 @@
 <template>
-  <v-col v-show="filterStore.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterControls.isFilterPanelShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
-  <v-col :cols="filterStore.isFilterPanelShowing ? 10 : 12" class="ml-2">
+  <v-col :cols="appStore.filterControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
     <div class="search-header">
       <h1>Search</h1>
-      <p>You are viewing {{ filterStore.itemCount }} of {{ filterStore.countPairs }} records.</p>
+      <p>You are viewing {{ appStore.dataTable.itemCount }} of {{ appStore.dataTable.countPairs }} records.</p>
     </div>
     <v-alert
       title="Invalid gene(s) specified"
@@ -29,10 +29,11 @@
 // *** Imports *****************************************************************
 import { nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from "vue-router";
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
+import { PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -53,10 +54,10 @@ provide('loadTableDataFlag', loadTableDataFlag)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => filterStore.pastedGenes, (newVal, oldVal) => {
+watch(() => appStore[PAGE_NAMES.SEARCH].pastedGenes, (newVal, oldVal) => {
   // console.log('pasted genes: nv:', newVal, 'ov:', oldVal)
-  if(newVal) geneListHandler(filterStore.pastedGenes)
-  filterStore.pastedGenes = null
+  if(newVal) geneListHandler(appStore[PAGE_NAMES.SEARCH].pastedGenes)
+  appStore[PAGE_NAMES.SEARCH].pastedGenes = null
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -87,21 +88,8 @@ const loadTableData = () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
-/* genes for testing
-   A2M,AAMP,PDF
-   A2M,AAMP,PDF,
-   A2M,AAMP,PDF,x
-   A2M,AAMP,\t\r\n\n   PDF,y
-   A2M,A2ML1-AS1,AAGAB,AAK1,AAMP,ABCA1,ABCA8,ABCG5,ABCG8,ABHD12,ABLIM3,ABTB1,ENSG00000000938,x,y
-   A2M	A2ML1-AS1	AAGAB	AAK1	AAMP	ABCA1	ABCA8	ABCG5	ABCG8	ABHD12	ABLIM3	ABTB1	ENSG00000000938	x	y
-
-z
-vv
-x1
-
-*/
 const geneListHandler = (genes) => {
-  const { goodGenes, badGenes } = filterStore.checkGenes(genes)
+  const { goodGenes, badGenes } = appStore.checkGenes(genes)
   // console.log('bad genes length:', badGenes.length)
   if(badGenes.length > 0) {
     // console.log(badGenes)

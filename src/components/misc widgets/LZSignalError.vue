@@ -26,17 +26,18 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
+import { PAGE_NAMES } from '@/constants'
 
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 const signal1 = ref(null)
 const signal2 = ref(null)
 
-watch(() => filterStore.colocDataReady, async (newVal) => {
+watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, async (newVal) => {
   if(newVal) {
-    signal1.value = filterStore.colocData.signal1
-    signal2.value = filterStore.colocData.signal2
+    signal1.value = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
+    signal2.value = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
   }
 })
 

@@ -20,11 +20,10 @@
 // *** Imports *****************************************************************
 import { inject, onMounted, ref, watch } from 'vue'
 import { debounce } from 'lodash'
-import { useFilterStore } from '@/stores/FilterStore'
-import { PAGE_STORE_DATA_MAP } from '@/constants'
+import { useAppStore } from '@/stores/AppStore'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 const { controlSet } = defineProps({
@@ -43,7 +42,7 @@ const resetInput = inject('resetInput')
 // *** Watches *****************************************************************
 watch(resetInput, () => {
   inputValue.value = controlSet.defaultValue
-  filterStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -57,7 +56,7 @@ const validateDebouncedInput = (newValue) => {
   const rule = controlSet.rules[0] // assumption: there is only one rule
   // need explicit comparison to true, as the rule returns a string, the error message, which is truthy, if invalid input
   if (rule(newValue) === true) {
-    filterStore.updateFilter(controlSet.storeKey, newValue)
+    appStore.updateFilter(controlSet.storeKey, newValue)
   } else {
     // do nothing, error message is displayed by the control
   }
@@ -66,15 +65,15 @@ const validateDebouncedInput = (newValue) => {
 const deBouncer = debounce(validateDebouncedInput, DEBOUNCE_DELAY)
 
 const populateControlData = () => {
-  const parentKey = PAGE_STORE_DATA_MAP[filterStore.currentPageName]
-  inputValue.value = filterStore[parentKey].filters[controlSet.storeKey]
+  const parentKey = appStore.currentPageName
+  inputValue.value = appStore[parentKey].filters[controlSet.storeKey]
 }
 
 const trapEmpty = (focused) => {
   const ev = controlSet.emptyValue
   if(!focused && inputValue && inputValue.value.length === 0 ) {
     inputValue.value = ev
-    filterStore.updateFilter(controlSet.storeKey, ev)
+    appStore.updateFilter(controlSet.storeKey, ev)
   }
 }
 </script>

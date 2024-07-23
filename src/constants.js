@@ -23,12 +23,6 @@ const PAGE_NAMES = {
   TRAITS: 'traits',
 }
 
-const PAGE_STORE_DATA_MAP = {
-  search: 'searchPageData',
-  locuszoom: 'locuszoomPageData',
-  manhattan: 'manhattanPageData',
-}
-
 const URLS = {
   // these are for the data tables that exist on the associated pages
   [PAGE_NAMES.SEARCH]: '/api/v1/coloc/',
@@ -43,5 +37,5 @@ const URLS = {
   LD_DATA: '/api/v1/ld/',
 }
 
-export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS
+export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS
 }

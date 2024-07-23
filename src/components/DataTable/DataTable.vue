@@ -4,7 +4,7 @@
     :headers="visibleColumns"
     :row-props="({item}) => getRowClass(item)"
     :items="dataItems"
-    :items-length="countPairs"
+    :items-length="appStore.dataTable.countPairs"
     :items-per-page="itemsPerPage"
     :items-per-page-options="ITEMS_PER_PAGE_OPTIONS"
     :loading="isLoadingData"
@@ -128,20 +128,19 @@
 // *** Imports *****************************************************************
 import { inject, markRaw, nextTick, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
-import { useFilterStore } from '@/stores/FilterStore'
-import { PAGE_NAMES, PAGE_STORE_DATA_MAP, URLS } from '@/constants'
+import { useAppStore } from '@/stores/AppStore'
+import { PAGE_NAMES, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
 import { useDirectionOfEffect } from '@/composables/DirectionOfEffect'
 import router from '@/router'
 
 // *** Composables ***************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 const { buildLZTableURL, fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
 
 // *** Props *******************************************************************
 
 // *** Variables ***************************************************************
-const countPairs = ref(0)
 const currentPage = ref()
 const dataItems = shallowRef([])
 const isLoadingData = ref(false)
@@ -158,7 +157,7 @@ const loadTableDataFlag = inject('loadTableDataFlag')
 const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
-watch(() => filterStore.filterDataChanged, async () => {
+watch(() => appStore.filterControls.filterDataChanged, async () => {
   // console.log('dt: loading new table data from filterDataChanged flag')
   await loadData()
 })
@@ -176,12 +175,12 @@ const onAddPlotIconClick = (item) => {
 }
 
 const onRowClick = async (event, item) => {
-  const cpn = filterStore.currentPageName
+  const cpn = appStore.currentPageName
   // console.log('dt: onRowClick, page:', cpn)
-  filterStore.colocID = item.item.uuid
+  appStore[PAGE_NAMES.LOCUSZOOM].colocID = item.item.uuid
   if(cpn === PAGE_NAMES.SEARCH) {
     await router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
-  } else if (filterStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
+  } else if (appStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
     // console.log('dt: onRowClick, from lz page')
     emit('onDataTableRowClick', item)
     // await loadData()
@@ -189,13 +188,13 @@ const onRowClick = async (event, item) => {
 }
 
 const onItemsPerPageChanged = (ipp) => {
-  filterStore.updateFilter('pageSize', ipp)
+  appStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
   currentPage.value = 1
 }
 
 const onPageChanged = (newPageNum) => {
-  filterStore.updateFilter('pageNum', newPageNum)
+  appStore.updateFilter('pageNum', newPageNum)
   currentPage.value = newPageNum
 }
 
@@ -204,7 +203,7 @@ const onFileDownloadClick = () => {
 }
 
 const onSortUpdate = (newSort) => {
-  filterStore.updateSort(newSort)
+  appStore.updateSort(newSort)
 }
 
 // *** Utility functions *******************************************************
@@ -214,33 +213,29 @@ const loadColocData = async (cpn, url) => {
 
   if(await fetchData(url, 'coloc plot data', cpn)) {
     // console.log('got coloc data:', data.value)
-    filterStore.colocData = markRaw(data.value)
-    filterStore.colocDataReady = true
+    appStore[PAGE_NAMES.LOCUSZOOM].colocData = data.value
+    appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady = true
   } else {
     throw new Error('Error loading coloc plot data:\n' + errorMessage)
   }
-
-  const url2 = buildLZTableURL(URLS[cpn], filterStore.colocData.signal1, filterStore.colocData.signal2)
-  return url2
 }
 
 const loadTableData = async (cpn, url) => {
   // console.log(`loading table data for ${cpn} page from ${url.href}`)
   const { data, errorMessage, fetchData } = useFetchData()
-  filterStore.isDirEffectReady = false
+  appStore.dataTable.isDirEffectReady = false
   if(await fetchData(url, 'table data', cpn)) {
     // console.log('loaded table data:', data.value)
     dataItems.value = data.value.results
-    filterStore.itemCount = dataItems.value.length
-    countPairs.value = data.value.count
-    filterStore.countPairs = data.value.count
+    appStore.dataTable.itemCount = dataItems.value.length
+    appStore.dataTable.countPairs = data.value.count
 
-    filterStore.dirEffect = useDirectionOfEffect(dataItems.value)
-    filterStore.isDirEffectReady = true
+    appStore.dataTable.dirEffect = useDirectionOfEffect(dataItems.value)
+    appStore.dataTable.isDirEffectReady = true
 
-    const parentKey = PAGE_STORE_DATA_MAP[cpn]
-    currentPage.value = filterStore[parentKey].filters.pageNum
-    itemsPerPage.value = filterStore[parentKey].filters.pageSize
+    const parentKey = cpn
+    currentPage.value = appStore[parentKey].filters.pageNum
+    itemsPerPage.value = appStore[parentKey].filters.pageSize
 
   } else {
     throw new Error('Error loading table data:\n' + errorMessage)
@@ -251,23 +246,26 @@ const loadData = async () => {
   // console.log('dt: doing loadData')
   let url = null
   isLoadingData.value = true
-  const cpn = filterStore.currentPageName
+  const cpn = appStore.currentPageName
 
   try {
     if (cpn === PAGE_NAMES.LOCUSZOOM) {
-      const colocURL = `${URLS[cpn]}${filterStore.colocID}`
-      // console.log('colocURL:', colocURL)
-      url = await loadColocData(cpn, colocURL)
-      if(!filterStore.lzPageTableDataLoaded) {
+      const colocURL = `${URLS[cpn]}${appStore[PAGE_NAMES.LOCUSZOOM].colocID}`
+      await loadColocData(cpn, colocURL)
+      const signal1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
+      const signal2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
+      url = buildLZTableURL(URLS[cpn], signal1, signal2)
+
+      if(!appStore[PAGE_NAMES.LOCUSZOOM].tableDataLoaded) {
         await loadTableData(cpn, url)
-        filterStore.lzPageTableDataLoaded = true
+        appStore[PAGE_NAMES.LOCUSZOOM].tableDataLoaded = true
       }
     } else { // must be search page or manhattan page
-      url = filterStore.buildSearchURL(URLS[cpn])
+      url = appStore.buildSearchURL(URLS[cpn])
       await loadTableData(cpn, url)
     }
-  } catch {
-    throw new Error('Error loading data:\n' + errorMessage)
+  } catch (e) {
+    throw new Error(`Error loading data:\n${e}`)
   } finally {
     isLoadingData.value = false
     scrollTop()
@@ -275,11 +273,11 @@ const loadData = async () => {
 }
 
 const getRowClass = (item) => {
-  if(filterStore.currentPageName !== PAGE_NAMES.LOCUSZOOM) return
-  if(!filterStore.colocDataReady) return
+  if(appStore.currentPageName !== PAGE_NAMES.LOCUSZOOM) return
+  if(!appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady) return
 
-  const s1 = filterStore.colocData.signal1
-  const s2 = filterStore.colocData.signal2
+  const s1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
+  const s2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
 
   if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
     return { class: 'bg-clcTableHighlight font-weight-bold' }

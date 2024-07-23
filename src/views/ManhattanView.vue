@@ -1,8 +1,8 @@
 <template>
-  <v-col v-show="filterStore.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterControls.isFilterPanelShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
-  <v-col :cols="filterStore.isFilterPanelShowing ? 10 : 12" class="ml-2">
+  <v-col :cols="appStore.filterControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
     <v-row class="mx-0 my-0">
       <h1><BackButton />Manhattan Plot <span class="analysis-id">({{ analysisID }})</span></h1>
     </v-row>
@@ -49,13 +49,13 @@
 <script setup>
 // *** Imports *****************************************************************
 import {computed, onMounted, onUpdated, provide, ref} from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 import { useRoute } from 'vue-router'
 import VariantLabel from '@/components/DataTable/labels/VariantLabel.vue'
 import { sortVariantArray } from '@/util/util'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 const route = useRoute();
 
 // *** Props *******************************************************************
@@ -96,7 +96,7 @@ onMounted(() => {
   analysisID.value = getAnalysisID()
   lastAnalysisID.value = analysisID.value
 
-  // preloadTrait.value = filterStore.preloadTrait
+  // preloadTrait.value = appStore.preloadTrait
 
   loadFilterControls()
   loadTableData()
@@ -147,20 +147,20 @@ const addSignals = (signals) => {
       selectedSignals.value[key] = signal
     }
   }
-  filterStore.updateFilter('signals', Object.keys(selectedSignals.value))
+  appStore.updateFilter('signals', Object.keys(selectedSignals.value))
 }
 
 const removeSignal = (variant) => {
   const keyToDelete = Object.keys(selectedSignals.value).find(key => selectedSignals.value[key].variant === variant);
   if (keyToDelete) {
     delete selectedSignals.value[keyToDelete];
-    filterStore.updateFilter('signals', Object.keys(selectedSignals.value))
+    appStore.updateFilter('signals', Object.keys(selectedSignals.value))
   }
 }
 
 const clearSignals = () => {
   selectedSignals.value = {}
-  filterStore.updateFilter('signals', Object.keys(selectedSignals.value))
+  appStore.updateFilter('signals', Object.keys(selectedSignals.value))
 }
 
 // *** Configuration data ******************************************************

@@ -1,9 +1,9 @@
 <template>
-  <v-col v-show="filterStore.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterControls.isFilterPanelShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
 
-  <v-col :cols="filterStore.isFilterPanelShowing ? 10 : 12" class="ml-3">
+  <v-col :cols="appStore.filterControls.isFilterPanelShowing ? 10 : 12" class="ml-3">
     <v-row class="mt-1 ml-2">
       <h1><BackButton />Locus Zoom</h1>
     </v-row>
@@ -78,13 +78,13 @@
 <script setup>
 // *** Imports *****************************************************************
 import { onMounted, provide, ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
-import { AXIS_OPTIONS } from '@/constants'
+import { AXIS_OPTIONS, PAGE_NAMES } from '@/constants'
 import { useLZPageHelpers } from '@/composables/lzPageHelpers'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 const lzPageHelpers = useLZPageHelpers()
 
 // *** Props *******************************************************************
@@ -120,7 +120,7 @@ provide('preloadGenes', preloadGenes)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => filterStore.colocDataReady, (newVal) => {
+watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, (newVal) => {
   if (newVal) initializePage()
 })
 
@@ -130,10 +130,7 @@ watch(() => conMarIndicator.value, (newVal, oldVal) => {
 
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
-  filterStore.lzPageTableDataLoaded = false
-  loadFPControls.value = !loadFPControls.value
-  filterStore.colocDataReady = false
-  loadTableDataFlag.value = !loadTableDataFlag.value
+  loadPageData()
 })
 
 // *** Event handlers **********************************************************
@@ -143,7 +140,7 @@ const onAddPlotIconClick = (item) => {
 }
 
 const onDataTableRowClick = () => {
-  loadData()
+  loadPageData()
 }
 
 const onCMRadioChange = (val) => {
@@ -160,8 +157,8 @@ const onUniqueCheckboxChange = (val) => {
 
 // *** Utility functions *******************************************************
 const initializePage = () => {
-  const signal1 = filterStore.colocData.signal1
-  const signal2 = filterStore.colocData.signal2
+  const signal1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
+  const signal2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
 
   // set template variables
   s1trait.value = signal1.analysis.trait.phenotype.name
@@ -175,6 +172,13 @@ const initializePage = () => {
   lzPageHelpers.assembleLayout(signal1, signal2, comparePlotRef, regionPlotRef)
 }
 
+const loadPageData = async () => {
+  lzPageHelpers.clearRefList()
+  appStore[PAGE_NAMES.LOCUSZOOM].tableDataLoaded = false
+  loadFPControls.value = !loadFPControls.value
+  appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady = false
+  loadTableDataFlag.value = !loadTableDataFlag.value
+}
 // *** Configuration data ******************************************************
 </script>
 

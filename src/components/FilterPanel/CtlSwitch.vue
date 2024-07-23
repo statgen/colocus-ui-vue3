@@ -12,21 +12,20 @@
 
 <script setup>
 import { inject, onMounted, ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
-import { PAGE_STORE_DATA_MAP } from '@/constants'
+import { useAppStore } from '@/stores/AppStore'
 
 const { controlSet } = defineProps({
   controlSet: {}
 })
 
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 const controlValue = ref(false)
 
 const resetInput = inject('resetInput')
 
 watch(resetInput, () => {
   controlValue.value = controlSet.defaultValue
-  filterStore.updateSwitch(controlSet.storeKey, controlSet.defaultValue)
+  appStore.updateSwitch(controlSet.storeKey, controlSet.defaultValue)
 })
 
 onMounted(() => {
@@ -34,12 +33,12 @@ onMounted(() => {
 })
 
 const onModelChanged = (newValue) => {
-  filterStore.updateSwitch(controlSet.storeKey, newValue)
+  appStore.updateSwitch(controlSet.storeKey, newValue)
 }
 
 const populateControlData = () => {
-  const parentKey = PAGE_STORE_DATA_MAP[filterStore.currentPageName]
-  controlValue.value = filterStore[parentKey][controlSet.storeKey]
+  const parentKey = appStore.currentPageName
+  controlValue.value = appStore[parentKey][controlSet.storeKey]
 }
 
 </script>

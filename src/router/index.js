@@ -1,19 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 
 const SHOW_FILTER_PANEL = true
 
 const enableFiltering = (panelIsVisible) => {
-  const filterStore = useFilterStore()
-  filterStore.isFilterButtonShowing = true
-  filterStore.isFilterPanelShowing = panelIsVisible
+  const appStore = useAppStore()
+  appStore.filterControls.isFilterButtonShowing = true
+  appStore.filterControls.isFilterPanelShowing = panelIsVisible
 }
 
 const disableFiltering = () => {
-  const filterStore = useFilterStore()
-  filterStore.isFilterButtonShowing = false
-  filterStore.isFilterPanelShowing = false
+  const appStore = useAppStore()
+  appStore.filterControls.isFilterButtonShowing = false
+  appStore.filterControls.isFilterPanelShowing = false
 }
 
 const routes = [
@@ -38,9 +38,8 @@ const routes = [
     component: () => import('@/views/LocusZoomView.vue'),
     beforeEnter: (to, from, next) => {
       enableFiltering(SHOW_FILTER_PANEL)
-      const filterStore = useFilterStore()
-      filterStore.copySearchFiltersToNextPage(to.name)
-      filterStore.uniqueLDrefs.length = 0
+      const appStore = useAppStore()
+      appStore.copySearchFiltersToNextPage(to.name)
       next()
     }
   },
@@ -51,9 +50,9 @@ const routes = [
     component: () => import('@/views/ManhattanView.vue'),
     beforeEnter: async (to, from, next) => {
       enableFiltering(SHOW_FILTER_PANEL)
-      const filterStore = useFilterStore()
-      filterStore.copySearchFiltersToNextPage(to.name)
-      // filterStore.preloadTrait = to.params.trait
+      const appStore = useAppStore()
+      appStore.copySearchFiltersToNextPage(to.name)
+      // appStore.preloadTrait = to.params.trait
       next()
     }
   },
@@ -89,10 +88,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async(to, from, next) => {
-  const filterStore = useFilterStore()
-  filterStore.currentPageName = to.name
+  const appStore = useAppStore()
+  appStore.currentPageName = to.name
   if(![PAGE_NAMES.SEARCH, PAGE_NAMES.LOCUSZOOM, PAGE_NAMES.MANHATTAN].includes(to.name)) disableFiltering()
-  if (!filterStore.isFilterDataLoaded) await filterStore.loadFilterData()
+  if (!appStore.filterControls.isFilterDataLoaded) await appStore.loadFilterData()
 
   const isReload = sessionStorage.getItem('isReload');
   // console.log(`isReload: ${isReload}, to.name: ${to.name}`); // Debug log

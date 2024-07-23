@@ -25,12 +25,12 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 
-const filterStore = useFilterStore()
-const { toggleFilterPanel } = filterStore
-const isFilterButtonVisible = computed(() => filterStore.isFilterButtonShowing)
+const appStore = useAppStore()
+const { toggleFilterPanel } = appStore
+const isFilterButtonVisible = computed(() => appStore.filterControls.isFilterButtonShowing)
 const searchPage = `/${PAGE_NAMES.SEARCH}`
 
 </script>

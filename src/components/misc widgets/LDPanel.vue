@@ -37,7 +37,7 @@
       </v-col>
       <v-col class="my-0 py-0">
         <v-radio-group :model-value="selectedLDRadio" @update:model-value="onLDRadioChange" density="compact">
-          <v-radio v-for="(ldRef, index) in filterStore.uniqueLDrefs" :key="index" :value="ldRef" color="clcAction">
+          <v-radio v-for="(ldRef, index) in appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs" :key="index" :value="ldRef" color="clcAction">
             <template v-slot:label>
                 <span :style="{color: colorHasher.hex(ldRef)}">
                   {{ formatVariantString(ldRef) }}
@@ -52,29 +52,25 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { AXIS_OPTIONS } from '@/constants'
-import { useFilterStore } from '@/stores/FilterStore'
+import { AXIS_OPTIONS, PAGE_NAMES } from '@/constants'
+import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 const selectedLDRadio = ref(null)
 const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
 
-const props = defineProps({
-  regionPanelRemoved: Boolean,
-})
-
 const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange', 'onUniqueCheckboxChange'])
 
-watch(() => filterStore.colocDataReady, async (newVal) => {
+watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, async (newVal) => {
   if(newVal) {
-    selectedLDRadio.value = filterStore.colocData.signal1.lead_variant.vid
+    selectedLDRadio.value = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1.lead_variant.vid
   }
 })
 
-watch(() => filterStore.regionPanelRemoved, async (newVal) => {
-  if(filterStore.uniqueLDrefs.length > 0) {
-    const variant = filterStore.uniqueLDrefs[0]
+watch(() => appStore[PAGE_NAMES.LOCUSZOOM].regionPanelRemoved, async (newVal) => {
+  if(appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs.length > 0) {
+    const variant = appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs[0]
     selectedLDRadio.value = variant
   }
 })

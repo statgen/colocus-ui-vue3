@@ -29,10 +29,10 @@
 <script setup>
 // *** Imports *****************************************************************
 import { inject, ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 const props = defineProps({
@@ -40,7 +40,7 @@ const props = defineProps({
 })
 
 // *** Variables ***************************************************************
-const dirEffect = filterStore.dirEffect
+const dirEffect = appStore.dataTable.dirEffect
 const discord = ref(Boolean)
 const item = props.item
 const effect = item.cross_signal.effect
@@ -53,7 +53,7 @@ const uuid = ref(item.uuid)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => filterStore.isDirEffectReady, (newValue) => {
+watch(() => appStore.dataTable.isDirEffectReady, (newValue) => {
   if(newValue) {
     const x = dirEffect[uuid.value]
     discord.value = x.discord

@@ -8,10 +8,10 @@
 <script setup>
 // *** Imports *****************************************************************
 import { ref, watch } from 'vue'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 const props = defineProps({
@@ -21,7 +21,7 @@ const props = defineProps({
 // *** Variables ***************************************************************
 const cellClass = ref({})
 const cellLabel = ref('')
-const dirEffect = filterStore.dirEffect
+const dirEffect = appStore.dataTable.dirEffect
 const item = props.item
 const uuid = ref(item.uuid)
 
@@ -31,7 +31,7 @@ const uuid = ref(item.uuid)
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
 const setCellLabel = ((dirEffect) => {
-  if(!filterStore.isDirEffectReady) return
+  if(!appStore.dataTable.isDirEffectReady) return
 
   const dir = dirEffect.direction
   const missing = dirEffect.hasMissing
@@ -52,7 +52,7 @@ const setCellLabel = ((dirEffect) => {
   }
 })
 
-watch(() => filterStore.isDirEffectReady, (newValue) => {
+watch(() => appStore.dataTable.isDirEffectReady, (newValue) => {
     if(newValue) {
       const u = uuid.value
       const de = dirEffect[u]

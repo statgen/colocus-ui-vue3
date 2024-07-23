@@ -50,9 +50,9 @@ The Manhattan page has the same flags.
 
 The DataTable component injects the loadDataTableFlag and watches it. Whenever it changes, the watcher executes loadTableData.
 
-Whenever filter data changes, the associated control calls filterStore.updateFilter. It then flips filterDataChanged. The DataTable watches that, and executes loadTableData whenever it flips.
+Whenever filter data changes, the associated control calls appStore.updateFilter. It then flips filterDataChanged. The DataTable watches that, and executes loadTableData whenever it flips.
 
-Whenever the user changes page or page size, filterStore.updateFilter is again called, which flips flag filterDataChanged. There is logic as to when it will do so. Mainly, we want to ignore a page num event immediately after a page size event. Otherwise, the flag if flipped twice in succession, and the watch in the DataTable misses the change, so data is not loaded.
+Whenever the user changes page or page size, appStore.updateFilter is again called, which flips flag filterDataChanged. There is logic as to when it will do so. Mainly, we want to ignore a page num event immediately after a page size event. Otherwise, the flag if flipped twice in succession, and the watch in the DataTable misses the change, so data is not loaded.
 
 ### Pinia store
 
@@ -66,7 +66,7 @@ The data structure includes global state variables (e.g., isDataLoaded), plus pa
 - buildSearchURL builds a URL based on all filter and sort criteria and formats it for consumption by the Django REST API back end.
 - checkGenes accepts a comma-delimited list of genes and returns an object containt two arrays, badGenes, and goodGenes. This is used in the case where an external entity (such as AMP) specifies a gene as a query string in a URL directed at the search page.
 - copySearchFilterToLZ copies the filter panel data for the search page into the corresponding keys for the LocusZoom page, and is called by the router before entering the LocusZoom page.
-- loadFilterData relies on the async composable, fetchData.js to load the filter data lists and populates the filterLists keys for use by the FilterPanel controls.
+- loadFilterData relies on the async composable, fetchData.js to load the filter data lists and populates the filterControls keys for use by the FilterPanel controls.
 - updateFilter is a helper for the filter panel components. updateFilter updates the appropriate value in the appropriate key, depending on which page (Search or LocusZoom) the user is on.
 - updateSort updates the store key storing sort parameters that end up in the URL.
 - updateSwitch updates the booleans tracking the display of the ensemble IDs and the concordance values.
@@ -135,12 +135,12 @@ The Search View provides a context for displaying a data table. It uses the Vue 
   - Through provide/inject this causes the underlying AutoComplete to call the updateFilter method on the Pinia store
   - UpdateFilter adds the selected gene(s) to the filter data, then toggles local variable filterDataChange
   - The DataTable component watches the variable and triggers a data load when it changes.
-The reason the DataTable has to watch filterStore.filterDataChanged, instead of using provide/inject, is that it is not possible to use that mechanism from within a Pinia store. The effect is the same, it's just a different way of triggering a desired event.
+The reason the DataTable has to watch appStore.filterDataChanged, instead of using provide/inject, is that it is not possible to use that mechanism from within a Pinia store. The effect is the same, it's just a different way of triggering a desired event.
 
 ### Trait following
 This is a feature added and then disabled. It was originally added due to hope for the Manhattan view to display data in the data table from multiple studies, and allow the user to filter by phenotype. But then it turned out that the back end as presently configured, could not support this. I am disabling the code, but documenting here, in case we decide to go back and correctly implement that feature.
 
-On the Search page, the user clicks a trait link. The router pulls trait from the URL and saves it in the filterStore as a top-level property called preloadTrait. The Manhattan view copies that to a local variable in its onMounted lifecycle method. It `provides` that value for injection where needed, in this case the AutoComplete control. It `watch`es that variable, and when it is updated, assigns it to local variable selectedItems, thus populating the on-screen control, and then calls updateFilter on the filter store with that value, which causes the data table to load.
+On the Search page, the user clicks a trait link. The router pulls trait from the URL and saves it in the appStore as a top-level property called preloadTrait. The Manhattan view copies that to a local variable in its onMounted lifecycle method. It `provides` that value for injection where needed, in this case the AutoComplete control. It `watch`es that variable, and when it is updated, assigns it to local variable selectedItems, thus populating the on-screen control, and then calls updateFilter on the filter store with that value, which causes the data table to load.
 
 The Search page also has references to preloadTrait, which are not used, but are required so that the AutoComplete controls will function.
 
@@ -160,7 +160,7 @@ The TOC must be maintained manually. Its href values are determined by the rende
 A Vue watch is set up to watch the v-sheet that contains the help content. When it is populated, the watcher sets up the event listeners for the links, and when it is being torn down, the event listeners are removed. This is necessary to prevent memory leaks, and to avoid navigation problems with the Vue router.
 
 ### Locuszoom view
-This is the most complicated page of the app thus far. It consists of five main files, plus references to the filterStore, utils, etc. The main files are:
+This is the most complicated page of the app thus far. It consists of five main files, plus references to the appStore, utils, etc. The main files are:
 - LocusZoomView.vue: This is the top-level page definition linked to by the router. It primarily consists of the Vue template definition, plus event handlers. 
 - lzPageHelpers.js: This is a composable that contains the meat of the functionality required by the page.
 - LzPlot.vue: This is a wrapper, lightly mofified from the Vue 2 app, that allows creation of the main containers for the compare and region plots.
@@ -170,11 +170,11 @@ This is the most complicated page of the app thus far. It consists of five main 
 #### Data loading
 Our common idiom for data loading in this app is to set a flag from the source requesting the data, then watch that flag and load data when it changes. That pattern is used in the LZ page as well. The onMounted lifecycle hook initiates data loading.
 
-First we set the filterStore.lzPageTableDataLoaded to false. Later, when the data table's loadData is called, this alerts it that the data is needed.
+First we set the appStore.locuszoom.tableDataLoaded to false. Later, when the data table's loadData is called, this alerts it that the data is needed.
 
 Then we flip the value of local variable, loadFPControls. This is provided to controls in the filter panel to alert them to load their static data, such as the gene list, not user selections.
 
-Next we set the flag filterStore.colocDataReady to false. The data table's loadData function sets that flag to true when the coloc data is ready. Then we have several watchers that take appropriate action when the colocalization data is ready:
+Next we set the flag appStore.colocDataReady to false. The data table's loadData function sets that flag to true when the coloc data is ready. Then we have several watchers that take appropriate action when the colocalization data is ready:
 - the LDPanel component, which allows to set the correct radio button for the initial LD reference
 - the LocusZoom page, and this is what kicks off loading of the compare and region plots.
 
@@ -200,7 +200,7 @@ A key function in the composable, **assembleLayout()**, builds the overall conta
 Similarly, **buildCompareLayout()**, builds the container, and also creates the scatter plot directly.
 
 #### The LD panel
-The LDPanel is component that displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. The list is generated in the composable and then pushed to the filterStore. Earlier, I tried supply the list directly to the LDPanel, but it would not display correctly. In different scenarios, it would display only the first two elements, or duplicate the first two elements as panels were added, or display nothing in the label slot. The functional workaround was to push the list to the filterStore.
+The LDPanel is component that displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. The list is generated in the composable and then pushed to the appStore. Earlier, I tried supply the list directly to the LDPanel, but it would not display correctly. In different scenarios, it would display only the first two elements, or duplicate the first two elements as panels were added, or display nothing in the label slot. The functional workaround was to push the list to the appStore.
 
 So LDPanel  pulls the list from there for display as radio buttons. Using our VariantLabel component caused erroneous behavior. The solution was to render and format the values directly. The downside to this is that it is partially redundant with code in the VariantLabel component. My hunch is that Vue's reactivity system was failing with all the nesting. Perhaps a new version of Vue, Vuetify, or both will help. As of this writing (2024-07-22), we are using the following key libraries, which are the latest as of this date:
 
@@ -213,6 +213,18 @@ So LDPanel  pulls the list from there for display as radio buttons. Using our Va
 
 ## Misc debugging hints
 - use {{ $log() }} in templates to log local values to console. This is defined in main.js.
+
+## Genes for testing
+A2M,AAMP,PDF
+A2M,AAMP,PDF,
+A2M,AAMP,PDF,x
+A2M,AAMP,\t\r\n\n   PDF,y
+A2M,A2ML1-AS1,AAGAB,AAK1,AAMP,ABCA1,ABCA8,ABCG5,ABCG8,ABHD12,ABLIM3,ABTB1,ENSG00000000938,x,y
+A2M	A2ML1-AS1	AAGAB	AAK1	AAMP	ABCA1	ABCA8	ABCG5	ABCG8	ABHD12	ABLIM3	ABTB1	ENSG00000000938	x	y
+
+z
+vv
+x1
 
 ## Section headings in view and component files
 I find that it helps reduce cognitive load to have the sections in the same order throughout the application. There are some dependencies among them; for example, variables must be defined before watches. Very simple components don't need the overhead. This structure does not fit composables, constants, and helper files. In those cases, we list functions alphabetically. 

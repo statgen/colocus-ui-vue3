@@ -1,51 +1,58 @@
+import { markRaw } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { PAGE_STORE_DATA_MAP, URLS } from '@/constants'
+import { PAGE_NAMES, URLS } from '@/constants'
 
-export const useFilterStore = defineStore('filterStore', {
+export const useAppStore = defineStore('appStore', {
   state: () => ({
-    regionPanelRemoved: false,
-    uniqueLDrefs: [],
-    pastedGenes: null,
-    plotID: 0,
-    colocID: '',
-    colocData: null,
-    colocDataReady: false,
-    lzPageTableDataLoaded: false,
     // preloadTrait: '',
-    manhattanData: [],
-    filterDataChanged: false,
-    lastFilterUpdated: '',
     currentPageName: '',
-    isFilterDataLoaded: false,
-    isFilterButtonShowing: true,
-    isFilterPanelShowing: true,
-    isItemDataLoaded: false,
-    countPairs: 0,
-    dataItems: {},
-    itemCount: 0,
-    dirEffect: {},
-    isDirEffectReady: false,
-    filterLists: {
-      analysisTypes: [],
-      genes: [],
-      phenotypes: [],
-      studies: [],
-      tissues: [],
+    dataTable: {
+      countPairs: 0,  // total records in the data set
+      itemCount: 0,   // records shown in the data table
+      dirEffect: {},
+      isDirEffectReady: false,
     },
-    searchPageData: getDefaultPageData(),
-    locuszoomPageData: getDefaultPageData(),
-    manhattanPageData: getDefaultPageData(),
+    filterControls: {
+      filterDataChanged: false,
+      isFilterButtonShowing: true,
+      isFilterDataLoaded: false,
+      isFilterPanelShowing: true,
+      lastFilterUpdated: '',
+      analysisTypes: markRaw([]),
+      genes: markRaw([]),
+      phenotypes: markRaw([]),
+      studies: markRaw([]),
+      tissues: markRaw([]),
+    },
+    [PAGE_NAMES.LOCUSZOOM]: {
+      colocData: markRaw(null),
+      colocDataReady: false,
+      colocID: '',
+      plotID: 0,
+      regionPanelRemoved: false,
+      tableDataLoaded: false,
+      uniqueLDrefs: [],
+      ...getFilterPanelSettings()
+    },
+    [PAGE_NAMES.MANHATTAN]: {
+      manhattanData: markRaw([]),
+      ...getFilterPanelSettings()
+    },
+    [PAGE_NAMES.SEARCH]: {
+      pastedGenes: null,
+      ...getFilterPanelSettings()
+    },
   }),
+
   actions: {
     buildSearchURL (urlPath) {
-      const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
+      const parentKey = this.currentPageName
       const url = new URL(urlPath, window.location.origin)
       Object.entries(dataMapAPI).map(([key, value]) => {
         const p = this[parentKey].filters[key]
         if(p && p.toString().length > 0) url.searchParams.set(value, this[parentKey].filters[key])
       })
-
       const newOrdering = []
       this[parentKey].sortKeys.forEach((sortKey) => {
         const key = sortKey.key
@@ -60,20 +67,20 @@ export const useFilterStore = defineStore('filterStore', {
           newOrdering.push(`${sortOrder}${sortField}`)
         }
       })
-
       if (newOrdering.length > 0) {
         url.searchParams.set('ordering', newOrdering.join(','))
       }
       return url
     },
+
     checkGenes(geneStr) {
-      let testGenes = geneStr.replace(/ |\t|\r|\n/g, ',') // replace space, tab, newline, return with comma
-      testGenes = testGenes.split(',').filter(z => z)     // make array and remove empty elements
-      testGenes = [... new Set(testGenes)].sort()         // make unique list and sort
+      let testGenes = geneStr.replace(/ |\t|\r|\n/g, ',')   // replace space, tab, newline, return with comma
+      testGenes = testGenes.split(',').filter(gene => gene) // make array and remove empty elements
+      testGenes = [... new Set(testGenes)].sort()           // make unique list and sort
       const goodGenes = []
       const badGenes = []
       testGenes.forEach(gene => {
-        if(this.filterLists.genes.includes(gene)) {
+        if(this.filterControls.genes.includes(gene)) {
           goodGenes.push(gene)
         } else {
           badGenes.push(gene)
@@ -81,49 +88,53 @@ export const useFilterStore = defineStore('filterStore', {
       })
       return { goodGenes, badGenes }
     },
+
     copySearchFiltersToNextPage(nextPageName) {
-      const parentKey = PAGE_STORE_DATA_MAP[nextPageName]
-      for (const [key, value] of Object.entries(this.searchPageData.filters)) {
+      const parentKey = nextPageName
+      for (const [key, value] of Object.entries(this[PAGE_NAMES.SEARCH].filters)) {
         this[parentKey].filters[key] = value
       }
-      this[parentKey].filters.showEnsIDs = this.searchPageData.filters.showEnsIDs
-      this[parentKey].filters.showEffects = this.searchPageData.filters.showEffects
-      this[parentKey].filters.itemsPerPage = this.searchPageData.filters.itemsPerPage
+      this[parentKey].filters.showEnsIDs = this[PAGE_NAMES.SEARCH].filters.showEnsIDs
+      this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
+      this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
     },
+
     async loadFilterData() {
-      if(this.isFilterDataLoaded) return
+      if(this.filterControls.isFilterDataLoaded) return
       const { data, errorMessage, fetchData } = useFetchData()
       if(await fetchData(URLS.FILTER_DATA, 'filter data', this.currentPageName)) {
         const d = data.value
-        this.filterLists.analysisTypes = d.analysis_types.sort()
-        this.filterLists.genes = d.genes.sort()
-        this.filterLists.phenotypes = d.phenotypes.sort()
-        this.filterLists.studies = d.studies.sort()
-        this.filterLists.tissues = d.tissues.sort()
-        this.isFilterDataLoaded = true
+        this.filterControls.analysisTypes = d.analysis_types.sort()
+        this.filterControls.genes = d.genes.sort()
+        this.filterControls.phenotypes = d.phenotypes.sort()
+        this.filterControls.studies = d.studies.sort()
+        this.filterControls.tissues = d.tissues.sort()
+        this.filterControls.isFilterDataLoaded = true
       } else {
         throw new Error('Error loading filter data:\n' + errorMessage)
       }
     },
+
     async loadManhattanData (analysisID) {
-      this.manhattanPageData.filters.analysisID = analysisID
+      this[PAGE_NAMES.MANHATTAN].filters.analysisID = analysisID
       const href = `${URLS.TRAIT_DATA}${analysisID}/manhattan/`
       const url = new URL(href, window.location.origin)
       // console.log('mh loading url:', url)
       const { data, errorMessage, fetchData } = useFetchData()
       if(await fetchData(url, 'manhattan data', this.currentPageName)) {
         // console.log('mh data:', data.value)
-        this.manhattanData = data.value
+        this[PAGE_NAMES.MANHATTAN].manhattanData = data.value
       } else {
         throw new Error('Error loading manhattan data:\n' + errorMessage)
       }
     },
+
     updateFilter(key, value) {
       // following is to ignore a double hit when changing page size in <DataTable>; page num also changes and generates event
-      if(this.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
+      if(this.filterControls.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
 
-      const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
+      const parentKey = this.currentPageName
       const filters = this[parentKey].filters
       // console.log('uf:', filters)
 
@@ -137,28 +148,31 @@ export const useFilterStore = defineStore('filterStore', {
           filters.pageNum = 1
         }
 
-        this.lastFilterUpdated = key
-        this.filterDataChanged = !this.filterDataChanged
+        this.filterControls.lastFilterUpdated = key
+        this.filterControls.filterDataChanged = !this.filterControls.filterDataChanged
       }
     },
+
     async updateSort(newSort) {
-      const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
+      const parentKey = this.currentPageName
       this[parentKey].sortKeys = newSort
-      this.filterDataChanged = !this.filterDataChanged
+      this.filterControls.filterDataChanged = !this.filterControls.filterDataChanged
     },
+
     updateSwitch(key, value) {
-      const parentKey = PAGE_STORE_DATA_MAP[this.currentPageName]
+      const parentKey = this.currentPageName
       this[parentKey][key] = value
     },
+
     toggleFilterPanel() {
-      this.isFilterPanelShowing = !this.isFilterPanelShowing
+      this.filterControls.isFilterPanelShowing = !this.filterControls.isFilterPanelShowing
     },
   },
   getters: {
   }
 })
 
-function getDefaultPageData() {
+function getFilterPanelSettings() {
   return {
     showEnsIDs: false,
     showEffects: false,
@@ -228,5 +242,5 @@ const sortKeyMapAPI = {
 
 // allows hot module replacement of store in dev mode
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useFilterStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useAppStore, import.meta.hot))
 }

@@ -7,10 +7,11 @@
 import { defineEmits, inject, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { create_gwas_plot } from '@/vis/pheweb_plots'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
+import { PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 const route = useRoute();
 
 // *** Props *******************************************************************
@@ -32,8 +33,8 @@ watch(() => loadManhattanDataFlag.value, async () => {
   const analysisID = route.params.analysisID
   // console.log('MP watcher, analysis ID:', analysisID)
 
-  await filterStore.loadManhattanData(analysisID)
-  const { variant_bins, unbinned_variants } = filterStore.manhattanData
+  await appStore.loadManhattanData(analysisID)
+  const { variant_bins, unbinned_variants } = appStore[PAGE_NAMES.MANHATTAN].manhattanData
 
   const existingPlot = document.getElementById(plotContainerID)
   if(existingPlot) existingPlot.remove()

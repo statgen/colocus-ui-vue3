@@ -1,13 +1,13 @@
 import { createVNode, nextTick, ref, render, watch } from 'vue'
 import { findPlotRegion, makePlotTitle, sortVariantArray } from '@/util/util'
-import { useFilterStore } from '@/stores/FilterStore'
+import { useAppStore } from '@/stores/AppStore'
 import { normalizeMarker } from "locuszoom/esm/helpers/parse"
 import { get_compare_layout, get_region_layout, get_region_sources, toggle_trait } from "@/util/lz-layouts"
-import { URLS } from "@/constants"
+import { PAGE_NAMES, URLS } from "@/constants"
 import LZPlot from '@/components/misc widgets/LZPLot.vue'
 import * as d3 from 'd3'
 
-const filterStore = useFilterStore()
+const appStore = useAppStore()
 
 export function useLZPageHelpers() {
 // *** local variables *************************************************************************************************
@@ -19,11 +19,15 @@ export function useLZPageHelpers() {
 
 // *** LD ref management ***********************************************************************************************
   watch(refList, (newList) => {
-    filterStore.uniqueLDrefs = getUniqueRefs(newList)
+    appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs = getUniqueRefs(newList)
   }, { deep: true })
 
   const addRef = (ref) => {
     refList.value.push(ref)
+  }
+
+  const clearRefList = () => {
+    refList.value.length = 0
   }
 
   const getUniqueRefs = (newList) => {
@@ -173,9 +177,9 @@ export function useLZPageHelpers() {
   const regionPanelRemovedHandler = (eventData) => {
     if (eventData.data === 'genes') return // it was a gene panel, nothing to do
     removePanelRef(eventData)
-    const variant = filterStore.uniqueLDrefs[0]
+    const variant = appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs[0]
     applyLDref(variant, regionVnodeRef)
-    filterStore.regionPanelRemoved = !filterStore.regionPanelRemoved
+    appStore[PAGE_NAMES.LOCUSZOOM].regionPanelRemoved = !appStore[PAGE_NAMES.LOCUSZOOM].regionPanelRemoved
   }
 
   const toggleConditionalMarginal = (newVal, oldVal) => {
@@ -203,6 +207,7 @@ export function useLZPageHelpers() {
     addUniqueRefsOnly,
     applyLDref,
     assembleLayout,
+    clearRefList,
     toggleConditionalMarginal,
   }
 }
