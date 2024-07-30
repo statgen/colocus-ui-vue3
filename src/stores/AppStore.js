@@ -120,10 +120,9 @@ export const useAppStore = defineStore('appStore', {
       this[PAGE_NAMES.MANHATTAN].filters.analysisID = analysisID
       const href = `${URLS.TRAIT_DATA}${analysisID}/manhattan/`
       const url = new URL(href, window.location.origin)
-      // console.log('mh loading url:', url)
       const { data, errorMessage, fetchData } = useFetchData()
+
       if(await fetchData(url, 'manhattan data', this.currentPageName)) {
-        // console.log('mh data:', data.value)
         this[PAGE_NAMES.MANHATTAN].manhattanData = data.value
       } else {
         throw new Error('Error loading manhattan data:\n' + errorMessage)

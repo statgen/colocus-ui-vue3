@@ -64,7 +64,7 @@ const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange', 'onUniqueCheckbo
 
 watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, async (newVal) => {
   if(newVal) {
-    selectedLDRadio.value = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1.lead_variant.vid
+    selectedLDRadio.value = appStore[PAGE_NAMES.LOCUSZOOM]?.colocData?.signal1?.lead_variant.vid || ''
   }
 })
 

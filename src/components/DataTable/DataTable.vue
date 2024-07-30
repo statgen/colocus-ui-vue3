@@ -31,7 +31,7 @@
 
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
       <!--      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid, trait: item.signal1.analysis.trait.phenotype.name } }">-->
-            <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid } }">
+      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid } }">
         <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
       </router-link>
     </template>
@@ -126,7 +126,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { inject, markRaw, nextTick, ref, shallowRef, watch } from 'vue'
+import { inject, nextTick, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES, URLS } from '@/constants'
@@ -149,7 +149,6 @@ const loadingText = ref('Loading data ...')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
-
 // *** Injects *****************************************************************
 const loadTableDataFlag = inject('loadTableDataFlag')
 
@@ -158,33 +157,22 @@ const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterControls.filterDataChanged, async () => {
-  // console.log('dt: loading new table data from filterDataChanged flag')
   await loadData()
 })
 
 watch(() => loadTableDataFlag.value, async () => {
-  // console.log('dt: loading new data from loadTableDataFlag')
   await loadData()
 })
 
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
-  // console.log('dt: add plot for item:', item)
   emit('onAddPlotIconClick', item)
 }
 
 const onRowClick = async (event, item) => {
-  const cpn = appStore.currentPageName
-  // console.log('dt: onRowClick, page:', cpn)
   appStore[PAGE_NAMES.LOCUSZOOM].colocID = item.item.uuid
-  if(cpn === PAGE_NAMES.SEARCH) {
-    await router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
-  } else if (appStore.currentPageName === PAGE_NAMES.LOCUSZOOM) {
-    // console.log('dt: onRowClick, from lz page')
-    emit('onDataTableRowClick', item)
-    // await loadData()
-  }
+  await router.push({name: PAGE_NAMES.LOCUSZOOM, params: {}})
 }
 
 const onItemsPerPageChanged = (ipp) => {
@@ -208,11 +196,9 @@ const onSortUpdate = (newSort) => {
 
 // *** Utility functions *******************************************************
 const loadColocData = async (cpn, url) => {
-  // console.log(`dt: loading coloc data for page: ${cpn} from: ${url}`)
   const { data, errorMessage, fetchData } = useFetchData()
 
   if(await fetchData(url, 'coloc plot data', cpn)) {
-    // console.log('got coloc data:', data.value)
     appStore[PAGE_NAMES.LOCUSZOOM].colocData = data.value
     appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady = true
   } else {
@@ -221,11 +207,9 @@ const loadColocData = async (cpn, url) => {
 }
 
 const loadTableData = async (cpn, url) => {
-  // console.log(`loading table data for ${cpn} page from ${url.href}`)
   const { data, errorMessage, fetchData } = useFetchData()
   appStore.dataTable.isDirEffectReady = false
   if(await fetchData(url, 'table data', cpn)) {
-    // console.log('loaded table data:', data.value)
     dataItems.value = data.value.results
     appStore.dataTable.itemCount = dataItems.value.length
     appStore.dataTable.countPairs = data.value.count
@@ -243,14 +227,18 @@ const loadTableData = async (cpn, url) => {
 }
 
 const loadData = async () => {
-  // console.log('dt: doing loadData')
+  const colocID = appStore[PAGE_NAMES.LOCUSZOOM].colocID
+  const cpn = appStore.currentPageName
+  if(cpn === PAGE_NAMES.LOCUSZOOM && !colocID) {
+    await router.push({ name: PAGE_NAMES.SEARCH })
+    return
+  }
   let url = null
   isLoadingData.value = true
-  const cpn = appStore.currentPageName
 
   try {
     if (cpn === PAGE_NAMES.LOCUSZOOM) {
-      const colocURL = `${URLS[cpn]}${appStore[PAGE_NAMES.LOCUSZOOM].colocID}`
+      const colocURL = `${URLS[cpn]}${colocID}`
       await loadColocData(cpn, colocURL)
       const signal1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
       const signal2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
@@ -265,7 +253,7 @@ const loadData = async () => {
       await loadTableData(cpn, url)
     }
   } catch (e) {
-    throw new Error(`Error loading data:\n${e}`)
+    console.error(`Error loading data:\n${e}`)
   } finally {
     isLoadingData.value = false
     scrollTop()
@@ -287,7 +275,9 @@ const getRowClass = (item) => {
 }
 
 const scrollTop = () => {
-  nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
+  if(appStore.currentPageName === PAGE_NAMES.SEARCH) {
+    nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
+  }
 }
 
 // *** Configuration data ******************************************************
@@ -307,5 +297,4 @@ a:hover {
   font-weight: bold;
   background: aliceblue;
 }
-
 </style>

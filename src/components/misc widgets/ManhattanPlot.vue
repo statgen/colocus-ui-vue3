@@ -1,10 +1,10 @@
 <template>
-  <div ref="manhattanPlotParent" class="manhattan-plot"></div>
+  <div ref="manhattanPlotRef" class="manhattan-plot"></div>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { defineEmits, inject, onMounted, ref, watch } from 'vue'
+import { defineEmits, inject, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { create_gwas_plot } from '@/vis/pheweb_plots'
 import { useAppStore } from '@/stores/AppStore'
@@ -16,7 +16,7 @@ const route = useRoute();
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const manhattanPlotParent = ref(null)
+const manhattanPlotRef = ref(null)
 const plotContainerID = 'manhattan-plot'
 
 // *** Computed ****************************************************************
@@ -29,25 +29,7 @@ const emit = defineEmits(['onSelectSignals'])
 
 // *** Watches *****************************************************************
 watch(() => loadManhattanDataFlag.value, async () => {
-  // console.log('MP watcher')
-  const analysisID = route.params.analysisID
-  // console.log('MP watcher, analysis ID:', analysisID)
-
-  await appStore.loadManhattanData(analysisID)
-  const { variant_bins, unbinned_variants } = appStore[PAGE_NAMES.MANHATTAN].manhattanData
-
-  const existingPlot = document.getElementById(plotContainerID)
-  if(existingPlot) existingPlot.remove()
-
-  const newPlot = document.createElement('div')
-  newPlot.id = plotContainerID
-  manhattanPlotParent.value.appendChild(newPlot)
-
-  try {
-    create_gwas_plot(newPlot, tooltip_template, variant_bins, unbinned_variants, onClickSignals)
-  } catch (err) {
-    console.log(err)
-  }
+  await loadManhattanData()
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -58,6 +40,24 @@ const onClickSignals = (signals) => {
 }
 
 // *** Utility functions *******************************************************
+const loadManhattanData = async () => {
+  const analysisID = route.params.analysisID
+  await appStore.loadManhattanData(analysisID)
+
+  const { variant_bins, unbinned_variants } = appStore[PAGE_NAMES.MANHATTAN].manhattanData
+  const existingPlot = document.getElementById(plotContainerID)
+  if (existingPlot) existingPlot.remove()
+
+  const newPlot = document.createElement('div')
+  newPlot.id = plotContainerID
+  manhattanPlotRef.value.appendChild(newPlot)
+  try {
+    create_gwas_plot(newPlot, tooltip_template, variant_bins, unbinned_variants, onClickSignals)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 // *** Configuration data ******************************************************
 const tooltip_template = `<b><%- d.chrom %>:<%- d.pos.toLocaleString() %> <%- (d.ref && d.alt) ? (d.ref + "/" + d.alt) : "" %></b><br>
   -log<sub>10</sub>(p): <%- d.neg_log_pvalue && (+d.neg_log_pvalue).toFixed(3) %><br>

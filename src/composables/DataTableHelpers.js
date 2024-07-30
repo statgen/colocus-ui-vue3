@@ -92,7 +92,7 @@ export const useDataTableHelpers = () => {
 
     if (!coloc_signal1) {
       console.error('missing coloc signal1')
-      return base
+      return ''
     }
 
     const { start, end } = findPlotRegion(

@@ -48,7 +48,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import {computed, onMounted, onUpdated, provide, ref} from 'vue'
+import { computed, onMounted, onUpdated, provide, ref} from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { useRoute } from 'vue-router'
 import VariantLabel from '@/components/DataTable/labels/VariantLabel.vue'
@@ -71,13 +71,9 @@ const selectedSignals = ref({})
 
 // *** Computed ****************************************************************
 const sortedSignals = computed(() => {
-
   let variants = Object.values(selectedSignals.value).map(item => item.variant)
-
-  // variants = Array.from(variants)
   variants = sortVariantArray(variants)
   return variants
-  //return sortVariantArray(Object.values(selectedSignals.value))
 })
 
 // *** Provides ****************************************************************
@@ -92,7 +88,6 @@ provide('preloadGenes', preloadGenes)
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
-  // console.log('onMounted')
   analysisID.value = getAnalysisID()
   lastAnalysisID.value = analysisID.value
 
@@ -103,15 +98,6 @@ onMounted(() => {
   loadManhattanData()
 })
 
-onUpdated(() => {
-  // console.log('onUpdated')
-  const aid = getAnalysisID()
-  if(aid === lastAnalysisID.value) return
-
-  analysisID.value = aid
-  lastAnalysisID.value = aid
-  loadManhattanData()
-})
 // *** Event handlers **********************************************************
 const onDataTableRowClick = () => {
   // console.log('mv: DataTableRowClick')
