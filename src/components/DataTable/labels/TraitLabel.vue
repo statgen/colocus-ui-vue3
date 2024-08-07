@@ -5,7 +5,7 @@
         <v-tooltip activator="parent" location="top">
           <span>{{ trait?.phenotype?.name }}</span>
         </v-tooltip>
-        <span>{{ trait?.uuid }}</span>
+        <span class="text-clcAction trait-highlight">{{ trait?.uuid }}</span>
       </span>
       <span v-else :class="highlight ? 'text-indigo-darken-4' : '' ">
         {{ trait?.phenotype?.name }}
@@ -38,4 +38,7 @@ const props = defineProps({
 </script>
 
 <style scoped>
+.trait-highlight {
+  border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
+}
 </style>

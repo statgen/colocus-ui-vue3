@@ -30,10 +30,7 @@
     </template>
 
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <div @click.stop="onTrait1Click(item)" class="mhclick">
-        <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
-      </div>
-
+      <TraitLabel :trait="item.signal1.analysis.trait" abbrev @click.stop="onTrait1Click(item)"/>
     </template>
 
     <template v-slot:item.signal2.analysis.study.uuid="{item}">
@@ -41,7 +38,7 @@
     </template>
 
     <template v-slot:item.signal2.analysis.trait.uuid="{item}">
-        <TraitLabel :trait="item.signal2.analysis.trait" abbrev />
+      <TraitLabel :trait="item.signal2.analysis.trait" abbrev />
     </template>
 
     <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">
@@ -303,14 +300,5 @@ const scrollTop = () => {
 
 a:hover {
   font-weight: bold;
-}
-
-.signal-row {
-  font-weight: bold;
-  background: aliceblue;
-}
-
-.mhclick {
-  border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
 }
 </style>
