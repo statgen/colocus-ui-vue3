@@ -4,7 +4,7 @@
   </v-col>
   <v-col :cols="appStore.filterControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
     <v-row class="mx-0 my-0">
-      <h1><BackButton />Manhattan Plot <span class="analysis-id">({{ analysisID }})</span></h1>
+      <h1><BackButton />Manhattan Plot: <span class="analysis-id">{{ analysisID }}</span></h1>
     </v-row>
     <v-row class="ml-2 mt-14 plot-container">
       <ManhattanPlot
@@ -38,7 +38,7 @@
     <v-row>
       <div class="table-container mt-2">
         <DataTable
-          @onDataTableRowClick="onDataTableRowClick"
+          @onTrait1Click="onTrait1Click"
           @select_signals="addSignals"
         ></DataTable>
       </div>
@@ -48,11 +48,13 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, onMounted, onUpdated, provide, ref} from 'vue'
+import { computed, onBeforeMount, onMounted, provide, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { useRoute } from 'vue-router'
 import VariantLabel from '@/components/DataTable/labels/VariantLabel.vue'
 import { sortVariantArray } from '@/util/util'
+import { PAGE_NAMES } from '@/constants'
+import router from '@/router'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -60,16 +62,19 @@ const route = useRoute();
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const analysisID = ref('')
-const lastAnalysisID = ref('')
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const loadManhattanDataFlag = ref(false)
 const preloadGenes = ref([])
 // const preloadTrait = ref('')
 const selectedSignals = ref({})
+const manhattanPage = PAGE_NAMES.MANHATTAN
 
 // *** Computed ****************************************************************
+const analysisID = computed(() => {
+  return appStore.getPageKey(manhattanPage, 'analysisID') || sessionStorage.getItem('lastAnalysisID')
+})
+
 const sortedSignals = computed(() => {
   let variants = Object.values(selectedSignals.value).map(item => item.variant)
   variants = sortVariantArray(variants)
@@ -87,27 +92,24 @@ provide('preloadGenes', preloadGenes)
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
+onBeforeMount(() => {
+  if(!analysisID.value) {
+    router.push({name: PAGE_NAMES.SEARCH})
+  }
+})
+
 onMounted(() => {
-  analysisID.value = getAnalysisID()
-  lastAnalysisID.value = analysisID.value
-
-  // preloadTrait.value = appStore.preloadTrait
-
   loadFilterControls()
   loadTableData()
   loadManhattanData()
 })
 
 // *** Event handlers **********************************************************
-const onDataTableRowClick = () => {
-  // console.log('mv: DataTableRowClick')
+const onTrait1Click = () => {
+  loadManhattanData()
 }
 
 // *** Utility functions *******************************************************
-const getAnalysisID = () => {
-  return route.params.analysisID
-}
-
 const loadFilterControls = () => {
   loadFPControls.value = !loadFPControls.value
 }

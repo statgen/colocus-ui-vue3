@@ -5,19 +5,18 @@
 <script setup>
 // *** Imports *****************************************************************
 import { defineEmits, inject, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { create_gwas_plot } from '@/vis/pheweb_plots'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const route = useRoute();
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 const manhattanPlotRef = ref(null)
 const plotContainerID = 'manhattan-plot'
+const manhattanPage = PAGE_NAMES.MANHATTAN
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -29,7 +28,8 @@ const emit = defineEmits(['onSelectSignals'])
 
 // *** Watches *****************************************************************
 watch(() => loadManhattanDataFlag.value, async () => {
-  await loadManhattanData()
+  await appStore.loadManhattanData()
+  plotManhattanData()
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -40,14 +40,14 @@ const onClickSignals = (signals) => {
 }
 
 // *** Utility functions *******************************************************
-const loadManhattanData = async () => {
-  const analysisID = route.params.analysisID
-  await appStore.loadManhattanData(analysisID)
-
-  const { variant_bins, unbinned_variants } = appStore[PAGE_NAMES.MANHATTAN].manhattanData
+const plotManhattanData = () => {
+  const { variant_bins, unbinned_variants } = appStore.getPageKey(manhattanPage, 'manhattanData')
+  if(!variant_bins || !unbinned_variants) {
+    console.error('Missing manhattanData')
+    return
+  }
   const existingPlot = document.getElementById(plotContainerID)
   if (existingPlot) existingPlot.remove()
-
   const newPlot = document.createElement('div')
   newPlot.id = plotContainerID
   manhattanPlotRef.value.appendChild(newPlot)

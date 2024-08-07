@@ -30,10 +30,10 @@
     </template>
 
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <!--      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid, trait: item.signal1.analysis.trait.phenotype.name } }">-->
-      <router-link @click.stop :to="{name: `${PAGE_NAMES.MANHATTAN}`, params: { analysisID: item.signal1.analysis.uuid } }">
+      <div @click.stop="onTrait1Click(item)" class="mhclick">
         <TraitLabel :trait="item.signal1.analysis.trait" abbrev/>
-      </router-link>
+      </div>
+
     </template>
 
     <template v-slot:item.signal2.analysis.study.uuid="{item}">
@@ -146,6 +146,7 @@ const dataItems = shallowRef([])
 const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
+const manhattanPage = PAGE_NAMES.MANHATTAN
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -153,7 +154,7 @@ const loadingText = ref('Loading data ...')
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick', 'onTrait1Click'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterControls.filterDataChanged, async () => {
@@ -170,9 +171,8 @@ const onAddPlotIconClick = (item) => {
   emit('onAddPlotIconClick', item)
 }
 
-const onRowClick = async (event, item) => {
-  appStore[PAGE_NAMES.LOCUSZOOM].colocID = item.item.uuid
-  await router.push({name: PAGE_NAMES.LOCUSZOOM, params: {}})
+const onFileDownloadClick = () => {
+  fileDownload(dataItems.value)
 }
 
 const onItemsPerPageChanged = (ipp) => {
@@ -186,12 +186,24 @@ const onPageChanged = (newPageNum) => {
   currentPage.value = newPageNum
 }
 
-const onFileDownloadClick = () => {
-  fileDownload(dataItems.value)
+const onRowClick = async (event, item) => {
+  appStore[PAGE_NAMES.LOCUSZOOM].colocID = item.item.uuid
+  await router.push({name: PAGE_NAMES.LOCUSZOOM, params: {}})
 }
 
 const onSortUpdate = (newSort) => {
   appStore.updateSort(newSort)
+}
+
+const onTrait1Click = (item) => {
+  const analysisID = item.signal1.analysis.uuid
+  appStore.setPageKey(manhattanPage, 'analysisID', analysisID)
+  const cpn = appStore.currentPageName
+  if(cpn === manhattanPage) {
+    emit('onTrait1Click')
+  } else {
+    router.push({name: manhattanPage})
+  }
 }
 
 // *** Utility functions *******************************************************
@@ -296,5 +308,9 @@ a:hover {
 .signal-row {
   font-weight: bold;
   background: aliceblue;
+}
+
+.mhclick {
+  border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
 }
 </style>

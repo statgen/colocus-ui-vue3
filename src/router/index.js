@@ -45,7 +45,7 @@ const routes = [
   },
   {
     // path: `/${PAGE_NAMES.MANHATTAN}/:analysisID/:trait`,
-    path: `/${PAGE_NAMES.MANHATTAN}/:analysisID`,
+    path: `/${PAGE_NAMES.MANHATTAN}/`,
     name: PAGE_NAMES.MANHATTAN,
     component: () => import('@/views/ManhattanView.vue'),
     beforeEnter: async (to, from, next) => {
@@ -61,6 +61,7 @@ const routes = [
     name: PAGE_NAMES.SEARCH,
     component: () => import('@/views/SearchView.vue'),
     beforeEnter: (to, from, next) => {
+      const appStore = useAppStore()
       enableFiltering(SHOW_FILTER_PANEL)
       next()
     }

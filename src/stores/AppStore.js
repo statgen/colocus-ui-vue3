@@ -36,7 +36,9 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.MANHATTAN]: {
+      analysisID: '',
       manhattanData: markRaw([]),
+      manhattanDataReady: false,
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.SEARCH]: {
@@ -116,16 +118,46 @@ export const useAppStore = defineStore('appStore', {
       }
     },
 
-    async loadManhattanData (analysisID) {
-      this[PAGE_NAMES.MANHATTAN].filters.analysisID = analysisID
+    async loadManhattanData () {
+      this[PAGE_NAMES.MANHATTAN].manhattanDataReady = false
+
+      const analysisID = this[PAGE_NAMES.MANHATTAN].analysisID || sessionStorage.getItem('lastAnalysisID')
+
+      if(!analysisID || analysisID.length === 0) {
+        console.error('no analysisID to load manhattan data')
+        return
+      }
+
+      sessionStorage.setItem('lastAnalysisID', analysisID)
+
       const href = `${URLS.TRAIT_DATA}${analysisID}/manhattan/`
       const url = new URL(href, window.location.origin)
       const { data, errorMessage, fetchData } = useFetchData()
 
       if(await fetchData(url, 'manhattan data', this.currentPageName)) {
         this[PAGE_NAMES.MANHATTAN].manhattanData = data.value
+        this[PAGE_NAMES.MANHATTAN].manhattanDataReady = true
       } else {
         throw new Error('Error loading manhattan data:\n' + errorMessage)
+      }
+    },
+
+    getPageKey(pageName, key) {
+      const page = this[pageName]
+      if(Object.hasOwn(page, key)) {
+        return page[key]
+      } else {
+        throw new Error('Bad key specified for store page getter')
+      }
+    },
+
+    setPageKey(pageName, key, value) {
+      const page = this[pageName]
+      if(Object.hasOwn(page, key)) {
+        page[key] = value
+        return
+      } else {
+        throw new Error('Bad key specified for store page setter')
       }
     },
 
@@ -189,7 +221,6 @@ function getFilterPanelSettings() {
       r2: "0.3",
 
       // these are pseudo filters that get appended to the URL
-      analysisID:'',
       pageNum: "1",
       pageSize: "10",
       signals: [],
