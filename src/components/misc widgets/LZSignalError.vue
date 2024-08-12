@@ -34,10 +34,12 @@ const appStore = useAppStore()
 const signal1 = ref(null)
 const signal2 = ref(null)
 
-watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, async (newVal) => {
+const locusZoomPage = PAGE_NAMES.LOCUSZOOM
+
+watch(() => appStore[locusZoomPage].colocDataReady, async (newVal) => {
   if(newVal) {
-    signal1.value = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
-    signal2.value = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
+    signal1.value = appStore[locusZoomPage].colocData.signal1
+    signal2.value = appStore[locusZoomPage].colocData.signal2
   }
 })
 

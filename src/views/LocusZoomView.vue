@@ -111,6 +111,9 @@ const preloadGenes = ref([])
 const comparePlotRef = ref(null)
 const regionPlotRef = ref(null)
 
+// constants
+const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
@@ -120,7 +123,7 @@ provide('preloadGenes', preloadGenes)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, (newVal) => {
+watch(() => appStore[locuszoomPage].colocDataReady, (newVal) => {
   if (newVal) initializePage()
 })
 
@@ -157,8 +160,8 @@ const onUniqueCheckboxChange = (val) => {
 
 // *** Utility functions *******************************************************
 const initializePage = () => {
-  const signal1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
-  const signal2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
+  const signal1 = appStore[locuszoomPage].colocData.signal1
+  const signal2 = appStore[locuszoomPage].colocData.signal2
 
   // set template variables
   s1trait.value = signal1.analysis.trait.phenotype.name
@@ -168,15 +171,16 @@ const initializePage = () => {
   s1color.value = colorHasher.hex(s1Variant.value)
   s2color.value = colorHasher.hex(s2Variant.value)
 
+  loadFPControls.value = !loadFPControls.value
+
   // build compare and region plots
   lzPageHelpers.assembleLayout(signal1, signal2, comparePlotRef, regionPlotRef)
 }
 
 const loadPageData = async () => {
   lzPageHelpers.clearRefList()
-  appStore[PAGE_NAMES.LOCUSZOOM].tableDataLoaded = false
-  loadFPControls.value = !loadFPControls.value
-  appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady = false
+  appStore[locuszoomPage].tableDataLoaded = false
+  appStore[locuszoomPage].colocDataReady = false
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 // *** Configuration data ******************************************************

@@ -31,6 +31,7 @@ import { nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from "vue-router";
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
+import router from '@/router'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -44,6 +45,9 @@ const loadTableDataFlag = ref(false)
 const preloadGenes = ref([])
 // const preloadTrait = ref('')
 
+const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+const searchPage = PAGE_NAMES.SEARCH
+
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
@@ -54,10 +58,10 @@ provide('loadTableDataFlag', loadTableDataFlag)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => appStore[PAGE_NAMES.SEARCH].pastedGenes, (newVal, oldVal) => {
+watch(() => appStore[searchPage].pastedGenes, (newVal, oldVal) => {
   // console.log('pasted genes: nv:', newVal, 'ov:', oldVal)
-  if(newVal) geneListHandler(appStore[PAGE_NAMES.SEARCH].pastedGenes)
-  appStore[PAGE_NAMES.SEARCH].pastedGenes = null
+  if(newVal) geneListHandler(appStore[searchPage].pastedGenes)
+  appStore[searchPage].pastedGenes = null
 })
 
 // *** Lifecycle hooks *********************************************************
@@ -74,9 +78,8 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
-const onDataTableRowClick = (item) => {
-  console.log('sv: dataTableRowClick')
-  // router.push({ name: PAGE_NAMES.LOCUSZOOM, params: { } })
+const onDataTableRowClick = async (item) => {
+  await router.push({name: locuszoomPage, params: {}})
 }
 
 // *** Utility functions *******************************************************

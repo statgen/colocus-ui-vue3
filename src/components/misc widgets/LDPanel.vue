@@ -37,7 +37,7 @@
       </v-col>
       <v-col class="my-0 py-0">
         <v-radio-group :model-value="selectedLDRadio" @update:model-value="onLDRadioChange" density="compact">
-          <v-radio v-for="(ldRef, index) in appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs" :key="index" :value="ldRef" color="clcAction">
+          <v-radio v-for="(ldRef, index) in appStore[locuszoomPage].uniqueLDrefs" :key="index" :value="ldRef" color="clcAction">
             <template v-slot:label>
                 <span :style="{color: colorHasher.hex(ldRef)}">
                   {{ formatVariantString(ldRef) }}
@@ -60,17 +60,19 @@ const appStore = useAppStore()
 const selectedLDRadio = ref(null)
 const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
 
+const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+
 const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange', 'onUniqueCheckboxChange'])
 
-watch(() => appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady, async (newVal) => {
+watch(() => appStore[locuszoomPage].colocDataReady, async (newVal) => {
   if(newVal) {
-    selectedLDRadio.value = appStore[PAGE_NAMES.LOCUSZOOM]?.colocData?.signal1?.lead_variant.vid || ''
+    selectedLDRadio.value = appStore[locuszoomPage]?.colocData?.signal1?.lead_variant.vid || ''
   }
 })
 
-watch(() => appStore[PAGE_NAMES.LOCUSZOOM].regionPanelRemoved, async (newVal) => {
-  if(appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs.length > 0) {
-    const variant = appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs[0]
+watch(() => appStore[locuszoomPage].regionPanelRemoved, async (newVal) => {
+  if(appStore[locuszoomPage].uniqueLDrefs.length > 0) {
+    const variant = appStore[locuszoomPage].uniqueLDrefs[0]
     selectedLDRadio.value = variant
   }
 })

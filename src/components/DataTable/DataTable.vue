@@ -144,6 +144,8 @@ const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
 const manhattanPage = PAGE_NAMES.MANHATTAN
+const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+const searchPage = PAGE_NAMES.SEARCH
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -184,8 +186,9 @@ const onPageChanged = (newPageNum) => {
 }
 
 const onRowClick = async (event, item) => {
-  appStore[PAGE_NAMES.LOCUSZOOM].colocID = item.item.uuid
-  await router.push({name: PAGE_NAMES.LOCUSZOOM, params: {}})
+  const colocID = item.item.uuid
+  appStore[locuszoomPage].colocID = colocID
+  emit('onDataTableRowClick', item)
 }
 
 const onSortUpdate = (newSort) => {
@@ -208,8 +211,8 @@ const loadColocData = async (cpn, url) => {
   const { data, errorMessage, fetchData } = useFetchData()
 
   if(await fetchData(url, 'coloc plot data', cpn)) {
-    appStore[PAGE_NAMES.LOCUSZOOM].colocData = data.value
-    appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady = true
+    appStore[locuszoomPage].colocData = data.value
+    appStore[locuszoomPage].colocDataReady = true
   } else {
     throw new Error('Error loading coloc plot data:\n' + errorMessage)
   }
@@ -236,26 +239,26 @@ const loadTableData = async (cpn, url) => {
 }
 
 const loadData = async () => {
-  const colocID = appStore[PAGE_NAMES.LOCUSZOOM].colocID
+  const colocID = appStore[locuszoomPage].colocID
   const cpn = appStore.currentPageName
-  if(cpn === PAGE_NAMES.LOCUSZOOM && !colocID) {
-    await router.push({ name: PAGE_NAMES.SEARCH })
+  if(cpn === locuszoomPage && !colocID) {
+    await router.push({ name: searchPage })
     return
   }
   let url = null
   isLoadingData.value = true
 
   try {
-    if (cpn === PAGE_NAMES.LOCUSZOOM) {
+    if (cpn === locuszoomPage) {
       const colocURL = `${URLS[cpn]}${colocID}`
       await loadColocData(cpn, colocURL)
-      const signal1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
-      const signal2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
+      const signal1 = appStore[locuszoomPage].colocData.signal1
+      const signal2 = appStore[locuszoomPage].colocData.signal2
       url = buildLZTableURL(URLS[cpn], signal1, signal2)
 
-      if(!appStore[PAGE_NAMES.LOCUSZOOM].tableDataLoaded) {
+      if(!appStore[locuszoomPage].tableDataLoaded) {
         await loadTableData(cpn, url)
-        appStore[PAGE_NAMES.LOCUSZOOM].tableDataLoaded = true
+        appStore[locuszoomPage].tableDataLoaded = true
       }
     } else { // must be search page or manhattan page
       url = appStore.buildSearchURL(URLS[cpn])
@@ -270,11 +273,11 @@ const loadData = async () => {
 }
 
 const getRowClass = (item) => {
-  if(appStore.currentPageName !== PAGE_NAMES.LOCUSZOOM) return
-  if(!appStore[PAGE_NAMES.LOCUSZOOM].colocDataReady) return
+  if(appStore.currentPageName !== locuszoomPage) return
+  if(!appStore[locuszoomPage].colocDataReady) return
 
-  const s1 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal1
-  const s2 = appStore[PAGE_NAMES.LOCUSZOOM].colocData.signal2
+  const s1 = appStore[locuszoomPage].colocData.signal1
+  const s2 = appStore[locuszoomPage].colocData.signal2
 
   if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
     return { class: 'bg-clcTableHighlight font-weight-bold' }
@@ -284,7 +287,7 @@ const getRowClass = (item) => {
 }
 
 const scrollTop = () => {
-  if(appStore.currentPageName === PAGE_NAMES.SEARCH) {
+  if(appStore.currentPageName === searchPage) {
     nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
   }
 }

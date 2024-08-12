@@ -69,6 +69,7 @@ const preloadGenes = ref([])
 // const preloadTrait = ref('')
 const selectedSignals = ref({})
 const manhattanPage = PAGE_NAMES.MANHATTAN
+const searchPage = PAGE_NAMES.SEARCH
 
 // *** Computed ****************************************************************
 const analysisID = computed(() => {
@@ -94,7 +95,7 @@ provide('preloadGenes', preloadGenes)
 // *** Lifecycle hooks *********************************************************
 onBeforeMount(() => {
   if(!analysisID.value) {
-    router.push({name: PAGE_NAMES.SEARCH})
+    router.push({name: searchPage})
   }
 })
 

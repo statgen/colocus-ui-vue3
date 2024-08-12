@@ -17,9 +17,11 @@ export function useLZPageHelpers() {
   const compareVnodeRef = ref(null)
   const regionVnodeRef = ref(null)
 
+  const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+
 // *** LD ref management ***********************************************************************************************
   watch(refList, (newList) => {
-    appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs = getUniqueRefs(newList)
+    appStore[locuszoomPage].uniqueLDrefs = getUniqueRefs(newList)
   }, { deep: true })
 
   const addRef = (ref) => {
@@ -177,9 +179,9 @@ export function useLZPageHelpers() {
   const regionPanelRemovedHandler = (eventData) => {
     if (eventData.data === 'genes') return // it was a gene panel, nothing to do
     removePanelRef(eventData)
-    const variant = appStore[PAGE_NAMES.LOCUSZOOM].uniqueLDrefs[0]
+    const variant = appStore[locuszoomPage].uniqueLDrefs[0]
     applyLDref(variant, regionVnodeRef)
-    appStore[PAGE_NAMES.LOCUSZOOM].regionPanelRemoved = !appStore[PAGE_NAMES.LOCUSZOOM].regionPanelRemoved
+    appStore[locuszoomPage].regionPanelRemoved = !appStore[locuszoomPage].regionPanelRemoved
   }
 
   const toggleConditionalMarginal = (newVal, oldVal) => {

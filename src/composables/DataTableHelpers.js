@@ -6,6 +6,9 @@ import { PAGE_NAMES } from '@/constants'
 export const useDataTableHelpers = () => {
   const appStore = useAppStore()
 
+  const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+  const searchPage = PAGE_NAMES.SEARCH
+
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
 
@@ -13,11 +16,11 @@ export const useDataTableHelpers = () => {
     return ['locuszoom'].includes(appStore.currentPageName)
   }
 
-  watch(() => appStore[PAGE_NAMES.SEARCH].showEnsIDs, newValue => {showEnsIDs.value = newValue})
-  watch(() => appStore[PAGE_NAMES.LOCUSZOOM].showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => appStore[searchPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => appStore[locuszoomPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
 
-  watch(() => appStore[PAGE_NAMES.SEARCH].showEffects, newValue => {showEffects.value = newValue})
-  watch(() => appStore[PAGE_NAMES.LOCUSZOOM].showEffects, newValue => {showEffects.value = newValue})
+  watch(() => appStore[searchPage].showEffects, newValue => {showEffects.value = newValue})
+  watch(() => appStore[locuszoomPage].showEffects, newValue => {showEffects.value = newValue})
 
   const alwaysShow = () => true
 
@@ -87,7 +90,7 @@ export const useDataTableHelpers = () => {
 
   const buildLZTableURL = (baseURL, coloc_signal1, coloc_signal2) => {
     const base = new URL(baseURL, window.location.origin)
-    const filter_data = appStore[PAGE_NAMES.LOCUSZOOM].filters
+    const filter_data = appStore[locuszoomPage].filters
     // console.log('filter_data', filter_data)
 
     if (!coloc_signal1) {

@@ -4,6 +4,15 @@ import { PAGE_NAMES } from '@/constants'
 
 const SHOW_FILTER_PANEL = true
 
+const homePage = PAGE_NAMES.HOME
+const genePage = PAGE_NAMES.GENES
+const helpPage = PAGE_NAMES.HELP
+const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+const manhattanPage = PAGE_NAMES.MANHATTAN
+const searchPage = PAGE_NAMES.SEARCH
+const studyPage = PAGE_NAMES.STUDIES
+const traitPage = PAGE_NAMES.TRAITS
+
 const enableFiltering = (panelIsVisible) => {
   const appStore = useAppStore()
   appStore.filterControls.isFilterButtonShowing = true
@@ -19,22 +28,22 @@ const disableFiltering = () => {
 const routes = [
   {
     path: '/',
-    name: PAGE_NAMES.HOME,
+    name: homePage,
     component: () => import('@/views/HomeView.vue'),
   },
   {
-    path: `/${PAGE_NAMES.GENES}`,
-    name: PAGE_NAMES.GENES,
+    path: `/${genePage}`,
+    name: genePage,
     component: () => import('@/views/GenesView.vue'),
   },
   {
-    path: `/${PAGE_NAMES.HELP}`,
-    name: PAGE_NAMES.HELP,
+    path: `/${helpPage}`,
+    name: helpPage,
     component: () => import('@/views/HelpView.vue'),
   },
   {
-    path: `/${PAGE_NAMES.LOCUSZOOM}`,
-    name: PAGE_NAMES.LOCUSZOOM,
+    path: `/${locuszoomPage}`,
+    name: locuszoomPage,
     component: () => import('@/views/LocusZoomView.vue'),
     beforeEnter: (to, from, next) => {
       enableFiltering(SHOW_FILTER_PANEL)
@@ -44,9 +53,9 @@ const routes = [
     }
   },
   {
-    // path: `/${PAGE_NAMES.MANHATTAN}/:analysisID/:trait`,
-    path: `/${PAGE_NAMES.MANHATTAN}/`,
-    name: PAGE_NAMES.MANHATTAN,
+    // path: `/${manhattanPage}/:analysisID/:trait`,
+    path: `/${manhattanPage}/`,
+    name: manhattanPage,
     component: () => import('@/views/ManhattanView.vue'),
     beforeEnter: async (to, from, next) => {
       enableFiltering(SHOW_FILTER_PANEL)
@@ -57,8 +66,8 @@ const routes = [
     }
   },
   {
-    path: `/${PAGE_NAMES.SEARCH}`,
-    name: PAGE_NAMES.SEARCH,
+    path: `/${searchPage}`,
+    name: searchPage,
     component: () => import('@/views/SearchView.vue'),
     beforeEnter: (to, from, next) => {
       const appStore = useAppStore()
@@ -72,13 +81,13 @@ const routes = [
     component: () => import('@/views/StyleSheetView.vue'),
   },
   {
-    path: `/${PAGE_NAMES.STUDIES}`,
-    name: PAGE_NAMES.STUDIES,
+    path: `/${studyPage}`,
+    name: studyPage,
     component: () => import('@/views/StudiesView.vue'),
   },
   {
-    path: `/${PAGE_NAMES.TRAITS}`,
-    name: PAGE_NAMES.TRAITS,
+    path: `/${traitPage}`,
+    name: traitPage,
     component: () => import('@/views/TraitView.vue'),
   },
 ]
@@ -92,7 +101,7 @@ router.beforeEach(async(to, from, next) => {
   // console.log('Navigating from', from.fullPath, 'to', to.fullPath)
   const appStore = useAppStore()
   appStore.currentPageName = to.name
-  if(![PAGE_NAMES.SEARCH, PAGE_NAMES.LOCUSZOOM, PAGE_NAMES.MANHATTAN].includes(to.name)) disableFiltering()
+  if(![searchPage, locuszoomPage, manhattanPage].includes(to.name)) disableFiltering()
   if (!appStore.filterControls.isFilterDataLoaded) await appStore.loadFilterData()
   next()
 })
