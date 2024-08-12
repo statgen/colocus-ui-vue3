@@ -38,6 +38,7 @@
     <v-row>
       <div class="table-container mt-2">
         <DataTable
+          @onDataTableRowClick="onDataTableRowClick"
           @onTrait1Click="onTrait1Click"
           @select_signals="addSignals"
         ></DataTable>
@@ -68,6 +69,7 @@ const loadManhattanDataFlag = ref(false)
 const preloadGenes = ref([])
 // const preloadTrait = ref('')
 const selectedSignals = ref({})
+const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN
 const searchPage = PAGE_NAMES.SEARCH
 
@@ -106,6 +108,10 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
+const onDataTableRowClick = async (item) => {
+  await router.push({name: locuszoomPage, params: {}})
+}
+
 const onTrait1Click = () => {
   loadManhattanData()
 }
