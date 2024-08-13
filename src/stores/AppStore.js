@@ -2,6 +2,7 @@ import { markRaw } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { PAGE_NAMES, URLS } from '@/constants'
+import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
   state: () => ({
@@ -29,6 +30,7 @@ export const useAppStore = defineStore('appStore', {
       colocData: markRaw(null),
       colocDataReady: false,
       colocID: '',
+      filterDataChanged: false,
       plotID: 0,
       regionPanelRemoved: false,
       tableDataLoaded: false,
@@ -48,12 +50,11 @@ export const useAppStore = defineStore('appStore', {
   }),
 
   actions: {
-    buildSearchURL (urlPath) {
+    addQueryString(url) {
       const parentKey = this.currentPageName
-      const url = new URL(urlPath, window.location.origin)
       Object.entries(dataMapAPI).map(([key, value]) => {
         const p = this[parentKey].filters[key]
-        if(p && p.toString().length > 0) url.searchParams.set(value, this[parentKey].filters[key])
+        if(p?.toString().length > 0) url.searchParams.set(value, this[parentKey].filters[key])
       })
       const newOrdering = []
       this[parentKey].sortKeys.forEach((sortKey) => {
@@ -72,6 +73,31 @@ export const useAppStore = defineStore('appStore', {
       if (newOrdering.length > 0) {
         url.searchParams.set('ordering', newOrdering.join(','))
       }
+
+    },
+
+    buildLZdataTableURL(urlPath, signal1, signal2) {
+      console.log('blzdtu', signal1.lead_variant.chrom, signal2.lead_variant.chrom)
+      const url = new URL(urlPath, window.location.origin)
+      const { start, end } = findPlotRegion(
+        signal1.lead_variant.pos,
+        signal2.lead_variant.pos
+      )
+
+      const signal1_region = `${signal1.lead_variant.chrom}:${start}-${end}`
+      const signal2_region = `${signal2.lead_variant.chrom}:${start}-${end}`
+
+      url.searchParams.set('signal1_region', signal1_region)
+      url.searchParams.set('signal2_region', signal2_region)
+
+      this.addQueryString(url)
+
+      return url
+    },
+
+    buildSearchURL (urlPath) {
+      const url = new URL(urlPath, window.location.origin)
+      this.addQueryString(url)
       return url
     },
 

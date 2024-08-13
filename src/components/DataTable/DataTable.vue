@@ -157,6 +157,7 @@ const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick', 'onTrait1
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterControls.filterDataChanged, async () => {
+  appStore[locuszoomPage].filterDataChanged = true;
   await loadData()
 })
 
@@ -250,15 +251,18 @@ const loadData = async () => {
 
   try {
     if (cpn === locuszoomPage) {
-      const colocURL = `${URLS[cpn]}${colocID}`
-      await loadColocData(cpn, colocURL)
+      if(!appStore[locuszoomPage].colocDataReady) {
+        const colocURL = `${URLS[cpn]}${colocID}`
+        await loadColocData(cpn, colocURL)
+      }
       const signal1 = appStore[locuszoomPage].colocData.signal1
       const signal2 = appStore[locuszoomPage].colocData.signal2
-      url = buildLZTableURL(URLS[cpn], signal1, signal2)
+      url = appStore.buildLZdataTableURL(URLS[cpn], signal1, signal2)
 
-      if(!appStore[locuszoomPage].tableDataLoaded) {
+      if(!appStore[locuszoomPage].tableDataLoaded || appStore[locuszoomPage].filterDataChanged) {
         await loadTableData(cpn, url)
         appStore[locuszoomPage].tableDataLoaded = true
+        appStore[locuszoomPage].filterDataChanged = false
       }
     } else { // must be search page or manhattan page
       url = appStore.buildSearchURL(URLS[cpn])

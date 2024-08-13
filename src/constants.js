@@ -31,7 +31,6 @@ const URLS = {
   // these are misc data links
   FILTER_DATA: '/api/v1/internal/search_metadata/',
   TRAIT_DATA: '/api/v1/internal/analysis/',
-  LZ_DATA: '',
   PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
   SIGNALS_DATA: '/api/v1/signals/',
   LD_DATA: '/api/v1/ld/',
