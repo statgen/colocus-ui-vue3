@@ -1,26 +1,30 @@
 <template>
   <div>
-    <span v-if="trait.exon">
+    <span v-if="exonEnsID">
       <v-tooltip activator="parent" location="top">
-        {{ trait.exon.ens_id }}
+        {{ exonEnsID }}
       </v-tooltip>
-      {{ middleTrim(trait.exon.ens_id, 3, 8) }}
+      {{ middleTrim(exonEnsID, 3, 8) }}
     </span>
     <span v-else>
       <v-tooltip activator="parent" location="top">
-        {{ trait.gene.ens_id }}
+        {{ geneEnsID }}
       </v-tooltip>
-      {{ middleTrim(trait.gene.ens_id, 3, 8) }}
+      {{ middleTrim(geneEnsID, 3, 8) }}
     </span>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { middleTrim } from '@/util/util'
 
 const props = defineProps({
   trait: Object,
 })
+
+const geneEnsID = computed(() => props?.trait?.gene?.ens_id)
+const exonEnsID = computed(() => props?.trait?.exon?.ens_id)
 </script>
 
 <style scoped>

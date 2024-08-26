@@ -52,10 +52,8 @@ export const useAppStore = defineStore('appStore', {
   actions: {
     addQueryString(url) {
       const parentKey = this.currentPageName
-      Object.entries(dataMapAPI).map(([key, value]) => {
-        const p = this[parentKey].filters[key]
-        if(p?.toString().length > 0) url.searchParams.set(value, this[parentKey].filters[key])
-      })
+
+      // add ordering clause first
       const newOrdering = []
       this[parentKey].sortKeys.forEach((sortKey) => {
         const key = sortKey.key
@@ -74,6 +72,11 @@ export const useAppStore = defineStore('appStore', {
         url.searchParams.set('ordering', newOrdering.join(','))
       }
 
+      // then add remaining filters
+      Object.entries(dataMapAPI).map(([key, value]) => {
+        const p = this[parentKey].filters[key]
+        if(p?.toString().length > 0) url.searchParams.set(value, p)
+      })
     },
 
     buildLZdataTableURL(urlPath, signal1, signal2) {

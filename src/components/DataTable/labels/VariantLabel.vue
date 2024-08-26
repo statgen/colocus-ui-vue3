@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { colorHasher, formatVariantString } from '@/util/util'
 
 const emit = defineEmits(['onClose'])
@@ -22,7 +22,7 @@ const props = defineProps({
   marginLeft: { type: Number, default: 0 },
 })
 
-const myVariant = ref(props.variant || '')
+const myVariant = computed(() => props?.variant)
 
 const onIconClick = () => {
   emit('onClose')
