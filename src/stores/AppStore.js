@@ -80,7 +80,6 @@ export const useAppStore = defineStore('appStore', {
     },
 
     buildLZdataTableURL(urlPath, signal1, signal2) {
-      console.log('blzdtu', signal1.lead_variant.chrom, signal2.lead_variant.chrom)
       const url = new URL(urlPath, window.location.origin)
       const { start, end } = findPlotRegion(
         signal1.lead_variant.pos,

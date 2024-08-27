@@ -110,6 +110,14 @@ const sortVariantArray = (variants) => {
   })
 }
 
+const titleCase = (str) => {
+  if (!str || str?.length === 0) {
+    return ''
+  } else {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+}
+
 /**
  * A tagged template function that encodes URL parameters used in path segments / query params
  *   Usage: url`https://website.example/${value1}/?param=${value2}`
@@ -127,4 +135,4 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL,
-  sleeper, sortVariantArray, url }
+  sleeper, sortVariantArray, titleCase, url }

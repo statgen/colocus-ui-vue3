@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
+import { titleCase } from '@/util/util'
 
 const SHOW_FILTER_PANEL = true
 
@@ -104,6 +105,10 @@ router.beforeEach(async(to, from, next) => {
   if(![searchPage, locuszoomPage, manhattanPage].includes(to.name)) disableFiltering()
   if (!appStore.filterControls.isFilterDataLoaded) await appStore.loadFilterData()
   next()
+})
+
+router.afterEach(async(to, from, next) => {
+  document.title = `Colocus: ${titleCase(to.name)}`
 })
 
 export default router
