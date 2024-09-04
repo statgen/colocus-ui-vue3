@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <ToolTippy>
     <span>{{ theAbbrev ? middleTrim(theStudy, 3, 6) : study }}</span>
-    <v-tooltip activator="parent" location="top">
+    <template #tooltipContent>
       {{ theStudy }}
-    </v-tooltip>
-  </div>
+    </template>
+  </ToolTippy>
 </template>
 
 <script setup>

@@ -1,16 +1,20 @@
 <template>
   <div>
     <span v-if="exonEnsID">
-      <v-tooltip activator="parent" location="top">
-        {{ exonEnsID }}
-      </v-tooltip>
-      {{ middleTrim(exonEnsID, 3, 8) }}
+      <ToolTippy>
+        {{ middleTrim(exonEnsID, 3, 8) }}
+        <template #tooltipContent>
+          {{ exonEnsID }}
+        </template>
+      </ToolTippy>
     </span>
     <span v-else>
-      <v-tooltip activator="parent" location="top">
-        {{ geneEnsID }}
-      </v-tooltip>
-      {{ middleTrim(geneEnsID, 3, 8) }}
+      <ToolTippy>
+        {{ middleTrim(geneEnsID, 3, 8) }}
+        <template #tooltipContent>
+          {{ geneEnsID }}
+        </template>
+      </ToolTippy>
     </span>
   </div>
 </template>
@@ -18,6 +22,7 @@
 <script setup>
 import { computed } from 'vue'
 import { middleTrim } from '@/util/util'
+import ToolTippy from "@/components/DataTable/tooltips/ToolTippy.vue";
 
 const props = defineProps({
   trait: Object,

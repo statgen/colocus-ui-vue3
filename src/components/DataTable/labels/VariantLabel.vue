@@ -1,12 +1,14 @@
 <template>
-  <span class="text-no-wrap" :style="{color: colorHasher.hex(myVariant), marginLeft: marginLeft + 'px'}">
-    <v-icon v-if="showSplotch" icon="mdi-square" size="x-small" class="mb-1"/>
-    {{ formatVariantString(myVariant, 20) }}
-    <v-icon v-if="showClose" icon="mdi-close-circle" class="text-clcAction mb-1" size="1rem" @click="onIconClick"/>
-  </span>
-  <v-tooltip activator="parent" location="top">
-    {{ formatVariantString(myVariant) }}
-  </v-tooltip>
+  <ToolTippy>
+    <span class="text-no-wrap" :style="{color: colorHasher.hex(myVariant), marginLeft: marginLeft + 'px'}">
+      <v-icon v-if="showSplotch" icon="mdi-square" size="x-small" class="mb-1"/>
+      {{ formatVariantString(myVariant, 20) }}
+      <v-icon v-if="showClose" icon="mdi-close-circle" class="text-clcAction mb-1" size="1rem" @click="onIconClick"/>
+    </span>
+    <template #tooltipContent>
+      {{ formatVariantString(myVariant) }}
+    </template>
+  </ToolTippy>
 </template>
 
 <script setup>

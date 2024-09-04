@@ -25,6 +25,8 @@ export default createVuetify({
           clcEffZero: '#dddddd',
           clcEffNA: '#ffffff',
           clcTableHighlight: '#f0f8ff',   // css: aliceblue: '#f0f8ff'
+          clcTooltipBackground: '#eee',
+          clcTooltipBorder: '#2962ff',    // material: blue-accent-4
         },
       },
     },

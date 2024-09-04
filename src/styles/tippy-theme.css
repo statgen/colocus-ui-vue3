@@ -1,0 +1,55 @@
+.tippy-box[data-theme~='tippy-theme'] {
+  background-color: rgba(var(--v-theme-clcTooltipBackground), 1.0);
+  color: black;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--v-theme-clcTooltipBorder), 1.0);
+  font-size: 1rem;
+  font-weight: normal;
+  padding: 4px 4px;
+}
+
+.tippy-box[data-theme~='tippy-theme'] .tippy-arrow {
+  width: 16px;
+  height: 16px;
+  color: rgba(var(--v-theme-clcTooltipBackground), 1.0);
+}
+
+.tippy-box[data-theme~='tippy-theme'] .tippy-arrow::before {
+  content: '';
+  position: absolute;
+  border-color: transparent;
+  border-style: solid;
+}
+
+.tippy-box[data-theme~='tippy-theme'][data-placement^='top'] .tippy-arrow::before {
+  bottom: -9px;
+  left: 0;
+  border-width: 8px 8px 0;
+  border-top-color: rgba(var(--v-theme-clcTooltipBorder), 1.0);
+  transform-origin: center top;
+}
+
+
+.tippy-box[data-theme~='tippy-theme'][data-placement^='bottom'] .tippy-arrow::before {
+  top: -8px;
+  left: 0;
+  border-width: 0 8px 8px;
+  border-bottom-color: rgba(var(--v-theme-clcTooltipBorder), 1.0);
+  transform-origin: center bottom;
+}
+
+.tippy-box[data-theme~='tippy-theme'][data-placement^='left'] .tippy-arrow::before {
+  right: -8px;
+  top: 0;
+  border-width: 8px 0 8px 8px;
+  border-left-color: rgba(var(--v-theme-clcTooltipBorder), 1.0);
+  transform-origin: center left;
+}
+
+.tippy-box[data-theme~='tippy-theme'][data-placement^='right'] .tippy-arrow::before {
+  left: -8px;
+  top: 0;
+  border-width: 8px 8px 8px 0;
+  border-right-color: rgba(var(--v-theme-clcTooltipBorder), 1.0);
+  transform-origin: center right;
+}

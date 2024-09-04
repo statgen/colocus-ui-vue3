@@ -38,7 +38,7 @@
     </template>
 
     <template v-slot:item.signal2.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal2.analysis.trait" abbrev />
+      <TraitLabel :trait="item.signal2.analysis.trait" abbrev :isInteractive="true"/>
     </template>
 
     <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">
@@ -111,10 +111,12 @@
 
     <template v-slot:footer.prepend>
       <div>
-      <v-tooltip activator="parent" location="top">
-        Click to download currently displayed data
-      </v-tooltip>
-      <v-icon icon="mdi-file-download-outline" @click="onFileDownloadClick()" class="text-clcAction mx-3" size="32px"/>
+        <ToolTippy>
+          <v-icon icon="mdi-file-download-outline" @click="onFileDownloadClick()" class="text-clcAction mx-3" size="32px"/>
+          <template #tooltipContent>
+            Click to download currently displayed data
+          </template>
+        </ToolTippy>
       </div>
     </template>
 
