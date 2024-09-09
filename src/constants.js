@@ -34,6 +34,8 @@ const URLS = {
   PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
   SIGNALS_DATA: '/api/v1/signals/',
   LD_DATA: '/api/v1/ld/',
+  PORTAL_GENE_CHECK: 'https://bioindex.hugeamp.org/api/bio/query/gene',
+  PORTAL_GENE_PAGE: 'https://hugeamp.org/gene.html',
 }
 
 export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS

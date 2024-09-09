@@ -1,5 +1,5 @@
 <template>
-  <Tippy theme="tippy-theme" :arrow="true" :interactive="isInteractive" :key="isInteractive" :hide-on-click="false">
+  <Tippy theme="tippy-theme" :arrow="true" :interactive="isInteractive" :key="isInteractive" :hide-on-click="true">
     <template #default>
       <slot />
     </template>
