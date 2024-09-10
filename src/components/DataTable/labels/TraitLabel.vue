@@ -23,7 +23,7 @@
             <div @click.stop>
               {{ theGene }}
               <br />
-              <a :href="geneLink" target="_blank">{{ geneLinkText }}</a>
+              <a :href="geneLink" target="_blank" :class="aStyle">{{ geneLinkText }}</a>
             </div>
           </template>
         </ToolTippy>
@@ -52,6 +52,8 @@ const props = defineProps({
   isInteractive: Boolean,
 })
 
+const aStyle = ref('')
+
 const theAbbrev = computed(() => props?.abbrev)
 const theBiomarkerType = computed(() => props?.trait?.biomarker_type)
 const theGene = computed(() => props?.trait?.gene?.symbol)
@@ -76,6 +78,7 @@ const onTrigger = async () => {
         // console.log('gene page url:', u)
         geneLink.value = u
         geneText.value = `View ${ theGene.value } in CMDKP portal`
+        aStyle.value = 'a-style'
       } else {
         geneText.value = `Unknown gene: ${ theGene.value }`
       }
@@ -86,8 +89,13 @@ const onTrigger = async () => {
 }
 
 </script>
-
 <style scoped>
+.a-style {
+  border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
+  color: rgba(var(--v-theme-clcAction), 1.0);
+  text-decoration: none;
+}
+
 .trait-highlight {
   border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
   color: rgba(var(--v-theme-clcAction), 1.0);
