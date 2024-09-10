@@ -10,8 +10,8 @@ export const useFetchData = () => {
   })
 
   const fetchData = async (url, reason, page, options) => {
-    // const prettyPrint = true
-    // console.log(`fetching ${reason} for ${page} page from:\n`, prettyPrint ? ppURL(url.href) : url.href)
+    const prettyPrint = true
+    // console.log(`fetching ${reason} for ${page} page from:\n`, prettyPrint ? ppURL(url.href || url) : url.href || url)
     state.isLoading = true
     try {
       const response = await fetch(url, options)

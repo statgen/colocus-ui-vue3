@@ -38,7 +38,7 @@
     </template>
 
     <template v-slot:item.signal2.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal2.analysis.trait" abbrev :isInteractive="true"/>
+      <TraitLabel :trait="item.signal2.analysis.trait" abbrev :key="item.signal2.analysis.trait" :isInteractive="true"/>
     </template>
 
     <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">
