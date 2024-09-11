@@ -30,7 +30,7 @@
     </template>
 
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal1.analysis.trait" abbrev @click.stop="onTrait1Click(item)"/>
+      <TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait" :analysisID="item.signal1.analysis.uuid"/>
     </template>
 
     <template v-slot:item.signal2.analysis.study.uuid="{item}">
@@ -38,7 +38,7 @@
     </template>
 
     <template v-slot:item.signal2.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal2.analysis.trait" abbrev :key="item.signal2.analysis.trait" :isInteractive="true"/>
+      <TraitLabel :trait="item.signal2.analysis.trait" :key="item.signal2.analysis.trait"/>
     </template>
 
     <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">
@@ -135,7 +135,7 @@ import router from '@/router'
 
 // *** Composables ***************************************************************
 const appStore = useAppStore()
-const { buildLZTableURL, fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
+const { fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
 
 // *** Props *******************************************************************
 
@@ -155,7 +155,7 @@ const searchPage = PAGE_NAMES.SEARCH
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick', 'onTrait1Click'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterControls.filterDataChanged, async () => {
@@ -196,17 +196,6 @@ const onRowClick = async (event, item) => {
 
 const onSortUpdate = (newSort) => {
   appStore.updateSort(newSort)
-}
-
-const onTrait1Click = (item) => {
-  const analysisID = item.signal1.analysis.uuid
-  appStore.setPageKey(manhattanPage, 'analysisID', analysisID)
-  const cpn = appStore.currentPageName
-  if(cpn === manhattanPage) {
-    emit('onTrait1Click')
-  } else {
-    router.push({name: manhattanPage})
-  }
 }
 
 // *** Utility functions *******************************************************

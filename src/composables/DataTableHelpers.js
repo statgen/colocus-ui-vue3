@@ -26,10 +26,10 @@ export const useDataTableHelpers = () => {
 
   const allColumns= [
     { title: 'Add plots', value: 'actions', sortable: false, visible: () => showAddPlotIcon() },
-    { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
+    { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '6rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Study 2', sortable: true, value: 'signal2.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Trait 2', sortable: true, value: 'signal2.analysis.trait.uuid', minWidth: '11rem', visible: alwaysShow },
+    { title: 'Trait 2', sortable: true, value: 'signal2.analysis.trait.uuid', minWidth: '10rem', visible: alwaysShow },
     { title: 'Trait 2 Type', sortable: false, value: 'signal2.analysis.trait.biomarker_type', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 2 ENSG', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '12rem', visible: () => showEnsIDs.value },
     { title: 'Trait 2 Tissue', sortable: true, value: 'signal2.analysis.tissue', minWidth: '7rem', visible: alwaysShow },

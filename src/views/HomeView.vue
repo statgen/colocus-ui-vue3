@@ -19,10 +19,10 @@
     </ul>
     <h2>Main pages</h2>
     <p>
-      <a href="/search" class="text-clcAction">Search page:</a> Your entryway to exploring the data in colocus.  From the Search page you can select a gene, and/or a trait of interest and set filters for data display such as the strength of the eQTL or GWAS signals and the posterior probability of colocalization.
+      <a href="/search" class="coLink font-weight-bold">Search page:</a> Your entryway to exploring the data in colocus.  From the Search page you can select a gene, and/or a trait of interest and set filters for data display such as the strength of the eQTL or GWAS signals and the posterior probability of colocalization.
     </p>
     <p>
-      <a href="/studies" class="text-clcAction">Studies page:</a> Contains omic QTL and GWAS study information, including data sources and references.
+      <a href="/studies" class="coLink font-weight-bold">Studies page:</a> Contains omic QTL and GWAS study information, including data sources and references.
     </p>
   </div>
 </v-col>
@@ -34,7 +34,7 @@
 <style scoped>
 ul {
   list-style-type: disc;
-  padding-left: 20px;
+  padding-left: 1rem;
 }
 li {
   margin-top: 1rem;
@@ -44,18 +44,12 @@ h2 {
   margin-top: 1rem;
 }
 
-a {
-  text-decoration: none;
-  font-weight: bold;
-  border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
-}
-
 p {
   margin-top: 1rem;
 }
 
 #text-content {
   min-width: 500px;
-  width: 70%;
+  max-width: 1100px;
 }
 </style>

@@ -39,6 +39,7 @@ export const useAppStore = defineStore('appStore', {
     },
     [PAGE_NAMES.MANHATTAN]: {
       analysisID: '',
+      loadManhattanDataFlag: false,
       manhattanData: markRaw([]),
       manhattanDataReady: false,
       ...getFilterPanelSettings()

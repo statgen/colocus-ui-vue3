@@ -39,7 +39,6 @@
       <div class="table-container mt-2">
         <DataTable
           @onDataTableRowClick="onDataTableRowClick"
-          @onTrait1Click="onTrait1Click"
           @select_signals="addSignals"
         ></DataTable>
       </div>
@@ -104,7 +103,7 @@ onBeforeMount(() => {
 onMounted(() => {
   loadFilterControls()
   loadTableData()
-  loadManhattanData()
+  appStore[manhattanPage].loadManhattanDataFlag = !appStore[manhattanPage].loadManhattanDataFlag
 })
 
 // *** Event handlers **********************************************************
@@ -112,17 +111,9 @@ const onDataTableRowClick = async (item) => {
   await router.push({name: locuszoomPage, params: {}})
 }
 
-const onTrait1Click = () => {
-  loadManhattanData()
-}
-
 // *** Utility functions *******************************************************
 const loadFilterControls = () => {
   loadFPControls.value = !loadFPControls.value
-}
-
-const loadManhattanData = () => {
-  loadManhattanDataFlag.value = !loadManhattanDataFlag.value
 }
 
 const loadTableData = () => {

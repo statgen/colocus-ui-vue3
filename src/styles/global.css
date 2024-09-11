@@ -26,3 +26,9 @@ p {
   font-size: 1rem;
 }
 */
+
+.coLink {
+  border-bottom: 1px rgba(var(--v-theme-clcAction), 1.0) dashed;
+  color: rgba(var(--v-theme-clcAction), 1.0);
+  text-decoration: none;
+}

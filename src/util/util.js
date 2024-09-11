@@ -63,6 +63,7 @@ const matchLowercase = ((s1, s2) => s2.toLowerCase().startsWith(s1.toLowerCase()
 
 // trim the middle between specified left and right of string
 const middleTrim = (s, left=4, right=4) => {
+  if(!s) return ''
   left = Math.max(1, left)
   right = Math.max(1, right)
   if(s.length <= left + right) return s

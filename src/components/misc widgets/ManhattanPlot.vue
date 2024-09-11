@@ -21,13 +21,11 @@ const manhattanPage = PAGE_NAMES.MANHATTAN
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
-const loadManhattanDataFlag = inject('loadManhattanDataFlag')
-
 // *** Emits *******************************************************************
 const emit = defineEmits(['onSelectSignals'])
 
 // *** Watches *****************************************************************
-watch(() => loadManhattanDataFlag.value, async () => {
+watch(() => appStore.manhattan.loadManhattanDataFlag, async () => {
   await appStore.loadManhattanData()
   plotManhattanData()
 })

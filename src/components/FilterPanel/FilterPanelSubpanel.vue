@@ -1,19 +1,16 @@
 <template>
   <v-sheet class="bg-clcBackground px-2 mt-2" elevation="0" border>
     <div class="d-flex align-center">
-      <h2 class="mb-2 d-inline-flex">{{ title }}</h2>
-
-      <v-spacer v-if="resetButton"></v-spacer>
-
-      <v-btn v-if="resetButton" @click="onResetButtonClick" size="small" variant="plain" >
         <ToolTippy>
-          <v-icon icon="mdi-close-circle" class="text-clcAction" size="24px"/>
+          <h2 class="mb-2 d-inline-flex">
+            <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="icon-class" />
+            {{ title }}
+          </h2>
+
           <template #tooltipContent>
             Reset to default values
           </template>
         </ToolTippy>
-      </v-btn>
-
     </div>
     <slot />
   </v-sheet>
@@ -34,4 +31,11 @@ function onResetButtonClick() {
 </script>
 
 <style scoped>
+.icon-class {
+  font-size: 24px;
+  margin-top: 6px;
+  margin-right: 4px;
+  color: rgba(var(--v-theme-clcAction), 1.0);
+}
+
 </style>
