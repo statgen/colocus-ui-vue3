@@ -125,6 +125,7 @@ export const useAppStore = defineStore('appStore', {
       for (const [key, value] of Object.entries(this[PAGE_NAMES.SEARCH].filters)) {
         this[parentKey].filters[key] = value
       }
+      this[parentKey].filters.colorCodeVariants = this[PAGE_NAMES.SEARCH].filters.colorCodeVariants
       this[parentKey].filters.showEnsIDs = this[PAGE_NAMES.SEARCH].filters.showEnsIDs
       this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
@@ -234,6 +235,7 @@ export const useAppStore = defineStore('appStore', {
 
 function getFilterPanelSettings() {
   return {
+    colorCodeVariants: false,
     showEnsIDs: false,
     showEffects: false,
     sortKeys: [],

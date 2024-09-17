@@ -38,6 +38,8 @@ const URLS = {
   PORTAL_GENE_PAGE: 'https://hugeamp.org/gene.html',
   PORTAL_PHEN_CHECK: 'https://bioindex.hugeamp.org/api/bio/count/global-associations',
   PORTAL_PHEN_PAGE: 'https://hugeamp.org/phenotype.html',
+  PORTAL_VAR_CHECK: 'https://bioindex.hugeamp.org/api/bio/query/variant',
+  PORTAL_VAR_PAGE: 'https://hugeamp.org/variant.html',
 }
 
 export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS
