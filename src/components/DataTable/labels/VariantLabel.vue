@@ -1,8 +1,9 @@
 <template>
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
     <span class="text-no-wrap" :style="variantStyle">
-      <v-icon v-if="showSplotch" icon="mdi-square" size="x-small" class="mb-1"/>
+      <v-icon v-if="showSplotch && appStore[cpn].colorCodeVariants" icon="mdi-square" size="x-small" class="mb-1"/>
       {{ formatVariantString(theVariant, 20) }}
+      <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>
       <v-icon v-if="showClose" icon="mdi-close-circle" class="text-clcAction mb-1" size="1rem" @click="onIconClick"/>
     </span>
     <template #tooltipContent>
@@ -27,7 +28,7 @@ const cpn = appStore.currentPageName
 const { data, errorMessage, fetchData } = useFetchData()
 
 const variantStyle = computed(() => {
-  return { color: appStore[cpn].colorCodeVariants ? colorHasher.hex(theVariant.value) : 'rgba(var(--v-theme-clcAction), 1.0)' }
+  return { color: appStore[cpn].colorCodeVariants ? colorHasher.hex(theVariant.value) : '' }
 })
 
 const emit = defineEmits(['onClose'])

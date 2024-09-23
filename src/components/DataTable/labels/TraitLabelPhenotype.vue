@@ -1,6 +1,9 @@
 <template>
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
-    <span class="text-clcAction" @click.stop="onClick">{{ theUUID }}</span>
+    <span @click.stop="onClick" class="text-no-wrap">
+      {{ theUUID }}
+      <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>
+    </span>
     <template #tooltipContent>
       <h3>{{ theUUID }}: {{ thePhenotype }}</h3>
       <span class="coLink" @click.stop="onClick">View local Manhattan plot</span>

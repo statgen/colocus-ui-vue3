@@ -1,10 +1,13 @@
 <template>
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
-    <span class="text-clcAction">{{ middleTrim(theGene, 6, 6) }}</span>
+    <span class="text-no-wrap">
+      {{ middleTrim(theGene, 6, 6) }}
+      <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>
+    </span>
     <template #tooltipContent>
       <div @click.stop>
         <h3>{{ theGene }}</h3>
-        <a :href="geneLink" target="_blank" :class="aStyle">{{ geneLinkText }}</a>
+        <a :href="geneLink" target="_blank">{{ geneLinkText }}</a>
       </div>
     </template>
   </ToolTippy>
@@ -24,8 +27,6 @@ const props = defineProps({
   trait: Object,
 })
 
-const aStyle = ref('')
-
 const theGene = computed(() => props?.trait?.gene?.symbol)
 
 const geneLink = ref(null)
@@ -44,7 +45,6 @@ const onTrigger = async () => {
         const u = encodeURI(`${URLS.PORTAL_GENE_PAGE}?gene=${theGene.value}`)
         geneLink.value = u
         geneText.value = `View ${ theGene.value } in CMDKP portal`
-        aStyle.value = 'coLink'
       } else {
         geneText.value = `Unknown gene: ${ theGene.value }`
       }
