@@ -55,7 +55,7 @@ const onClick = () => {
 const onTrigger = async () => {
   if(!phenChecked.value) {
     const url = encodeURI(`${URLS.PORTAL_PHEN_CHECK}?q=${theUUID.value}`)
-    console.log('phen check url:', url)
+    // console.log('phen check url:', url)
     if(await fetchData(url, 'gene check', appStore.currentPageName)) {
       phenChecked.value = true
       const c = data?.value?.count

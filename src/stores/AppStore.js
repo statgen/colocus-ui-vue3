@@ -279,6 +279,7 @@ const dataMapAPI = {
 // this maps data keys to the sort keys expected by the back end
 const sortKeyMapAPI = {
   'coloc_h4': 'h4',
+  'coloc_h3': 'h3',
   'r2': 'r2',
   'n_coloc_between_traits': 'n_coloc_between_traits',
   'signal1.neg_log_p': 'signal1_logp',
