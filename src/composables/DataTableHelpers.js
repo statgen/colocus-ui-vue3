@@ -8,6 +8,7 @@ export const useDataTableHelpers = () => {
 
   const locuszoomPage = PAGE_NAMES.LOCUSZOOM
   const searchPage = PAGE_NAMES.SEARCH
+  const manhattanPage = PAGE_NAMES.MANHATTAN
 
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
@@ -16,11 +17,13 @@ export const useDataTableHelpers = () => {
     return ['locuszoom'].includes(appStore.currentPageName)
   }
 
-  watch(() => appStore[searchPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
   watch(() => appStore[locuszoomPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => appStore[manhattanPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
+  watch(() => appStore[searchPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
 
-  watch(() => appStore[searchPage].showEffects, newValue => {showEffects.value = newValue})
   watch(() => appStore[locuszoomPage].showEffects, newValue => {showEffects.value = newValue})
+  watch(() => appStore[manhattanPage].showEffects, newValue => {showEffects.value = newValue})
+  watch(() => appStore[searchPage].showEffects, newValue => {showEffects.value = newValue})
 
   const alwaysShow = () => true
 
