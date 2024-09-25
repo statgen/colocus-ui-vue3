@@ -77,8 +77,15 @@ export const useDataTableHelpers = () => {
     return csvRows.join('\n')
   }
 
-  const fileDownload = (dataItems) => {
-    const csvString = convertToCSV(dataItems, visibleColumns.value)
+  // use passed in headers if present, else assume this is for search etc data table and use visibleColumns
+  const fileDownload = (dataItems, headers) => {
+    let csvString
+    if(headers) {
+      csvString = convertToCSV(dataItems, headers)
+    } else {
+      csvString = convertToCSV(dataItems, visibleColumns.value)
+
+    }
     const blob = new Blob([csvString], { type: 'text/csv' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
