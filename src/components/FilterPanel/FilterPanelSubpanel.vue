@@ -1,16 +1,16 @@
 <template>
   <v-sheet class="bg-clcBackground px-2 mt-2" elevation="0" border>
     <div class="d-flex align-center">
-        <ToolTippy>
-          <h2 class="mb-2 d-inline-flex">
-            <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="icon-class" />
-            {{ title }}
-          </h2>
+      <ToolTippy>
+        <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="icon-class" />
 
-          <template #tooltipContent>
-            Reset to default values
-          </template>
-        </ToolTippy>
+        <template #tooltipContent>
+          Reset to default values
+        </template>
+      </ToolTippy>
+      <h2 class="mb-2 d-inline-flex">
+        {{ title }}
+      </h2>
     </div>
     <slot />
   </v-sheet>
@@ -32,10 +32,9 @@ function onResetButtonClick() {
 
 <style scoped>
 .icon-class {
-  font-size: 24px;
-  margin-top: 6px;
+  font-size: 20px;
+  margin-top: -10px;
   margin-right: 4px;
   color: rgba(var(--v-theme-clcAction), 1.0);
 }
-
 </style>
