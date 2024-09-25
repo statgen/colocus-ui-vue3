@@ -30,6 +30,7 @@ const URLS = {
   [PAGE_NAMES.LOCUSZOOM]: '/api/v1/coloc/',
   // these are misc data links
   FILTER_DATA: '/api/v1/internal/search_metadata/',
+  STUDY_DATA: '/data/studies.json',
   TRAIT_DATA: '/api/v1/internal/analysis/',
   PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
   SIGNALS_DATA: '/api/v1/signals/',
