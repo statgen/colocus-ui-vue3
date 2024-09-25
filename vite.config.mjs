@@ -14,7 +14,9 @@ import { marked } from 'marked';
 const renderer = new marked.Renderer();
 
 // returns a heading tag with an embedded id equal to the lower case of heading text, separated by dashes
-renderer.heading = function (text, level) {
+renderer.heading = function (textObj) {
+  const text = textObj.text;
+  const level = textObj.depth;
   const escapedText = text.toLowerCase().replace(/[^\w]+/g, '-')
   return `
     <h${level} id="${escapedText}">
@@ -44,10 +46,12 @@ function markdownPlugin() {
         console.log('*** loading markdown file:', id);
         try {
           const content = readFileSync(id, 'utf-8');
+          // console.log('content', content);
           const html = marked(content);
+          // console.log('html', html)
           return `export default \`${html}\`;`;
         } catch (error) {
-          // console.error('Error loading markdown file:', error);
+          console.error('Error loading markdown file:', error);
           return null;
         }
       }
