@@ -32,6 +32,7 @@ const props = defineProps({
 
 const thePhenotype = computed(() => props?.trait?.phenotype?.name)
 const theUUID = computed(() => props?.trait?.uuid)
+const portalPheno = computed(() => props?.trait?.phenotype?.kp_id)
 
 const aStyle = ref('')
 
@@ -54,21 +55,24 @@ const onClick = () => {
 
 const onTrigger = async () => {
   if(!phenChecked.value) {
-    const url = encodeURI(`${URLS.PORTAL_PHEN_CHECK}?q=${theUUID.value}`)
+    const url = encodeURI(`${URLS.PORTAL_PHEN_CHECK}?q=${portalPheno.value}`)
     // console.log('phen check url:', url)
     if(await fetchData(url, 'gene check', appStore.currentPageName)) {
       phenChecked.value = true
       const c = data?.value?.count
       // console.log('count:', c)
       if(c > 0) {
-        const u = encodeURI(`${URLS.PORTAL_PHEN_PAGE}?phenotype=${theUUID.value}`)
+        const u = encodeURI(`${URLS.PORTAL_PHEN_PAGE}?phenotype=${portalPheno.value}`)
         // console.log('phen page url:', u)
         phenLink.value = u
+        // RPW: keeping this to our phenotype ID/UUID so that it matches the table, I think someone might be confused
+        // that the phenotype changed name in the tooltip if we show the portal phenotype ID (and it's just a technical
+        // detail)
         phenText.value = `View ${ theUUID.value } in CMDKP portal`
         aStyle.value = 'coLink'
       } else {
         aStyle.value = ''
-        phenText.value = `Unknown phenotype: ${ theUUID.value }`
+        phenText.value = `Unknown phenotype: ${ portalPheno.value }`
       }
     } else {
       console.error(`Error checking phenotype: ${ thePhenotype.value } on portal:`, errorMessage)
