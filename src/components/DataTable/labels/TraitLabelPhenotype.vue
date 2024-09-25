@@ -1,6 +1,6 @@
 <template>
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
-    <span @click.stop="onClick" class="text-no-wrap">
+    <span @click.stop class="text-no-wrap">
       {{ theUUID }}
       <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>
     </span>
