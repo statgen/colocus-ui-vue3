@@ -38,6 +38,10 @@
             <a class="coLink" :href="value" target="_blank">{{ value }}</a>
           </template>
 
+          <template v-slot:item.pmid="{ value }">
+            <a class="coLink" :href="'https://pubmed.ncbi.nlm.nih.gov/' + value" target="_blank">{{ value }}</a>
+          </template>
+
           <template v-slot:footer.prepend>
             <div>
               <ToolTippy>
