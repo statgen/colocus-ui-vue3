@@ -72,7 +72,8 @@ const onTrigger = async () => {
         aStyle.value = 'coLink'
       } else {
         aStyle.value = ''
-        phenText.value = `Unknown phenotype: ${ portalPheno.value }`
+        phenLink.value = "https://hugeamp.org/"
+        phenText.value = `${ theUUID.value } does not exist in CMDKP portal`
       }
     } else {
       console.error(`Error checking phenotype: ${ thePhenotype.value } on portal:`, errorMessage)
