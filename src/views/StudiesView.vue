@@ -72,7 +72,7 @@ const headers = ref([
   { title: 'Authors', value: 'authors', sortable: true },
   { title: 'Submitter', value: 'submitter', sortable: true},
   { title: 'Study Type', value: 'study_type', sortable: true },
-  { title: 'Number of Traits', value: 'ntraits', sortable: true },
+  { title: '# of OMIC Elements or Traits', value: 'ntraits', sortable: true },
   { title: 'Trait(s)', value: 'trait', sortable: true, maxWidth: '20rem' },
   { title: 'Tissue', value: 'tissue', sortable: true },
   { title: 'Build', value: 'build', sortable: true },
