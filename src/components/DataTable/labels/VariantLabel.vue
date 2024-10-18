@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { colorHasher, formatVariantString } from '@/util/util'
 import { useAppStore } from '@/stores/AppStore'
 import { URLS } from '@/constants'
@@ -79,6 +79,14 @@ const onTrigger = async () => {
     }
   }
 }
+
+const reset = () => {
+  variantChecked.value = false
+  variantLink.value = null
+  variantText.value = `Checking ${theVariant.value}, please wait ...`
+}
+
+watch(() => theVariant.value, reset)
 
 </script>
 
