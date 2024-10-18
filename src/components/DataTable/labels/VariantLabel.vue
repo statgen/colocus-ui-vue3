@@ -72,7 +72,8 @@ const onTrigger = async () => {
         variantText.value = `View ${ theVariant.value } in CMDKP portal`
         aStyle.value = 'coLink'
       } else {
-        variantText.value = `Unknown variant: ${ theVariant.value }`
+        variantLink.value = "https://hugeamp.org/"
+        variantText.value = `Variant ${ theVariant.value } not present in CMDKP portal`
       }
     } else {
       console.error(`Error checking variant: ${ theVariant.value } on portal:`, errorMessage)
