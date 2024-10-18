@@ -55,10 +55,10 @@ const onIconClick = () => {
 const aStyle = ref('')
 
 const variantLink = ref(null)
+const variantText = ref(`Checking ${theVariant.value}, please wait ...`)
 const variantLinkText = computed(() => {
   return variantText.value
 })
-const variantText = ref(`Checking ${theVariant.value}, please wait ...`)
 const variantChecked = ref(false)
 
 const onTrigger = async () => {
