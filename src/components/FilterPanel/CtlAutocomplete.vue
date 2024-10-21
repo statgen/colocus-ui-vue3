@@ -12,6 +12,7 @@
     bg-color="white"
     chips
     class="mb-n1"
+    clear-on-select
     closable-chips
     clearable
     density="compact"

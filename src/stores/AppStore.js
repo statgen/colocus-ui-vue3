@@ -235,7 +235,7 @@ export const useAppStore = defineStore('appStore', {
 
 function getFilterPanelSettings() {
   return {
-    colorCodeVariants: false,
+    colorCodeVariants: true,
     showEnsIDs: false,
     showEffects: false,
     sortKeys: [],
