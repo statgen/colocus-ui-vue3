@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { colorHasher, formatVariantString } from '@/util/util'
 import { useAppStore } from '@/stores/AppStore'
 import { URLS } from '@/constants'
@@ -55,10 +55,10 @@ const onIconClick = () => {
 const aStyle = ref('')
 
 const variantLink = ref(null)
+const variantText = ref(`Checking ${theVariant.value}, please wait ...`)
 const variantLinkText = computed(() => {
   return variantText.value
 })
-const variantText = ref(`Checking ${theVariant.value}, please wait ...`)
 const variantChecked = ref(false)
 
 const onTrigger = async () => {
@@ -72,13 +72,22 @@ const onTrigger = async () => {
         variantText.value = `View ${ theVariant.value } in CMDKP portal`
         aStyle.value = 'coLink'
       } else {
-        variantText.value = `Unknown variant: ${ theVariant.value }`
+        variantLink.value = "https://hugeamp.org/"
+        variantText.value = `Variant ${ theVariant.value } not present in CMDKP portal`
       }
     } else {
       console.error(`Error checking variant: ${ theVariant.value } on portal:`, errorMessage)
     }
   }
 }
+
+const reset = () => {
+  variantChecked.value = false
+  variantLink.value = null
+  variantText.value = `Checking ${theVariant.value}, please wait ...`
+}
+
+watch(() => theVariant.value, reset)
 
 </script>
 
