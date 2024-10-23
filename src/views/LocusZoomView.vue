@@ -49,7 +49,17 @@
     <v-row class="ml-2">
       <v-col cols="12">
         <v-row>
-          <h2>Data table</h2>
+
+          <h2>
+            <ToolTippy>
+              <v-icon icon="mdi-help-circle-outline" size="1.5rem" class="text-clcAction mb-1" />
+              <template #tooltipContent>
+                If you want to...
+              </template>
+            </ToolTippy>
+
+            Data table
+          </h2>
         </v-row>
 
         <v-row>
