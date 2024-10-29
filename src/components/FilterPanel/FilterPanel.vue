@@ -1,6 +1,6 @@
 <template>
   <v-scroll-x-transition>
-    <v-sheet v-show="appStore.filterControls.isFilterPanelShowing" class="ml-n2" >
+    <v-sheet v-show="appStore.filterPanelControls.isFilterPanelShowing" class="ml-n2" >
       <FilterPanelSubpanel title="Select" resetButton="true">
         <CtlAutocomplete :controlSet="controlConfig.study" />
         <CtlAutocomplete :controlSet="controlConfig.gene" />
@@ -60,9 +60,9 @@ const controlConfig = {
   trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   h4: { title: 'Colocalization PP(H4) ≥', storeKey: 'h4', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: '0.5', placeholder: null },
   r2: { title: 'r<sup>2</sup> ≥', storeKey: 'r2', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: '0.3', placeholder: null },
-  colorCodeVariants: {title: 'Color-code variants', storeKey: 'colorCodeVariants'},
-  showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs' },
-  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects' }
+  colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
+  showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false },
+  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false }
 }
 
 </script>

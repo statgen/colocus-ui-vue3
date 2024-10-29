@@ -158,7 +158,7 @@ const loadTableDataFlag = inject('loadTableDataFlag')
 const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
-watch(() => appStore.filterControls.filterDataChanged, async () => {
+watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
   appStore[locuszoomPage].filterDataChanged = true;
   await loadData()
 })

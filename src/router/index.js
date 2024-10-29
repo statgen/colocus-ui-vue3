@@ -16,14 +16,14 @@ const traitPage = PAGE_NAMES.TRAITS
 
 const enableFiltering = (panelIsVisible) => {
   const appStore = useAppStore()
-  appStore.filterControls.isFilterButtonShowing = true
-  appStore.filterControls.isFilterPanelShowing = panelIsVisible
+  appStore.filterPanelControls.isFilterButtonShowing = true
+  appStore.filterPanelControls.isFilterPanelShowing = panelIsVisible
 }
 
 const disableFiltering = () => {
   const appStore = useAppStore()
-  appStore.filterControls.isFilterButtonShowing = false
-  appStore.filterControls.isFilterPanelShowing = false
+  appStore.filterPanelControls.isFilterButtonShowing = false
+  appStore.filterPanelControls.isFilterPanelShowing = false
 }
 
 const routes = [
@@ -103,7 +103,7 @@ router.beforeEach(async(to, from, next) => {
   const appStore = useAppStore()
   appStore.currentPageName = to.name
   if(![searchPage, locuszoomPage, manhattanPage].includes(to.name)) disableFiltering()
-  if (!appStore.filterControls.isFilterDataLoaded) await appStore.loadFilterData()
+  if (!appStore.filterPanelControls.isFilterDataLoaded) await appStore.loadFilterData()
   next()
 })
 

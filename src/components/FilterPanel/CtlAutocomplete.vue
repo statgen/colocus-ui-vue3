@@ -99,7 +99,7 @@ const mlc = ((itemTitle, queryText, item) => {
 })
 
 const populateControlSelectList = () => {
-  selectListItems.value = appStore.filterControls[controlSet.storeKey]
+  selectListItems.value = appStore.filterPanelControls[controlSet.storeKey]
 }
 
 const populateControlData = () => {

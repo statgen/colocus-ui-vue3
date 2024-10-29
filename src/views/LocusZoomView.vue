@@ -1,9 +1,9 @@
 <template>
-  <v-col v-show="appStore.filterControls.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterPanelControls.isFilterPanelShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
 
-  <v-col :cols="appStore.filterControls.isFilterPanelShowing ? 10 : 12" class="ml-3">
+  <v-col :cols="appStore.filterPanelControls.isFilterPanelShowing ? 10 : 12" class="ml-3">
     <v-row class="mt-1 ml-2">
       <h1><BackButton />Locus Zoom</h1>
     </v-row>
@@ -23,7 +23,7 @@
       <v-col cols="6">
         <v-row>
           <h2>LZ Compare Plot</h2>
-          <div ref="comparePlotRef"></div>
+          <div ref="comparePlot"></div>
         </v-row>
 
         <v-row class="d-flex justify-end mb-2 mr-16">
@@ -37,7 +37,7 @@
       <v-col cols="6">
         <v-row>
           <h2>LZ Region Plots</h2>
-          <div ref="regionPlotRef" class="region-plot"></div>
+          <div ref="regionPlot" class="region-plot"></div>
         </v-row>
 
         <v-row>
@@ -87,7 +87,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted, provide, ref, watch } from 'vue'
+import { onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 import { AXIS_OPTIONS, PAGE_NAMES } from '@/constants'
@@ -118,8 +118,8 @@ const loadTableDataFlag = ref(false)
 const preloadGenes = ref([])
 
 // managing the refs for the plot panels
-const comparePlotRef = ref(null)
-const regionPlotRef = ref(null)
+const comparePlotRef = useTemplateRef('comparePlot')
+const regionPlotRef = useTemplateRef('regionPlot')
 
 // constants
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM

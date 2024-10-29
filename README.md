@@ -66,7 +66,7 @@ The data structure includes global state variables (e.g., isDataLoaded), plus pa
 - buildSearchURL builds a URL based on all filter and sort criteria and formats it for consumption by the Django REST API back end.
 - checkGenes accepts a comma-delimited list of genes and returns an object containt two arrays, badGenes, and goodGenes. This is used in the case where an external entity (such as AMP) specifies a gene as a query string in a URL directed at the search page.
 - copySearchFilterToLZ copies the filter panel data for the search page into the corresponding keys for the LocusZoom page, and is called by the router before entering the LocusZoom page.
-- loadFilterData relies on the async composable, fetchData.js to load the filter data lists and populates the filterControls keys for use by the FilterPanel controls.
+- loadFilterData relies on the async composable, fetchData.js to load the filter data lists and populates the filterPanelControls keys for use by the FilterPanel controls.
 - updateFilter is a helper for the filter panel components. updateFilter updates the appropriate value in the appropriate key, depending on which page (Search or LocusZoom) the user is on.
 - updateSort updates the store key storing sort parameters that end up in the URL.
 - updateSwitch updates the booleans tracking the display of the ensemble IDs and the concordance values.
@@ -186,9 +186,9 @@ We also refactored almost everything except the template definitions and event h
 Placeholders for the compare plot and the region plot are defined in the template as empty divs:
 ```
 ...
-<div ref="comparePlotRef"></div>
+<div ref="comparePlot"></div>
 ...
-<div ref="regionPlotRef" class="region-plot"></div>
+<div ref="regionPlot" class="region-plot"></div>
 ...
 ```
 Then the `ref` variables are populated by functions buildCompareLayout and buildRegionLayout in the composable. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build*Layout functions create Vnodes based on the underlying LZPlot library. The *VnodeRef variables maintain Vue references to these components so that we can do things with them later, such as adding additional plots.

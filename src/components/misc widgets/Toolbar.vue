@@ -30,7 +30,7 @@ import { PAGE_NAMES } from '@/constants'
 
 const appStore = useAppStore()
 const { toggleFilterPanel } = appStore
-const isFilterButtonVisible = computed(() => appStore.filterControls.isFilterButtonShowing)
+const isFilterButtonVisible = computed(() => appStore.filterPanelControls.isFilterButtonShowing)
 const searchPage = `/${PAGE_NAMES.SEARCH}`
 
 </script>

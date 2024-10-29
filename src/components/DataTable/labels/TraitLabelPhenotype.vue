@@ -47,10 +47,14 @@ const onClick = () => {
   appStore.setPageKey(manhattanPage, 'analysisID', props.analysisID)
   const cpn = appStore.currentPageName
   if(cpn === manhattanPage) {
-    appStore[manhattanPage].loadManhattanDataFlag = !appStore[manhattanPage].loadManhattanDataFlag
+    loadManhattanData()
   } else {
     router.push({name: manhattanPage})
   }
+}
+
+const loadManhattanData = () => {
+  appStore[manhattanPage].loadManhattanDataFlag = !appStore[manhattanPage].loadManhattanDataFlag
 }
 
 const onTrigger = async () => {

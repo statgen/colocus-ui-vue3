@@ -1,8 +1,8 @@
 <template>
-  <v-col v-show="appStore.filterControls.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterPanelControls.isFilterPanelShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
-  <v-col :cols="appStore.filterControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
+  <v-col :cols="appStore.filterPanelControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
     <v-row class="mx-0 my-0">
       <h1><BackButton />Manhattan Plot: <span class="analysis-id">{{ analysisID }}</span></h1>
     </v-row>
@@ -101,9 +101,9 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
-  loadFilterControls()
+  loadFilterPanelControls()
   loadTableData()
-  appStore[manhattanPage].loadManhattanDataFlag = !appStore[manhattanPage].loadManhattanDataFlag
+  loadManhattanData()
 })
 
 // *** Event handlers **********************************************************
@@ -112,12 +112,16 @@ const onDataTableRowClick = async (item) => {
 }
 
 // *** Utility functions *******************************************************
-const loadFilterControls = () => {
+const loadFilterPanelControls = () => {
   loadFPControls.value = !loadFPControls.value
 }
 
 const loadTableData = () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
+}
+
+const loadManhattanData = () => {
+  appStore[manhattanPage].loadManhattanDataFlag = !appStore[manhattanPage].loadManhattanDataFlag
 }
 
 const addSignals = (signals) => {

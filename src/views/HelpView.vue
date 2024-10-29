@@ -22,11 +22,11 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { useTemplateRef, watch, nextTick } from 'vue'
 import helpContent from '@/docs/help/help.md'
 import '@/styles/github-markdown.css'
 
-const toc = ref(null)
+const tocRef = useTemplateRef('toc')
 
 const scrollToHeading = (id) => {
   const target = document.getElementById(id)
@@ -46,7 +46,7 @@ const handleLinkClick = (event) => {
   scrollToHeading(targetId)
 }
 
-watch(toc, async (newVal, oldVal) => {
+watch(tocRef.value, async (newVal, oldVal) => {
   if (oldVal) {
     const oldLinks = oldVal.$el ? oldVal.$el.querySelectorAll('a') : oldVal.querySelectorAll('a')
     oldLinks.forEach(link => {

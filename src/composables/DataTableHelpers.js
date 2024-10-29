@@ -14,7 +14,7 @@ export const useDataTableHelpers = () => {
   const showEffects = ref(false)
 
   const showAddPlotIcon = () => {
-    return ['locuszoom'].includes(appStore.currentPageName)
+    return [PAGE_NAMES.LOCUSZOOM].includes(appStore.currentPageName)
   }
 
   watch(() => appStore[locuszoomPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})

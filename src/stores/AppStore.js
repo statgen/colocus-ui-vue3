@@ -14,7 +14,7 @@ export const useAppStore = defineStore('appStore', {
       dirEffect: {},
       isDirEffectReady: false,
     },
-    filterControls: {
+    filterPanelControls: {
       filterDataChanged: false,
       isFilterButtonShowing: true,
       isFilterDataLoaded: false,
@@ -56,7 +56,7 @@ export const useAppStore = defineStore('appStore', {
 
       // add ordering clause first
       const newOrdering = []
-      this[parentKey].sortKeys.forEach((sortKey) => {
+      this[parentKey].filters.sortKeys.forEach((sortKey) => {
         const key = sortKey.key
         const order = sortKey.order
         const sortOrder = order === 'desc' ? '-' : ''
@@ -111,7 +111,7 @@ export const useAppStore = defineStore('appStore', {
       const goodGenes = []
       const badGenes = []
       testGenes.forEach(gene => {
-        if(this.filterControls.genes.includes(gene)) {
+        if(this.filterPanelControls.genes.includes(gene)) {
           goodGenes.push(gene)
         } else {
           badGenes.push(gene)
@@ -133,16 +133,16 @@ export const useAppStore = defineStore('appStore', {
     },
 
     async loadFilterData() {
-      if(this.filterControls.isFilterDataLoaded) return
+      if(this.filterPanelControls.isFilterDataLoaded) return
       const { data, errorMessage, fetchData } = useFetchData()
       if(await fetchData(URLS.FILTER_DATA, 'filter data', this.currentPageName)) {
         const d = data.value
-        this.filterControls.analysisTypes = d.analysis_types.sort()
-        this.filterControls.genes = d.genes.sort()
-        this.filterControls.phenotypes = d.phenotypes.sort()
-        this.filterControls.studies = d.studies.sort()
-        this.filterControls.tissues = d.tissues.sort()
-        this.filterControls.isFilterDataLoaded = true
+        this.filterPanelControls.analysisTypes = d.analysis_types.sort()
+        this.filterPanelControls.genes = d.genes.sort()
+        this.filterPanelControls.phenotypes = d.phenotypes.sort()
+        this.filterPanelControls.studies = d.studies.sort()
+        this.filterPanelControls.tissues = d.tissues.sort()
+        this.filterPanelControls.isFilterDataLoaded = true
       } else {
         throw new Error('Error loading filter data:\n' + errorMessage)
       }
@@ -193,7 +193,7 @@ export const useAppStore = defineStore('appStore', {
 
     updateFilter(key, value) {
       // following is to ignore a double hit when changing page size in <DataTable>; page num also changes and generates event
-      if(this.filterControls.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
+      if(this.filterPanelControls.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
 
       const parentKey = this.currentPageName
       const filters = this[parentKey].filters
@@ -209,15 +209,15 @@ export const useAppStore = defineStore('appStore', {
           filters.pageNum = 1
         }
 
-        this.filterControls.lastFilterUpdated = key
-        this.filterControls.filterDataChanged = !this.filterControls.filterDataChanged
+        this.filterPanelControls.lastFilterUpdated = key
+        this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
       }
     },
 
     async updateSort(newSort) {
       const parentKey = this.currentPageName
-      this[parentKey].sortKeys = newSort
-      this.filterControls.filterDataChanged = !this.filterControls.filterDataChanged
+      this[parentKey].filters.sortKeys = newSort
+      this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
     },
 
     updateSwitch(key, value) {
@@ -226,7 +226,7 @@ export const useAppStore = defineStore('appStore', {
     },
 
     toggleFilterPanel() {
-      this.filterControls.isFilterPanelShowing = !this.filterControls.isFilterPanelShowing
+      this.filterPanelControls.isFilterPanelShowing = !this.filterPanelControls.isFilterPanelShowing
     },
   },
   getters: {
@@ -238,7 +238,6 @@ function getFilterPanelSettings() {
     colorCodeVariants: true,
     showEnsIDs: false,
     showEffects: false,
-    sortKeys: [],
     filters: {
       // these are actual filters set by the user in the UI
       studies: [],
@@ -255,6 +254,7 @@ function getFilterPanelSettings() {
       pageNum: "1",
       pageSize: "10",
       signals: [],
+      sortKeys: [],
     }
   }
 }

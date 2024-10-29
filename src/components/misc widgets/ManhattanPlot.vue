@@ -1,10 +1,10 @@
 <template>
-  <div ref="manhattanPlotRef" class="manhattan-plot"></div>
+  <div ref="manhattanPlot" class="manhattan-plot"></div>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { defineEmits, inject, ref, watch } from 'vue'
+import { defineEmits, inject, ref, useTemplateRef, watch } from 'vue'
 import { create_gwas_plot } from '@/vis/pheweb_plots'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
@@ -14,7 +14,7 @@ const appStore = useAppStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const manhattanPlotRef = ref(null)
+const manhattanPlotRef = useTemplateRef('manhattanPlot')
 const plotContainerID = 'manhattan-plot'
 const manhattanPage = PAGE_NAMES.MANHATTAN
 
