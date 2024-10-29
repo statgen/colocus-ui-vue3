@@ -27,7 +27,7 @@ export const useAppStore = defineStore('appStore', {
       tissues: markRaw([]),
     },
     [PAGE_NAMES.LOCUSZOOM]: {
-      colocData: markRaw(null),
+      colocData: markRaw({}),
       colocDataReady: false,
       colocID: '',
       filterDataChanged: false,
