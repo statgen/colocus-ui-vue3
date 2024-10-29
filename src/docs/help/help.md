@@ -1,17 +1,3 @@
-## Tutorial Videos
-
-### Colocalization
-
-<a href="">
-  <img src="help-images/colocus-training.webp" alt="colocalization science video" width="250">
-</a>
-
-### User Interface
-
-<a href="">
-  <img src="help-images/colocus-training.webp" alt="colocus training video" width="250">
-</a>
-
 ## Pages
 
 ### Search page
@@ -133,9 +119,19 @@ Below the plots is a table showing all other known colocalized signals in the sa
 
 The table follows the same format as the colocalization results table on the search page, with an additional button on the left hand side under the `Add plots` column. Clicking this button will add two LocusZoom panels above, one for each trait's associated signals.
 
-### Genome-wide trait page
+### Manhattan plot page
 
-TBD
+On the search page, hovering over a trait's green star will bring up a menu:
+
+<img src="help-images/trait-menu.png" alt="trait menu on search page">
+
+From here, clicking on *View local Manhattan plot* will take you to the manhattan plot page for that trait. The manhattan plot page looks like the following:
+
+<img src="help-images/manhattan-page.png" alt="manhattan plot page overview image">
+
+At the top is a manhattan plot showing associations between all variants and the trait. The x-axis is the genomic position of the variant, and the y-axis is the -log10 p-value of the association. The blue/grey colors alternate by chromosome.
+
+Each red dot corresponds to a variant that colocalizes with another trait. Clicking on the red dot will filter the colocalization results table to show only colocalizations involving that variant. By default, the table shows all colocalization results genome-wide for the trait.
 
 ## FAQ
 
