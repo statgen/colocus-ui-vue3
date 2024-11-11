@@ -2,7 +2,8 @@
   "name": "colocus-ui-vue3",
   "version": "2.0.0",
   "scripts": {
-    "cypress": "cypress open",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
     "dev": "node --no-warnings ./node_modules/.bin/vite",
     "build": "vite build",
     "preview": "vite preview"
