@@ -3,6 +3,7 @@
   <v-autocomplete
     :items="selectListItems"
     :custom-filter="mlc"
+    :id="controlSet.id"
     :placeholder="controlSet.placeholder"
     v-model="selectedItems"
     @update:model-value="onModelChanged"
