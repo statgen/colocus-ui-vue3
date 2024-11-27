@@ -21,6 +21,7 @@
     ></v-alert>
     <div class="table-container">
       <DataTable
+        id="dataTableSearch"
         @onDataTableRowClick="onDataTableRowClick"
       ></DataTable>
     </div>

@@ -46,7 +46,7 @@ const handleLinkClick = (event) => {
   scrollToHeading(targetId)
 }
 
-watch(tocRef.value, async (newVal, oldVal) => {
+watch(tocRef, async (newVal, oldVal) => {
   if (oldVal) {
     const oldLinks = oldVal.$el ? oldVal.$el.querySelectorAll('a') : oldVal.querySelectorAll('a')
     oldLinks.forEach(link => {

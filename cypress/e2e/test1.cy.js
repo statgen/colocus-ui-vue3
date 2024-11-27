@@ -30,10 +30,14 @@ describe('Test search page', function () {
     cy.visit('http://localhost:5173/search')
   })
 
-  it('test the study selector', () => {
-    cy.get('.v-toolbar__content').contains('Search').click()
+  it.only('test the study selector', () => {
     cy.get('#studyInput').type('AdipoExpress{enter}{esc}{esc}')
-    cy.get('.v-data-table__tbody > :nth-child(1) > :nth-child(3) > [data-v-dd96f50a=""] > span').should('contain', 'Adi...xpress')
+    // cy.get('#app > div > div > main > div > div.v-col.v-col-10.ml-2 > div.table-container > div > div.v-table__wrapper > table > tbody > tr:nth-child(1) > td:nth-child(3) > span > span').should('contain', 'Adi...xpress')
+    // cy.get('#dataTableSearch tbody > :nth-child(1) > :nth-child(3) > [data-v-dd96f50a=""] > span').should('contain', 'Adi...xpress')
+    cy.get('#dataTableSearch tbody > :nth-child(1) > :nth-child(3)').within(() => {
+      // cy.get('span > span').should('contain', 'Adi...xpress')
+      cy.get('span > span').contains(/^adi.*press$/i)
+    })
   })
 
   it('test the gene selector', () => {

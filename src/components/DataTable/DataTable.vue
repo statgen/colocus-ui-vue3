@@ -2,6 +2,7 @@
   <v-data-table-server
     :fixed-header="false"
     :headers="visibleColumns"
+    :id="id"
     :row-props="({item}) => getRowClass(item)"
     :items="dataItems"
     :items-length="appStore.dataTable.countPairs"
