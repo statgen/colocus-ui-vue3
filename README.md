@@ -251,3 +251,42 @@ I find that it helps reduce cognitive load to have the sections in the same orde
 - Put destructured imports in alphabetical order, eg import { onMounted, provide, ref, watch } from 'vue'
 - Imports should be in this order: Vue, third-party libraries, app-level imports
 - List variables, props, watches, computeds, etc., within a section, in alphabetical order
+
+## Cypress test framework
+In the fall of 2024, we implemented the front-end testing framework, Cypress, learned a bit about it, and implemented some basic tests. The result exists in branch front-end-testing-with-cypress. It was built on Cypress 13.16.0. It includes a single file (test1.cy.js) with our tests, plus two folders of sample tests supplied by the vendor for reference.
+
+### Running tests
+To run cypress, open an additional terminal window in the project directory. The node process running the front end as well as the Django process both need to be running. Then run cypress:
+```
+$ npm run cypress:open
+```
+This executes a script defined in package.json. It will open a window, which is the cypress app. It presents two buttons, E2E Testing and Component Testing. We did not implement any component tests, so click E2E to get started. Next a browser selection window opens, and will show browsers installed on your system. We only testing using Chrome. Select Chrome if not already selected, then click the green button, Start E2E Testing in Chrome.
+
+A new special Chrome instance will open full screen. Resize as desired, then scroll down to the bottom of the list to find test1.cy.js and click it. It will run all tests in the file and all should pass. (Actually with code as committed, will only run the study selector test. Remove the `.only` tag on it to run all tests.)
+
+### About the tests
+As this was a proof-of-concept, there are several unrelated tests in the file. Each group of tests is contained in a `describe` block. Each block is defined by a text string that is output when tests are run, and further serve as documentation, plus a callback function that contains several tests. Each test is defined by an `it` block, again with a text string and a callback containing a single test.
+
+The first `describe` group validates basic navigation to the currently active pages of the app. The second tests some functionality of the search page - mainly, the filter panel.
+
+Cypress supports the concept of hooks. In our case, both `describe` blocks use a `beforeEach` hook, which is run before each test. For the navigation block, the `beforeEach` simply loads the home page via the `visit` command, and for the search page, it loads the search page.
+
+Note the test, "test the study selector". It is defined by `it.only`, which means only that test will run when the file is executed. The first line of the test enters (types) the desired study and forces it to be selected.
+```
+    cy.get('#studyInput').type('AdipoExpress{enter}{esc}{esc}')
+```
+The remaining lines then execute different versions of the same test, which insures that the first row, third column of the data table contains the string 'Adi...xpress'. The first two of those are commented out, as they are undesirable from the standpoint of the selector used to find the component of interest in the DOM.
+
+The first commented out test drills all the way from the vue `#app` component.
+
+The second drills from the component `#dataTableSearch` (which is actually a div containing the actual HTML table). One element in the select chain is `[data-v-dd96f50a=""]` which is an attribute on a span created by Vuetify. I was concerned that the `dd96f50a ` might change between installations or versions of Vuetify, so looked for a more generic approach.
+
+The third also drills from `#dataTableSearch`, but then uses the Cypress `within` command to penetrate to the lowest level span containing the desired text string. `Within` takes a callback function; within that we perform another `get` command to drill through the nested spans and get our test string.
+
+There are actually sub-versions of that; one contains the literal string, the other a regex. I was concerned that we might change the parameters of the shortening function that removes the middle of long strings, so the regex version is a little more general-purpose, but still probably not ideal.
+
+You might wonder if simply replacing `[data-v-dd96f50a=""]` with `span` in the second test would suffice, and for unknown reasons it in fact does not work, hence the third version using `within`.
+
+### Test organization
+Since this was a proof of concept and we just wanted to get something working, we made no attempt to organize the tests. For example, the first block, navigation, would become a separate file. The second block is really testing the filter panel, not the search page, so it's description would be altered, and it would move to its own file.
+
