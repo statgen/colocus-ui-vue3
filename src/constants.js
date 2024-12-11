@@ -21,6 +21,7 @@ const PAGE_NAMES = {
   SEARCH: 'search',
   STUDIES: 'studies',
   TRAITS: 'traits',
+  QC: 'qc',
 }
 
 const URLS = {

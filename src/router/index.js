@@ -13,6 +13,7 @@ const manhattanPage = PAGE_NAMES.MANHATTAN
 const searchPage = PAGE_NAMES.SEARCH
 const studyPage = PAGE_NAMES.STUDIES
 const traitPage = PAGE_NAMES.TRAITS
+const qcPage = PAGE_NAMES.QC
 
 const enableFiltering = (panelIsVisible) => {
   const appStore = useAppStore()
@@ -63,6 +64,14 @@ const routes = [
       const appStore = useAppStore()
       appStore.copySearchFiltersToNextPage(to.name)
       // appStore.preloadTrait = to.params.trait
+      next()
+    }
+  },
+  {
+    path: `/${qcPage}`,
+    name: qcPage,
+    component: () => import('@/views/QC.vue'),
+    beforeEnter: (to, from, next) => {
       next()
     }
   },

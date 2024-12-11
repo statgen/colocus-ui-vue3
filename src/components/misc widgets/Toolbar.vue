@@ -9,6 +9,7 @@
         <router-link to="/studies" class="nav-link text-clcHeading">Studies</router-link>
 <!--        <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link>-->
 <!--        <router-link to="/traits" class="nav-link text-clcHeading">Traits</router-link>-->
+        <router-link to="qc" class="nav-link text-clcHeading">QC</router-link>
         <router-link to="/help" class="nav-link text-clcHeading">Help</router-link>
       </div>
 

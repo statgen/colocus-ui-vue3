@@ -290,3 +290,33 @@ You might wonder if simply replacing `[data-v-dd96f50a=""]` with `span` in the s
 ### Test organization
 Since this was a proof of concept and we just wanted to get something working, we made no attempt to organize the tests. For example, the first block, navigation, would become a separate file. The second block is really testing the filter panel, not the search page, so it's description would be altered, and it would move to its own file.
 
+## To add new page to app
+The example below adds a placeholder page, QC, to the app.
+1. Add page name to PAGE_NAMES in ./constants
+```
+  QC: 'qc',
+```
+2. Add vue file to ./src/views
+```
+<template>
+  <h1>Bonjour, le monde</h1>
+</template>
+```
+3. Add entries to ./router/index.js
+```
+...
+const qcPage = PAGE_NAMES.QC
+...
+  {
+    path: `/${qcPage}`,
+    name: qcPage,
+    component: () => import('@/views/QC.vue'),
+    beforeEnter: (to, from, next) => {
+      next()
+    }
+  },
+```
+4. Optionally, add link to ./src/components/misc widgets/Toolbar.vue if not otherwise linked.
+```
+  <router-link to="qc" class="nav-link text-clcHeading">QC</router-link>
+```
