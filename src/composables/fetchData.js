@@ -3,7 +3,7 @@ import { ppURL } from '@/util/util'
 
 export const useFetchData = () => {
   const state = reactive({
-    data: null,
+    data: [],
     isLoading: false,
     hasError: false,
     errorMessage: '',
