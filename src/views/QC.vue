@@ -131,8 +131,7 @@ const onStudySelectUpdate = async (newStudy) => {
 const generatePlot = async (container, spec, colocData, qtlStudies, study, h4, r2) => {
   console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}`)
   const cfs = getColocDataForStudy(colocData, qtlStudies, study, h4, r2)
-  const records = makePlotRecords(cfs)
-  spec.data.values = records
+  spec.data.values = makePlotRecords(cfs)
   await embed(container, spec)
 }
 
@@ -144,11 +143,8 @@ const loadData = async() => {
   }
 
   qtlStudies.value = getQTLStudies(allColocData)
-
   studyList.value = [...qtlStudies.value.keys()]
-
-  const initialStudy = studyList.value[0]
-  selectedStudy.value = initialStudy
+  selectedStudy.value = studyList.value[0]
 }
 
 // *** Configuration data ******************************************************
