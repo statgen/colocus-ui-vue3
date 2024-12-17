@@ -1,6 +1,6 @@
-const spec1 = {
+const colocClassSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "data": { "values": [] },  // 'records' must be a defined variable/array
+  "data": { "values": [] },
   "transform": [
     { "filter": "datum.value > 0" }
   ],
@@ -93,4 +93,4 @@ const spec1 = {
   }
 }
 
-export default spec1
+export default colocClassSpec

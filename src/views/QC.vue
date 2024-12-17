@@ -1,17 +1,19 @@
 <template>
   <v-container class="ml-0">
     <v-row>
-      <h1>Bonjour, le monde</h1>
+      <v-col>
+        <h1>Colocalization statistics</h1>
+        <p>Overview and description of what this page is about.</p>
+      </v-col>
     </v-row>
-    <v-row class="mt-4">
-      <div id="vega">Ca va?</div>
-    </v-row>
-    <v-row id="qcPanel">
+
+    <v-row id="qcPanel" class="mt-5">
       <v-col>
         <span class="text-caption">
           Set H4 threshold ({{ filterH4 }})
         </span>
         <v-slider
+          @end="onH4SliderUpdate"
           v-model="filterH4"
           :min="0"
           :max="1.0"
@@ -21,12 +23,12 @@
           width="200"
         ></v-slider>
       </v-col>
-
       <v-col>
         <span class="text-caption">
           Set r<sup>2</sup> threshold ({{ filterR2 }})
         </span>
         <v-slider
+          @end="onR2SliderUpdate"
           v-model="filterR2"
           :min="0"
           :max="1.0"
@@ -38,10 +40,11 @@
         ></v-slider>
       </v-col>
       <v-col>
-<!--        <span>omics</span>-->
         <v-select
-          :items="Object.keys(qtlStudies)"
-          v-model="selectedOmicsStudy"
+          @update:modelValue="onStudySelectUpdate"
+          class="mt-3"
+          :items="studyList"
+          v-model="selectedStudy"
           density="compact"
           label="omics"
           bg-color="white"
@@ -51,9 +54,16 @@
         ></v-select>
       </v-col>
     </v-row>
+
+    <v-row class="mt-6">
+      <h2>Plot 1: Colocalization class</h2>
+    </v-row>
+    <v-row>
+      <p>Plot 1 description</p>
+    </v-row>
     <v-row>
       <v-col>
-        <div id="spec1"></div>
+        <div id="colocClassPlot"></div>
       </v-col>
     </v-row>
   </v-container>
@@ -61,13 +71,13 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, toRaw, watch } from 'vue'
 import embed from 'vega-embed'
 import { Graph } from 'graphology'
 import { useFetchData } from '@/composables/fetchData'
 import { useAppStore } from '@/stores/AppStore'
 import { URLS } from '@/constants'
-import spec1 from '@/vegaSpecs/spec.js'
+import colocClassSpec from '@/vegaSpecs/colocClassSpec.js'
 
 // *** Composables *************************************************************
 const { data, errorMessage, fetchData } = useFetchData()
@@ -75,23 +85,15 @@ const appStore = useAppStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-let allColoc
-let coloc
+// data variables
+let allColocData
+const qtlStudies = ref({})
+const studyList = ref([])
 
-const qtlStudies = {
-  "LiverQTL (liver)": { "study": "LiverQTL", "tissue": "liver" },
-  "AdipoExpress (adipose)": { "study": "AdipoExpress", "tissue": "adipose" },
-  "FUSION (muscle)": { "study": "FUSION", "tissue": "muscle" },
-  "INSPIRE (islet)": { "study": "INSPIRE", "tissue": "islet"},
-}
-
-// const omicsList = ref(Object.keys(qtlStudies))
-
-// UI variables
+// UI control variables
 const filterH4 = ref(0.5)
 const filterR2 = ref(0.3)
-const selectedOmicsStudy = ref('LiverQTL (liver)')
-
+const selectedStudy = ref('')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -100,70 +102,136 @@ const selectedOmicsStudy = ref('LiverQTL (liver)')
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
-  const r = '#vega'
-  const x = await embed(r, spec)
+  await loadData()
+  const initialStudy = studyList.value[0]
+  selectedStudy.value = initialStudy
 
+  await generatePlot(allColocData, qtlStudies, initialStudy, filterH4.value, filterR2.value)
+})
+
+// *** Event handlers **********************************************************
+const onH4SliderUpdate = async (newH4value) => {
+  await generatePlot(allColocData, qtlStudies, selectedStudy.value, newH4value, filterR2.value)
+}
+
+const onR2SliderUpdate = async (newR2value) => {
+  await generatePlot(allColocData, qtlStudies, selectedStudy.value, filterH4.value, newR2value)
+}
+
+const onStudySelectUpdate = async (newStudy) => {
+  await generatePlot(allColocData, qtlStudies, newStudy, filterH4.value, filterR2.value)
+}
+
+// *** Utility functions *******************************************************
+const generatePlot = async (colocData, qtlStudies, study, h4, r2) => {
+  console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}`)
+  const cfs = getColocDataForStudy(colocData, qtlStudies, study, h4, r2)
+
+  const records = makePlotRecords(cfs)
+
+  const plotContainer = '#colocClassPlot'
+  colocClassSpec.data.values = records
+  await embed(plotContainer, colocClassSpec)
+}
+
+const loadData = async() => {
   if(await fetchData(URLS.QC_COLOC, 'gene check', appStore.currentPageName)) {
-    allColoc = data.value.results
-    console.log('acv:', allColoc)
+    allColocData = data.value.results
+  } else {
+    console.error('Error loading qc data:', errorMessage)
   }
 
-  // ***** coloc ***************************************************************
-  coloc = allColoc.filter((x) => {
-    // console.log('x', x)
-    const omicsStudyName = selectedOmicsStudy.value
-    const omicsStudy = qtlStudies[omicsStudyName]
+  qtlStudies.value = getQTLStudies(allColocData)
+
+  studyList.value = [...qtlStudies.value.keys()]
+
+  const initialStudy = studyList.value[0]
+  selectedStudy.value = initialStudy
+}
+
+const getQTLStudies = (colocData) => {
+   const qs = new Map(colocData.map(x => {
+    let k = `${x.signal2.analysis.study.uuid} (${x.signal2.analysis.tissue})`
+    let v = {
+      study: x.signal2.analysis.study.uuid,
+      tissue: x.signal2.analysis.tissue
+    }
+    return [k, v]
+  }))
+  return qs
+}
+
+const getColocDataForStudy = (colocData, qtlStudies, studyName, h4, r2) => {
+  const cfs = colocData.filter((x) => {
+    const omicsStudy = qtlStudies.value.get(studyName)
     const study = omicsStudy.study
     const tissue = omicsStudy.tissue
 
-    // console.log('ost', omicsStudy, study, tissue)
-    return (x.r2 > filterR2.value) &&
-      (x.coloc_h4 > filterH4.value) &&
+    return (x.r2 >= r2) &&
+      (x.coloc_h4 >= h4) &&
       (x.signal2.analysis.study.uuid === study) &&
       (x.signal2.analysis.tissue === tissue);
   })
-  console.log('coloc:', coloc)
+  return cfs
+}
 
-  // ***** records *************************************************************
-  // records = {
-    // Build graph of colocalizations
-    // GWAS analysis trait <--> GWAS variant <--> eQTL variant <--> eQTL analysis gene
-    // Note: the analysis part here is important. There could be multiple analyses for the same GWAS trait. For example,
-    // if two different analysts or consortia analyzed a particular trait, they would be separate analyses.
-    // For now, trait 1 is always GWAS, and trait 2 is always eQTL.
-    const graph = new Graph();
-    const analysisPairs = new Map();
-    const analysisNames = new Map();
-    for (let c of coloc) {
-      let analysis1 = c.signal1.analysis.uuid;
-      let analysis2 = c.signal2.analysis.uuid;
-      let a1_variant = c.signal1.lead_variant.vid;
-      let a2_variant = c.signal2.lead_variant.vid;
+function makeAnalysisTitle(analysis) {
+  // let year = analysis.publication?.year ?? 'NA';
+  return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
+}
 
-      // This plot will currently only work for GWAS by X colocalizations.
-      if (c.signal1.analysis.analysis_type != 'GWAS') {
-        continue;
-      }
+function colocTypeLabel(t) {
+  if (t === 'moreThanTwoGwasPerEqtlSignal' ) {
+    return 'QTL variant has 2+ GWAS signals';
+  }
+  if (t === 'moreThanTwoQtlPerGwasSignal') {
+    return 'GWAS variant has 2+ QTL signals';
+  }
+  if (t === 'oneToOneSignal') {
+    return 'One-to-one GWAS:eQTL signal';
+  }
+}
 
-      // Make a prettier title for this analysis
-      analysisNames.set(analysis1, makeAnalysisTitle(c.signal1.analysis));
+// ***** records *************************************************************
+const makePlotRecords = (colocForStudy) => {
+  // Build graph of colocalizations
+  // GWAS analysis trait <--> GWAS variant <--> eQTL variant <--> eQTL analysis gene
+  // Note: the analysis part here is important. There could be multiple analyses for the same GWAS trait. For example,
+  // if two different analysts or consortia analyzed a particular trait, they would be separate analyses.
+  // For now, trait 1 is always GWAS, and trait 2 is always eQTL.
+  const graph = new Graph();
+  const analysisPairs = new Map();
+  const analysisNames = new Map();
+  for (let c of colocForStudy) {
+    let analysis1 = c.signal1.analysis.uuid;
+    let analysis2 = c.signal2.analysis.uuid;
+    let a1_variant = c.signal1.lead_variant.vid;
+    let a2_variant = c.signal2.lead_variant.vid;
 
-      // Remember valid analysis pairs
-      const a1_map = analysisPairs.get(analysis1) ?? analysisPairs.set(analysis1, new Set()).get(analysis1);
-      a1_map.add(analysis2);
+    // This plot will currently only work for GWAS by X colocalizations.
+    if (c.signal1.analysis.analysis_type != 'GWAS') {
+      continue;
+    }
 
-      // Strange nomenclature. This just adds a node into the graph if it doesn't already exist.
-      graph.mergeNode(analysis1);
-      graph.mergeNode(analysis2);
-      graph.mergeNode(a1_variant);
-      graph.mergeNode(a2_variant);
+    // Make a prettier title for this analysis
+    analysisNames.set(analysis1, makeAnalysisTitle(c.signal1.analysis));
 
-      // Same as above; add edges if they don't already exist.
-      graph.mergeEdge(analysis1, a1_variant);
-      graph.mergeEdge(analysis2, a2_variant);
+    // Remember valid analysis pairs
+    const a1_map = analysisPairs.get(analysis1) ?? analysisPairs.set(analysis1, new Set()).get(analysis1);
+    a1_map.add(analysis2);
 
-      graph.mergeEdge(a1_variant, a2_variant);
-      graph.mergeEdge(a2_variant, a1_variant);
+    // Strange nomenclature. This just adds a node into the graph if it doesn't already exist.
+    graph.mergeNode(analysis1);
+    graph.mergeNode(analysis2);
+    graph.mergeNode(a1_variant);
+    graph.mergeNode(a2_variant);
+
+    // Same as above; add edges if they don't already exist.
+    graph.mergeEdge(analysis1, a1_variant);
+    graph.mergeEdge(analysis2, a2_variant);
+
+    graph.mergeEdge(a1_variant, a2_variant);
+    graph.mergeEdge(a2_variant, a1_variant);
   }
 
   const records = [];
@@ -284,74 +352,16 @@ onMounted(async () => {
       return 1;
     }
   })
-
-  // return records
-  console.log('records', records)
-// }
-
-  const r1 = '#spec1'
-  spec1.data.values = records
-  const xx = await embed(r1, spec1)
-})
-
-// *** Event handlers **********************************************************
-// *** Utility functions *******************************************************
-function makeAnalysisTitle(analysis) {
-  // let year = analysis.publication?.year ?? 'NA';
-  return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
+  return records
 }
 
-function colocTypeLabel(t) {
-  if (t === 'moreThanTwoGwasPerEqtlSignal' ) {
-    return 'QTL variant has 2+ GWAS signals';
-  }
-  if (t === 'moreThanTwoQtlPerGwasSignal') {
-    return 'GWAS variant has 2+ QTL signals';
-  }
-  if (t === 'oneToOneSignal') {
-    return 'One-to-one GWAS:eQTL signal';
-  }
-}
 
 // *** Configuration data ******************************************************
-const spec = {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "data": {
-    "values": [
-      {"a": "C", "b": 2},
-      {"a": "C", "b": 7},
-      {"a": "C", "b": 4},
-      {"a": "D", "b": 1},
-      {"a": "D", "b": 2},
-      {"a": "D", "b": 6},
-      {"a": "E", "b": 8},
-      {"a": "E", "b": 4},
-      {"a": "E", "b": 7}
-    ]
-  },
-  "height": 200,
-  "width": 400,
-  "title": "Vega lite embed example",
-  "mark": "bar",
-  "encoding": {
-    "y": {"field": "a", "type": "nominal"},
-    "x": {
-      "aggregate": "average",
-      "field": "b",
-      "type": "quantitative",
-      "axis": {
-        "title": "Average of b"
-      }
-    }
-  }
-}
-
 </script>
 
 <style scoped>
 #qcPanel {
   border: 1px solid #ddd;
-  margin: 5px 0 5px 0;
-  padding: 20px 0 -10px 0 !important;
+  height: 90px;
 }
 </style>
