@@ -7,52 +7,8 @@
       </v-col>
     </v-row>
 
-    <v-row id="qcPanel" class="mt-5">
-      <v-col>
-        <span class="text-caption">
-          Set H4 threshold ({{ filterH4 }})
-        </span>
-        <v-slider
-          @end="onH4SliderUpdate"
-          v-model="filterH4"
-          :min="0"
-          :max="1.0"
-          :step="0.05"
-          show-ticks="always"
-          thumb-size="14"
-          width="200"
-        ></v-slider>
-      </v-col>
-      <v-col>
-        <span class="text-caption">
-          Set r<sup>2</sup> threshold ({{ filterR2 }})
-        </span>
-        <v-slider
-          @end="onR2SliderUpdate"
-          v-model="filterR2"
-          :min="0"
-          :max="1.0"
-          :step="0.05"
-          show-ticks="always"
-          thumb-label
-          thumb-size="14"
-          width="200"
-        ></v-slider>
-      </v-col>
-      <v-col>
-        <v-select
-          @update:modelValue="onStudySelectUpdate"
-          class="mt-3"
-          :items="studyList"
-          v-model="selectedStudy"
-          density="compact"
-          label="omics"
-          bg-color="white"
-          flat
-          variant="outlined"
-          width="200"
-        ></v-select>
-      </v-col>
+    <v-row>
+      <QCPanel />
     </v-row>
 
     <v-row class="mt-6">
@@ -66,14 +22,15 @@
         <div id="colocClassPlot"></div>
       </v-col>
     </v-row>
+
   </v-container>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, onMounted, ref, toRaw, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import embed from 'vega-embed'
-import { URLS } from '@/constants'
+import { PAGE_NAMES, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
 import { useAppStore } from '@/stores/AppStore'
 import colocClassSpec from '@/vegaSpecs/colocClassSpec.js'
@@ -91,13 +48,11 @@ const { makePlotRecords } = useQCPlotRecords();
 // data variables
 let allColocData
 const qtlStudies = ref({})
-const studyList = ref([])
 
-// UI control variables
-const filterH4 = ref(0.5)
-const filterR2 = ref(0.3)
-const selectedStudy = ref('')
+// constants
+const qcPage = PAGE_NAMES.QC
 
+// dom plot refs
 const plotRef = '#colocClassPlot'
 
 // *** Computed ****************************************************************
@@ -105,28 +60,21 @@ const plotRef = '#colocClassPlot'
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
+watch(() => appStore[qcPage].regenPlotFlag, async () => {
+  await generatePlot(plotRef, colocClassSpec, allColocData, qtlStudies,
+    appStore[qcPage].selectedStudy,
+    appStore[qcPage].h4Threshold,
+    appStore[qcPage].r2Threshold
+  )
+})
+
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   await loadData()
-  const initialStudy = studyList.value[0]
-  selectedStudy.value = initialStudy
-
-  await generatePlot(plotRef, colocClassSpec, allColocData, qtlStudies, initialStudy, filterH4.value, filterR2.value)
+  appStore[qcPage].regenPlotFlag = !appStore[qcPage].regenPlotFlag
 })
 
 // *** Event handlers **********************************************************
-const onH4SliderUpdate = async (newH4value) => {
-  await generatePlot(plotRef, colocClassSpec, allColocData, qtlStudies, selectedStudy.value, newH4value, filterR2.value)
-}
-
-const onR2SliderUpdate = async (newR2value) => {
-  await generatePlot(plotRef, colocClassSpec, allColocData, qtlStudies, selectedStudy.value, filterH4.value, newR2value)
-}
-
-const onStudySelectUpdate = async (newStudy) => {
-  await generatePlot(plotRef, colocClassSpec, allColocData, qtlStudies, newStudy, filterH4.value, filterR2.value)
-}
-
 // *** Utility functions *******************************************************
 const generatePlot = async (container, spec, colocData, qtlStudies, study, h4, r2) => {
   console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}`)
@@ -143,16 +91,11 @@ const loadData = async() => {
   }
 
   qtlStudies.value = getQTLStudies(allColocData)
-  studyList.value = [...qtlStudies.value.keys()]
-  selectedStudy.value = studyList.value[0]
+  appStore[qcPage].studyList = [...qtlStudies.value.keys()]
 }
 
 // *** Configuration data ******************************************************
 </script>
 
 <style scoped>
-#qcPanel {
-  border: 1px solid #ddd;
-  height: 90px;
-}
 </style>

@@ -71,7 +71,9 @@ export default defineConfig({
     }),
     Vuetify(),
     Components({
-      dirs: ['src/components', 'src/components/misc widgets', 'src/components/FilterPanel'],
+      dirs: ['src/components', 'src/components/misc widgets', 'src/components/FilterPanel',
+        'src/components/qcPageControls'
+      ],
     }),
     ViteFonts({
       google: {

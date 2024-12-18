@@ -48,6 +48,13 @@ export const useAppStore = defineStore('appStore', {
       pastedGenes: null,
       ...getFilterPanelSettings()
     },
+    [PAGE_NAMES.QC]: {
+      h4Threshold: 0.5,
+      r2Threshold: 0.3,
+      selectedStudy: '',
+      studyList: [],
+      regenPlotFlag: true,
+    },
   }),
 
   actions: {
@@ -212,6 +219,12 @@ export const useAppStore = defineStore('appStore', {
         this.filterPanelControls.lastFilterUpdated = key
         this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
       }
+    },
+
+    updateQCpageKey(key, value) {
+      this.setPageKey(PAGE_NAMES.QC, key, value)
+      const parentKey = this.currentPageName
+      this[parentKey].regenPlotFlag = !this[parentKey].regenPlotFlag
     },
 
     async updateSort(newSort) {
