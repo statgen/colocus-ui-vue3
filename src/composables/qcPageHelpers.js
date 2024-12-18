@@ -1,7 +1,23 @@
+import { useQCPlotRecords } from '@/composables/qcPlotRecords'
+import embed from 'vega-embed'
+
+const { makePlotRecords } = useQCPlotRecords();
+
 export function useQCPageHelpers() {
+
+  const generatePlot = async (container, spec, colocData, qtlStudies, study, h4, r2) => {
+    console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}, domID=${container}`)
+    console.log('container', document.querySelector('#plot1'))
+
+    const cfs = getColocDataForStudy(colocData, qtlStudies, study, h4, r2)
+    spec.data.values = makePlotRecords(cfs)
+    // debugger
+    await embed(container, spec)
+  }
+
   const getColocDataForStudy = (colocData, qtlStudies, studyName, h4, r2) => {
     const cfs = colocData.filter((x) => {
-      const omicsStudy = qtlStudies.value.get(studyName)
+      const omicsStudy = qtlStudies.get(studyName)
       const study = omicsStudy.study
       const tissue = omicsStudy.tissue
 
@@ -27,6 +43,7 @@ export function useQCPageHelpers() {
 
 
   return {
+    generatePlot,
     getColocDataForStudy,
     getQTLStudies,
   };

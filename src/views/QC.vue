@@ -11,6 +11,10 @@
       <QCPanel />
     </v-row>
 
+    <v-row>
+      <VegaPlotContainer :controlSet="VegaPlotConfig.ColocalizationClass" :vegaSpec="colocClassSpec" />
+    </v-row>
+<!--
     <v-row class="mt-6">
       <h2>Plot 1: Colocalization class</h2>
     </v-row>
@@ -22,32 +26,33 @@
         <div id="colocClassPlot"></div>
       </v-col>
     </v-row>
-
+-->
   </v-container>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
 import { onMounted, ref, watch } from 'vue'
-import embed from 'vega-embed'
+// import embed from 'vega-embed'
 import { PAGE_NAMES, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
 import { useAppStore } from '@/stores/AppStore'
 import colocClassSpec from '@/vegaSpecs/colocClassSpec.js'
 import { useQCPageHelpers } from '@/composables/qcPageHelpers'
 import { useQCPlotRecords } from '@/composables/qcPlotRecords'
+import VegaPlotConfig from '@/components/qcPageControls/VegaPlotConfig'
 
 // *** Composables *************************************************************
 const { data, errorMessage, fetchData } = useFetchData()
 const appStore = useAppStore()
-const { getColocDataForStudy, getQTLStudies } = useQCPageHelpers();
+const { generatePlot, getColocDataForStudy, getQTLStudies } = useQCPageHelpers();
 const { makePlotRecords } = useQCPlotRecords();
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 // data variables
-let allColocData
-const qtlStudies = ref({})
+// let allColocData
+// const qtlStudies = ref({})
 
 // constants
 const qcPage = PAGE_NAMES.QC
@@ -60,13 +65,15 @@ const plotRef = '#colocClassPlot'
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => appStore[qcPage].regenPlotFlag, async () => {
-  await generatePlot(plotRef, colocClassSpec, allColocData, qtlStudies,
-    appStore[qcPage].selectedStudy,
-    appStore[qcPage].h4Threshold,
-    appStore[qcPage].r2Threshold
-  )
-})
+// watch(() => appStore[qcPage].regenPlotFlag, async () => {
+//   await generatePlot(plotRef, colocClassSpec,
+//     appStore[qcPage].allColocData,
+//     appStore[qcPage].qtlStudies,
+//     appStore[qcPage].selectedStudy,
+//     appStore[qcPage].h4Threshold,
+//     appStore[qcPage].r2Threshold
+//   )
+// })
 
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
@@ -76,22 +83,24 @@ onMounted(async () => {
 
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
-const generatePlot = async (container, spec, colocData, qtlStudies, study, h4, r2) => {
-  console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}`)
-  const cfs = getColocDataForStudy(colocData, qtlStudies, study, h4, r2)
-  spec.data.values = makePlotRecords(cfs)
-  await embed(container, spec)
-}
+
+
+
+// const generatePlot = async (container, spec, colocData, qtlStudies, study, h4, r2) => {
+//   console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}`)
+//   const cfs = getColocDataForStudy(colocData, qtlStudies, study, h4, r2)
+//   spec.data.values = makePlotRecords(cfs)
+//   await embed(container, spec)
+// }
 
 const loadData = async() => {
   if(await fetchData(URLS.QC_COLOC, 'gene check', appStore.currentPageName)) {
-    allColocData = data.value.results
+    appStore[qcPage].allColocData = data.value.results
+    appStore[qcPage].qtlStudies = getQTLStudies(appStore[qcPage].allColocData)
+    appStore[qcPage].studyList = [...appStore[qcPage].qtlStudies.keys()]
   } else {
     console.error('Error loading qc data:', errorMessage)
   }
-
-  qtlStudies.value = getQTLStudies(allColocData)
-  appStore[qcPage].studyList = [...qtlStudies.value.keys()]
 }
 
 // *** Configuration data ******************************************************
