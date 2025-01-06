@@ -5,14 +5,13 @@ const { makePlotRecords } = useQCPlotRecords();
 
 export function useQCPageHelpers() {
 
-  const generatePlot = async (container, spec, colocData, qtlStudies, study, h4, r2) => {
-    console.log(`Building plot for ${study}, h4=${h4}, r2=${r2}, domID=${container}`)
-    console.log('container', document.querySelector('#plot1'))
+  const generatePlot = async (args) => {
+    const cdfs = getColocDataForStudy(args.data, args.studies, args.study, args.h4, args.r2)
 
-    const cfs = getColocDataForStudy(colocData, qtlStudies, study, h4, r2)
-    spec.data.values = makePlotRecords(cfs)
-    // debugger
-    await embed(container, spec)
+    args.spec.data.values = makePlotRecords(cdfs)
+    const container = `#${args.container}`
+
+    await embed(container, args.spec)
   }
 
   const getColocDataForStudy = (colocData, qtlStudies, studyName, h4, r2) => {
@@ -41,10 +40,8 @@ export function useQCPageHelpers() {
     return qs
   }
 
-
   return {
     generatePlot,
-    getColocDataForStudy,
     getQTLStudies,
   };
 }

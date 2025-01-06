@@ -3,6 +3,8 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { PAGE_NAMES, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
+import { useQCPageHelpers } from '@/composables/qcPageHelpers'
+
 
 export const useAppStore = defineStore('appStore', {
   state: () => ({
@@ -178,6 +180,20 @@ export const useAppStore = defineStore('appStore', {
         this[PAGE_NAMES.MANHATTAN].manhattanDataReady = true
       } else {
         throw new Error('Error loading manhattan data:\n' + errorMessage)
+      }
+    },
+
+    async loadQCData() {
+      const { getQTLStudies } = useQCPageHelpers()
+      const { data, errorMessage, fetchData } = useFetchData()
+
+      if(await fetchData(URLS.QC_COLOC, 'load qc data', this.currentPageName)) {
+        this[PAGE_NAMES.QC].allColocData = data.value.results
+        this[PAGE_NAMES.QC].qtlStudies = getQTLStudies(this[PAGE_NAMES.QC].allColocData)
+        this[PAGE_NAMES.QC].studyList = [...this[PAGE_NAMES.QC].qtlStudies.keys()]
+        this[PAGE_NAMES.QC].regenPlotFlag = !this[PAGE_NAMES.QC].regenPlotFlag
+      } else {
+        throw new Error('Error loading qc data:\n' + errorMessage)
       }
     },
 
