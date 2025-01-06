@@ -17,9 +17,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAppStore } from '@/stores/AppStore'
+import { useQCStore } from '@/stores/QCStore'
 
-const appStore = useAppStore()
+const qcStore = useQCStore()
 
 const controlValue = ref(controlSet.defaultValue)
 
@@ -28,7 +28,7 @@ const { controlSet } = defineProps({
 })
 
 const onSliderUpdate = (newValue) => {
-  appStore.updateQCpageKey(controlSet.dataKey, newValue)
+  qcStore.updateQCStoreKey(controlSet.dataKey, newValue)
 }
 </script>
 

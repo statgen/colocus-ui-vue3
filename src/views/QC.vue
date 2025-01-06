@@ -21,12 +21,12 @@
 <script setup>
 // *** Imports *****************************************************************
 import { onMounted } from 'vue'
-import { useAppStore } from '@/stores/AppStore'
+import { useQCStore } from '@/stores/QCStore'
 import colocClassSpec from '@/vegaSpecs/colocClassSpec.js'
 import VegaPlotConfig from '@/components/qcPageControls/VegaPlotConfig'
 
 // *** Composables *************************************************************
-const appStore = useAppStore()
+const qcStore = useQCStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -38,7 +38,7 @@ const appStore = useAppStore()
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
-  await appStore.loadQCData()
+  await qcStore.loadQCData()
 })
 
 // *** Event handlers **********************************************************

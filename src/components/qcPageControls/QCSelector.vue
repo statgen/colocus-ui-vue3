@@ -2,7 +2,7 @@
   <v-select
     @update:modelValue="onSelectUpdate"
     class="mt-3"
-    :items="appStore[PAGE_NAMES.QC].studyList"
+    :items="qcStore.studyList"
     v-model="selectedStudy"
     density="compact"
     :label="controlSet.caption"
@@ -16,19 +16,18 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { PAGE_NAMES } from '@/constants'
-import { useAppStore } from '@/stores/AppStore'
+import { useQCStore } from '@/stores/QCStore'
 
-const appStore = useAppStore()
+const qcStore = useQCStore()
 
 const qcPage = PAGE_NAMES.QC
 
-// const selectedStudy = ref(appStore[qcPage].selectedStudy) // undefined on initial load
 const selectedStudy = ref('')
 
-// this is necessary to populate the initial study on first load
-watch(() => appStore[qcPage].studyList, async () => {
-  const initialStudy = appStore[qcPage].studyList[0]
-  appStore[qcPage].selectedStudy = initialStudy
+// this is necessary to populate the selected study on initial load
+watch(() => qcStore.studyList, async () => {
+  const initialStudy = qcStore.studyList[0]
+  qcStore.selectedStudy = initialStudy
   selectedStudy.value = initialStudy
 })
 
@@ -37,7 +36,7 @@ const { controlSet } = defineProps({
 })
 
 const onSelectUpdate = (newValue) => {
-  appStore.updateQCpageKey(controlSet.dataKey, newValue)
+  qcStore.updateQCStoreKey(controlSet.dataKey, newValue)
 }
 
 </script>

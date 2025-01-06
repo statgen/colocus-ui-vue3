@@ -15,7 +15,7 @@ export function useQCPageHelpers() {
   }
 
   const getColocDataForStudy = (colocData, qtlStudies, studyName, h4, r2) => {
-    const cfs = colocData.filter((x) => {
+    const cdfs = colocData.filter((x) => {
       const omicsStudy = qtlStudies.get(studyName)
       const study = omicsStudy.study
       const tissue = omicsStudy.tissue
@@ -25,7 +25,7 @@ export function useQCPageHelpers() {
         (x.signal2.analysis.study.uuid === study) &&
         (x.signal2.analysis.tissue === tissue);
     })
-    return cfs
+    return cdfs
   }
 
   const getQTLStudies = (colocData) => {

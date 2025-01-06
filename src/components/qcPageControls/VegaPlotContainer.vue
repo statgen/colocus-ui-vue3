@@ -3,7 +3,6 @@
     <h2>{{ controlSet.heading }}</h2>
     <p>{{ controlSet.description }}</p>
     <div :id="controlSet.container"></div>
-<!--    <div id="plot1">plot1</div>-->
   </v-container>
 </template>
 
@@ -11,9 +10,9 @@
 import { watch } from 'vue'
 import { useQCPageHelpers } from '@/composables/qcPageHelpers'
 import { PAGE_NAMES } from '@/constants'
-import { useAppStore } from '@/stores/AppStore'
+import { useQCStore } from '@/stores/QCStore'
 
-const appStore = useAppStore()
+const qcStore = useQCStore()
 const { generatePlot } = useQCPageHelpers();
 
 const qcPage = PAGE_NAMES.QC
@@ -23,15 +22,15 @@ const { controlSet, vegaSpec } = defineProps({
   vegaSpec: {},
 })
 
-watch(() => appStore[qcPage].regenPlotFlag, async () => {
+watch(() => qcStore.regenPlotFlag, async () => {
   await generatePlot({
     container: controlSet.container,
     spec: vegaSpec,
-    data: appStore[qcPage].allColocData,
-    studies: appStore[qcPage].qtlStudies,
-    study: appStore[qcPage].selectedStudy,
-    h4: appStore[qcPage].h4Threshold,
-    r2: appStore[qcPage].r2Threshold
+    data: qcStore.allColocData,
+    studies: qcStore.qtlStudies,
+    study: qcStore.selectedStudy,
+    h4: qcStore.h4Threshold,
+    r2: qcStore.r2Threshold
   })
 })
 
