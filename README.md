@@ -320,3 +320,111 @@ const qcPage = PAGE_NAMES.QC
 ```
   <router-link to="qc" class="nav-link text-clcHeading">QC</router-link>
 ```
+## Vega plots
+Note: **This whole section is subject to rapid change as development continues.**
+
+The plotting system depends on the following components
+- The overall page (QC.vue)
+- A vega spec for each plot, stored in src/vegaSpecs
+- A Pinia store, QCStore, for plot data and operation
+- A plot component, <VegaPlotContainer>, one for each plot rendered on the page
+- VegaPlotConfig, a js file containing macro info for instantiating plots
+- qcMakePlotRecords, a composable providing a function for building the data set required by the first plot
+
+### QC page
+This view contains the overall page structure, including the templates for all the plots (so far just the one). There are two rows:
+- page header and description
+- <QCPanel> component, with controls to set h4 and r2, and to select study
+
+These are then followed by the plots, each an instance of <VegaPlotContainer>. That component accepts two props:
+- a controlSet, which has some macro settings for each plot
+- a vega spec, the details of each plot, including the data
+  In our app, the vega spec is a JS object, not a JSON blob, which simplifies dynamically updating things like the data set for the plot, and other settings.
+
+The page's only action, in the onMounted hook, is to tell the qcStore to load the plot data from the back end, then flip the flag that triggers plot generation.
+
+### qcStore
+The Pinia store for this portion of Colocus is responsible for fetching data from the API, and generating data subsets for the different plots. It has state variables for those data elements, plus variables for the UI elements controlling the plot displays (h4, r2, and omics study). It has three primary actions:
+- loadQCData: fetches overall data set data from the backend and generates subsets for the plots
+- makePlotRecords: regenerates plot data when needed (on initial load and when UI changes)
+- updateQCStoreKey: updates state variables when UI controls change due to user interaction
+
+- There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
+
+### VegaPlotContainer
+This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, building a new plot instance and embedding it in the containing div in the template. The flag is triggered on initial load of the QC page view, and on subsequent changes to the UI controls.
+
+### Problems
+Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to about six seconds. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous.
+
+Rather than having to deploy to external platform, a server that can be run locally was generated. It uses the Express js server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
+
+It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts to experiment with this:
+- dev-build: this runs vite build in watch mode
+- dev-serve: runs the express server
+
+I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue. so reverted to just regenerating the plot from scratch. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
+```aiignore
+import embed from 'vega-embed'
+import * as vega from 'vega'
+// ...
+const chartView = ref(null)
+// ...
+watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
+  if(!chartView.value) { // initial hit, create plot
+    qcStore.makePlotRecords()
+    vegaSpec.data.name = controlSet.dataName
+    vegaSpec.data.values = qcStore.plotRecords
+    const containerID = `#${controlSet.containerID}`
+    const { view } = await embed(containerID, vegaSpec)
+    chartView.value = view
+
+  } else { // just update
+    timeLog('starting to make plot records')
+    qcStore.makePlotRecords()
+    timeLog('made plot records, starting vega update')
+    chartView.value
+      .change(
+        controlSet.dataName,
+        vega
+          .changeset()
+          .remove(() => true)
+          .insert(qcStore.plotRecords)
+      ).run()
+    chartView.value.resize().run()
+    timeLog('vega update complete')
+  }
+})
+
+// this also necessitates providing a name for the dataset in the vega spec:
+  "data": {
+    "name": "placeholder",
+    "values": []
+  },
+
+// and in the VegaPlotConfig for each plot
+...
+    dataName: "colocClassData",
+...
+```
+
+### Plot dimensions
+The plot specs in the Observable file use a method of setting global defaults for overall plot height and width. 
+```aiignore
+  "config": {
+    "view": {
+      "continuousHeight": 600,
+      "continuousWidth": 600
+    }
+  }
+```
+
+Consequently, early graphs with smaller specified sizes adopted the sizes specified by later graphs. For example, Class of Colocalizations had a specified width of 600 but were actually about 800 wide.
+
+So the config.view.continuous* were removed to set dimensions directly. In particular, setting only the width, and allowing Vega to set height itself produced better looking plots. Also, I removed the hard-coded value for width, and specified "container", thus allowing height to be specified externally by the Vue infrastructure. This will probably migrate into the VegaPlotConfig.js file, along with the other macro settings.
+
+### Plot fonts
+Following a team discussion about font sizing in plots and the app generally, I experimented and found the following three settings in the spec file to set font sizes.
+- layer.encoding.y.axis.fontSize: affects the y-axis labels
+- layer.encoding.legend.labelFontSize: affects the legend labels
+- layer.mark.fontSize: affects the in-bar text in the plots

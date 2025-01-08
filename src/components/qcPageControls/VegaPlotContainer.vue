@@ -2,39 +2,49 @@
   <v-container class="ml-n4">
     <h2>{{ controlSet.heading }}</h2>
     <p>{{ controlSet.description }}</p>
-    <div :id="controlSet.container"></div>
+    <div :id="controlSet.containerID" class="plotContainer"></div>
   </v-container>
 </template>
 
 <script setup>
 import { watch } from 'vue'
-import { useQCPageHelpers } from '@/composables/qcPageHelpers'
-import { PAGE_NAMES } from '@/constants'
 import { useQCStore } from '@/stores/QCStore'
+import embed from 'vega-embed'
+import { timeLog } from '@/util/util'
 
 const qcStore = useQCStore()
-const { generatePlot } = useQCPageHelpers();
 
-const qcPage = PAGE_NAMES.QC
 
 const { controlSet, vegaSpec } = defineProps({
   controlSet: {},
   vegaSpec: {},
 })
 
-watch(() => qcStore.regenPlotFlag, async () => {
-  await generatePlot({
-    container: controlSet.container,
-    spec: vegaSpec,
-    data: qcStore.allColocData,
-    studies: qcStore.qtlStudies,
-    study: qcStore.selectedStudy,
-    h4: qcStore.h4Threshold,
-    r2: qcStore.r2Threshold
-  })
+const vegaOptions = {
+  actions: {
+    export: true,
+    source: false,
+    compiled: false,
+    editor: false,
+    }
+}
+
+watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
+  qcStore.makePlotRecords()
+  timeLog(`plotRecords length:, ${qcStore.plotRecords.length}`)
+
+  vegaSpec.data.values = qcStore.plotRecords
+  const container = `#${controlSet.containerID}`
+
+  timeLog('embed start')
+  await embed(container, vegaSpec, vegaOptions)
+  timeLog('embed stop')
 })
 
 </script>
 
 <style scoped>
+.plotContainer {
+  width: 800px;
+}
 </style>

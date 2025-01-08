@@ -1,4 +1,5 @@
 import ColorHash from 'color-hash'
+import dayjs from 'dayjs'
 import { NEARBY_DIST } from '@/constants'
 
 // for colorizing variant labels
@@ -111,6 +112,10 @@ const sortVariantArray = (variants) => {
   })
 }
 
+const timeLog = (msg) => {
+  console.log(dayjs().format('HH:mm:ss.SSS: '), msg)
+}
+
 const titleCase = (str) => {
   if (!str || str?.length === 0) {
     return ''
@@ -136,4 +141,4 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL,
-  sleeper, sortVariantArray, titleCase, url }
+  sleeper, sortVariantArray, timeLog, titleCase, url }

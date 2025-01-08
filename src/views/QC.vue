@@ -39,6 +39,7 @@ const qcStore = useQCStore()
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   await qcStore.loadQCData()
+  qcStore.regenPlotFlag = !qcStore.regenPlotFlag
 })
 
 // *** Event handlers **********************************************************

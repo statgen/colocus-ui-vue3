@@ -1,6 +1,10 @@
 const colocClassSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "data": { "values": [] },
+  "data": {
+    "name": "placeholder",
+    "values": []
+  },
+  "width": "container",
   "transform": [
     { "filter": "datum.value > 0" }
   ],
@@ -20,6 +24,7 @@ const colocClassSpec = {
           "type": "ordinal",
           "sort": null,
           "axis": {
+            "labelFontSize": 14,
             "titlePadding": 15,
             "labelPadding": 15,
             "ticks": false
@@ -42,6 +47,7 @@ const colocClassSpec = {
             "range": ["#66c2a5", "#fc8d62", "#8da0cb"]
           },
           "legend": {
+            // "labelFontSize": 10,
             "orient": "top",
             "title": "Colocalization class",
             "labelExpr": "datum.label === 'moreThanTwoGwasPerEqtlSignal' ? 'QTL variant has 2+ GWAS signals' : datum.label === 'moreThanTwoQtlPerGwasSignal' ? 'GWAS variant has 2+ QTL signals' : datum.label === 'oneToOneSignal' ? 'One-to-one GWAS:eQTL signal' : datum.label"
@@ -58,7 +64,7 @@ const colocClassSpec = {
       "mark": {
         "type": "text",
         "baseline": "middle",
-        "fontSize": 10,
+        "fontSize": 14,
         "fontWeight": "normal",
         "color": "black"
       },
@@ -84,13 +90,7 @@ const colocClassSpec = {
         }
       }
     }
-  ],
-  "config": {
-    "view": {
-      "continuousHeight": 600,
-      "continuousWidth": 600
-    }
-  }
+  ]
 }
 
 export default colocClassSpec

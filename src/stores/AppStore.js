@@ -3,8 +3,6 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { PAGE_NAMES, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
-import { useQCPageHelpers } from '@/composables/qcPageHelpers'
-
 
 export const useAppStore = defineStore('appStore', {
   state: () => ({

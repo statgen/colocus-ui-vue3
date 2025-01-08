@@ -1,6 +1,6 @@
 import { Graph } from 'graphology'
 
-export function useQCPlotRecords() {
+export function useMakeQCPlotRecords() {
   function makeAnalysisTitle(analysis) {
     // let year = analysis.publication?.year ?? 'NA';
     return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
