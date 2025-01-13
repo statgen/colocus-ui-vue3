@@ -337,7 +337,7 @@ This view contains the overall page structure, including the templates for all t
 - <QCPanel> component, with controls to set h4 and r2, and to select study
 
 These are then followed by the plots, each an instance of <VegaPlotContainer>. That component accepts two props:
-- a controlSet, which has some macro settings for each plot
+- a controlSet, following conventions established elsewhere in the app, which has some macro settings for each plot
 - a vega spec, the details of each plot, including the data
   In our app, the vega spec is a JS object, not a JSON blob, which simplifies dynamically updating things like the data set for the plot, and other settings.
 
@@ -349,7 +349,7 @@ The Pinia store for this portion of Colocus is responsible for fetching data fro
 - makePlotRecords: regenerates plot data when needed (on initial load and when UI changes)
 - updateQCStoreKey: updates state variables when UI controls change due to user interaction
 
-- There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
+There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
 
 ### VegaPlotContainer
 This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, building a new plot instance and embedding it in the containing div in the template. The flag is triggered on initial load of the QC page view, and on subsequent changes to the UI controls.
@@ -359,11 +359,13 @@ Early development of this functionality went smoothly, but at a certain point, t
 
 Rather than having to deploy to external platform, a server that can be run locally was generated. It uses the Express js server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
 
-It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts to experiment with this:
+It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts to experiment with this (both need to be running in separate terminal windows):
 - dev-build: this runs vite build in watch mode
 - dev-serve: runs the express server
 
-I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue. so reverted to just regenerating the plot from scratch. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
+It works, but is slow; takes 3.5 seconds to rebuild, then requires a hard page reload (Cmd-R). So not much better than the simple approach.
+
+I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue. so reverted to just regenerating the plot from scratch on each update of the UI controls. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
 ```aiignore
 import embed from 'vega-embed'
 import * as vega from 'vega'
@@ -422,6 +424,18 @@ The plot specs in the Observable file use a method of setting global defaults fo
 Consequently, early graphs with smaller specified sizes adopted the sizes specified by later graphs. For example, Class of Colocalizations had a specified width of 600 but were actually about 800 wide.
 
 So the config.view.continuous* were removed to set dimensions directly. In particular, setting only the width, and allowing Vega to set height itself produced better looking plots. Also, I removed the hard-coded value for width, and specified "container", thus allowing height to be specified externally by the Vue infrastructure. This will probably migrate into the VegaPlotConfig.js file, along with the other macro settings.
+
+Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropping "fit-y" because spec has discrete height." Attempts to resolve this were unsuccessful, primarily through setting the autosize property in the spec, as follows.
+
+```aiignore
+// "autosize": {
+//   "type": "fit"
+// },
+// "autosize": {
+//   "type": "fit-x",
+//   "contains": "padding",
+// },
+```
 
 ### Plot fonts
 Following a team discussion about font sizing in plots and the app generally, I experimented and found the following three settings in the spec file to set font sizes.

@@ -14,6 +14,7 @@
  */
 
 const express = require('express')
+const path = require('path')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const app = express()
@@ -30,6 +31,12 @@ app.use(
     changeOrigin: true,
   })
 )
+
+// Catch-all route: serve index.html for unmatched paths
+app.get('*', (req, res) => {
+  // Adjust path.join(...) if your dist folder is elsewhere
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
 
 app.listen(port, () => {
   console.log(`Production build served at http://localhost:${port}`)

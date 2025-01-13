@@ -4,7 +4,17 @@ const colocClassSpec = {
     "name": "placeholder",
     "values": []
   },
+  "height": {
+    "step": 22,
+  },
   "width": "container",
+  // "autosize": {
+  //   "type": "fit"
+  // },
+  // "autosize": {
+  //   "type": "fit-x",
+  //   "contains": "padding",
+  // },
   "transform": [
     { "filter": "datum.value > 0" }
   ],

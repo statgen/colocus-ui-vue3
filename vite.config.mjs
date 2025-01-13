@@ -43,7 +43,7 @@ function markdownPlugin() {
     },
     load(id) {
       if (id.endsWith('.md')) {
-        console.log('*** loading markdown file:', id);
+        console.log('*** Building markdown file:', id);
         try {
           const content = readFileSync(id, 'utf-8');
           // console.log('content', content);
