@@ -8,13 +8,6 @@ const colocClassSpec = {
     "step": 22,
   },
   "width": "container",
-  // "autosize": {
-  //   "type": "fit"
-  // },
-  // "autosize": {
-  //   "type": "fit-x",
-  //   "contains": "padding",
-  // },
   "transform": [
     { "filter": "datum.value > 0" }
   ],
@@ -57,7 +50,7 @@ const colocClassSpec = {
             "range": ["#66c2a5", "#fc8d62", "#8da0cb"]
           },
           "legend": {
-            // "labelFontSize": 10,
+            "labelFontSize": 12,
             "orient": "top",
             "title": "Colocalization class",
             "labelExpr": "datum.label === 'moreThanTwoGwasPerEqtlSignal' ? 'QTL variant has 2+ GWAS signals' : datum.label === 'moreThanTwoQtlPerGwasSignal' ? 'GWAS variant has 2+ QTL signals' : datum.label === 'oneToOneSignal' ? 'One-to-one GWAS:eQTL signal' : datum.label"

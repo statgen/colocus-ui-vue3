@@ -2,49 +2,68 @@
   <v-container class="ml-n4">
     <h2>{{ controlSet.heading }}</h2>
     <p>{{ controlSet.description }}</p>
-    <div :id="controlSet.containerID" class="plotContainer"></div>
+
+    <div v-if="showPlot" :id="controlSet.containerID" :style="{ width: controlSet.width + 'px' }"></div>
+    <p v-else class="text-error">⚠️ No records in this dataset; no plot can be shown.</p>
+
   </v-container>
 </template>
 
 <script setup>
-import { watch } from 'vue'
+// *** Imports *****************************************************************
+import { ref, watch } from 'vue'
 import { useQCStore } from '@/stores/QCStore'
 import embed from 'vega-embed'
 import { timeLog } from '@/util/util'
 
+// *** Composables *************************************************************
 const qcStore = useQCStore()
 
-
+// *** Props *******************************************************************
 const { controlSet, vegaSpec } = defineProps({
   controlSet: {},
   vegaSpec: {},
 })
 
+// *** Variables ***************************************************************
+const showPlot = ref(true)
+
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
+// *** Watches *****************************************************************
+watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
+  const dk = controlSet.dataKey
+
+  if(qcStore[dk].length < 1) {
+    showPlot.value = false
+    return
+  }
+
+  const domID = `#${controlSet.containerID}`
+
+  vegaSpec.data.values = qcStore[dk]
+  // vegaSpec.width = controlSet.width
+
+  timeLog('embed start', controlSet.containerID, controlSet.dataKey)
+  await embed(domID, vegaSpec, vegaOptions)
+  timeLog('embed stop', controlSet.containerID, controlSet.dataKey)
+})
+
+// *** Lifecycle hooks *********************************************************
+// *** Event handlers **********************************************************
+// *** Utility functions *******************************************************
+// *** Configuration data ******************************************************
 const vegaOptions = {
   actions: {
     export: true,
     source: false,
     compiled: false,
     editor: false,
-    }
+  }
 }
-
-watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
-  qcStore.makePlotRecords()
-  timeLog(`plotRecords length:, ${qcStore.plotRecords.length}`)
-
-  vegaSpec.data.values = qcStore.plotRecords
-  const container = `#${controlSet.containerID}`
-
-  timeLog('embed start')
-  await embed(container, vegaSpec, vegaOptions)
-  timeLog('embed stop')
-})
-
 </script>
 
 <style scoped>
-.plotContainer {
-  width: 800px;
-}
 </style>

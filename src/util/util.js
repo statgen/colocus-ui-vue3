@@ -112,8 +112,8 @@ const sortVariantArray = (variants) => {
   })
 }
 
-const timeLog = (msg) => {
-  console.log(dayjs().format('HH:mm:ss.SSS: '), msg)
+const timeLog = (...args) => {
+  console.log(dayjs().format('HH:mm:ss.SSS: '), ...args)
 }
 
 const titleCase = (str) => {

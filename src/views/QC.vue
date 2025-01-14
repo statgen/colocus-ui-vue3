@@ -12,7 +12,11 @@
     </v-row>
 
     <v-row>
-      <VegaPlotContainer :controlSet="VegaPlotConfig.ColocalizationClass" :vegaSpec="colocClassSpec" />
+      <VegaPlotContainer :controlSet="vpc.ColocalizationClass" :vegaSpec="colocClass" />
+    </v-row>
+
+    <v-row>
+      <VegaPlotContainer :controlSet="vpc.ColocalizationClassError" :vegaSpec="colocClassError" />
     </v-row>
 
   </v-container>
@@ -21,16 +25,20 @@
 <script setup>
 // *** Imports *****************************************************************
 import { onMounted } from 'vue'
+import { timeLog } from '@/util/util'
 import { useQCStore } from '@/stores/QCStore'
-import colocClassSpec from '@/vegaSpecs/colocClassSpec.js'
-import VegaPlotConfig from '@/components/qcPageControls/VegaPlotConfig'
+import vpc from '@/components/qcPageControls/VegaPlotConfig'
+import VegaPlotContainer from "@/components/qcPageControls/VegaPlotContainer.vue"
+
+// *** Vega specs **************************************************************
+import colocClass from '@/vegaSpecs/colocClassSpec'
+import colocClassError from '@/vegaSpecs/colocClassErrorSpec'
 
 // *** Composables *************************************************************
 const qcStore = useQCStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
@@ -39,7 +47,6 @@ const qcStore = useQCStore()
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   await qcStore.loadQCData()
-  qcStore.regenPlotFlag = !qcStore.regenPlotFlag
 })
 
 // *** Event handlers **********************************************************

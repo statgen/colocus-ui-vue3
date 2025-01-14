@@ -9,7 +9,8 @@ export const useQCStore = defineStore('qcStore', {
     allColocData: markRaw([]),
     h4Threshold: 0.5,
     r2Threshold: 0.3,
-    plotRecords: markRaw([]),
+    recordsColocClass: markRaw([]),
+    recordsWithoutOneToOne: [],
     qtlStudies: markRaw([]),
     regenPlotFlag: true,
     selectedStudy: '',
@@ -25,6 +26,7 @@ export const useQCStore = defineStore('qcStore', {
         this.qtlStudies = getQTLStudies(this.allColocData)
         this.studyList = [...this.qtlStudies.keys()]
         this.selectedStudy = this.studyList[0]
+        this.makePlotRecords()
       } else {
         throw new Error('Error loading qc data:\n' + errorMessage)
       }
@@ -33,12 +35,18 @@ export const useQCStore = defineStore('qcStore', {
     makePlotRecords() {
       const { makePlotRecords } = useMakeQCPlotRecords();
       const cdfs = getColocDataForStudy(this.allColocData, this.qtlStudies, this.selectedStudy, this.h4Threshold, this.r2Threshold)
-      this.plotRecords = makePlotRecords(cdfs)
+      this.recordsColocClass = makePlotRecords(cdfs)
+      this.recordsWithoutOneToOne = this.recordsColocClass.filter((x) => !(x.variable === 'oneToOneSignal'))
+      this.regeneratePlots()
+    },
+
+    regeneratePlots() {
+      this.regenPlotFlag = !this.regenPlotFlag
     },
 
     updateQCStoreKey(key, value) {
       this[key] = value
-      this.regenPlotFlag = !this.regenPlotFlag
+      this.makePlotRecords()
     },
   },
   getters: {

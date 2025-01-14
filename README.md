@@ -376,7 +376,7 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
   if(!chartView.value) { // initial hit, create plot
     qcStore.makePlotRecords()
     vegaSpec.data.name = controlSet.dataName
-    vegaSpec.data.values = qcStore.plotRecords
+    vegaSpec.data.values = qcStore.recordsColocClass
     const containerID = `#${controlSet.containerID}`
     const { view } = await embed(containerID, vegaSpec)
     chartView.value = view
@@ -391,7 +391,7 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
         vega
           .changeset()
           .remove(() => true)
-          .insert(qcStore.plotRecords)
+          .insert(qcStore.recordsColocClass)
       ).run()
     chartView.value.resize().run()
     timeLog('vega update complete')
@@ -442,3 +442,12 @@ Following a team discussion about font sizing in plots and the app generally, I 
 - layer.encoding.y.axis.fontSize: affects the y-axis labels
 - layer.encoding.legend.labelFontSize: affects the legend labels
 - layer.mark.fontSize: affects the in-bar text in the plots
+
+### Customizing the spec
+These are the items in a spec that need to be altered from their values in the Observables notebook, or simply added.
+- data: { "name": "placeholder", "values": [] },
+- height: { "step": 22, },
+- width: "container",
+- y.axis.labelFontSize: 14
+- legend.labelFontSize: 12
+- mark.fontSize: 14

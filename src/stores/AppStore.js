@@ -55,7 +55,6 @@ export const useAppStore = defineStore('appStore', {
       r2Threshold: 0.3,
       selectedStudy: '',
       studyList: markRaw([]),
-      regenPlotFlag: true,
     },
   }),
 
