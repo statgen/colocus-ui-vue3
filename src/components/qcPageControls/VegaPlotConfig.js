@@ -20,6 +20,14 @@ const VegaPlotConfig = {
     heading: "Plot 2: Colocalization class (only error classes)",
     width: 800,
   },
+  ColocalizationForStudy: {
+    containerID: "plot03",
+    dataKey: "recordsColocForStudy",
+    description: "descriptive text",
+    heading: "Plot 3: r² vs. h4 - all colocalizations",
+    height: 400,
+    width: 400,
+  },
 }
 
 export default VegaPlotConfig

@@ -12,11 +12,15 @@
     </v-row>
 
     <v-row>
-      <VegaPlotContainer :controlSet="vpc.ColocalizationClass" :vegaSpec="colocClass" />
+      <VegaPlotContainer :controlSet="vpc.ColocalizationClass" :vegaSpec="colocClassSpec" />
     </v-row>
 
     <v-row>
-      <VegaPlotContainer :controlSet="vpc.ColocalizationClassError" :vegaSpec="colocClassError" />
+      <VegaPlotContainer :controlSet="vpc.ColocalizationClassError" :vegaSpec="colocClassErrorSpec" />
+    </v-row>
+
+    <v-row>
+      <VegaPlotContainer :controlSet="vpc.ColocalizationForStudy" :vegaSpec="colocForStudySpec" />
     </v-row>
 
   </v-container>
@@ -31,8 +35,9 @@ import vpc from '@/components/qcPageControls/VegaPlotConfig'
 import VegaPlotContainer from "@/components/qcPageControls/VegaPlotContainer.vue"
 
 // *** Vega specs **************************************************************
-import colocClass from '@/vegaSpecs/colocClassSpec'
-import colocClassError from '@/vegaSpecs/colocClassErrorSpec'
+import { colocClassSpec } from '@/vegaSpecs/colocClassSpec'
+import { colocClassErrorSpec } from '@/vegaSpecs/colocClassErrorSpec'
+import { colocForStudySpec } from '@/vegaSpecs/colocForStudySpec'
 
 // *** Composables *************************************************************
 const qcStore = useQCStore()

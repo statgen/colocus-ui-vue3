@@ -1,7 +1,7 @@
-import { markRaw } from 'vue'
+import { markRaw, toRaw } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { useMakeQCPlotRecords } from '@/composables/qcMakePlotRecords'
+import { useMakeColocClassPlotRecords } from '@/composables/qcMakeColocClassPlotRecords'
 import { URLS } from '@/constants'
 
 export const useQCStore = defineStore('qcStore', {
@@ -10,10 +10,13 @@ export const useQCStore = defineStore('qcStore', {
     h4Threshold: 0.5,
     r2Threshold: 0.3,
     recordsColocClass: markRaw([]),
-    recordsWithoutOneToOne: [],
+    recordsColocForStudy: markRaw([]),
+    recordsWithoutOneToOne: markRaw([]),
     qtlStudies: markRaw([]),
     regenPlotFlag: true,
-    selectedStudy: '',
+    selectedStudy: '',      // full name: <study> (<tissue>)
+    selectedStudyName: '',  // just study name
+    selectedTissue: '',
     studyList: markRaw([]),
   }),
 
@@ -26,18 +29,45 @@ export const useQCStore = defineStore('qcStore', {
         this.qtlStudies = getQTLStudies(this.allColocData)
         this.studyList = [...this.qtlStudies.keys()]
         this.selectedStudy = this.studyList[0]
-        this.makePlotRecords()
+        this.makeRecordsForAllPlots()
       } else {
         throw new Error('Error loading qc data:\n' + errorMessage)
       }
     },
 
-    makePlotRecords() {
-      const { makePlotRecords } = useMakeQCPlotRecords();
-      const cdfs = getColocDataForStudy(this.allColocData, this.qtlStudies, this.selectedStudy, this.h4Threshold, this.r2Threshold)
-      this.recordsColocClass = makePlotRecords(cdfs)
-      this.recordsWithoutOneToOne = this.recordsColocClass.filter((x) => !(x.variable === 'oneToOneSignal'))
+    makeRecordsForAllPlots() {
+      const { makeColocClassPlotRecords } = useMakeColocClassPlotRecords();
+
+      this.selectedStudyName = this.qtlStudies.get(this.selectedStudy).study
+      this.selectedTissue = this.qtlStudies.get(this.selectedStudy).tissue
+
+      this.recordsColocClass = makeColocClassPlotRecords(this.allColocData, this.qtlStudies, this.selectedStudy, this.h4Threshold, this.r2Threshold)
+      this.recordsWithoutOneToOne = this.makeRecordsWithoutOneToOne()
+      this.recordsColocForStudy = this.makeRecordsColocForStudy()
+
       this.regeneratePlots()
+    },
+
+    makeRecordsColocForStudy() {
+      const results = []
+      for(const y of this.allColocData) {
+        const x = toRaw(y)
+        if (x.signal2.analysis.study.uuid === this.selectedStudyName &&
+          x.signal2.analysis.tissue === this.selectedTissue)
+        {
+          results.push(x)
+        }
+      }
+      return markRaw(results)
+    },
+
+    makeRecordsWithoutOneToOne() {
+      const results = []
+      for(const y of this.recordsColocClass) {
+        const x = toRaw(y)
+        if(x.variable !== 'oneToOneSignal') results.push(x)
+      }
+      return markRaw(results)
     },
 
     regeneratePlots() {
@@ -46,26 +76,12 @@ export const useQCStore = defineStore('qcStore', {
 
     updateQCStoreKey(key, value) {
       this[key] = value
-      this.makePlotRecords()
+      this.makeRecordsForAllPlots()
     },
   },
   getters: {
   }
 })
-
-const getColocDataForStudy = (colocData, qtlStudies, studyName, h4, r2) => {
-  const omicsStudy = qtlStudies.get(studyName)
-  const study = omicsStudy.study
-  const tissue = omicsStudy.tissue
-
-  const cdfs = colocData.filter((x) => {
-    return (x.r2 >= r2) &&
-      (x.coloc_h4 >= h4) &&
-      (x.signal2.analysis.study.uuid === study) &&
-      (x.signal2.analysis.tissue === tissue);
-  })
-  return cdfs
-}
 
 const getQTLStudies = (colocData) => {
   const qs = new Map(colocData.map(x => {

@@ -1,4 +1,4 @@
-const colocClassSpec = {
+export const colocClassSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": {
     "name": "placeholder",
@@ -95,5 +95,3 @@ const colocClassSpec = {
     }
   ]
 }
-
-export default colocClassSpec

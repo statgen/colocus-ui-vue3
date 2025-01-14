@@ -49,12 +49,9 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.QC]: {
-      allColocData: markRaw([]),
-      qtlStudies: markRaw([]),
       h4Threshold: 0.5,
       r2Threshold: 0.3,
       selectedStudy: '',
-      studyList: markRaw([]),
     },
   }),
 

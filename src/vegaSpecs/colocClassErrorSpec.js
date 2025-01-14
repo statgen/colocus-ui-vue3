@@ -1,5 +1,5 @@
 // Getting the stacked bars to sort correctly is currently a hack: https://github.com/vega/vega-lite/issues/1734#issuecomment-533223530
-let colocClassErrorSpec = {
+export const colocClassErrorSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": {
     "name": "placeholder",
@@ -106,6 +106,3 @@ let colocClassErrorSpec = {
     }
   ],
 }
-
-export default colocClassErrorSpec
-

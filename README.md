@@ -346,7 +346,7 @@ The page's only action, in the onMounted hook, is to tell the qcStore to load th
 ### qcStore
 The Pinia store for this portion of Colocus is responsible for fetching data from the API, and generating data subsets for the different plots. It has state variables for those data elements, plus variables for the UI elements controlling the plot displays (h4, r2, and omics study). It has three primary actions:
 - loadQCData: fetches overall data set data from the backend and generates subsets for the plots
-- makePlotRecords: regenerates plot data when needed (on initial load and when UI changes)
+- makeColocClassPlotRecords: regenerates plot data when needed (on initial load and when UI changes)
 - updateQCStoreKey: updates state variables when UI controls change due to user interaction
 
 There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
@@ -374,7 +374,7 @@ const chartView = ref(null)
 // ...
 watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
   if(!chartView.value) { // initial hit, create plot
-    qcStore.makePlotRecords()
+    qcStore.makeColocClassPlotRecords()
     vegaSpec.data.name = controlSet.dataName
     vegaSpec.data.values = qcStore.recordsColocClass
     const containerID = `#${controlSet.containerID}`
@@ -383,7 +383,7 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 
   } else { // just update
     timeLog('starting to make plot records')
-    qcStore.makePlotRecords()
+    qcStore.makeColocClassPlotRecords()
     timeLog('made plot records, starting vega update')
     chartView.value
       .change(
@@ -443,11 +443,18 @@ Following a team discussion about font sizing in plots and the app generally, I 
 - layer.encoding.legend.labelFontSize: affects the legend labels
 - layer.mark.fontSize: affects the in-bar text in the plots
 
-### Customizing the spec
-These are the items in a spec that need to be altered from their values in the Observables notebook, or simply added.
-- data: { "name": "placeholder", "values": [] },
-- height: { "step": 22, },
-- width: "container",
-- y.axis.labelFontSize: 14
-- legend.labelFontSize: 12
+### Adding new plot
+- if needed, add data set to qcStore, make sure nonreactive
+- create spec and add import to QC.vue
+- add row for new plot, setting controSet and vegaSpec in the <VegaPlotContinaer> tag
+- add record to VegaPlotConfig.js, changing key values appropriately
+
+Spec updates
+- export const <spec-name>Spec = {...}
+- remove config.view.* if present
+- "data": { "name": "placeholder", "values": [] },
+- "height": { "step": 22, }, // for bar charts only
+- "width": "container",
+- encoding.y.axis.labelFontSize: 14
+- encoding.color.legend.labelFontSize: 12
 - mark.fontSize: 14
