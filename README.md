@@ -452,9 +452,11 @@ Following a team discussion about font sizing in plots and the app generally, I 
 Spec updates
 - export const <spec-name>Spec = {...}
 - remove config.view.* if present
-- "data": { "name": "placeholder", "values": [] },
-- "height": { "step": 22, }, // for bar charts only
-- "width": "container",
+- add following
+"data": { "name": "placeholder", "values": [] },
+"height": { "step": 22, }, // for bar charts only, else
+"height": "container",
+"width": "container",
 - encoding.y.axis.labelFontSize: 14
 - encoding.color.legend.labelFontSize: 12
 - mark.fontSize: 14

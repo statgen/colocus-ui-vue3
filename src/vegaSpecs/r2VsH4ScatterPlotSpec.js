@@ -1,4 +1,4 @@
-export const colocForStudySpec = {
+export const r2VsH4ScatterPlotSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": {
     "name": "placeholder",

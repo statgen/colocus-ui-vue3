@@ -53,7 +53,7 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
   // vegaSpec.width = controlSet.width
 
   // if(controlSet.containerID === 'plot03') {
-    timeLog('cs', controlSet)
+  //   timeLog('cs', controlSet)
   //   timeLog('data', qcStore[dk])
   //   timeLog('vs', vegaSpec)
   //   return
