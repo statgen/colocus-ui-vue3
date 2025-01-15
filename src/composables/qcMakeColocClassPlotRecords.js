@@ -1,10 +1,7 @@
 import { Graph } from 'graphology'
+import { makeAnalysisTitle } from '@/util/util'
 
 export function useMakeColocClassPlotRecords() {
-  function makeAnalysisTitle(analysis) {
-    // let year = analysis.publication?.year ?? 'NA';
-    return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
-  }
 
   function colocTypeLabel(t) {
     if (t === 'moreThanTwoGwasPerEqtlSignal' ) {

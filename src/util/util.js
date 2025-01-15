@@ -43,6 +43,10 @@ const formatVariantString = ((variant, truncateLength = 0) => {
   return formattedVariant
 })
 
+function makeAnalysisTitle(analysis) {
+  return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
+}
+
 function makePlotTitle(signal) {
   let part1 = ''
   if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
@@ -140,5 +144,5 @@ function url(strings, ...values) {
   return res;
 }
 
-export { colorHasher, findPlotRegion, formatVariantString, makePlotTitle, matchLowercase, middleTrim, ppURL,
-  sleeper, sortVariantArray, timeLog, titleCase, url }
+export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
+  middleTrim, ppURL, sleeper, sortVariantArray, timeLog, titleCase, url }

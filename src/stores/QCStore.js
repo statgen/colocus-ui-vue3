@@ -2,6 +2,7 @@ import { markRaw, toRaw } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { useMakeColocClassPlotRecords } from '@/composables/qcMakeColocClassPlotRecords'
+import { useMakeCountsForFigures } from '@/composables/qcMakeCountsForFigures'
 import { URLS } from '@/constants'
 import { timeLog } from '@/util/util'
 
@@ -13,6 +14,7 @@ export const useQCStore = defineStore('qcStore', {
     colocWithout11: markRaw([]),
     colocWithStTiH4: markRaw([]),
     colocWithStTiH4R2: markRaw([]),
+    countsForFigures: null,
     h4Threshold: 0.5,
     r2Threshold: 0.3,
     qtlStudies: markRaw([]),
@@ -35,7 +37,6 @@ export const useQCStore = defineStore('qcStore', {
         this.selectedStudy = this.studyList[0]
         this.selectedStudyName = this.qtlStudies.get(this.selectedStudy).study
         this.selectedTissue = this.qtlStudies.get(this.selectedStudy).tissue
-        this.makeRecordsForAllPlots()
       } else {
         throw new Error('Error loading qc data:\n' + errorMessage)
       }
@@ -45,11 +46,13 @@ export const useQCStore = defineStore('qcStore', {
       } else {
         throw new Error('Error loading qc signals:\n' + errorMessage)
       }
+      this.makeRecordsForAllPlots()
     },
 
     makeRecordsForAllPlots() {
       timeLog('making record for all plots started')
-      const { makeColocClassPlotRecords } = useMakeColocClassPlotRecords();
+      const { makeColocClassPlotRecords } = useMakeColocClassPlotRecords()
+      const { makeCountsForFigures } = useMakeCountsForFigures()
 
       this.selectedStudyName = this.qtlStudies.get(this.selectedStudy).study
       this.selectedTissue = this.qtlStudies.get(this.selectedStudy).tissue
@@ -60,6 +63,8 @@ export const useQCStore = defineStore('qcStore', {
 
       this.colocClass = makeColocClassPlotRecords(this.colocWithStTiH4R2)
       this.colocWithout11 = this.makeColocWithout11()
+
+      this.countsForFigures = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
 
       timeLog('making record for all plots done, starting plots')
       this.regeneratePlots()
