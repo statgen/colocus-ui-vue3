@@ -8,21 +8,21 @@
 const VegaPlotConfig = {
   ColocalizationClass: {
     containerID: "plot01",
-    dataKey: "recordsColocClass",
+    dataKey: "colocClass",
     description: "descriptive text",
     heading: "Plot 1: Colocalization class",
     width: 800,
   },
   ColocalizationClassError: {
     containerID: "plot02",
-    dataKey: "recordsWithoutOneToOne",
+    dataKey: "colocWithout11",
     description: "descriptive text",
     heading: "Plot 2: Colocalization class (only error classes)",
     width: 800,
   },
   r2VsH4ScatterPlot: {
     containerID: "plot03",
-    dataKey: "recordsColocForStudy",
+    dataKey: "colocForStTi",
     description: "descriptive text",
     heading: "Plot 3: r² vs. h4 - all colocalizations",
     height: 400,
@@ -30,7 +30,7 @@ const VegaPlotConfig = {
   },
   r2VsH4HeatMap: {
     containerID: "plot04",
-    dataKey: "recordsColocForStudy",
+    dataKey: "colocForStTi",
     description: "descriptive text",
     heading: "Plot 4: r² vs. h4 - all colocalizations",
     height: 400,
@@ -38,7 +38,7 @@ const VegaPlotConfig = {
   },
   histogramH4: {
     containerID: "plot05",
-    dataKey: "recordsColocForStudy",
+    dataKey: "colocForStTi",
     description: "descriptive text",
     heading: "Histogram of h4 - all colocalizations",
     height: 400,
@@ -46,7 +46,7 @@ const VegaPlotConfig = {
   },
   histogramR2: {
     containerID: "plot06",
-    dataKey: "recordsColocForStudy",
+    dataKey: "colocForStTi",
     description: "descriptive text",
     heading: "Histogram of r2 - all colocalizations",
     height: 400,

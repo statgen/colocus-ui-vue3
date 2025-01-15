@@ -3,15 +3,18 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { useMakeColocClassPlotRecords } from '@/composables/qcMakeColocClassPlotRecords'
 import { URLS } from '@/constants'
+import { timeLog } from '@/util/util'
 
 export const useQCStore = defineStore('qcStore', {
   state: () => ({
-    allColocData: markRaw([]),
+    colocAll: markRaw([]),
+    colocClass: markRaw([]),
+    colocForStTi: markRaw([]),
+    colocWithout11: markRaw([]),
+    colocWithStTiH4: markRaw([]),
+    colocWithStTiH4R2: markRaw([]),
     h4Threshold: 0.5,
     r2Threshold: 0.3,
-    recordsColocClass: markRaw([]),
-    recordsColocForStudy: markRaw([]),
-    recordsWithoutOneToOne: markRaw([]),
     qtlStudies: markRaw([]),
     regenPlotFlag: true,
     selectedStudy: '',      // full name: <study> (<tissue>)
@@ -25,32 +28,39 @@ export const useQCStore = defineStore('qcStore', {
       const { data, errorMessage, fetchData } = useFetchData()
 
       if(await fetchData(URLS.QC_COLOC, 'load qc data', 'qc page')) {
-        this.allColocData = data.value.results
-        this.qtlStudies = getQTLStudies(this.allColocData)
+        this.colocAll = data.value.results
+        this.qtlStudies = getQTLStudies(this.colocAll)
         this.studyList = [...this.qtlStudies.keys()]
         this.selectedStudy = this.studyList[0]
+        this.selectedStudyName = this.qtlStudies.get(this.selectedStudy).study
+        this.selectedTissue = this.qtlStudies.get(this.selectedStudy).tissue
         this.makeRecordsForAllPlots()
       } else {
         throw new Error('Error loading qc data:\n' + errorMessage)
       }
-    },
+     },
 
     makeRecordsForAllPlots() {
+      timeLog('making record for all plots started')
       const { makeColocClassPlotRecords } = useMakeColocClassPlotRecords();
 
       this.selectedStudyName = this.qtlStudies.get(this.selectedStudy).study
       this.selectedTissue = this.qtlStudies.get(this.selectedStudy).tissue
 
-      this.recordsColocClass = makeColocClassPlotRecords(this.allColocData, this.qtlStudies, this.selectedStudy, this.h4Threshold, this.r2Threshold)
-      this.recordsWithoutOneToOne = this.makeRecordsWithoutOneToOne()
-      this.recordsColocForStudy = this.makeRecordsColocForStudy()
+      this.colocForStTi = this.makeColocForStTi(this.colocAll)
+      this.colocWithStTiH4 = this.makeColocWithStTiH4(this.colocForStTi)
+      this.colocWithStTiH4R2 = this.makeColocWithStTiH4R2(this.colocForStTi)
 
+      this.colocClass = makeColocClassPlotRecords(this.colocWithStTiH4R2)
+      this.colocWithout11 = this.makeColocWithout11()
+
+      timeLog('making record for all plots done, starting plots')
       this.regeneratePlots()
     },
 
-    makeRecordsColocForStudy() {
+    makeColocForStTi(dataSet) {
       const results = []
-      for(const y of this.allColocData) {
+      for(const y of dataSet) {
         const x = toRaw(y)
         if (x.signal2.analysis.study.uuid === this.selectedStudyName &&
           x.signal2.analysis.tissue === this.selectedTissue)
@@ -61,9 +71,38 @@ export const useQCStore = defineStore('qcStore', {
       return markRaw(results)
     },
 
-    makeRecordsWithoutOneToOne() {
+    makeColocWithStTiH4(dataSet) {
       const results = []
-      for(const y of this.recordsColocClass) {
+      for(const y of dataSet) {
+        const x = toRaw(y)
+        if(x.coloc_h4 >= this.h4Threshold &&
+          x.signal2.analysis.study.uuid === this.selectedStudyName &&
+          x.signal2.analysis.tissue === this.selectedTissue)
+        {
+          results.push(x)
+        }
+      }
+      return markRaw(results)
+    },
+
+    makeColocWithStTiH4R2(dataSet) {
+      const results = []
+      for(const y of dataSet) {
+        const x = toRaw(y)
+        if(x.coloc_h4 >= this.h4Threshold &&
+          x.r2 >= this.r2Threshold &&
+          x.signal2.analysis.study.uuid === this.selectedStudyName &&
+          x.signal2.analysis.tissue === this.selectedTissue)
+        {
+          results.push(x)
+        }
+      }
+      return markRaw(results)
+    },
+
+    makeColocWithout11() {
+      const results = []
+      for(const y of this.colocClass) {
         const x = toRaw(y)
         if(x.variable !== 'oneToOneSignal') results.push(x)
       }

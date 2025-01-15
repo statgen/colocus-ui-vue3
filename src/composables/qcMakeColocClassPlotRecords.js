@@ -18,27 +18,7 @@ export function useMakeColocClassPlotRecords() {
     }
   }
 
-  const makeColocClassPlotRecords = (colocData, qtlStudies, studyName, h4, r2) => {
-    const cdfs = getColocDataForStudy(colocData, qtlStudies, studyName, h4, r2)
-    const records = makeRecords(cdfs)
-    return records
-  }
-
-  const getColocDataForStudy = (colocData, qtlStudies, studyName, h4, r2) => {
-    const omicsStudy = qtlStudies.get(studyName)
-    const study = omicsStudy.study
-    const tissue = omicsStudy.tissue
-
-    const cdfs = colocData.filter((x) => {
-      return (x.r2 >= r2) &&
-        (x.coloc_h4 >= h4) &&
-        (x.signal2.analysis.study.uuid === study) &&
-        (x.signal2.analysis.tissue === tissue);
-    })
-    return cdfs
-  }
-
-  const makeRecords = (colocForStudy) => {
+  const makeColocClassPlotRecords = (colocForStudy) => {
     // Build graph of colocalizations
     // GWAS analysis trait <--> GWAS variant <--> eQTL variant <--> eQTL analysis gene
     // Note: the analysis part here is important. There could be multiple analyses for the same GWAS trait. For example,
