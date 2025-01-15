@@ -70,7 +70,7 @@ const routes = [
   {
     path: `/${qcPage}`,
     name: qcPage,
-    component: () => import('@/views/QC.vue'),
+    component: () => import('@/views/QCView.vue'),
     beforeEnter: (to, from, next) => {
       next()
     }

@@ -20,6 +20,7 @@ export const useQCStore = defineStore('qcStore', {
     selectedStudy: '',      // full name: <study> (<tissue>)
     selectedStudyName: '',  // just study name
     selectedTissue: '',
+    signalsAll: markRaw([]),
     studyList: markRaw([]),
   }),
 
@@ -38,7 +39,13 @@ export const useQCStore = defineStore('qcStore', {
       } else {
         throw new Error('Error loading qc data:\n' + errorMessage)
       }
-     },
+
+      if(await fetchData(URLS.QC_SIGNALS, 'load qc signals', 'qc page')) {
+        this.signalsAll = data.value.results
+      } else {
+        throw new Error('Error loading qc signals:\n' + errorMessage)
+      }
+    },
 
     makeRecordsForAllPlots() {
       timeLog('making record for all plots started')

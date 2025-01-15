@@ -42,7 +42,8 @@ const URLS = {
   PORTAL_PHEN_PAGE: 'https://hugeamp.org/phenotype.html',
   PORTAL_VAR_CHECK: 'https://bioindex.hugeamp.org/api/bio/query/variant',
   PORTAL_VAR_PAGE: 'https://hugeamp.org/variant.html',
-  QC_COLOC: "https://test.amp.colocus.app/api/v1/internal/coloc-slim/",
+  QC_COLOC: 'https://test.amp.colocus.app/api/v1/internal/coloc-slim/',
+  QC_SIGNALS: 'https://test.amp.colocus.app/api/v1/internal/signals-slim/',
 }
 
 export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS
