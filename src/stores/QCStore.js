@@ -1,8 +1,9 @@
-import { markRaw, toRaw } from 'vue'
+import { isReactive, markRaw, toRaw } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { useMakeColocClassPlotRecords } from '@/composables/qcMakeColocClassPlotRecords'
 import { useMakeCountsForFigures } from '@/composables/qcMakeCountsForFigures'
+import { useMakeSignalsPerDataset } from '@/composables/qcMakeSignalsPerDataset'
 import { URLS } from '@/constants'
 import { timeLog } from '@/util/util'
 
@@ -14,7 +15,8 @@ export const useQCStore = defineStore('qcStore', {
     colocWithout11: markRaw([]),
     colocWithStTiH4: markRaw([]),
     colocWithStTiH4R2: markRaw([]),
-    countsForFigures: null,
+    countsByGwas: 0,
+    countsByOmics: 0,
     h4Threshold: 0.5,
     r2Threshold: 0.3,
     qtlStudies: markRaw([]),
@@ -23,11 +25,13 @@ export const useQCStore = defineStore('qcStore', {
     selectedStudyName: '',  // just study name
     selectedTissue: '',
     signalsAll: markRaw([]),
+    signalsPerDataset: markRaw([]),
     studyList: markRaw([]),
   }),
 
   actions: {
     async loadQCData() {
+      const { makeSignalsPerDataset } = useMakeSignalsPerDataset()
       const { data, errorMessage, fetchData } = useFetchData()
 
       if(await fetchData(URLS.QC_COLOC, 'load qc data', 'qc page')) {
@@ -46,6 +50,8 @@ export const useQCStore = defineStore('qcStore', {
       } else {
         throw new Error('Error loading qc signals:\n' + errorMessage)
       }
+
+      this.signalsPerDataset = makeSignalsPerDataset(this.signalsAll)
       this.makeRecordsForAllPlots()
     },
 
@@ -64,7 +70,9 @@ export const useQCStore = defineStore('qcStore', {
       this.colocClass = makeColocClassPlotRecords(this.colocWithStTiH4R2)
       this.colocWithout11 = this.makeColocWithout11()
 
-      this.countsForFigures = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
+      const mcff = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
+      this.countsByGwas = mcff['byGwas']
+      this.countsByOmics = mcff['byOmics']
 
       timeLog('making record for all plots done, starting plots')
       this.regeneratePlots()

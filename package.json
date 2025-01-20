@@ -18,7 +18,7 @@
     "graphology": "^0.25.4",
     "js-md5": "0.8.3",
     "locuszoom": "git+https://github.com/statgen/locuszoom.git#d70a920",
-    "lodash": "4.17.21",
+    "lodash": "^4.17.21",
     "marked": "14.1.2",
     "pinia": "2.3.0",
     "roboto-fontface": "*",
