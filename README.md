@@ -320,6 +320,7 @@ const qcPage = PAGE_NAMES.QC
 ```
   <router-link to="qc" class="nav-link text-clcHeading">QC</router-link>
 ```
+
 ## Vega plots
 Note: **This whole section is subject to rapid change as development continues.**
 
@@ -329,24 +330,24 @@ The plotting system depends on the following components
 - A Pinia store, QCStore, for plot data and operation
 - A plot component, <VegaPlotContainer>, one for each plot rendered on the page
 - VegaPlotConfig, a js file containing macro info for instantiating plots
-- qcMakePlotRecords, a composable providing a function for building the data set required by the first plot
+- qcMake*, a set of composables providing data processing functions for building the data sets required by the plots. Some of the simpler data sets are generated within the QCStore.
 
 ### QC page
-This view contains the overall page structure, including the templates for all the plots (so far just the one). There are two rows:
+This view contains the overall page structure, including the templates for all the plots (so far just the one). The first two rows:
 - page header and description
-- <QCPanel> component, with controls to set h4 and r2, and to select study
+- <QCPanel> component, with controls to set h4 and r2, and to select study. This will move to a sidebar like the filter panel later on.
 
 These are then followed by the plots, each an instance of <VegaPlotContainer>. That component accepts two props:
 - a controlSet, following conventions established elsewhere in the app, which has some macro settings for each plot
 - a vega spec, the details of each plot, including the data
-  In our app, the vega spec is a JS object, not a JSON blob, which simplifies dynamically updating things like the data set for the plot, and other settings.
+In our app, the vega spec is a JS object, not a JSON blob, which simplifies dynamically updating things like the data set for the plot, and other settings.
 
 The page's only action, in the onMounted hook, is to tell the qcStore to load the plot data from the back end, then flip the flag that triggers plot generation.
 
 ### qcStore
 The Pinia store for this portion of Colocus is responsible for fetching data from the API, and generating data subsets for the different plots. It has state variables for those data elements, plus variables for the UI elements controlling the plot displays (h4, r2, and omics study). It has three primary actions:
-- loadQCData: fetches overall data set data from the backend and generates subsets for the plots
-- makeColocClassPlotRecords: regenerates plot data when needed (on initial load and when UI changes)
+- loadQCData: fetches fundamental data sets from the backend and generates subsets for the plots
+- makeRecordsForAllPlots: regenerates plot data when needed (on initial load and when UI changes)
 - updateQCStoreKey: updates state variables when UI controls change due to user interaction
 
 There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
@@ -354,18 +355,18 @@ There are also several internal functions (getColocDataForStudy, getQTLStudies) 
 ### VegaPlotContainer
 This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, building a new plot instance and embedding it in the containing div in the template. The flag is triggered on initial load of the QC page view, and on subsequent changes to the UI controls.
 
-### Problems
-Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to about six seconds. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous.
+### Performance problems
+Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to as much as 30 seconds in some scenarios. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous.
 
-Rather than having to deploy to external platform, a server that can be run locally was generated. It uses the Express js server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
+Rather than having to deploy to external platform, a server that can run locally was generated. It uses the Express js server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
 
 It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts to experiment with this (both need to be running in separate terminal windows):
-- dev-build: this runs vite build in watch mode
-- dev-serve: runs the express server
+- dev-build: this runs vite build in watch mode, regenerating site after each save
+- dev-serve: runs the express server as a standalone instance following a `npm run build`
 
-It works, but is slow; takes 3.5 seconds to rebuild, then requires a hard page reload (Cmd-R). So not much better than the simple approach.
+It works, but is slow; takes 3.5 seconds to rebuild. Plus, Vue Dev Tools don't work in production mode. But better than waiting 30 seconds. Starting to wonder if switching from Vega-lite to Vega might improve things...
 
-I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue. so reverted to just regenerating the plot from scratch on each update of the UI controls. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
+I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue, so reverted to just regenerating the plot from scratch on each update of the UI controls. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
 ```aiignore
 import embed from 'vega-embed'
 import * as vega from 'vega'
@@ -410,6 +411,8 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 ...
 ```
 
+Another performance issue: The UI became nonresponsive for long periods of time -- up to 15 mintues -- when plot data was stored as reactive data in the QCStore, so data must be stored nonreactively. 
+
 ### Plot dimensions
 The plot specs in the Observable file use a method of setting global defaults for overall plot height and width. 
 ```aiignore
@@ -423,7 +426,7 @@ The plot specs in the Observable file use a method of setting global defaults fo
 
 Consequently, early graphs with smaller specified sizes adopted the sizes specified by later graphs. For example, Class of Colocalizations had a specified width of 600 but were actually about 800 wide.
 
-So the config.view.continuous* were removed to set dimensions directly. In particular, setting only the width, and allowing Vega to set height itself produced better looking plots. Also, I removed the hard-coded value for width, and specified "container", thus allowing height to be specified externally by the Vue infrastructure. This will probably migrate into the VegaPlotConfig.js file, along with the other macro settings.
+So the config.view.continuous* were removed to set dimensions directly. In particular, setting only the width, and allowing Vega to set height itself produced better looking plots. Also, I removed the hard-coded value for width, and specified "container", thus allowing height to be specified externally by the Vue infrastructure.
 
 Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropping "fit-y" because spec has discrete height." Attempts to resolve this were unsuccessful, primarily through setting the autosize property in the spec, as follows.
 
@@ -445,11 +448,11 @@ Following a team discussion about font sizing in plots and the app generally, I 
 
 ### Adding new plot
 - if needed, add data set to qcStore, make sure nonreactive
+- add record to VegaPlotConfig.js, setting values appropriately
 - create spec and add import to QC.vue
 - add row for new plot, setting controSet and vegaSpec in the <VegaPlotContinaer> tag
-- add record to VegaPlotConfig.js, changing key values appropriately
 
-Spec updates
+#### Spec updates
 - export const <spec-name>Spec = {...}
 - remove config.view.* if present
 - add following
@@ -460,3 +463,36 @@ Spec updates
 - encoding.y.axis.labelFontSize: 14
 - encoding.color.legend.labelFontSize: 12
 - mark.fontSize: 14
+
+### Mapping variables from ObservableHQ to our app
+```aiignore
+Observable name         Colocus name        plot    Description
+----------------------- ------------------- ------- ----------------------------------------------------
+allColoc                colocAll                    all from api/v1/internal/coloc-slim/
+records                 colocClass          plot1   graph built from coloc, used for coloc class plot
+colocForStudy           colocForStTi        plot3-6 allColoc matching study, tissue
+recordsWithoutOneToOne  colocWithout11      plot2   records excluding oneToOneSignal
+colocForStudyWithH4     colocWithStTiH4             allColoc matching study, tissue, h4
+coloc                   colocWithStTiH4R2           allColoc matching study, tissue, h4, r2
+countsForFigures["byOmics"] contsByOmics    plot7   data derived from signalsAll
+allSignals              signalsAll                  all from api/v1/internal/signals-slim/
+qtlStudies              qtlStudies                  map off all studies from allColoc
+countsForFigures        ?                           filtered allSignals, uses colocForStudyWithH4
+```
+
+### Layers in omics per gwas plot
+Top Section, gray ALL GWAS bar
+- barLayerTopTotal: shows gray bar
+- barLayer: overlays purple bar for sub sum
+- textLayerTotalTop: text for total count over gray bar
+- textLayer: shows text for purple bar sub sum
+Bottom section: purple count bars
+- barLayerBottom: show purple bar per GWAS
+- textLayer: shows text value of each bar
+
+To set font size of axis labels and bars in multilayer plot:
+- textLayer.mark.fontSize: 14
+- textLayer.encoding.y.axis.fontSize: 14
+- textLayerTotalTop.encoding.y.axis.fontSize: 14
+
+

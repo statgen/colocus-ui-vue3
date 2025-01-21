@@ -56,7 +56,7 @@ export const useQCStore = defineStore('qcStore', {
     },
 
     makeRecordsForAllPlots() {
-      timeLog('making record for all plots started')
+      timeLog('making records for all plots started')
       const { makeColocClassPlotRecords } = useMakeColocClassPlotRecords()
       const { makeCountsForFigures } = useMakeCountsForFigures()
 
@@ -74,7 +74,7 @@ export const useQCStore = defineStore('qcStore', {
       this.countsByGwas = mcff['byGwas']
       this.countsByOmics = mcff['byOmics']
 
-      timeLog('making record for all plots done, starting plots')
+      timeLog('making records for all plots done, starting plots')
       this.regeneratePlots()
     },
 

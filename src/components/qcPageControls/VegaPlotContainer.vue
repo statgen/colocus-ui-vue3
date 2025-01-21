@@ -1,13 +1,13 @@
 <template>
   <v-container class="ml-n4">
-    <h2>{{ controlSet.heading }}</h2>
+    <h2>{{ title }}</h2>
     <p>{{ controlSet.description }}</p>
 
     <div v-if="showPlot"
-       :id="controlSet.containerID"
+       :id="domID"
        :style="{
-         width: controlSet.width + 'px',
-         height: controlSet.height + 'px'
+         width: controlSet.containerWidth + 'px',
+         height: controlSet.containerHeight + 'px'
        }"
     ></div>
     <p v-else class="text-error">⚠️ No records in this dataset; no plot can be shown.</p>
@@ -32,7 +32,9 @@ const { controlSet, vegaSpec } = defineProps({
 })
 
 // *** Variables ***************************************************************
+const domID = ref('plot' + controlSet.plotID)
 const showPlot = ref(true)
+const title = ref('')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -47,21 +49,23 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
     return
   }
 
-  const domID = `#${controlSet.containerID}`
-
   vegaSpec.data.values = qcStore[dk]
-  // vegaSpec.width = controlSet.width
 
-  // if(controlSet.containerID === 'plot03') {
-  //   timeLog('cs', controlSet)
-  //   timeLog('data', qcStore[dk])
-  //   timeLog('vs', vegaSpec)
-  //   return
-  // }
+  // this is for the layered plots (7 ...)
+  if(controlSet.plotWidth) {
+    vegaSpec.vconcat[0].width = controlSet.plotWidth
+    vegaSpec.vconcat[1].width = controlSet.plotWidth
+  }
 
-  timeLog('embed start', controlSet.containerID, controlSet.dataKey)
-  await embed(domID, vegaSpec, vegaOptions)
-  timeLog('embed stop', controlSet.containerID, controlSet.dataKey)
+  const titleString = controlSet.title.replace('%s', qcStore.selectedStudyName)
+  title.value = `Plot ${controlSet.plotID}: ${titleString}`
+  vegaSpec.title = titleString
+
+  const domSelector = `#${domID.value}`
+
+  timeLog('embed start', domID.value, controlSet.dataKey)
+  await embed(domSelector, vegaSpec, vegaOptions)
+  timeLog('embed stop', domID.value, controlSet.dataKey)
 })
 
 // *** Lifecycle hooks *********************************************************
