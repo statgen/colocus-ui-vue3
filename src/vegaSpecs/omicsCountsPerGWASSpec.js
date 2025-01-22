@@ -9,11 +9,10 @@ const barLayer = {
     "x": {
       "field": "count",
       "type": "quantitative",
-      "title": "",
     },
     "y": {
       "field": "row",
-      "title": "",
+      "title": "", // needs to be here empty, otherwise field name displayed
       "type": "ordinal",
       "sort": null,
       "axis": {
@@ -39,14 +38,12 @@ const barLayerTopTotal = {
     "x": {
       "field": "total",
       "type": "quantitative",
-      "title": "",
       "scale": {
         "nice": false
       }
     },
     "y": {
       "field": "row",
-      "title": "",
       "type": "ordinal",
       "sort": null,
       "axis": {
@@ -69,12 +66,9 @@ const barLayerBottom = () => {
     "mark": {
       "color": "#8da0cb",
     },
-    "title": {
-      "text": ""
-    },
     "encoding": {
       "x": {
-        "title": "Number of colocalized ${filters.omics.study} signals",
+        "title": "placeholder",
       },
       "y": {
         "title": "GWAS analysis",
@@ -151,9 +145,10 @@ const omicsCountsPerGWASSpec = {
   "data": { "name": "placeholder", "values": [] },
   // "height": { "step": 22, },
   "title": {
-    "text": "Count of ${filters.omics.study} QTL signals colocalized per GWAS",
+    "text": "placeholder",
+    "anchor": "start",
+    "fontSize": 16,
     "offset": 10,
-    "anchor": "start"
   },
   "vconcat": [
     {

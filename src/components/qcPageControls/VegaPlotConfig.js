@@ -57,6 +57,11 @@ const VegaPlotConfig = {
     dataKey: "countsByOmics",
     description: "descriptive text",
     pageSubhead: "Count of %s QTL signals colocalized per GWAS",
+    specCustom: {
+      plotTitle: { key: "title.text", value: "Count of %s QTL signals colocalized per GWAS" },
+      xTopTitle: { key: "vconcat[0].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
+      xBottomTitle: { key: "vconcat[1].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
+    },
     containerWidth: 800,
     plotWidth: 575,
   },
@@ -67,7 +72,6 @@ const VegaPlotConfig = {
     pageSubhead: "Proportion of %s QTL signals colocalized per GWAS",
     specCustom: {
       plotTitle: { key: "title.text", value: "Proportion of %s QTL signals colocalized per GWAS" },
-      xTopTitle: { key: "vconcat[0].layer[0].encoding.x.title", value: "Proportion of %s QTL signals" },
       xBottomTitle: { key: "vconcat[1].layer[0].encoding.x.title", value: "Proportion of %s QTL signals" },
     },
     containerWidth: 800,

@@ -88,7 +88,7 @@ let omicsPropsPerGWASSpec = {
   "data": { "name": "placeholder", "values": [] },
   "title": {
     "text": "placeholder",
-    "fontSize": 14,
+    "fontSize": 16,
     "offset": 10,
     "anchor": "start"
   },

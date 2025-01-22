@@ -50,8 +50,6 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
     return
   }
 
-  vegaSpec.data.values = qcStore[dk]
-
   // this is for the layered plots (7 ...)
   if(controlSet.plotWidth) {
     for (const el of vegaSpec.vconcat) {
@@ -69,7 +67,9 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
     }
   }
 
-  // console.log(vegaSpec)
+  if (controlSet.plotID === "1") console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
+
+  vegaSpec.data.values = qcStore[dk]
 
   const domSelector = `#${domID.value}`
 

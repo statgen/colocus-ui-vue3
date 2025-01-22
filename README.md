@@ -487,7 +487,7 @@ Top Section, gray ALL GWAS bar
 - textLayerTotalTop: text for total count over gray bar
 - textLayer: shows text for purple bar sub sum
 Bottom section: purple count bars
-- barLayerBottom: show purple bar per GWAS
+- barLayerBottom: merges copy of barLayer, shows purple bar per GWAS
 - textLayer: shows text value of each bar
 
 To set font size of axis labels and bars in multilayer plot:

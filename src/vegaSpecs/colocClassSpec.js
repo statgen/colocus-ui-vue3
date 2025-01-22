@@ -8,6 +8,12 @@ export const colocClassSpec = {
     "step": 22,
   },
   "width": "container",
+  "title": {
+    "text": "Colocalization class",
+    "anchor": "start",
+    "fontSize": 16,
+    "offset": 10
+  },
   "transform": [
     { "filter": "datum.value > 0" }
   ],
@@ -40,7 +46,6 @@ export const colocClassSpec = {
         "color": {
           "field": "variable",
           "type": "ordinal",
-          "title": "Colocalization class",
           "scale": {
             "domain": [
               "oneToOneSignal",
@@ -52,7 +57,7 @@ export const colocClassSpec = {
           "legend": {
             "labelFontSize": 12,
             "orient": "top",
-            "title": "Colocalization class",
+            "title": "",
             "labelExpr": "datum.label === 'moreThanTwoGwasPerEqtlSignal' ? 'QTL variant has 2+ GWAS signals' : datum.label === 'moreThanTwoQtlPerGwasSignal' ? 'GWAS variant has 2+ QTL signals' : datum.label === 'oneToOneSignal' ? 'One-to-one GWAS:eQTL signal' : datum.label"
           }
         },
