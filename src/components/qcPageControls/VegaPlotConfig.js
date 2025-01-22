@@ -22,15 +22,15 @@ const VegaPlotConfig = {
   },
   r2VsH4ScatterPlot: {
     plotID: "3",
-    dataKey: "colocForStTi",
+    dataKey: "colocWithStTiH4R2",
     description: "descriptive text",
-    pageSubhead: "r² vs. h4 - all colocalizations",
+    pageSubhead: "r² vs. h4 - all colocalizations jeff",
     containerHeight: 400,
     containerWidth: 400,
   },
   r2VsH4HeatMap: {
     plotID: "4",
-    dataKey: "colocForStTi",
+    dataKey: "colocWithStTiH4R2",
     description: "descriptive text",
     pageSubhead: "r² vs. h4 - all colocalizations",
     containerHeight: 400,
@@ -38,7 +38,7 @@ const VegaPlotConfig = {
   },
   histogramH4: {
     plotID: "5",
-    dataKey: "colocForStTi",
+    dataKey: "colocWithStTiH4R2",
     description: "descriptive text",
     pageSubhead: "Histogram of h4 - all colocalizations",
     containerHeight: 400,
@@ -46,7 +46,7 @@ const VegaPlotConfig = {
   },
   histogramR2: {
     plotID: "6",
-    dataKey: "colocForStTi",
+    dataKey: "colocWithStTiH4R2",
     description: "descriptive text",
     pageSubhead: "Histogram of r2 - all colocalizations",
     containerHeight: 400,
