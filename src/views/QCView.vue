@@ -38,7 +38,11 @@
     </v-row>
 
     <v-row>
-      <VegaPlotContainer :controlSet="vpc.omicsByGWAS" :vegaSpec="omicsCountsByGWASSpec" />
+      <VegaPlotContainer :controlSet="vpc.omicsCountsByGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
+    </v-row>
+
+    <v-row>
+      <VegaPlotContainer :controlSet="vpc.omicsPropsByGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
     </v-row>
 
   </v-container>
@@ -59,7 +63,8 @@ import { r2VsH4ScatterPlotSpec } from '@/vegaSpecs/r2VsH4ScatterPlotSpec'
 import { r2VsH4HeatMapSpec } from '@/vegaSpecs/r2VsH4HeatMapSpec'
 import { histogramH4Spec } from '@/vegaSpecs/histogramH4Spec'
 import { histogramR2Spec } from '@/vegaSpecs/histogramR2Spec'
-import { omicsCountsByGWASSpec } from '@/vegaSpecs/omicsCountPerGWASSpec'
+import { omicsCountsPerGWASSpec } from '@/vegaSpecs/omicsCountsPerGWASSpec'
+import { omicsPropsPerGWASSpec } from '@/vegaSpecs/omicsPropsPerGWASSpec'
 
 // *** Composables *************************************************************
 const qcStore = useQCStore()

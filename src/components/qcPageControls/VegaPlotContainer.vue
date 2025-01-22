@@ -1,6 +1,6 @@
 <template>
   <v-container class="ml-n4">
-    <h2>{{ title }}</h2>
+    <h2>{{ pageSubhead }}</h2>
     <p>{{ controlSet.description }}</p>
 
     <div v-if="showPlot"
@@ -18,8 +18,9 @@
 <script setup>
 // *** Imports *****************************************************************
 import { ref, watch } from 'vue'
-import { useQCStore } from '@/stores/QCStore'
 import embed from 'vega-embed'
+import _ from 'lodash'
+import { useQCStore } from '@/stores/QCStore'
 import { timeLog } from '@/util/util'
 
 // *** Composables *************************************************************
@@ -34,7 +35,7 @@ const { controlSet, vegaSpec } = defineProps({
 // *** Variables ***************************************************************
 const domID = ref('plot' + controlSet.plotID)
 const showPlot = ref(true)
-const title = ref('')
+const pageSubhead = ref('')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -53,13 +54,22 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 
   // this is for the layered plots (7 ...)
   if(controlSet.plotWidth) {
-    vegaSpec.vconcat[0].width = controlSet.plotWidth
-    vegaSpec.vconcat[1].width = controlSet.plotWidth
+    for (const el of vegaSpec.vconcat) {
+      el.width = controlSet.plotWidth
+    }
   }
 
-  const titleString = controlSet.title.replace('%s', qcStore.selectedStudyName)
-  title.value = `Plot ${controlSet.plotID}: ${titleString}`
-  vegaSpec.title = titleString
+  const titleString = controlSet.pageSubhead.replace('%s', qcStore.selectedStudyName)
+  pageSubhead.value = `Plot ${controlSet.plotID}: ${titleString}`
+
+  if (controlSet.specCustom) {
+    for (const {key, value} of Object.values(controlSet.specCustom)) {
+      const newValue = value.replace('%s', qcStore.selectedStudyName);
+      _.set(vegaSpec, key, newValue);
+    }
+  }
+
+  // console.log(vegaSpec)
 
   const domSelector = `#${domID.value}`
 

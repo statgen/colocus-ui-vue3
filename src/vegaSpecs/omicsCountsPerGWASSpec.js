@@ -146,7 +146,7 @@ const textLayerTotalTop = {
   }
 }
 
-const omicsCountsByGWASSpec = {
+const omicsCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
   // "height": { "step": 22, },
@@ -169,4 +169,4 @@ const omicsCountsByGWASSpec = {
   ],
 }
 
-export { omicsCountsByGWASSpec }
+export { omicsCountsPerGWASSpec }

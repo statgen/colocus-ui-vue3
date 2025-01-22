@@ -474,7 +474,7 @@ colocForStudy           colocForStTi        plot3-6 allColoc matching study, tis
 recordsWithoutOneToOne  colocWithout11      plot2   records excluding oneToOneSignal
 colocForStudyWithH4     colocWithStTiH4             allColoc matching study, tissue, h4
 coloc                   colocWithStTiH4R2           allColoc matching study, tissue, h4, r2
-countsForFigures["byOmics"] contsByOmics    plot7   data derived from signalsAll
+countsForFigures["byOmics"] contsByOmics    plot7-8 data derived from signalsAll
 allSignals              signalsAll                  all from api/v1/internal/signals-slim/
 qtlStudies              qtlStudies                  map off all studies from allColoc
 countsForFigures        ?                           filtered allSignals, uses colocForStudyWithH4
@@ -492,7 +492,7 @@ Bottom section: purple count bars
 
 To set font size of axis labels and bars in multilayer plot:
 - textLayer.mark.fontSize: 14
-- textLayer.encoding.y.axis.fontSize: 14
+- textLayer.encoding.y.axis.labelFontSize: 14
 - textLayerTotalTop.encoding.y.axis.fontSize: 14
 
 
