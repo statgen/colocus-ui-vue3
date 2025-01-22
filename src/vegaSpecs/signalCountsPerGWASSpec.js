@@ -1,0 +1,213 @@
+import _ from 'lodash'
+
+let barLayers = [
+  {
+    "mark": {
+      "type": "bar",
+      "color": "lightgray",
+    },
+    "encoding": {
+      "x": {
+        "field": "total",
+        "type": "quantitative",
+        "title": "Count of signals",
+        "scale": {
+          "nice": false
+        }
+      },
+      "y": {
+        "field": "row",
+        "title": "GWAS analysis",
+        "type": "ordinal",
+        "sort": null,
+        "axis": {
+          "labelFontSize": 14,
+          "titlePadding": 15,
+          "labelPadding": 15,
+          "ticks": false
+        },
+      },
+      "tooltip": [
+        {"field": "row", "title": "GWAS analysis"},
+        {"field": "count", "type": "quantitative", "title": "Count of GWAS signals" },
+        {"field": "total", "type": "quantitative", "title": "Total GWAS signals"},
+        {"field": "prop", "type": "quantitative", "title": "Proportion of GWAS signals", "format": "0.1%"}
+      ],
+    },
+  },
+  {
+    "mark": {
+      "type": "bar",
+      "color": "#8da0cb",
+    },
+    "title": {
+      "subtitlePadding": 10,
+      "fontSize": 16,
+      "offset": 10,
+      "anchor": "start"
+    },
+    "encoding": {
+      "x": {
+        "field": "count",
+        "type": "quantitative",
+      },
+      "y": {
+        "field": "row",
+        "title": "GWAS analysis",
+        "type": "ordinal",
+        "sort": null,
+        "axis": {
+          "titlePadding": 15,
+          "labelPadding": 15,
+          "ticks": false
+        },
+      },
+      "tooltip": [
+        {"field": "row", "title": "GWAS analysis"},
+        {"field": "count", "type": "quantitative", "title": "Count of GWAS signals" },
+        {"field": "total", "type": "quantitative", "title": "Total GWAS signals"},
+        {"field": "prop", "type": "quantitative", "title": "Proportion of GWAS signals", "format": "0.1%"}
+      ],
+    },
+  }
+];
+
+let textLayers = [
+  {
+    "mark": {
+      "type": "text",
+      "baseline": "middle",
+      "fontSize": 14,
+      "fontWeight": "normal",
+      "color": "black",
+      "dx": 3
+    },
+    "encoding": {
+      "x": {
+        "field": "count",
+        "type": "quantitative",
+        "stack": "zero",
+        "bandPosition": 0.5
+      },
+      "y": {
+        "field": "row",
+        "type": "ordinal",
+        "sort": null
+      },
+      "text": {
+        "field": "count",
+        "type": "quantitative",
+        "format": ",d"
+      },
+
+    }
+  },
+  {
+    "mark": {
+      "type": "text",
+      "baseline": "middle",
+      "fontSize": 14,
+      "fontWeight": "normal",
+      "color": "black",
+      "dx": -15
+    },
+    "encoding": {
+      "x": {
+        "field": "total",
+        "type": "quantitative",
+        "bandPosition": 0.5
+      },
+      "y": {
+        "field": "row",
+        "type": "ordinal",
+        "sort": null
+      },
+      "text": {
+        "field": "total",
+        "type": "quantitative",
+        "format": ",d"
+      },
+
+    }
+  }
+];
+
+const barLayersTop = () => {
+  const x = _.merge(_.cloneDeep(barLayers), [
+    {
+      "encoding": {
+        "y": {
+          "title": ""
+        }
+      }
+    },
+    {
+      "encoding": {
+        "y": {
+          "title": ""
+        }
+      }
+    }
+  ])
+  return x
+}
+
+const barLayersBot = () => {
+  const x = _.merge(_.cloneDeep(barLayers), [
+    {
+      "height": { "step": 22, },
+      // This part makes it so that the total bars on the bottom half of the plot don't go the entire full length
+      // Otherwise by default it "nicely" rounds up the scale bound
+      "encoding": {
+        "x": {
+          "scale": {
+            "nice": true
+          }
+        }
+      }
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "Type",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Total", "Count"],
+            "range": ["lightgray", "#8da0cb"]
+          },
+          "title": "",
+        }
+      },
+    }
+  ])
+  return x
+}
+
+let signalCountsPerGWASSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": { "name": "placeholder", "values": [] },
+  "width": "container",
+  "title": {
+    "text": "Count of signals per GWAS colocalized to at least 1 signal from ${filters.omics.study}",
+    "subtitlePadding": 10,
+    "fontSize": 16,
+    "offset": 10,
+    "anchor": "start"
+  },
+  "vconcat": [
+    {
+      "transform": [{"filter": "datum.row === 'All GWAS'"}],
+      "layer": [...barLayersTop(), ...textLayers]
+    },
+    {
+      "transform": [
+        {"filter": "datum.row !== 'All GWAS'"},
+        {"calculate": "'Total'", "as": "Type"},
+        {"calculate": "'Count'", "as": "Type"}
+      ],
+      "layer": [...barLayersBot(), ...textLayers]
+    }
+  ],
+}
+
+export { signalCountsPerGWASSpec }
