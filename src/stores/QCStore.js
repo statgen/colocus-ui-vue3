@@ -11,10 +11,10 @@ export const useQCStore = defineStore('qcStore', {
   state: () => ({
     colocAll: markRaw([]),
     colocClass: markRaw([]),
-    colocForStTi: markRaw([]),
-    colocWithout11: markRaw([]),
-    colocWithStTiH4: markRaw([]),
-    colocWithStTiH4R2: markRaw([]),
+    colocForStTi: markRaw([]),      // filter for study and tissue only
+    colocWithout11: markRaw([]),    // exclude signals marked 'oneToOneSignal'
+    colocWithStTiH4: markRaw([]),   // filter for study, tissue. h4
+    colocWithStTiH4R2: markRaw([]), // filter for study, tissue, h4, r2
     countsByGwas: 0,
     countsByOmics: 0,
     h4Threshold: 0.5,

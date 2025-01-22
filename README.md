@@ -440,6 +440,19 @@ Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropp
 // },
 ```
 
+### Dynamic spec updates
+Several of the plots (7, 8, ...) require dynamic updates to the specs. This is handled by adding a new key, specCustom, to each plot config in VegaPlotConfig:
+```aiignore
+    specCustom: {
+      plotTitle: { key: "title.text", value: "Count of %s QTL signals colocalized per GWAS" },
+      xTopTitle: { key: "vconcat[0].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
+      xBottomTitle: { key: "vconcat[1].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
+    },
+```
+The outermost keys (plotTitle, etc) are just documentation and not acted upon. The inner objects have a key and value. The key is the tree structure to reach the desired setting in the vega spec. The value is what it should be set to. Some values have an embedded %s, which is replaced by the study name selected in the UI.
+
+This data structure is processed in <VegaPlotContainer>, where a lodash set function drills through the layers to updated the value of the specified key.
+
 ### Plot fonts
 Following a team discussion about font sizing in plots and the app generally, I experimented and found the following three settings in the spec file to set font sizes.
 - layer.encoding.y.axis.fontSize: affects the y-axis labels
