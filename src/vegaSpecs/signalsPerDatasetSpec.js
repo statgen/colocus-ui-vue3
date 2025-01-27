@@ -10,7 +10,6 @@ export const signalsPerDatasetSpec = {
           "color": "#8da0cb",
         },
         "title": {
-          "text": 'placeholder',
           "subtitlePadding": 10,
           "fontSize": 16,
           "offset": 10,
@@ -61,6 +60,9 @@ export const signalsPerDatasetSpec = {
             "bandPosition": 0.5
           },
           "y": {
+            "axis": {
+              labelFontSize: 14,
+            },
             "field": "dataset",
             "type": "ordinal",
             "sort": {

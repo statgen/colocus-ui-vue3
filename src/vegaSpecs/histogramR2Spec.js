@@ -4,7 +4,7 @@ export const histogramR2Spec = {
   "height": "container",
   "width": "container",
   "title": {
-    "text": "Histograms of r² and H4 - All colocalizations",
+    "text": "Histogram of r² - All colocalizations",
     "anchor": "start",
     "fontSize": 16,
     "offset": 10
