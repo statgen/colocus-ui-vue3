@@ -3,12 +3,7 @@ export const r2VsH4HeatMapSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {
-    "text": "r² vs. H4 - All colocalizations",
-    "anchor": "start",
-    "fontSize": 16,
-    "offset": 10
-  },
+  "title": {}, // value set programmatically
   "mark": "rect",
   "encoding": {
     "x": {

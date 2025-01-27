@@ -9,12 +9,6 @@ export const signalsPerDatasetSpec = {
           "type": "bar",
           "color": "#8da0cb",
         },
-        "title": {
-          "subtitlePadding": 10,
-          "fontSize": 16,
-          "offset": 10,
-          "anchor": "start"
-        },
         "encoding": {
           "x": {
             "field": "count",
@@ -25,7 +19,6 @@ export const signalsPerDatasetSpec = {
           "y": {
             "field": "dataset",
             "type": "ordinal",
-            "title": false,
             "sort": {
               "field": "count",
               "order": "descending"

@@ -3,12 +3,7 @@ export const histogramH4Spec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {
-    "text": "Histogram of H4 - All colocalizations",
-    "anchor": "start",
-    "fontSize": 16,
-    "offset": 10
-  },
+  "title": {}, // value set programmatically
   "mark": "bar",
   "encoding": {
     "x": {

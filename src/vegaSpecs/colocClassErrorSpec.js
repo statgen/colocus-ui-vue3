@@ -1,20 +1,10 @@
 // Getting the stacked bars to sort correctly is currently a hack: https://github.com/vega/vega-lite/issues/1734#issuecomment-533223530
 export const colocClassErrorSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "data": {
-    "name": "placeholder",
-    "values": []
-  },
-  "height": {
-    "step": 22,
-  },
+  "data": { "name": "placeholder", "values": [] },
+  "height": { "step": 22, },
   "width": "container",
-  "title": {
-    "text": "Colocalization class (only error classes)",
-    "anchor": "start",
-    "fontSize": 16,
-    "offset": 10
-  },
+  "title": {}, // value set programmatically
   "transform": [
     {"filter": "datum.value > 0"},
   ],

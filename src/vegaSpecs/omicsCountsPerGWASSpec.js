@@ -143,13 +143,7 @@ const textLayerTotalTop = {
 const omicsCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
-  // "height": { "step": 22, },
-  "title": {
-    "text": "placeholder",
-    "anchor": "start",
-    "fontSize": 16,
-    "offset": 10,
-  },
+  "title": {}, // value set programmatically
   "vconcat": [
     {
       "transform": [{"filter": "datum.row == 'All GWAS'"}],

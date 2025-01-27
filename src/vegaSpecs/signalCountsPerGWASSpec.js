@@ -40,12 +40,7 @@ let barLayers = [
       "type": "bar",
       "color": "#8da0cb",
     },
-    "title": {
-      "subtitlePadding": 10,
-      "fontSize": 16,
-      "offset": 10,
-      "anchor": "start"
-    },
+    "title": {}, // value set programmatically
     "encoding": {
       "x": {
         "field": "count",
@@ -187,13 +182,7 @@ let signalCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
   "width": "container",
-  "title": {
-    "text": "Count of signals per GWAS colocalized to at least 1 signal from ${filters.omics.study}",
-    "subtitlePadding": 10,
-    "fontSize": 16,
-    "offset": 10,
-    "anchor": "start"
-  },
+  "title": {}, // value set programmatically
   "vconcat": [
     {
       "transform": [{"filter": "datum.row === 'All GWAS'"}],

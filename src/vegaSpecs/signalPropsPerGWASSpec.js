@@ -9,11 +9,6 @@ export const signalPropsPerGWASSpec = {
         "type": "bar",
         "color": "#8da0cb",
       },
-      "title": {
-        "fontSize": 16,
-        "offset": 10,
-        "anchor": "start"
-      },
       "encoding": {
         "x": {
           "field": "prop",

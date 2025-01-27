@@ -38,11 +38,11 @@
     </v-row>
 
     <v-row>
-      <VegaPlotContainer :controlSet="vpc.omicsCountsByGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
+      <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
     </v-row>
 
     <v-row>
-      <VegaPlotContainer :controlSet="vpc.omicsPropsByGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
+      <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
     </v-row>
 
     <v-row>

@@ -50,15 +50,17 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
     return
   }
 
-  // this is for the layered plots (7-9)
+  const plotTitle = controlSet.plotTitle.replace('%s', qcStore.selectedStudyName)
+  pageSubhead.value = `Plot ${controlSet.plotID}: ${plotTitle}`
+
+  setPlotTitle(plotTitle)
+
+  // this is for the vconcat layered plots (7-9) with multiple plots per overall plot
   if(controlSet.plotWidth) {
     for (const el of vegaSpec.vconcat) {
       el.width = controlSet.plotWidth
     }
   }
-
-  const titleString = controlSet.pageSubhead.replace('%s', qcStore.selectedStudyName)
-  pageSubhead.value = `Plot ${controlSet.plotID}: ${titleString}`
 
   if (controlSet.specCustom) {
     for (const {key, value} of Object.values(controlSet.specCustom)) {
@@ -81,6 +83,13 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
+const setPlotTitle = (plotTitle) => {
+  _.set(vegaSpec, 'title.fontSize', VEGA_SPEC_DEFAULTS.TITLE_FONT_SIZE)
+  _.set(vegaSpec, 'title.anchor', VEGA_SPEC_DEFAULTS.TITLE_ANCHOR)
+  _.set(vegaSpec, 'title.text', plotTitle)
+}
+
+
 // *** Configuration data ******************************************************
 const vegaOptions = {
   actions: {
@@ -89,6 +98,11 @@ const vegaOptions = {
     compiled: false,
     editor: false,
   }
+}
+
+const VEGA_SPEC_DEFAULTS = {
+  TITLE_FONT_SIZE: 18,
+  TITLE_ANCHOR: "middle",
 }
 </script>
 

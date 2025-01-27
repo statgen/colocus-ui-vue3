@@ -3,12 +3,7 @@ export const histogramR2Spec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {
-    "text": "Histogram of r² - All colocalizations",
-    "anchor": "start",
-    "fontSize": 16,
-    "offset": 10
-  },
+  "title": {}, // value set programmatically
   "mark": "bar",
   "encoding": {
     "x": {
