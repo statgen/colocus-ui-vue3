@@ -95,6 +95,14 @@ const VegaPlotConfig = {
     pageSubhead: "Proportion of signals per GWAS colocalized to at least 1 signal from %s",
     containerWidth: 800,
   },
+  signalsPerDataset: {
+    plotID: "11",
+    dataKey: "signalsPerDataset",
+    description: "descriptive text",
+    pageSubhead: "Number of total signals per dataset",
+    containerWidth: 800,
+    plotWidth: 575,
+  },
 }
 
 export default VegaPlotConfig

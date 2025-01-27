@@ -483,13 +483,15 @@ Observable name         Colocus name        plot    Description
 ----------------------- ------------------- ------- ----------------------------------------------------
 allColoc                colocAll                    all from api/v1/internal/coloc-slim/
 records                 colocClass          plot1   graph built from coloc, used for coloc class plot
-colocForStudy           colocForStTi        plot3-6 allColoc matching study, tissue
+colocForStudy           colocForStTi                allColoc matching study, tissue
 recordsWithoutOneToOne  colocWithout11      plot2   records excluding oneToOneSignal
 colocForStudyWithH4     colocWithStTiH4             allColoc matching study, tissue, h4
-coloc                   colocWithStTiH4R2           allColoc matching study, tissue, h4, r2
+coloc                   colocWithStTiH4R2   plot3-6 allColoc matching study, tissue, h4, r2
 countsForFigures["byOmics"] contsByOmics    plot7-8 data derived from signalsAll
+countsForFigures["byGWAS"] contsByGWAS      plot9-10 data derived from signalsAll
+signalsPerDataset       signalsPerDataset   plot11   data derived from signalsAll
 allSignals              signalsAll                  all from api/v1/internal/signals-slim/
-qtlStudies              qtlStudies                  map off all studies from allColoc
+qtlStudies              qtlStudies                  map of all studies from allColoc
 countsForFigures        ?                           filtered allSignals, uses colocForStudyWithH4
 ```
 
