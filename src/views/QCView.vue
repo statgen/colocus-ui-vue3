@@ -49,6 +49,10 @@
       <VegaPlotContainer :controlSet="vpc.signalCountsPerGWAS" :vegaSpec="signalCountsPerGWASSpec" />
     </v-row>
 
+    <v-row>
+      <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
+    </v-row>
+
   </v-container>
 </template>
 
@@ -70,6 +74,7 @@ import { histogramR2Spec } from '@/vegaSpecs/histogramR2Spec'
 import { omicsCountsPerGWASSpec } from '@/vegaSpecs/omicsCountsPerGWASSpec'
 import { omicsPropsPerGWASSpec } from '@/vegaSpecs/omicsPropsPerGWASSpec'
 import { signalCountsPerGWASSpec } from '@/vegaSpecs/signalCountsPerGWASSpec'
+import { signalPropsPerGWASSpec } from '@/vegaSpecs/signalPropsPerGWASSpec'
 
 // *** Composables *************************************************************
 const qcStore = useQCStore()

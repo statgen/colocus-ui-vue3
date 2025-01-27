@@ -88,6 +88,13 @@ const VegaPlotConfig = {
     containerWidth: 800,
     plotWidth: 575,
   },
+  signalPropsPerGWAS: {
+    plotID: "10",
+    dataKey: "countsByGwas",
+    description: "descriptive text",
+    pageSubhead: "Proportion of signals per GWAS colocalized to at least 1 signal from %s",
+    containerWidth: 800,
+  },
 }
 
 export default VegaPlotConfig
