@@ -46,5 +46,22 @@ const URLS = {
   QC_SIGNALS: '/api/v1/internal/signals-slim/',
 }
 
-export { AXIS_OPTIONS, BIOMARKER_TYPES, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS
+const COLORS = {
+  CLC_BACKGROUND: '#fafafa',
+  CLC_ACTION: '#18c11c',
+  CLC_HEADING: '#1E88E5',
+  CLC_AMPBLUE: '#0097d6',
+  CLC_EFF_POS: '#e3fdff',
+  CLC_EFF_NEG: '#ffd1c7',
+  CLC_EFF_ZERO: '#dddddd',
+  CLC_EFF_NA: '#ffffff',
+  CLC_TABLE_HIGHLIGHT: '#f0f8ff',
+  CLC_TOOLTIP_BACKGROUND: '#eee',
+  CLC_TOOLTIP_BORDER: '#2962ff',
+  BAR_PRIMARY: "#8ef18f", //"#8da0cb",
+  BAR_SECONDARY: "#ffd1c7", //"#D3D3D3",
+  BAR_TERTIARY: "#dddddd", //"#fc8d62",
+}
+
+export { AXIS_OPTIONS, BIOMARKER_TYPES, COLORS, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS
 }

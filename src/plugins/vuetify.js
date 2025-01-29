@@ -1,5 +1,6 @@
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
+import { COLORS } from '@/constants'
 
 import { createVuetify } from 'vuetify'
 
@@ -15,18 +16,17 @@ export default createVuetify({
       myCustomTheme: {
         dark: false,
         colors: {
-          something: '#00ff00' ,
-          clcBackground: '#fafafa',
-          clcAction: '#18c11c', //'#F57C00',       // md: orange-darken-2: '#F57C00'
-          clcHeading: '#1E88E5',      // md: blue-darken-1: '#1E88E5'
-          clcAmpBlue: '#0097d6',
-          clcEffPos: '#e3fdff', //'#91bfdb', // '#fc8d59',
-          clcEffNeg: '#ffd1c7', //'#fc8d59', //'#91bfdb',
-          clcEffZero: '#dddddd',
-          clcEffNA: '#ffffff',
-          clcTableHighlight: '#f0f8ff',   // css: aliceblue: '#f0f8ff'
-          clcTooltipBackground: '#eee',
-          clcTooltipBorder: '#2962ff',    // material: blue-accent-4
+          clcBackground: COLORS.CLC_BACKGROUND,
+          clcAction: COLORS.CLC_ACTION,
+          clcHeading: COLORS.CLC_HEADING,
+          clcAmpBlue: COLORS.CLC_AMPBLUE,
+          clcEffPos: COLORS.CLC_EFF_POS,
+          clcEffNeg: COLORS.CLC_EFF_NEG,
+          clcEffZero: COLORS.CLC_EFF_ZERO,
+          clcEffNA: COLORS.CLC_EFF_NA,
+          clcTableHighlight: COLORS.CLC_TABLE_HIGHLIGHT,
+          clcTooltipBackground: COLORS.CLC_TOOLTIP_BACKGROUND,
+          clcTooltipBorder: COLORS.CLC_TOOLTIP_BORDER,
         },
       },
     },

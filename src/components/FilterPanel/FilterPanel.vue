@@ -67,5 +67,5 @@ const controlConfig = {
 
 </script>
 
-<style >
+<style scoped>
 </style>

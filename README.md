@@ -77,48 +77,24 @@ For most pages, the router simply provides a link to the corresponding view file
 
 There is a global route guard, beforeEach, which disables the filter panel and loads filter data if needed.
 
-## Styling
-A key design goal of this iteration of Colocus was to centralize style definitions as much as possible. Vuetify has an extensive color management system, based on Google's Material Design, but it only covers Vuetify components, not native HTML elements, such as headings, spans, etc. The solution is to define a custom theme in the Vuetify loader, and then have a global css file that references variables from it. (The global css file is imported in main.js.)
+## Colors
+A key design goal of this iteration of Colocus was to centralize style definitions as much as possible, colors in particular. Our global constants.js file has a COLORS object that is the definitive source of colors throughout the app. Each color is prefixed with CLC_, which stands for Colocus Color. Then a functional designation is appended. For example, CLC_ACTION refers to our action color, used to style components where user interaction is possible.
 
-A custom theme may be viewed as an overlay on the built-in theme, where it is possible to override built-in values and add new color keys. Initially, we have chosen the latter approach, defining several color values in plugins/vuetify.js (where the clc prefix stands for Colocus color):
+Vuetify has an extensive color management system, based on Google's Material Design. Vuetify allows definition of custom themes.  We define a custom theme in plugins/vuetify.js. Its colors are mapped directly from the COLORS object.
 
-```vue
-    themes: {
-      myCustomTheme: {
-        dark: false,
-        colors: {
-          something: '#00ff00' ,
-          clcBackground: '#fafafa',   // css: aliceblue: '#f0f8ff'
-          clcAction: '#F57C00',       // md: orange-darken-2: '#F57C00'
-          clcHeading: '#1E88E5',      // md: blue-darken-1: '#1E88E5'
-        },
-      },
-    },
-```
-
-Then in styles/global.css:
+However, Vuetify's themes only cover Vuetify components, not native HTML elements, such as headings, spans, etc. The solution is a css file, styles/global.css, that references variables from the custom Vuetify theme. The global css file is imported in main.js. Following is an example of how this works from global.css.
 
 ```css
 h1 {
   font-size: 2rem;
-  color: rgba(var(--v-theme-clcHeading), 1.0);
-}
-
-h2 {
-  font-size: 1.5rem;
-  color: rgba(var(--v-theme-clcHeading), 1.0);
-}
-
-h3 {
-  font-size: 1rem;
-  color: rgba(var(--v-theme-clcHeading), 1.0);
+  color: rgba(var(--v-theme-CLC_HEADING), 1.0);
 }
 ```
 The details will likely change, but this illustrates the principle. The rgba(var(--v-theme-<custom-color>), a.b) expression specifies the color name defined in the Vuetify file, with an optional opacity value of a.b, which may range from 0.0 to 1.0, so tints would be possible.
 
 The file src/ide-helper.css functions to prevent spurious warnings from the WebStorm IDE about these var expressions. The file is not imported or otherwise used anywhere in the project. Each custom color added to the custom theme in vuetify.js should have a corresponding entry here. The value shouldn't matter, as, again, the file is not used by the app. Without this file, the IDE presents a distracting warning wherever a  var expression with a --v-theme-<custom-color> is used.
 
-The following URL provides a tool working with color definitions. For example, you can give it a hex color, then select different shades and tints based on it. // https://www.w3schools.com/colors/colors_picker.asp?color=18c11c
+The following URL provides a tool useful working with color definitions. For example, you can give it a hex color, then select different shades and tints based on it. https://www.w3schools.com/colors/colors_picker.asp?color=18c11c
 
 ## Component import
 It is unnecessary to explicitly import components in this app. Importing is handled by a plug-in called unplugin-vue-components. This plugin automatically imports .vue files created in the src/components directory, and registers them as global components. Then, when the template is rendered, the appropriate import statement is injected.
@@ -320,7 +296,7 @@ const qcPage = PAGE_NAMES.QC
 ```
 4. Optionally, add link to ./src/components/misc widgets/Toolbar.vue if not otherwise linked.
 ```
-  <router-link to="qc" class="nav-link text-clcHeading">QC</router-link>
+  <router-link to="qc" class="nav-link text-CLC_HEADING">QC</router-link>
 ```
 
 ## Vega plots
