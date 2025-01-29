@@ -3,8 +3,11 @@ export const r2VsH4ScatterPlotSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {}, // value set programmatically
-  "mark": "circle",
+  "title": {}, // set programmatically
+  "mark": {
+    "type": "circle",
+    "color": "",
+  },
   "encoding": {
     "x": {
       "field": "coloc_h4",

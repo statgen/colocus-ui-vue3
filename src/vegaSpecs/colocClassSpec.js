@@ -3,7 +3,7 @@ export const colocClassSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": { "step": 22, },
   "width": "container",
-  "title": {}, // value set programmatically
+  "title": {}, // set programmatically
   "transform": [
     { "filter": "datum.value > 0" }
   ],
@@ -42,7 +42,7 @@ export const colocClassSpec = {
               "moreThanTwoGwasPerEqtlSignal",
               "moreThanTwoQtlPerGwasSignal"
             ],
-            "range": ["#66c2a5", "#fc8d62", "#8da0cb"]
+            "range": [], // set programmatically
           },
           "legend": {
             "labelFontSize": 12,

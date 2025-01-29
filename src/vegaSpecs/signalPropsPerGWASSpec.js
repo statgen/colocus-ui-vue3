@@ -7,7 +7,7 @@ export const signalPropsPerGWASSpec = {
     {
       "mark": {
         "type": "bar",
-        "color": "#8da0cb",
+        "color": "",  // supplied programmatically
       },
       "encoding": {
         "x": {
@@ -38,7 +38,7 @@ export const signalPropsPerGWASSpec = {
       "mark": {
         "type": "text",
         "baseline": "middle",
-        "fontSize": 10,
+        "fontSize": 14,
         "fontWeight": "normal",
         "color": "black"
       },

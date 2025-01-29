@@ -7,7 +7,7 @@ export const signalsPerDatasetSpec = {
         "height": {"step": 22,},
         "mark": {
           "type": "bar",
-          "color": "#8da0cb",
+          "color": "",  // supplied programmatically
         },
         "encoding": {
           "x": {
@@ -40,7 +40,7 @@ export const signalsPerDatasetSpec = {
         "mark": {
           "type": "text",
           "baseline": "middle",
-          "fontSize": 10,
+          "fontSize": 14,
           "fontWeight": "normal",
           "color": "black",
           "dx": 5

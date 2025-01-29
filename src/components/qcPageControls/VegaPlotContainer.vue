@@ -62,14 +62,23 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
     }
   }
 
-  if (controlSet.specCustom) {
-    for (const {key, value} of Object.values(controlSet.specCustom)) {
-      const newValue = value.replace('%s', qcStore.selectedStudyName);
-      _.set(vegaSpec, key, newValue);
+  if (controlSet.axisTitles) {
+    for (const {key, value} of Object.values(controlSet.axisTitles)) {
+      const newValue = value.replace('%s', qcStore.selectedStudyName)
+      const kk = `${key}.encoding.x.title`
+      _.set(vegaSpec, kk, newValue);
     }
   }
 
-  if (controlSet.plotID === "10") console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
+  if(controlSet.barColors) {
+    for (const {key, value} of Object.values(controlSet.barColors)) {
+      _.set(vegaSpec, key, value)
+    }
+  }
+
+  if (controlSet.plotID === "9") {
+    console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
+  }
 
   vegaSpec.data.values = qcStore[dk]
 

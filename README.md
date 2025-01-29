@@ -118,6 +118,8 @@ The details will likely change, but this illustrates the principle. The rgba(var
 
 The file src/ide-helper.css functions to prevent spurious warnings from the WebStorm IDE about these var expressions. The file is not imported or otherwise used anywhere in the project. Each custom color added to the custom theme in vuetify.js should have a corresponding entry here. The value shouldn't matter, as, again, the file is not used by the app. Without this file, the IDE presents a distracting warning wherever a  var expression with a --v-theme-<custom-color> is used.
 
+The following URL provides a tool working with color definitions. For example, you can give it a hex color, then select different shades and tints based on it. // https://www.w3schools.com/colors/colors_picker.asp?color=18c11c
+
 ## Component import
 It is unnecessary to explicitly import components in this app. Importing is handled by a plug-in called unplugin-vue-components. This plugin automatically imports .vue files created in the src/components directory, and registers them as global components. Then, when the template is rendered, the appropriate import statement is injected.
 
@@ -441,17 +443,29 @@ Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropp
 ```
 
 ### Dynamic spec updates
-Several of the plots (7, 8, ...) require dynamic updates to the specs. This is handled by adding a new key, specCustom, to each plot config in VegaPlotConfig:
+Several of the plots (7, 8, ...) require dynamic updates to the specs. For example, changes in the study drop-down require the titles of several plots to be updated. In VegaPlotConfig.js, you can specify a key, axisTitles, with a title string template. At render time, <VegaPlotContainer> will update any title(s) specified. Below is an example for Plot 7, Count of <study> QTL signals colocalized per GWAS. Note that outermost keys (e.g., xTopTitle) are not used for anything, but serve to document the function of the given title, in this case the x axis of the top plot element.
+
 ```aiignore
-    specCustom: {
-      plotTitle: { key: "title.text", value: "Count of %s QTL signals colocalized per GWAS" },
-      xTopTitle: { key: "vconcat[0].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
-      xBottomTitle: { key: "vconcat[1].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
+    axisTitles: {
+      xTopTitle: { key: "vconcat[0].layer[0]", value: "Count of %s QTL signals" },
+      xBottomTitle: { key: "vconcat[1].layer[0]", value: "Count of %s QTL signals" },
     },
 ```
-The outermost keys (plotTitle, etc) are just documentation and not acted upon. The inner objects have a key and value. The key is the tree structure to reach the desired setting in the vega spec. The value is what it should be set to. Some values have an embedded %s, which is replaced by the study name selected in the UI.
 
-This data structure is processed in <VegaPlotContainer>, where a lodash set function drills through the layers to updated the value of the specified key.
+This data structure is processed in <VegaPlotContainer>, where a lodash set function drills through the layers to update the value of the specified key.
+
+A similar approach is taken to specify plot colors:
+```aiignore
+    barColors: {
+      topTotal: { key: "vconcat[0]layer[0].mark.color", value: BAR_COLORS.BAR_TERTIARY },
+      topCount: { key: "vconcat[0]layer[1].mark.color", value: BAR_COLORS.BAR_PRIMARY },
+      bottomCount: { key: "vconcat[1]layer[0].mark.color", value: [BAR_COLORS.BAR_PRIMARY] },
+    },
+```
+
+Instead of recreating the whole plot each time the UI changes, in theory we could force a plot update. In that case, the following key would be added to each config element. However, couldn't get update to function reliably.
+  `dataName: "colocClassData",`
+
 
 ### Plot fonts
 Following a team discussion about font sizing in plots and the app generally, I experimented and found the following three settings in the spec file to set font sizes.
@@ -509,5 +523,3 @@ To set font size of axis labels and bars in multilayer plot:
 - textLayer.mark.fontSize: 14
 - textLayer.encoding.y.axis.labelFontSize: 14
 - textLayerTotalTop.encoding.y.axis.fontSize: 14
-
-

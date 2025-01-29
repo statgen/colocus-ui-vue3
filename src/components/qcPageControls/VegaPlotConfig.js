@@ -1,9 +1,8 @@
-/*
- * Note: Instead of recreating the whole plot each time the UI changes, in theory we could force a plot update.
- * In that case, the following key would be added to each config element.
- * However, couldn't get update to function reliably.
- *   dataName: "colocClassData",
- */
+const BAR_COLORS = {
+  BAR_PRIMARY: "#8ef18f", //"#8da0cb",
+  BAR_SECONDARY: "#ffd1c7", //"#D3D3D3",
+  BAR_TERTIARY: "#dddddd", //"#fc8d62",
+}
 
 const VegaPlotConfig = {
   ColocalizationClass: {
@@ -12,6 +11,10 @@ const VegaPlotConfig = {
     description: "descriptive text",
     plotTitle: "Colocalization class",
     containerWidth: 800,
+    barColors: {
+      // colorRange: { key: "layer[0].encoding.color.scale.range", value: ["#66c2a5", "#fc8d62", "#8da0cb"] }
+      colorRange: { key: "layer[0].encoding.color.scale.range", value: [BAR_COLORS.BAR_PRIMARY, BAR_COLORS.BAR_TERTIARY, BAR_COLORS.BAR_SECONDARY] },
+    },
   },
   ColocalizationClassError: {
     plotID: "2",
@@ -19,6 +22,9 @@ const VegaPlotConfig = {
     description: "descriptive text",
     plotTitle: "Colocalization class (only error classes)",
     containerWidth: 800,
+    barColors: {
+      colorRange: { key: "layer[0].encoding.color.scale.range", value: [BAR_COLORS.BAR_SECONDARY, BAR_COLORS.BAR_PRIMARY] }
+    },
   },
   r2VsH4ScatterPlot: {
     plotID: "3",
@@ -27,6 +33,9 @@ const VegaPlotConfig = {
     plotTitle: "r² vs. h4 - all colocalizations",
     containerHeight: 400,
     containerWidth: 400,
+    barColors: {
+      color: { key: "mark.color", value: BAR_COLORS.BAR_PRIMARY }
+    },
   },
   r2VsH4HeatMap: {
     plotID: "4",
@@ -35,6 +44,9 @@ const VegaPlotConfig = {
     plotTitle: "r² vs. h4 - all colocalizations",
     containerHeight: 400,
     containerWidth: 500,
+    barColors: {
+      colorRange: { key: "encoding.color.scale.range", value: [BAR_COLORS.BAR_TERTIARY, BAR_COLORS.BAR_PRIMARY] }
+    },
   },
   histogramH4: {
     plotID: "5",
@@ -43,6 +55,9 @@ const VegaPlotConfig = {
     plotTitle: "Histogram of h4 - all colocalizations",
     containerHeight: 400,
     containerWidth: 400,
+    barColors: {
+      count: { key: "mark.color", value: BAR_COLORS.BAR_PRIMARY },
+    },
   },
   histogramR2: {
     plotID: "6",
@@ -51,30 +66,42 @@ const VegaPlotConfig = {
     plotTitle: "Histogram of r² - all colocalizations",
     containerHeight: 400,
     containerWidth: 400,
+    barColors: {
+      count: { key: "mark.color", value: BAR_COLORS.BAR_PRIMARY },
+    },
   },
   omicsCountsPerGWAS: {
     plotID: "7",
     dataKey: "countsByOmics",
     description: "descriptive text",
     plotTitle: "Count of %s QTL signals colocalized per GWAS",
-    specCustom: {
-      xTopTitle: { key: "vconcat[0].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
-      xBottomTitle: { key: "vconcat[1].layer[0].encoding.x.title", value: "Count of %s QTL signals" },
+    axisTitles: {
+      xTopTitle: { key: "vconcat[0].layer[0]", value: "Count of %s QTL signals" },
+      xBottomTitle: { key: "vconcat[1].layer[0]", value: "Count of %s QTL signals" },
     },
     containerWidth: 800,
     plotWidth: 575,
+    barColors: {
+      topTotal: { key: "vconcat[0]layer[0].mark.color", value: BAR_COLORS.BAR_TERTIARY },
+      topCount: { key: "vconcat[0]layer[1].mark.color", value: BAR_COLORS.BAR_PRIMARY },
+      bottomCount: { key: "vconcat[1]layer[0].mark.color", value: [BAR_COLORS.BAR_PRIMARY] },
+    },
   },
   omicsPropsPerGWAS: {
     plotID: "8",
     dataKey: "countsByOmics",
     description: "descriptive text",
     plotTitle: "Proportion of %s QTL signals colocalized per GWAS",
-    specCustom: {
-      xBottomTitle: { key: "vconcat[1].layer[0].encoding.x.title", value: "Proportion of %s QTL signals" },
-      xTopTitle: { key: "vconcat[0].layer[0].encoding.x.title", value: "Proportion of %s QTL signals" },
+    axisTitles: {
+      xTopTitle: { key: "vconcat[0].layer[0]", value: "Proportion of %s QTL signals" },
+      xBottomTitle: { key: "vconcat[1].layer[0]", value: "Proportion of %s QTL signals" },
     },
     containerWidth: 800,
     plotWidth: 575,
+    barColors: {
+      topProp: { key: "vconcat[0]layer[0].mark.color", value: BAR_COLORS.BAR_PRIMARY },
+      bottomProp: { key: "vconcat[1]layer[0].mark.color", value: BAR_COLORS.BAR_PRIMARY },
+    },
   },
   signalCountsPerGWAS: {
     plotID: "9",
@@ -83,6 +110,12 @@ const VegaPlotConfig = {
     plotTitle: "Count of signals per GWAS colocalized to at least 1 signal from %s",
     containerWidth: 800,
     plotWidth: 575,
+    barColors: {
+      topTotal: { key: "vconcat[0]layer[0].mark.color", value: BAR_COLORS.BAR_TERTIARY },
+      topCount: { key: "vconcat[0]layer[1].mark.color", value: BAR_COLORS.BAR_PRIMARY },
+      bottomTotal: { key: "vconcat[1]layer[0].mark.color", value: BAR_COLORS.BAR_TERTIARY },
+      bottomCount: { key: "vconcat[1]layer[1].encoding.color.scale.range", value: [BAR_COLORS.BAR_TERTIARY, BAR_COLORS.BAR_PRIMARY] },
+    },
   },
   signalPropsPerGWAS: {
     plotID: "10",
@@ -90,6 +123,9 @@ const VegaPlotConfig = {
     description: "descriptive text",
     plotTitle: "Proportion of signals per GWAS colocalized to at least 1 signal from %s",
     containerWidth: 800,
+    barColors: {
+      bar: { key: "layer[0].mark.color", value: BAR_COLORS.BAR_PRIMARY }
+    },
   },
   signalsPerDataset: {
     plotID: "11",
@@ -98,6 +134,9 @@ const VegaPlotConfig = {
     plotTitle: "Number of total signals per dataset",
     containerWidth: 800,
     plotWidth: 575,
+    barColors: {
+      bar: { key: "vconcat[0].layer[0].mark.color", value: BAR_COLORS.BAR_PRIMARY }
+    },
   },
 }
 

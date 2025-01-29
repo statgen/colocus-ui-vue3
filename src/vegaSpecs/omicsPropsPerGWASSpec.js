@@ -86,7 +86,7 @@ let barLayerBottom = () => {
 let omicsPropsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
-  "title": {}, // value set programmatically
+  "title": {}, // set programmatically
   "vconcat": [
     {
       "transform": [{"filter": "datum.row == 'All GWAS'"}],

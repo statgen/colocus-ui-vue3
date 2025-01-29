@@ -3,8 +3,11 @@ export const histogramH4Spec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {}, // value set programmatically
-  "mark": "bar",
+  "title": {}, // set programmatically
+  "mark": {
+    "type": "bar",
+    "color": "", // set programmatically
+  },
   "encoding": {
     "x": {
       "bin": true,

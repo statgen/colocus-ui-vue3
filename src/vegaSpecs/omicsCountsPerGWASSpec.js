@@ -3,7 +3,7 @@ import _ from 'lodash'
 const barLayer = {
   "mark": {
     "type": "bar",
-    "color": "#8da0cb",
+    "color": "", // set programmatically
   },
   "encoding": {
     "x": {
@@ -32,7 +32,7 @@ const barLayer = {
 const barLayerTopTotal = {
   "mark": {
     "type": "bar",
-    "color": "lightgray",
+    "color": "", // set programmatically
   },
   "encoding": {
     "x": {
@@ -64,7 +64,7 @@ const barLayerBottom = () => {
   const x = _.merge(_.cloneDeep(barLayer), {
     "height": { "step": 22, },
     "mark": {
-      "color": "#8da0cb",
+      "color": "", // set programmatically
     },
     "encoding": {
       "x": {
@@ -143,7 +143,7 @@ const textLayerTotalTop = {
 const omicsCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
-  "title": {}, // value set programmatically
+  "title": {}, // set programmatically
   "vconcat": [
     {
       "transform": [{"filter": "datum.row == 'All GWAS'"}],

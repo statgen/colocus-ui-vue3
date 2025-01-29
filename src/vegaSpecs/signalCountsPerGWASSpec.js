@@ -4,7 +4,7 @@ let barLayers = [
   {
     "mark": {
       "type": "bar",
-      "color": "lightgray",
+      "color": "",  // set programmatically
     },
     "encoding": {
       "x": {
@@ -13,7 +13,8 @@ let barLayers = [
         "title": "Count of signals",
         "scale": {
           "nice": false
-        }
+        },
+        "stack": "null",
       },
       "y": {
         "field": "row",
@@ -38,9 +39,9 @@ let barLayers = [
   {
     "mark": {
       "type": "bar",
-      "color": "#8da0cb",
+      "color": "", // set programmatically
     },
-    "title": {}, // value set programmatically
+    "title": {}, // set programmatically
     "encoding": {
       "x": {
         "field": "count",
@@ -75,7 +76,6 @@ let textLayers = [
       "fontSize": 14,
       "fontWeight": "normal",
       "color": "black",
-      "dx": 3
     },
     "encoding": {
       "x": {
@@ -104,12 +104,12 @@ let textLayers = [
       "fontSize": 14,
       "fontWeight": "normal",
       "color": "black",
-      "dx": -15
     },
     "encoding": {
       "x": {
         "field": "total",
         "type": "quantitative",
+        "stack": "zero",
         "bandPosition": 0.5
       },
       "y": {
@@ -168,7 +168,7 @@ const barLayersBot = () => {
           "type": "nominal",
           "scale": {
             "domain": ["Total", "Count"],
-            "range": ["lightgray", "#8da0cb"]
+            "range": [],  // set programmatically
           },
           "title": "",
         }
@@ -182,7 +182,7 @@ let signalCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
   "width": "container",
-  "title": {}, // value set programmatically
+  "title": {}, // set programmatically
   "vconcat": [
     {
       "transform": [{"filter": "datum.row === 'All GWAS'"}],

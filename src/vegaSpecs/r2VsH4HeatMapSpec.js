@@ -3,8 +3,10 @@ export const r2VsH4HeatMapSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {}, // value set programmatically
-  "mark": "rect",
+  "title": {}, // set programmatically
+  "mark": {
+    "type": "rect",
+  },
   "encoding": {
     "x": {
       "field": "coloc_h4",
@@ -22,7 +24,10 @@ export const r2VsH4HeatMapSpec = {
     },
     "color": {
       "aggregate": "count",
-      "type": "quantitative"
+      "type": "quantitative",
+      "scale": {
+        "range": [], // set programmatically
+      },
     },
     "tooltip": {
       "aggregate": "count"
