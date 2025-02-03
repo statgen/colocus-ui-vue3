@@ -300,49 +300,48 @@ const qcPage = PAGE_NAMES.QC
 ```
 
 ## Vega plots
-Note: **This whole section is subject to rapid change as development continues.**
-
 The plotting system depends on the following components
 - The overall page (QC.vue)
 - A vega spec for each plot, stored in src/vegaSpecs
 - A Pinia store, QCStore, for plot data and operation
 - A plot component, <VegaPlotContainer>, one for each plot rendered on the page
-- VegaPlotConfig, a js file containing macro info for instantiating plots
+- VegaPlotConfig, a js file containing configuration info for instantiating plots
 - qcMake*, a set of composables providing data processing functions for building the data sets required by the plots. Some of the simpler data sets are generated within the QCStore.
 
 ### QC page
-This view contains the overall page structure, including the templates for all the plots (so far just the one). The first two rows:
-- page header and description
+This view contains the overall page structure, including the templates for all the plots. The first two rows in the template include:
+- The page header and description
 - <QCPanel> component, with controls to set h4 and r2, and to select study. This will move to a sidebar like the filter panel later on.
 
-These are then followed by the plots, each an instance of <VegaPlotContainer>. That component accepts two props:
-- a controlSet, following conventions established elsewhere in the app, which has some macro settings for each plot
-- a vega spec, the details of each plot, including the data
-In our app, the vega spec is a JS object, not a JSON blob, which simplifies dynamically updating things like the data set for the plot, and other settings.
+These are then followed by the plots templates, each an instance of <VegaPlotContainer>. That component accepts two props:
+- a controlSet, following conventions established elsewhere in the app, which has some configuration values for each plot
+- a Vega-lite spec, the details of each plot, including the data
+In this app, the spec is a JS object, not a JSON blob, which simplifies dynamically updating things like titles, colors, data set, etc.
 
 The page's only action, in the onMounted hook, is to tell the qcStore to load the plot data from the back end, then flip the flag that triggers plot generation.
 
 ### qcStore
 The Pinia store for this portion of Colocus is responsible for fetching data from the API, and generating data subsets for the different plots. It has state variables for those data elements, plus variables for the UI elements controlling the plot displays (h4, r2, and omics study). It has three primary actions:
 - loadQCData: fetches fundamental data sets from the backend and generates subsets for the plots
-- makeRecordsForAllPlots: regenerates plot data when needed (on initial load and when UI changes)
+- makeRecordsForAllPlots: regenerates plot data when needed (on initial load and when UI changes). This uses several internal methods, as well as the larger composable functions.
+- regeneratePlots: Flips the regenPlotFlag, which is watched by each of the plot instances, so when the flag changes, a new plot is generated.
 - updateQCStoreKey: updates state variables when UI controls change due to user interaction
 
 There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
 
 ### VegaPlotContainer
-This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, building a new plot instance and embedding it in the containing div in the template. The flag is triggered on initial load of the QC page view, and on subsequent changes to the UI controls.
+This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, the component builds a new plot instance and embeds it in the containing div in the template. The flag is triggered on initial load of the QC page view, and on subsequent changes to the UI controls.
 
 ### Performance problems
 Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to as much as 30 seconds in some scenarios. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous.
 
-Rather than having to deploy to external platform, a server that can run locally was generated. It uses the Express js server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
+Rather than having to deploy to the external platform, a server that can run locally was generated. It uses the ExpressJS server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
 
-It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts to experiment with this (both need to be running in separate terminal windows):
-- dev-build: this runs vite build in watch mode, regenerating site after each save
-- dev-serve: runs the express server as a standalone instance following a `npm run build`
+It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts: one to build the project, the other to serve the contents of the dist folder. Both need to be running in separate terminal windows in order to have an automated edit-save-build-serve development cycle. 
+- dev-build: this runs vite build in watch mode, regenerating the site after each save
+- dev-serve: runs the express server as a standalone instance
 
-It works, but is slow; takes 3.5 seconds to rebuild. Plus, Vue Dev Tools don't work in production mode. But better than waiting 30 seconds. Starting to wonder if switching from Vega-lite to Vega might improve things...
+This works, but is a little slow; it takes about 3.5 seconds to rebuild the project. More significantly, Vue Dev Tools don't work in production mode. I recommend using this approach only for working on the QC page; for other pages, use `npm run dev`.
 
 I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue, so reverted to just regenerating the plot from scratch on each update of the UI controls. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
 ```aiignore
@@ -389,7 +388,7 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 ...
 ```
 
-Another performance issue: The UI became nonresponsive for long periods of time -- up to 15 mintues -- when plot data was stored as reactive data in the QCStore, so data must be stored nonreactively. 
+Another performance issue: The UI became nonresponsive for long periods of time -- up to 15 mintues -- when plot data was stored as reactive data in the QCStore, so care must be taken to ensure that data is stored nonreactively. 
 
 ### Plot dimensions
 The plot specs in the Observable file use a method of setting global defaults for overall plot height and width. 
@@ -404,9 +403,9 @@ The plot specs in the Observable file use a method of setting global defaults fo
 
 Consequently, early graphs with smaller specified sizes adopted the sizes specified by later graphs. For example, Class of Colocalizations had a specified width of 600 but were actually about 800 wide.
 
-So the config.view.continuous* were removed to set dimensions directly. In particular, setting only the width, and allowing Vega to set height itself produced better looking plots. Also, I removed the hard-coded value for width, and specified "container", thus allowing height to be specified externally by the Vue infrastructure.
+So the config.view.continuous* were removed to set dimensions directly. In particular, setting only the width, and allowing Vega to set height itself produced better looking plots. Also, I removed the hard-coded value for width, and specified "container", thus allowing height to be specified externally by the Vue infrastructure. A single width setting is required for single plots, but multi-plot plots have to set the width of each element of the vconcat array. 
 
-Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropping "fit-y" because spec has discrete height." Attempts to resolve this were unsuccessful, primarily through setting the autosize property in the spec, as follows.
+Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropping "fit-y" because spec has discrete height." Attempts to resolve this were unsuccessful, primarily through setting the autosize property in the spec, as follows. There are currently other unresolved warnings.
 
 ```aiignore
 // "autosize": {
@@ -419,7 +418,7 @@ Another issue is that Vega emits a warning, "VegaPlotContainer.vue:40 WARN Dropp
 ```
 
 ### Dynamic spec updates
-Several of the plots (7, 8, ...) require dynamic updates to the specs. For example, changes in the study drop-down require the titles of several plots to be updated. In VegaPlotConfig.js, you can specify a key, axisTitles, with a title string template. At render time, <VegaPlotContainer> will update any title(s) specified. Below is an example for Plot 7, Count of <study> QTL signals colocalized per GWAS. Note that outermost keys (e.g., xTopTitle) are not used for anything, but serve to document the function of the given title, in this case the x axis of the top plot element.
+Several of the plots (7, 8) require dynamic updates to the specs. For example, changes in the study drop-down require the titles and axis labels to be updated. In VegaPlotConfig.js, you can specify a key, axisTitles, with a title string template. At render time, <VegaPlotContainer> will update any title(s) specified. Below is an example for Plot 7, Count of <study> QTL signals colocalized per GWAS. Note that outermost keys (e.g., xTopTitle) are not used for anything, but serve to document the function of the given title, in this case the x axis of the top plot element.
 
 ```aiignore
     axisTitles: {
@@ -442,30 +441,17 @@ A similar approach is taken to specify plot colors:
 Instead of recreating the whole plot each time the UI changes, in theory we could force a plot update. In that case, the following key would be added to each config element. However, couldn't get update to function reliably.
   `dataName: "colocClassData",`
 
-
-### Plot fonts
-Following a team discussion about font sizing in plots and the app generally, I experimented and found the following three settings in the spec file to set font sizes.
-- layer.encoding.y.axis.fontSize: affects the y-axis labels
-- layer.encoding.legend.labelFontSize: affects the legend labels
-- layer.mark.fontSize: affects the in-bar text in the plots
+A similar approach is used to set font sizes of
+- y-axis lablels
+- overall title
+- bar mark text
+- legend text, if any
 
 ### Adding new plot
-- if needed, add data set to qcStore, make sure nonreactive
+- if needed, add data set to qcStore, **make sure nonreactive**
 - add record to VegaPlotConfig.js, setting values appropriately
 - create spec and add import to QC.vue
 - add row for new plot, setting controSet and vegaSpec in the <VegaPlotContinaer> tag
-
-#### Spec updates
-- export const <spec-name>Spec = {...}
-- remove config.view.* if present
-- add following
-"data": { "name": "placeholder", "values": [] },
-"height": { "step": 22, }, // for bar charts only, else
-"height": "container",
-"width": "container",
-- encoding.y.axis.labelFontSize: 14
-- encoding.color.legend.labelFontSize: 12
-- mark.fontSize: 14
 
 ### Mapping variables from ObservableHQ to our app
 ```aiignore

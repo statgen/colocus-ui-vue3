@@ -3,10 +3,10 @@ export const histogramH4Spec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {}, // set programmatically
+  "title": {},
   "mark": {
     "type": "bar",
-    "color": "", // set programmatically
+    "color": "",
   },
   "encoding": {
     "x": {
@@ -15,7 +15,10 @@ export const histogramH4Spec = {
       "title": "Coloc H4"
     },
     "y": {
-      "aggregate": "count"
+      "aggregate": "count",
+      "axis": {
+        "titlePadding": 10,
+      },
     }
   },
 }

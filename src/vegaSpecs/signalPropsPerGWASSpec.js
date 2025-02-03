@@ -1,7 +1,7 @@
 export const signalPropsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
-  "height": { "step": 22, }, // for bar charts only, else
+  "height": { "step": 22, },
   "width": "container",
   "layer": [
     {
@@ -22,9 +22,9 @@ export const signalPropsPerGWASSpec = {
           "type": "nominal",
           "sort": {"field": "prop", "order": "descending"},
           "axis": {
-            labelFontSize: 14,
-            "titlePadding": 15,
-            "labelPadding": 15,
+            labelFontSize: null,
+            "titlePadding": 10,
+            "labelPadding": 10,
             "ticks": false
           },
         },
@@ -38,7 +38,7 @@ export const signalPropsPerGWASSpec = {
       "mark": {
         "type": "text",
         "baseline": "middle",
-        "fontSize": 14,
+        "fontSize": null,
         "fontWeight": "normal",
         "color": "black"
       },

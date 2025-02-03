@@ -21,8 +21,8 @@ let barLayer = {
       "title": "",
       "sort": null,
       "axis": {
-        "titlePadding": 15,
-        "labelPadding": 15,
+        "titlePadding": 10,
+        "labelPadding": 10,
         "ticks": false
       },
     },
@@ -38,7 +38,7 @@ let textLayer =
     "mark": {
       "type": "text",
       "baseline": "middle",
-      "fontSize": 14,
+      "fontSize": null,
       "fontWeight": "normal",
       "color": "black",
       "dx": 10
@@ -52,7 +52,7 @@ let textLayer =
       },
       "y": {
         "axis": {
-          "labelFontSize": 14,
+          "labelFontSize": null,
         },
         "field": "row",
         "type": "ordinal",
@@ -86,7 +86,7 @@ let barLayerBottom = () => {
 let omicsPropsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
-  "title": {}, // set programmatically
+  "title": {},
   "vconcat": [
     {
       "transform": [{"filter": "datum.row == 'All GWAS'"}],

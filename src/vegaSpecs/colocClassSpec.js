@@ -3,7 +3,7 @@ export const colocClassSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": { "step": 22, },
   "width": "container",
-  "title": {}, // set programmatically
+  "title": {},
   "transform": [
     { "filter": "datum.value > 0" }
   ],
@@ -23,9 +23,9 @@ export const colocClassSpec = {
           "type": "ordinal",
           "sort": null,
           "axis": {
-            "labelFontSize": 14,
-            "titlePadding": 15,
-            "labelPadding": 15,
+            "labelFontSize": null,
+            "titlePadding": 10,
+            "labelPadding": 10,
             "ticks": false
           }
         },
@@ -42,10 +42,10 @@ export const colocClassSpec = {
               "moreThanTwoGwasPerEqtlSignal",
               "moreThanTwoQtlPerGwasSignal"
             ],
-            "range": [], // set programmatically
+            "range": [],
           },
           "legend": {
-            "labelFontSize": 12,
+            "labelFontSize": null,
             "orient": "top",
             "title": "",
             "labelExpr": "datum.label === 'moreThanTwoGwasPerEqtlSignal' ? 'QTL variant has 2+ GWAS signals' : datum.label === 'moreThanTwoQtlPerGwasSignal' ? 'GWAS variant has 2+ QTL signals' : datum.label === 'oneToOneSignal' ? 'One-to-one GWAS:eQTL signal' : datum.label"
@@ -62,7 +62,7 @@ export const colocClassSpec = {
       "mark": {
         "type": "text",
         "baseline": "middle",
-        "fontSize": 14,
+        "fontSize": null,
         "fontWeight": "normal",
         "color": "black"
       },

@@ -3,7 +3,7 @@ export const r2VsH4ScatterPlotSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {}, // set programmatically
+  "title": {},
   "mark": {
     "type": "circle",
     "color": "",
@@ -17,7 +17,10 @@ export const r2VsH4ScatterPlotSpec = {
     "y": {
       "field": "r2",
       "type": "quantitative",
-      "title": "r² between lead variants"
+      "title": "r² between lead variants",
+      "axis": {
+        "titlePadding": 10,
+      },
     }
   }
 }

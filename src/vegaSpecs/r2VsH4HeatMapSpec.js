@@ -3,7 +3,7 @@ export const r2VsH4HeatMapSpec = {
   "data": { "name": "placeholder", "values": [] },
   "height": "container",
   "width": "container",
-  "title": {}, // set programmatically
+  "title": {},
   "mark": {
     "type": "rect",
   },
@@ -20,13 +20,16 @@ export const r2VsH4HeatMapSpec = {
       "bin": {"maxbins": 40},
       "type": "quantitative",
       "title": "r² between lead variants",
-      "scale": {"domain": [0, 1]}
+      "scale": {"domain": [0, 1]},
+      "axis": {
+        "titlePadding": 10,
+      },
     },
     "color": {
       "aggregate": "count",
       "type": "quantitative",
       "scale": {
-        "range": [], // set programmatically
+        "range": [],
       },
     },
     "tooltip": {

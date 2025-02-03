@@ -1,9 +1,10 @@
 import _ from 'lodash'
 
 const barLayer = {
+  "height": { "step": 22, },
   "mark": {
     "type": "bar",
-    "color": "", // set programmatically
+    "color": "",
   },
   "encoding": {
     "x": {
@@ -16,8 +17,8 @@ const barLayer = {
       "type": "ordinal",
       "sort": null,
       "axis": {
-        "titlePadding": 15,
-        "labelPadding": 15,
+        "titlePadding": 10,
+        "labelPadding": 10,
         "ticks": false
       },
     },
@@ -32,7 +33,7 @@ const barLayer = {
 const barLayerTopTotal = {
   "mark": {
     "type": "bar",
-    "color": "", // set programmatically
+    "color": "",
   },
   "encoding": {
     "x": {
@@ -47,8 +48,8 @@ const barLayerTopTotal = {
       "type": "ordinal",
       "sort": null,
       "axis": {
-        "titlePadding": 15,
-        "labelPadding": 15,
+        "titlePadding": 10,
+        "labelPadding": 10,
         "ticks": false
       },
     },
@@ -62,9 +63,8 @@ const barLayerTopTotal = {
 
 const barLayerBottom = () => {
   const x = _.merge(_.cloneDeep(barLayer), {
-    "height": { "step": 22, },
     "mark": {
-      "color": "", // set programmatically
+      "color": "",
     },
     "encoding": {
       "x": {
@@ -82,7 +82,7 @@ const textLayer = {
   "mark": {
     "type": "text",
     "baseline": "middle",
-    "fontSize": 14,
+    "fontSize": null,
     "fontWeight": "normal",
     "color": "black",
     "dx": 3,
@@ -96,7 +96,7 @@ const textLayer = {
     },
     "y": {
       "axis": {
-        "labelFontSize": 14,
+        "labelFontSize": null,
       },
       "field": "row",
       "type": "ordinal",
@@ -126,7 +126,7 @@ const textLayerTotalTop = {
     },
     "y": {
       "axis": {
-        "labelFontSize": 14,
+        "labelFontSize": null,
       },
       "field": "row",
       "type": "ordinal",
@@ -143,7 +143,7 @@ const textLayerTotalTop = {
 const omicsCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
-  "title": {}, // set programmatically
+  "title": {},
   "vconcat": [
     {
       "transform": [{"filter": "datum.row == 'All GWAS'"}],

@@ -24,8 +24,8 @@ export const signalsPerDatasetSpec = {
               "order": "descending"
             },
             "axis": {
-              "titlePadding": 15,
-              "labelPadding": 15,
+              "titlePadding": 10,
+              "labelPadding": 10,
               "labelLimit": 500,
               "ticks": false
             },
@@ -40,7 +40,7 @@ export const signalsPerDatasetSpec = {
         "mark": {
           "type": "text",
           "baseline": "middle",
-          "fontSize": 14,
+          "fontSize": null,
           "fontWeight": "normal",
           "color": "black",
           "dx": 5
@@ -54,7 +54,7 @@ export const signalsPerDatasetSpec = {
           },
           "y": {
             "axis": {
-              labelFontSize: 14,
+              labelFontSize: null,
             },
             "field": "dataset",
             "type": "ordinal",
@@ -72,7 +72,6 @@ export const signalsPerDatasetSpec = {
         }
       }
     ],
-
   }]
 }
 

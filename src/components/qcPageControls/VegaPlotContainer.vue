@@ -44,60 +44,72 @@ const pageSubhead = ref('')
 // *** Watches *****************************************************************
 watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
   const dk = controlSet.dataKey
+  const domSelector = `#${domID.value}`
+  const selectedStudyName = qcStore.selectedStudyName
+  const plotTitle = controlSet.plotTitle.replace('%s', selectedStudyName)
 
-  if(qcStore[dk].length < 1) {
-    showPlot.value = false
-    return
-  }
-
-  const plotTitle = controlSet.plotTitle.replace('%s', qcStore.selectedStudyName)
   pageSubhead.value = `Plot ${controlSet.plotID}: ${plotTitle}`
 
-  setPlotTitle(plotTitle)
+  setAxisTitles(vegaSpec, controlSet.axisTitles, selectedStudyName)
+  setBarColors(vegaSpec, controlSet.barColors)
+  setFontSizes(vegaSpec, controlSet.fontSizes)
+  setPlotTitle(vegaSpec, plotTitle, controlSet.plotTitleSize)
+  setPlotWidth(vegaSpec, controlSet.plotWidth)
 
-  // this is for the vconcat layered plots (7-9) with multiple plots per overall plot
-  if(controlSet.plotWidth) {
-    for (const el of vegaSpec.vconcat) {
-      el.width = controlSet.plotWidth
-    }
-  }
-
-  if (controlSet.axisTitles) {
-    for (const {key, value} of Object.values(controlSet.axisTitles)) {
-      const newValue = value.replace('%s', qcStore.selectedStudyName)
-      const kk = `${key}.encoding.x.title`
-      _.set(vegaSpec, kk, newValue);
-    }
-  }
-
-  if(controlSet.barColors) {
-    for (const {key, value} of Object.values(controlSet.barColors)) {
-      _.set(vegaSpec, key, value)
-    }
-  }
-
-  if (controlSet.plotID === "9") {
-    console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
-  }
+  // if (controlSet.plotID === "11") console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
 
   vegaSpec.data.values = qcStore[dk]
 
-  const domSelector = `#${domID.value}`
-
-  timeLog('embed start', domID.value, controlSet.dataKey)
+  // timeLog('embed start', domID.value, controlSet.dataKey)
   await embed(domSelector, vegaSpec, vegaOptions)
-  timeLog('embed stop', domID.value, controlSet.dataKey)
+  // timeLog('embed stop', domID.value, controlSet.dataKey)
 })
 
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
-const setPlotTitle = (plotTitle) => {
-  _.set(vegaSpec, 'title.fontSize', VEGA_SPEC_DEFAULTS.TITLE_FONT_SIZE)
-  _.set(vegaSpec, 'title.anchor', VEGA_SPEC_DEFAULTS.TITLE_ANCHOR)
+const setAxisTitles = (vegaSpec, axisTitles, studyName) => {
+  if (axisTitles) {
+    for (const {key, value} of Object.values(axisTitles)) {
+      const newValue = value.replace('%s', studyName)
+      const kk = `${key}.encoding.x.title`
+      _.set(vegaSpec, kk, newValue);
+    }
+  }
+}
+
+const setBarColors = (vegaSpec, barColors) => {
+  if(barColors) {
+    for (const {key, value} of Object.values(barColors)) {
+      _.set(vegaSpec, key, value)
+    }
+  }
+}
+
+const setFontSizes = (vegaSpec, fontSizes) => {
+  if(fontSizes) {
+    for (const [key, value] of Object.entries(fontSizes)) {
+      console.log('kv', key, value)
+      _.set(vegaSpec, key, value)
+    }
+  }
+}
+
+const setPlotTitle = (vegaSpec, plotTitle, plotTitleSize) => {
+  _.set(vegaSpec, 'title.anchor', 'middle')
+  _.set(vegaSpec, 'title.fontSize', plotTitleSize)
   _.set(vegaSpec, 'title.text', plotTitle)
 }
 
+// this is for the vconcat layered plots (7-9) with multiple plots per overall plot
+// where width of each has to be set separately
+const setPlotWidth = (vegaSpec, plotWidth) => {
+  if(plotWidth) {
+    for (const el of vegaSpec.vconcat) {
+      el.width = plotWidth
+    }
+  }
+}
 
 // *** Configuration data ******************************************************
 const vegaOptions = {
@@ -107,11 +119,6 @@ const vegaOptions = {
     compiled: false,
     editor: false,
   }
-}
-
-const VEGA_SPEC_DEFAULTS = {
-  TITLE_FONT_SIZE: 18,
-  TITLE_ANCHOR: "middle",
 }
 </script>
 

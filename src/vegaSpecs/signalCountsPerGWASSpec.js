@@ -2,9 +2,10 @@ import _ from 'lodash'
 
 let barLayers = [
   {
+    "height": { "step": 22, },
     "mark": {
       "type": "bar",
-      "color": "",  // set programmatically
+      "color": "",
     },
     "encoding": {
       "x": {
@@ -22,9 +23,9 @@ let barLayers = [
         "type": "ordinal",
         "sort": null,
         "axis": {
-          "labelFontSize": 14,
-          "titlePadding": 15,
-          "labelPadding": 15,
+          "labelFontSize": null,
+          "titlePadding": 10,
+          "labelPadding": 10,
           "ticks": false
         },
       },
@@ -37,11 +38,12 @@ let barLayers = [
     },
   },
   {
+    "height": { "step": 22, },
     "mark": {
       "type": "bar",
-      "color": "", // set programmatically
+      "color": "",
     },
-    "title": {}, // set programmatically
+    "title": {},
     "encoding": {
       "x": {
         "field": "count",
@@ -53,8 +55,8 @@ let barLayers = [
         "type": "ordinal",
         "sort": null,
         "axis": {
-          "titlePadding": 15,
-          "labelPadding": 15,
+          "titlePadding": 10,
+          "labelPadding": 10,
           "ticks": false
         },
       },
@@ -73,7 +75,7 @@ let textLayers = [
     "mark": {
       "type": "text",
       "baseline": "middle",
-      "fontSize": 14,
+      "fontSize": null,
       "fontWeight": "normal",
       "color": "black",
     },
@@ -101,7 +103,7 @@ let textLayers = [
     "mark": {
       "type": "text",
       "baseline": "middle",
-      "fontSize": 14,
+      "fontSize": null,
       "fontWeight": "normal",
       "color": "black",
     },
@@ -150,7 +152,6 @@ const barLayersTop = () => {
 const barLayersBot = () => {
   const x = _.merge(_.cloneDeep(barLayers), [
     {
-      "height": { "step": 22, },
       // This part makes it so that the total bars on the bottom half of the plot don't go the entire full length
       // Otherwise by default it "nicely" rounds up the scale bound
       "encoding": {
@@ -168,7 +169,7 @@ const barLayersBot = () => {
           "type": "nominal",
           "scale": {
             "domain": ["Total", "Count"],
-            "range": [],  // set programmatically
+            "range": [],
           },
           "title": "",
         }
@@ -182,7 +183,7 @@ let signalCountsPerGWASSpec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "data": { "name": "placeholder", "values": [] },
   "width": "container",
-  "title": {}, // set programmatically
+  "title": {},
   "vconcat": [
     {
       "transform": [{"filter": "datum.row === 'All GWAS'"}],
