@@ -20,7 +20,7 @@
     "locuszoom": "git+https://github.com/statgen/locuszoom.git#d70a920",
     "lodash": "^4.17.21",
     "marked": "14.1.2",
-    "pinia": "2.3.0",
+    "pinia": "2.3.1",
     "roboto-fontface": "*",
     "vega": "^5.30.0",
     "vega-embed": "^6.29.0",
@@ -30,7 +30,7 @@
     "vue-gtag": "2.0.1",
     "vue-router": "4.5.0",
     "vue-tippy": "6.4.4",
-    "vuetify": "3.7.6"
+    "vuetify": "3.7.9"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "5.1.4",
@@ -39,7 +39,7 @@
     "sass": "1.79.3",
     "unplugin-fonts": "1.1.1",
     "unplugin-vue-components": "0.27.4",
-    "vite": "5.4.11",
+    "vite": "5.4.14",
     "vite-plugin-vuetify": "2.0.4"
   }
 }
