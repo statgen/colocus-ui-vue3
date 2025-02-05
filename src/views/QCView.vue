@@ -1,63 +1,65 @@
 <template>
-  <v-container class="ml-0">
+  <v-col cols="3">
+    <QCPanel />
+  </v-col>
+  <v-col class="mt-4">
     <v-row>
       <v-col class="ml-n4">
-        <h1>Colocalization statistics</h1>
-        <p>Overview and description of what this page is about.</p>
+        <v-row>
+          <h1 class="">Colocalization statistics</h1>
+        </v-row>
+        <v-row>
+          <p>Overview and description of what this page is about.</p>
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.ColocalizationClass" :vegaSpec="colocClassSpec" />
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.ColocalizationClassError" :vegaSpec="colocClassErrorSpec" />
+        </v-row>
+
+        <v-row>
+          <v-col class="ml-n3">
+            <VegaPlotContainer :controlSet="vpc.r2VsH4ScatterPlot" :vegaSpec="r2VsH4ScatterPlotSpec" />
+          </v-col>
+          <v-col>
+            <VegaPlotContainer :controlSet="vpc.r2VsH4HeatMap" :vegaSpec="r2VsH4HeatMapSpec" />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col class="ml-n3">
+            <VegaPlotContainer :controlSet="vpc.histogramH4" :vegaSpec="histogramH4Spec" />
+          </v-col>
+          <v-col>
+            <VegaPlotContainer :controlSet="vpc.histogramR2" :vegaSpec="histogramR2Spec" />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.signalCountsPerGWAS" :vegaSpec="signalCountsPerGWASSpec" />
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
+        </v-row>
+
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.signalsPerDataset" :vegaSpec="signalsPerDatasetSpec" />
+        </v-row>
       </v-col>
     </v-row>
-
-    <v-row>
-      <QCPanel />
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.ColocalizationClass" :vegaSpec="colocClassSpec" />
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.ColocalizationClassError" :vegaSpec="colocClassErrorSpec" />
-    </v-row>
-
-    <v-row>
-      <v-col class="ml-n3">
-        <VegaPlotContainer :controlSet="vpc.r2VsH4ScatterPlot" :vegaSpec="r2VsH4ScatterPlotSpec" />
-      </v-col>
-      <v-col>
-        <VegaPlotContainer :controlSet="vpc.r2VsH4HeatMap" :vegaSpec="r2VsH4HeatMapSpec" />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col class="ml-n3">
-        <VegaPlotContainer :controlSet="vpc.histogramH4" :vegaSpec="histogramH4Spec" />
-      </v-col>
-      <v-col>
-        <VegaPlotContainer :controlSet="vpc.histogramR2" :vegaSpec="histogramR2Spec" />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.signalCountsPerGWAS" :vegaSpec="signalCountsPerGWASSpec" />
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
-    </v-row>
-
-    <v-row>
-      <VegaPlotContainer :controlSet="vpc.signalsPerDataset" :vegaSpec="signalsPerDatasetSpec" />
-    </v-row>
-
-  </v-container>
+  </v-col>
 </template>
 
 <script setup>

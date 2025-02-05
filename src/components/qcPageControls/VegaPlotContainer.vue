@@ -56,7 +56,7 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
   setPlotTitle(vegaSpec, plotTitle, controlSet.plotTitleSize)
   setPlotWidth(vegaSpec, controlSet.plotWidth)
 
-  // if (controlSet.plotID === "11") console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
+  // if (controlSet.plotID === "9") console.log(`spec for plot ${controlSet.plotID}`, vegaSpec)
 
   vegaSpec.data.values = qcStore[dk]
 
@@ -89,7 +89,6 @@ const setBarColors = (vegaSpec, barColors) => {
 const setFontSizes = (vegaSpec, fontSizes) => {
   if(fontSizes) {
     for (const [key, value] of Object.entries(fontSizes)) {
-      console.log('kv', key, value)
       _.set(vegaSpec, key, value)
     }
   }
