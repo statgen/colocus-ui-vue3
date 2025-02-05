@@ -64,7 +64,7 @@ const tooltip_template = `<b><%- d.chrom %>:<%- d.pos.toLocaleString() %> <%- (d
   Nearest gene(s): <%- d.nearest_genes && d.nearest_genes.length && d.nearest_genes.map(function(gene) { return gene.symbol; }).join(", ") %>`
 </script>
 
-<style scoped>
+<style> /* this can't be a scoped style def, doesn't trickle down */
   .d3-tip {
     line-height: 1.4;
     padding: 12px;
