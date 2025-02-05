@@ -48,11 +48,6 @@ export const useAppStore = defineStore('appStore', {
       pastedGenes: null,
       ...getFilterPanelSettings()
     },
-    [PAGE_NAMES.QC]: {
-      h4Threshold: THRESHOLDS.H4,
-      r2Threshold: THRESHOLDS.R2,
-      selectedStudy: '',
-    },
   }),
 
   actions: {

@@ -17,6 +17,7 @@ export const useQCStore = defineStore('qcStore', {
     colocWithStTiH4R2: markRaw([]), // filter for study, tissue, h4, r2
     countsByGwas: 0,
     countsByOmics: 0,
+    defaultStudy: '',
     h4Threshold: THRESHOLDS.H4,
     r2Threshold: THRESHOLDS.R2,
     qtlStudies: markRaw([]),
@@ -39,6 +40,7 @@ export const useQCStore = defineStore('qcStore', {
         this.qtlStudies = getQTLStudies(this.colocAll)
         this.studyList = [...this.qtlStudies.keys()]
         this.selectedStudy = this.studyList[0]
+        this.defaultStudy = this.selectedStudy
         this.selectedStudyName = this.qtlStudies.get(this.selectedStudy).study
         this.selectedTissue = this.qtlStudies.get(this.selectedStudy).tissue
       } else {
@@ -56,7 +58,6 @@ export const useQCStore = defineStore('qcStore', {
     },
 
     makeRecordsForAllPlots() {
-      timeLog('making records for all plots started')
       const { makeColocClassPlotRecords } = useMakeColocClassPlotRecords()
       const { makeCountsForFigures } = useMakeCountsForFigures()
 
@@ -70,11 +71,9 @@ export const useQCStore = defineStore('qcStore', {
       this.colocClass = makeColocClassPlotRecords(this.colocWithStTiH4R2)
       this.colocWithout11 = this.makeColocWithout11()
 
-      const mcff = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
+    const mcff = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
       this.countsByGwas = mcff['byGwas']
       this.countsByOmics = mcff['byOmics']
-
-      timeLog('making records for all plots done, starting plots')
       this.regeneratePlots()
     },
 

@@ -44,7 +44,7 @@ const onSelectUpdate = (newValue) => {
 }
 
 watch(() => resetSelect.value, () => {
-  qcStore.updateQCStoreKey(controlSet.dataKey, qcStore.studyList[0])
+  qcStore.updateQCStoreKey(controlSet.dataKey, qcStore.defaultStudy)
 })
 </script>
 
