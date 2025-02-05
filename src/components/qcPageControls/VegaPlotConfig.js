@@ -152,8 +152,10 @@ const VegaPlotConfig = {
     fontSizes: {
       "vconcat[0].layer[0].encoding.y.axis.labelFontSize": FONT_SIZE.LABEL,
       "vconcat[1].layer[0].encoding.y.axis.labelFontSize": FONT_SIZE.LABEL,
-      "vconcat[0].layer[1].mark.fontSize": FONT_SIZE.MARK,
-      "vconcat[1].layer[1].mark.fontSize": FONT_SIZE.MARK,
+      "vconcat[0].layer[2].mark.fontSize": FONT_SIZE.MARK,
+      "vconcat[0].layer[3].mark.fontSize": FONT_SIZE.MARK,
+      "vconcat[1].layer[2].mark.fontSize": FONT_SIZE.MARK,
+      "vconcat[1].layer[3].mark.fontSize": FONT_SIZE.MARK,
     },
     plotTitle: "Count of signals per GWAS colocalized to at least 1 signal from %s",
     plotTitleSize: FONT_SIZE.TITLE,
