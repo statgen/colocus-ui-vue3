@@ -7,8 +7,22 @@ const BIOMARKER_TYPES = Object.freeze({
   EXON_EXPRESSION: 'exon-expression',
 })
 
-// Specify which lead variant to use for LD coloring
-const LD_OPTIONS = Object.freeze({ SIGNAL1: 'signal1', SIGNAL2: 'signal2' });
+const COLORS = {
+  CLC_BACKGROUND: '#fafafa',
+  CLC_ACTION: '#18c11c',
+  CLC_HEADING: '#1E88E5',
+  CLC_AMPBLUE: '#0097d6',
+  CLC_EFF_POS: '#e3fdff',
+  CLC_EFF_NEG: '#ffd1c7',
+  CLC_EFF_ZERO: '#dddddd',
+  CLC_EFF_NA: '#ffffff',
+  CLC_TABLE_HIGHLIGHT: '#f0f8ff',
+  CLC_TOOLTIP_BACKGROUND: '#eee',
+  CLC_TOOLTIP_BORDER: '#2962ff',
+  BAR_PRIMARY: "#8ef18f",
+  BAR_SECONDARY: "#ffd1c7",
+  BAR_TERTIARY: "#eee",
+}
 
 const NEARBY_DIST = 500e3
 
@@ -46,22 +60,10 @@ const URLS = {
   QC_SIGNALS: '/api/v1/internal/signals-slim/',
 }
 
-const COLORS = {
-  CLC_BACKGROUND: '#fafafa',
-  CLC_ACTION: '#18c11c',
-  CLC_HEADING: '#1E88E5',
-  CLC_AMPBLUE: '#0097d6',
-  CLC_EFF_POS: '#e3fdff',
-  CLC_EFF_NEG: '#ffd1c7',
-  CLC_EFF_ZERO: '#dddddd',
-  CLC_EFF_NA: '#ffffff',
-  CLC_TABLE_HIGHLIGHT: '#f0f8ff',
-  CLC_TOOLTIP_BACKGROUND: '#eee',
-  CLC_TOOLTIP_BORDER: '#2962ff',
-  BAR_PRIMARY: "#8ef18f", //"#8da0cb",
-  BAR_SECONDARY: "#ffd1c7", //"#D3D3D3",
-  BAR_TERTIARY: "#dddddd", //"#fc8d62",
+const THRESHOLDS = {
+  H4: 0.5,
+  R2: 0.3,
 }
 
-export { AXIS_OPTIONS, BIOMARKER_TYPES, COLORS, LD_OPTIONS, NEARBY_DIST, PAGE_NAMES, URLS
+export { AXIS_OPTIONS, BIOMARKER_TYPES, COLORS, NEARBY_DIST, PAGE_NAMES, THRESHOLDS, URLS
 }

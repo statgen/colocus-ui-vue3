@@ -4,7 +4,7 @@ import { useFetchData } from '@/composables/fetchData'
 import { useMakeColocClassPlotRecords } from '@/composables/qcMakeColocClassPlotRecords'
 import { useMakeCountsForFigures } from '@/composables/qcMakeCountsForFigures'
 import { useMakeSignalsPerDataset } from '@/composables/qcMakeSignalsPerDataset'
-import { URLS } from '@/constants'
+import { THRESHOLDS, URLS } from '@/constants'
 import { timeLog } from '@/util/util'
 
 export const useQCStore = defineStore('qcStore', {
@@ -17,8 +17,8 @@ export const useQCStore = defineStore('qcStore', {
     colocWithStTiH4R2: markRaw([]), // filter for study, tissue, h4, r2
     countsByGwas: 0,
     countsByOmics: 0,
-    h4Threshold: 0.5,
-    r2Threshold: 0.3,
+    h4Threshold: THRESHOLDS.H4,
+    r2Threshold: THRESHOLDS.R2,
     qtlStudies: markRaw([]),
     regenPlotFlag: true,
     selectedStudy: '',      // full name: <study> (<tissue>)

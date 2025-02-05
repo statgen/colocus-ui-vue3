@@ -1,7 +1,7 @@
 import { markRaw } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { PAGE_NAMES, URLS } from '@/constants'
+import { PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -49,8 +49,8 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.QC]: {
-      h4Threshold: 0.5,
-      r2Threshold: 0.3,
+      h4Threshold: THRESHOLDS.H4,
+      r2Threshold: THRESHOLDS.R2,
       selectedStudy: '',
     },
   }),
@@ -252,8 +252,8 @@ function getFilterPanelSettings() {
       tissues: [],
       trait1log10p: "0",
       trait2log10p: "0",
-      h4: "0.5",
-      r2: "0.3",
+      h4: THRESHOLDS.H4,
+      r2: THRESHOLDS.R2,
 
       // these are pseudo filters that get appended to the URL
       pageNum: "1",
