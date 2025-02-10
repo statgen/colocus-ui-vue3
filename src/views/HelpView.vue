@@ -25,43 +25,10 @@
 import { useTemplateRef, watch, nextTick } from 'vue'
 import helpContent from '@/docs/help/help.md'
 import '@/styles/github-markdown.css'
+import { scrollToHeading } from '@/util/util'
 
 const tocRef = useTemplateRef('toc')
 
-const scrollToHeading = (id) => {
-  const target = document.getElementById(id)
-  if (target) {
-    const toolbarHeight = document.querySelector('.v-toolbar').offsetHeight || 0
-    const targetPosition = target.getBoundingClientRect().top + window.scrollY - toolbarHeight
-    window.scrollTo({
-      top: targetPosition,
-      behavior: 'smooth',
-    })
-  }
-}
-
-const handleLinkClick = (event) => {
-  event.preventDefault()
-  const targetId = event.target.getAttribute('href').substring(1)
-  scrollToHeading(targetId)
-}
-
-watch(tocRef.value, async (newVal, oldVal) => {
-  if (oldVal) {
-    const oldLinks = oldVal.$el ? oldVal.$el.querySelectorAll('a') : oldVal.querySelectorAll('a')
-    oldLinks.forEach(link => {
-      link.removeEventListener('click', handleLinkClick)
-    })
-  }
-
-  if (newVal) {
-    await nextTick()
-    const newLinks = newVal.$el ? newVal.$el.querySelectorAll('a') : newVal.querySelectorAll('a')
-    newLinks.forEach(link => {
-      link.addEventListener('click', handleLinkClick)
-    })
-  }
-})
 </script>
 
 <style scoped>

@@ -33,10 +33,13 @@ const PAGE_NAMES = {
   LOCUSZOOM: 'locuszoom',
   MANHATTAN: 'manhattan',
   SEARCH: 'search',
+  STATS_QC: 'qcstats',
+  STATS_SUMMARY: 'summarystats',
   STUDIES: 'studies',
   TRAITS: 'traits',
-  QC: 'qc',
 }
+
+const STATS_PAGE_TOP = 'topOfThePage'
 
 const URLS = {
   // these are for the data tables that exist on the associated pages
@@ -65,5 +68,5 @@ const THRESHOLDS = {
   R2: 0.3,
 }
 
-export { AXIS_OPTIONS, BIOMARKER_TYPES, COLORS, NEARBY_DIST, PAGE_NAMES, THRESHOLDS, URLS
+export { AXIS_OPTIONS, BIOMARKER_TYPES, COLORS, NEARBY_DIST, STATS_PAGE_TOP, PAGE_NAMES, THRESHOLDS, URLS
 }

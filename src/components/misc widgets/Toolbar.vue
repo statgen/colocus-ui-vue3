@@ -6,11 +6,42 @@
 
       <div class="ml-10">
         <router-link :to="searchPage" class="nav-link text-clcHeading">Search</router-link>
-        <router-link to="/studies" class="nav-link text-clcHeading">Studies</router-link>
-<!--        <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link>-->
-<!--        <router-link to="/traits" class="nav-link text-clcHeading">Traits</router-link>-->
-        <router-link to="qc" class="nav-link text-clcHeading">QC</router-link>
-        <router-link to="/help" class="nav-link text-clcHeading">Help</router-link>
+        <!-- <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link> -->
+
+        <v-menu offset-y>
+          <template v-slot:activator="{ props }">
+         <span
+           class="nav-link text-clcHeading"
+           style="cursor: pointer;"
+           v-bind="props"
+         >
+            Statistics
+            <v-icon x-small class="ml-n4">mdi-chevron-down</v-icon>
+          </span>          </template>
+          <v-list>
+            <v-list-item
+              active-color="black"
+              base-color="clcAction"
+              component="router-link"
+              nav
+              ripple
+              :to="qcStatsPage"
+            >QC Statistics</v-list-item>
+            <v-list-item
+              active-color="black"
+              base-color="clcAction"
+              component="router-link"
+              nav
+              ripple
+              :to="summaryStatsPage"
+            >Summary statistics</v-list-item>
+          </v-list>
+        </v-menu>
+
+        <router-link :to="studiesPage" class="nav-link text-clcHeading">Studies</router-link>
+        <!--        <router-link to="/traits" class="nav-link text-clcHeading">Traits</router-link>-->
+        <router-link :to="helpPage" class="nav-link text-clcHeading">Help</router-link>
+
       </div>
 
       <v-spacer></v-spacer>
@@ -32,7 +63,12 @@ import { PAGE_NAMES } from '@/constants'
 const appStore = useAppStore()
 const { toggleFilterPanel } = appStore
 const isFilterButtonVisible = computed(() => appStore.filterPanelControls.isFilterButtonShowing)
+
+const helpPage = `/${PAGE_NAMES.HELP}`
+const qcStatsPage = `/${PAGE_NAMES.STATS_QC}`
 const searchPage = `/${PAGE_NAMES.SEARCH}`
+const studiesPage = `/${PAGE_NAMES.STUDIES}`
+const summaryStatsPage = `/${PAGE_NAMES.STATS_SUMMARY}`
 
 </script>
 
@@ -45,7 +81,7 @@ const searchPage = `/${PAGE_NAMES.SEARCH}`
 }
 
 .nav-link {
-  margin: 0 15px;
+  margin: 0 10px;
   font-size: 1.75rem;
   text-decoration: none;
 }

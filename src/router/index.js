@@ -13,7 +13,8 @@ const manhattanPage = PAGE_NAMES.MANHATTAN
 const searchPage = PAGE_NAMES.SEARCH
 const studyPage = PAGE_NAMES.STUDIES
 const traitPage = PAGE_NAMES.TRAITS
-const qcPage = PAGE_NAMES.QC
+const qcStatsPage = PAGE_NAMES.STATS_QC
+const summaryStatsPage = PAGE_NAMES.STATS_SUMMARY
 
 const enableFiltering = (panelIsVisible) => {
   const appStore = useAppStore()
@@ -68,9 +69,9 @@ const routes = [
     }
   },
   {
-    path: `/${qcPage}`,
-    name: qcPage,
-    component: () => import('@/views/QCView.vue'),
+    path: `/${qcStatsPage}`,
+    name: qcStatsPage,
+    component: () => import('@/views/QCStatsView.vue'),
     beforeEnter: (to, from, next) => {
       next()
     }
@@ -82,6 +83,14 @@ const routes = [
     beforeEnter: (to, from, next) => {
       const appStore = useAppStore()
       enableFiltering(SHOW_FILTER_PANEL)
+      next()
+    }
+  },
+  {
+    path: `/${summaryStatsPage}`,
+    name: summaryStatsPage,
+    component: () => import('@/views/SummaryStatsView.vue'),
+    beforeEnter: (to, from, next) => {
       next()
     }
   },

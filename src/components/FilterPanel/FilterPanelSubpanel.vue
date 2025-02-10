@@ -2,7 +2,7 @@
   <v-sheet class="bg-clcBackground px-2 mt-2" elevation="0" border>
     <div class="d-flex align-center">
       <ToolTippy>
-        <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="icon-class" />
+        <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="reset-icon-class" />
 
         <template #tooltipContent>
           Reset to default values
@@ -31,10 +31,4 @@ function onResetButtonClick() {
 </script>
 
 <style scoped>
-.icon-class {
-  font-size: 20px;
-  margin-top: -10px;
-  margin-right: 4px;
-  color: rgba(var(--v-theme-clcAction), 1.0);
-}
 </style>

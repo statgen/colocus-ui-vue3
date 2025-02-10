@@ -1,10 +1,10 @@
 <template>
   <v-container class="ml-n4">
-    <h2>{{ pageSubhead }}</h2>
+    <h2 class="gatherMe" :id="domHeadingID" data-text="pageSubhead">{{ pageSubhead }}</h2>
     <p>{{ controlSet.description }}</p>
 
     <div v-if="showPlot"
-       :id="domID"
+       :id="domPlotID"
        :style="{
          width: controlSet.containerWidth + 'px',
          height: controlSet.containerHeight + 'px'
@@ -33,9 +33,10 @@ const { controlSet, vegaSpec } = defineProps({
 })
 
 // *** Variables ***************************************************************
-const domID = ref('plot' + controlSet.plotID)
+const domPlotID = ref('plot' + controlSet.plotID)
+const domHeadingID = ref(`PlotHeading` + controlSet.plotID)
 const showPlot = ref(true)
-const pageSubhead = ref('')
+const pageSubhead = ref('Plot ' + controlSet.plotID + ': ' + controlSet.plotTitle)
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -44,7 +45,7 @@ const pageSubhead = ref('')
 // *** Watches *****************************************************************
 watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
   const dk = controlSet.dataKey
-  const domSelector = `#${domID.value}`
+  const domSelector = `#${domPlotID.value}`
   const selectedStudyName = qcStore.selectedStudyName
   const plotTitle = controlSet.plotTitle.replace('%s', selectedStudyName)
 
@@ -60,9 +61,9 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 
   vegaSpec.data.values = qcStore[dk]
 
-  // timeLog('embed start', domID.value, controlSet.dataKey)
+  // timeLog('embed start', domPlotID.value, controlSet.dataKey)
   await embed(domSelector, vegaSpec, vegaOptions)
-  // timeLog('embed stop', domID.value, controlSet.dataKey)
+  // timeLog('embed stop', domPlotID.value, controlSet.dataKey)
 })
 
 // *** Lifecycle hooks *********************************************************

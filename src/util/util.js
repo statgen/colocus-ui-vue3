@@ -94,6 +94,18 @@ const parseVariant = (variant) => {
   }
 }
 
+const scrollToHeading = (id) => {
+  const target = document.getElementById(id)
+  if (target) {
+    const toolbarHeight = document.querySelector('.v-toolbar').offsetHeight || 0
+    const targetPosition = target.getBoundingClientRect().top + window.scrollY - toolbarHeight
+    window.scrollTo({
+      top: targetPosition,
+      behavior: 'smooth',
+    })
+  }
+}
+
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 // call with await sleeper(n); this is only for analysis/debugging, not production use
@@ -128,6 +140,11 @@ const titleCase = (str) => {
   }
 }
 
+const truncateString = (str, length) => {
+  if(str.length <= length) return str
+  return str.substring(0, length) + '...'
+}
+
 /**
  * A tagged template function that encodes URL parameters used in path segments / query params
  *   Usage: url`https://website.example/${value1}/?param=${value2}`
@@ -145,4 +162,4 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
-  middleTrim, ppURL, sleeper, sortVariantArray, timeLog, titleCase, url }
+  middleTrim, ppURL, scrollToHeading, sleeper, sortVariantArray, timeLog, titleCase, truncateString, url }

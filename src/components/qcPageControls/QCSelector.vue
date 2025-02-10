@@ -8,7 +8,6 @@
 
   <v-select
     :items="qcStore.studyList"
-    :max-width="controlSet.width"
 
     v-model="qcStore.selectedStudyName"
     @update:modelValue="onSelectUpdate"

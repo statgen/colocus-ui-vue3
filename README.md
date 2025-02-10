@@ -301,47 +301,51 @@ const qcPage = PAGE_NAMES.QC
 
 ## Vega plots
 The plotting system depends on the following components
-- The overall page (QC.vue)
+- The overall vue pages (QCStats.vue, SummaryStatsView.vue)
 - A vega spec for each plot, stored in src/vegaSpecs
 - A Pinia store, QCStore, for plot data and operation
-- A plot component, <VegaPlotContainer>, one for each plot rendered on the page
-- VegaPlotConfig, a js file containing configuration info for instantiating plots
-- qcMake*, a set of composables providing data processing functions for building the data sets required by the plots. Some of the simpler data sets are generated within the QCStore.
+- A plot component, <VegaPlotContainer>, one for each plot rendered on a page
+- VegaPlotConfig, a js file containing configuration info for instantiating all plots
+- qcMake*, a set of composables providing data processing functions for building the data sets required by the plots. Some of the simpler data sets are generated directly within the QCStore.
 
-### QC page
-This view contains the overall page structure, including the templates for all the plots. The first two rows in the template include:
-- The page header and description
-- <QCPanel> component, with controls to set h4 and r2, and to select study. This will move to a sidebar like the filter panel later on.
+### Page Views
+These views contain the overall page structure, including the templates for all the plots. Each page has two columns, one for the sidebar and one for the plots. The first row in the plots column includes the page header and description.
 
-These are then followed by the plots templates, each an instance of <VegaPlotContainer>. That component accepts two props:
-- a controlSet, following conventions established elsewhere in the app, which has some configuration values for each plot
+This is then followed by the plot templates, each an instance of <VegaPlotContainer>. That component accepts two props:
+- a controlSet, following conventions established elsewhere in the app, which has configuration values for each plot
 - a Vega-lite spec, the details of each plot, including the data
 In this app, the spec is a JS object, not a JSON blob, which simplifies dynamically updating things like titles, colors, data set, etc.
 
 The page's only action, in the onMounted hook, is to tell the qcStore to load the plot data from the back end, then flip the flag that triggers plot generation.
 
+Manipulating the controls in the sidebar also causes plots to be regenerated on each change to the selected:
+- study
+- h4 threshold
+- r2 threshold
+Pressing the 'reset' button to the left of the heading ('Settings') causes all three values to be reset to their default values. Resetting also forces the page to scroll to the top. Similarly, selecting a new study forces the h4 and R2 values to their default values, and a scroll to the top of the page.
+
 ### qcStore
-The Pinia store for this portion of Colocus is responsible for fetching data from the API, and generating data subsets for the different plots. It has state variables for those data elements, plus variables for the UI elements controlling the plot displays (h4, r2, and omics study). It has three primary actions:
+The Pinia store for this portion of Colocus is responsible for fetching data from the API, and generating data subsets for the different plots. It has state variables for those data elements, plus variables for the UI elements controlling the plot displays (h4, r2, and omics study). The qcStore has three primary actions:
 - loadQCData: fetches fundamental data sets from the backend and generates subsets for the plots
-- makeRecordsForAllPlots: regenerates plot data when needed (on initial load and when UI changes). This uses several internal methods, as well as the larger composable functions.
+- makeRecordsForAllPlots: regenerates plot data when needed (on initial load and when UI changes occur). This uses several internal methods, as well as the larger composable functions.
 - regeneratePlots: Flips the regenPlotFlag, which is watched by each of the plot instances, so when the flag changes, a new plot is generated.
 - updateQCStoreKey: updates state variables when UI controls change due to user interaction
 
 There are also several internal functions (getColocDataForStudy, getQTLStudies) used for data processing.
 
 ### VegaPlotContainer
-This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, the component builds a new plot instance and embeds it in the containing div in the template. The flag is triggered on initial load of the QC page view, and on subsequent changes to the UI controls.
+This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, the component builds a new plot instance and embeds it in the containing div in the template. The flag is triggered on initial load of each of the stats page views, and on subsequent changes to the UI controls.
 
 ### Performance problems
 Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to as much as 30 seconds in some scenarios. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous.
 
-Rather than having to deploy to the external platform, a server that can run locally was generated. It uses the ExpressJS server. It requires the project to be built, then runs from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
+Rather than having to deploy to the external platform, a server that can run locally was generated. It uses the ExpressJS library server. It requires the project to be built, then serves files from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
 
 It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts: one to build the project, the other to serve the contents of the dist folder. Both need to be running in separate terminal windows in order to have an automated edit-save-build-serve development cycle. 
 - dev-build: this runs vite build in watch mode, regenerating the site after each save
 - dev-serve: runs the express server as a standalone instance
 
-This works, but is a little slow; it takes about 3.5 seconds to rebuild the project. More significantly, Vue Dev Tools don't work in production mode. I recommend using this approach only for working on the QC page; for other pages, use `npm run dev`.
+This works, but is a little slow; it takes about 4 seconds to rebuild the project. More significantly, Vue Dev Tools don't work in production mode. I recommend using this approach only for working on the QC page; for other pages, use `npm run dev`.
 
 I attempted to optimize plot generation. Vega allows plots to be updated by supplying new data. The hope was that it would speed up redraws. However, it did not speed up the process, and furthermore left artifacts on the plot. I was unable to resolve either issue, so reverted to just regenerating the plot from scratch on each update of the UI controls. For potential future use, here is the code from VegaPlotContainer to generate a plot on initial use, then update it subsequently.
 ```aiignore

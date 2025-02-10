@@ -9,10 +9,9 @@
         :min="0"
         :max="1.0"
         :step="0.05"
-        :max-width="controlSet.width"
 
         v-model="qcStore[controlSet.dataKey]"
-        @end="onSliderUpdate"
+        @update:modelValue="onSliderUpdate"
 
         show-ticks="always"
         thumb-size="14"
