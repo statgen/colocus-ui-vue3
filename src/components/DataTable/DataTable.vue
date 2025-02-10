@@ -33,6 +33,10 @@
       <TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait" :analysisID="item.signal1.analysis.uuid"/>
     </template>
 
+    <template v-slot:item.signal1.analysis.analysis_type="{item}">
+      {{ item.signal1.analysis.analysis_type }}
+    </template>
+
     <template v-slot:item.signal2.analysis.study.uuid="{item}">
       <StudyLabel :study="item.signal2.analysis.study.uuid" abbrev/>
     </template>
