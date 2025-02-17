@@ -192,7 +192,7 @@ LocusZoom.Adapters.add('ColocRegionAdapter', ColocRegionAdapter);
 LocusZoom.Adapters.add('ColocLDAdapter', ColocLDAdapter);
 
 LocusZoom.Layouts.add('plot', 'locuscompare', {
-  width: 800,
+  width: 500,
   responsive_resize: true,
   min_region_scale: 20000,
   max_region_scale: 1000000,
