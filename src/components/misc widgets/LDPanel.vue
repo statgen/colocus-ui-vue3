@@ -3,6 +3,21 @@
 
     <v-row class="my-0 py-0">
       <v-col cols="3" class="my-0 py-0">
+        <h4 class="text-right mt-2">Blink:</h4>
+      </v-col>
+      <v-col class="my-0 py-0">
+        <v-checkbox
+          label="Blink lead variant marker"
+          @update:modelValue="onBlinkCheckboxChange"
+          color="clcAction"
+          density="compact"
+          :model-value="appStore[locuszoomPage].lzLeadVarBlink"
+        ></v-checkbox>
+      </v-col>
+    </v-row>
+
+    <v-row class="my-0 py-0">
+      <v-col cols="3" class="my-0 py-0">
         <h4 class="text-right mt-2">Uniques:</h4>
       </v-col>
       <v-col class="my-0 py-0">
@@ -52,7 +67,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { AXIS_OPTIONS, PAGE_NAMES } from '@/constants'
+import { AXIS_OPTIONS, COLORS, PAGE_NAMES } from '@/constants'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 
@@ -91,10 +106,20 @@ const onUniqueCheckboxChange = (value) => {
   emit('onUniqueCheckboxChange', value)
 }
 
+const onBlinkCheckboxChange = (value) => {
+  appStore[locuszoomPage].lzLeadVarBlink = value
+  appStore[locuszoomPage].lzLeadDOMIDs.forEach((element) => {
+    const domID = `#${element}`
+    const point = document.querySelector(domID)
+    value ? point.classList.add('blink') : point.classList.remove('blink')
+  })
+}
+
+
 const panelStyle = {
   width: '600px',
-  backgroundColor: '#fdfdfd',
-  borderColor: '#18c11c', // 'border-clcAction' doesn't work... FIXME
+  backgroundColor: COLORS.CLC_BACKGROUND,
+  borderColor: COLORS.CLC_ACTION,
   borderWidth: '2px',
   borderStyle: 'solid',
 }

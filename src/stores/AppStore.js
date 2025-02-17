@@ -31,6 +31,8 @@ export const useAppStore = defineStore('appStore', {
       colocDataReady: false,
       colocID: '',
       filterDataChanged: false,
+      lzLeadVarBlink: true,
+      lzLeadDOMIDs: [],
       plotID: 0,
       regionPanelRemoved: false,
       tableDataLoaded: false,

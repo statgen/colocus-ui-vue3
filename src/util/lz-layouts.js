@@ -347,7 +347,6 @@ LocusZoom.Layouts.add('panel', 'association_with_cond', (function () {
       return ops;
     }
   );
-
   return base;
 })());
 

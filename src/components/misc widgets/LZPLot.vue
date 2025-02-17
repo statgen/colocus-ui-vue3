@@ -13,7 +13,7 @@ import LocusZoom from 'locuszoom'
 import 'locuszoom/dist/locuszoom.css'
 import { config_to_sources } from '@/util/lz-layouts';
 import { makePlotTitle, url } from '@/util/util';
-import { PAGE_NAMES } from '@/constants'
+import { COLORS, PAGE_NAMES } from '@/constants'
 import { useAppStore } from '@/stores/AppStore'
 import { deepCopy, merge } from 'locuszoom/esm/helpers/layouts'
 
@@ -137,6 +137,37 @@ const connectListeners = (plot) => {
     if(eventData.data === 'genes') return
     emit('RegionPanelRemoved', eventData)
   });
+
+  plot.on('layout_changed', (eventData) => {
+    const PLOT_REGEX_ID = /^lz-plot-\d+\.assoc_\d+/
+    if(PLOT_REGEX_ID.test(eventData.sourceID)) {
+      const pointsOfInterest = document.querySelectorAll('path[fill="#9632b8"]')
+      pointsOfInterest.forEach(point => {
+        appStore[locuszoomPage].lzLeadDOMIDs.push(point.id)
+        const currentTransform = point.getAttribute('transform') || '';
+        point.setAttribute('transform', `${currentTransform} scale(1.5)`);
+
+        // this is almost the color defined by the lz locuscompare layout
+        // but can't use that color as weird UI bug occurs
+        point.setAttribute('fill', '#9632b7');
+
+        // following adds a border for visual contrast
+        point.style.stroke = COLORS.CLC_ACTION
+        point.style.strokeWidth = '1px';
+        point.style.strokeOpacity = '1';
+
+        if (point.parentNode) {
+          point.parentNode.appendChild(point);
+        }
+
+        if(appStore[locuszoomPage].lzLeadVarBlink) {
+          point.classList.add('blink');
+        }
+        // setTimeout(() => { point.classList.remove('blink') }, 10000)
+
+      })
+    }
+  })
 }
 
 const callPlot = (callback) => {

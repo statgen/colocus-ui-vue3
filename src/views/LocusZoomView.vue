@@ -124,6 +124,9 @@ const regionPlotRef = useTemplateRef('regionPlot')
 // constants
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 
+// blink control of lead ref marker(s) on lz plot(s)
+appStore[locuszoomPage].lzLeadDOMIDs.length = 0
+
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
