@@ -14,11 +14,50 @@ export const useFetchData = () => {
     // console.log(`fetching ${reason} for ${page} page from:\n`, prettyPrint ? ppURL(url.href || url) : url.href || url)
     state.isLoading = true
     try {
-      const response = await fetch(url, options)
-      if (!response.ok) {
-        throw new Error(response.statusText)
+      const results = []
+      let response = await fetch(url, options)
+      let json = null;
+
+      while (response.ok) {
+        json = await response.json()
+
+        // If these are paginated results, add the results into a list and continue
+        if (json.results) {
+          results.push(...json.results);
+        }
+
+        // Note: if a specific page was asked for, we should not continue fetching more pages
+        // Unfortunately `url` can be either a string, or a URL object
+        if (
+          url?.searchParams?.has?.('page') ||
+          url?.search?.includes?.('page=') ||
+          url?.includes?.('page=')
+        ) {
+          console.log('doing pagination fetch')
+          break;
+        }
+
+        // If there are more results to fetch, and they didn't ask for a specific page, keep going
+        if (json.next) {
+          response = await fetch(json.next)
+        } else {
+          break
+        }
       }
-      state.data = await response.json()
+
+      // If these were paginated, we need to return the result just as one object
+      // Otherwise it needs to be under a `results` field
+      // Count is critical as other parts of the app rely on it
+      if (json.results) {
+        state.data = {
+          results: results,
+          count: json.count ?? results.length
+        }
+      }
+      else {
+        state.data = json;
+      }
+
       // console.log('fetchData:', state.data)
     } catch (error) {
       state.hasError = true
