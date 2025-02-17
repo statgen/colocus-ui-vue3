@@ -20,7 +20,7 @@
           </span>          </template>
           <v-list>
             <v-list-item
-              active-color="black"
+              color="black"
               base-color="clcAction"
               component="router-link"
               nav
@@ -28,7 +28,7 @@
               :to="qcStatsPage"
             >QC Statistics</v-list-item>
             <v-list-item
-              active-color="black"
+              color="black"
               base-color="clcAction"
               component="router-link"
               nav
