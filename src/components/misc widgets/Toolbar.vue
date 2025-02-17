@@ -15,7 +15,7 @@
            style="cursor: pointer;"
            v-bind="props"
          >
-            Statistics
+            Summaries
             <v-icon x-small class="ml-n4">mdi-chevron-down</v-icon>
           </span>          </template>
           <v-list>
