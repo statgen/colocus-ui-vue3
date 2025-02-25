@@ -6,7 +6,7 @@
 
       <div class="ml-10">
         <router-link :to="searchPage" class="nav-link text-clcHeading">Search</router-link>
-        <!-- <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link> -->
+         <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link>
 
         <v-menu offset-y>
           <template v-slot:activator="{ props }">

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
+    "arquero": "^8.0.1",
     "color-hash": "2.0.2",
     "d3": "^5.16.0",
     "d3-tip": "0.9.1",
