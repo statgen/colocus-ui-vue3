@@ -37,7 +37,7 @@ const routes = [
   {
     path: `/${genePage}`,
     name: genePage,
-    component: () => import('@/views/GenesView.vue'),
+    component: () => import('@/views/GeneView.vue'),
   },
   {
     path: `/${helpPage}`,

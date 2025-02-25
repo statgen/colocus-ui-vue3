@@ -8,7 +8,6 @@ const { data, errorMessage, fetchData } = useFetchData()
 
 export function useGenePageHelpers() {
   let flatData = ''
-  let currentGene = 'ANK1' //'ENSG00000103351'
 
   const flattenData = (data) => {
     let recs = [];
@@ -36,8 +35,8 @@ export function useGenePageHelpers() {
     }
   }
 
-  const getTheData = async () => {
-    const url = `${URLS[genePage]}?genes=${currentGene}`
+  const getTheData = async (theGene) => {
+    const url = `${URLS[genePage]}?genes=${theGene}`
     const rawData = await getRawData(url)
     flatData = flattenData(rawData)
     const tableAllGenes = aq.from(flatData)
@@ -50,7 +49,7 @@ export function useGenePageHelpers() {
     // console.log('data2', data2)
     const data3 = flattenData(data2)
     // console.log('data3', data3)
-    const data4 = data3.filter((el) => el.qtlGene !== currentGene);
+    const data4 = data3.filter((el) => el.qtlGene !== theGene);
     // console.log('data4', data4)
     const tableExceptThisGene = aq.from(data4)
     // tableExceptThisGene.print(999)
@@ -109,6 +108,7 @@ export function useGenePageHelpers() {
       .join_left(t1)
       .join_left(t2)
 
+    // this converts 'undefined' to 0 in the count columns
     const filledTable = semiFinalTable.derive({
       otherGenesSameTissueCount: d => d.otherGenesSameTissueCount ?? 0,
       otherGenesSameTissue: d => d.otherGenesSameTissue ?? []
@@ -120,5 +120,20 @@ export function useGenePageHelpers() {
 
   }
 
-  return { getTheData };
+  const table2Headers = [
+    { title: 'GWAS Trait', value: 'gwasTrait', sortable: true, },
+    { title: 'GWAS Dataset', value: 'gwasDataset', sortable: true, },
+    { title: 'GWAS Lead Variant', value: 'gwasLeadVariant', sortable: true, },
+    { title: 'QTL Datset', value: 'qtlDatset', sortable: true, },
+    { title: 'QTL Lead Variant', value: 'qtlLeadVariant', sortable: true, },
+    { title: 'QTL Tissue', value: 'qtlTissue', sortable: true, },
+    { title: 'QTL Gene', value: 'qtlGene', sortable: true, },
+    { title: 'QTL Symbol', value: 'qtlSymbol', sortable: true, },
+    { title: 'Other Genes Any Tissue Count', value: 'otherGenesAnyTissueCount', sortable: true, },
+    { title: 'Other Genes Any Tissue', value: 'otherGenesAnyTissue', sortable: true, },
+    { title: 'Other Genes Same Tissue Count', value: 'otherGenesSameTissueCount', sortable: true, },
+    { title: 'Other Genes Same Tissue', value: 'otherGenesSameTissue', sortable: true, },
+  ]
+
+  return { getTheData, table2Headers };
 }

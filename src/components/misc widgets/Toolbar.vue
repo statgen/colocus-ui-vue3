@@ -6,7 +6,7 @@
 
       <div class="ml-10">
         <router-link :to="searchPage" class="nav-link text-clcHeading">Search</router-link>
-         <router-link to="/genes" class="nav-link text-clcHeading">Genes</router-link>
+         <router-link :to="genePage" class="nav-link text-clcHeading">Gene</router-link>
 
         <v-menu offset-y>
           <template v-slot:activator="{ props }">
@@ -64,6 +64,7 @@ const appStore = useAppStore()
 const { toggleFilterPanel } = appStore
 const isFilterButtonVisible = computed(() => appStore.filterPanelControls.isFilterButtonShowing)
 
+const genePage = `/${PAGE_NAMES.GENES}`
 const helpPage = `/${PAGE_NAMES.HELP}`
 const qcStatsPage = `/${PAGE_NAMES.STATS_QC}`
 const searchPage = `/${PAGE_NAMES.SEARCH}`

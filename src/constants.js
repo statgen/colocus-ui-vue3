@@ -27,7 +27,7 @@ const COLORS = {
 const NEARBY_DIST = 500e3
 
 const PAGE_NAMES = {
-  GENES: 'genes',
+  GENES: 'gene',
   HELP: 'help',
   HOME: 'home',
   LOCUSZOOM: 'locuszoom',

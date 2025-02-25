@@ -1,8 +1,24 @@
 <template>
-  <v-container>
-    <h1>Genes</h1>
-    <p>Data:</p>
-    <v-data-table :headers="headers" :items="theData">
+  <v-container fluid>
+    <h1>Gene</h1>
+    <p>Descriptive text...</p>
+    <p class="text-caption">Sample gene: ENSG00000103351</p>
+
+    <div class="d-flex align-center mt-5">
+      <v-text-field
+        v-model="theGene"
+        bg-color="white"
+        class="mb-n1"
+        density="compact"
+        flat
+        label="Gene"
+        variant="outlined"
+        style="flex: 0 0 25rem;"
+      />
+      <v-btn @click="getNewGene" variant="outlined" class="ml-2 mb-5">Get new gene</v-btn>
+    </div>
+
+    <v-data-table :headers="table2Headers" :items="table2Data">
       <template v-slot:gwasTrait="{ gwasTrait }">{{ gwasTrait }}</template>
       <template v-slot:gwasDataset="{ gwasDataset }">{{ gwasDataset }}</template>
       <template v-slot:gwasLeadVariant="{ gwasLeadVariant }">{{ gwasLeadVariant }}</template>
@@ -27,32 +43,19 @@
 import { onMounted, ref } from 'vue'
 import { useGenePageHelpers } from '@/composables/GenePageHelpers';
 
-const { getTheData } = useGenePageHelpers();
+const { getTheData, table2Headers } = useGenePageHelpers();
 
-const theData = ref([])
-
-const headers = [
-  { title: 'gwasTrait', value: 'gwasTrait', sortable: true, },
-  { title: 'gwasDataset', value: 'gwasDataset', sortable: true, },
-  { title: 'gwasLeadVariant', value: 'gwasLeadVariant', sortable: true, },
-  { title: 'qtlDatset', value: 'qtlDatset', sortable: true, },
-  { title: 'qtlLeadVariant', value: 'qtlLeadVariant', sortable: true, },
-  { title: 'qtlTissue', value: 'qtlTissue', sortable: true, },
-  { title: 'qtlGene', value: 'qtlGene', sortable: true, },
-  { title: 'qtlSymbol', value: 'qtlSymbol', sortable: true, },
-  { title: 'otherGenesAnyTissueCount', value: 'otherGenesAnyTissueCount', sortable: true, },
-  { title: 'otherGenesAnyTissue', value: 'otherGenesAnyTissue', sortable: true, },
-  { title: 'otherGenesSameTissueCount', value: 'otherGenesSameTissueCount', sortable: true, },
-  { title: 'otherGenesSameTissue', value: 'otherGenesSameTissue', sortable: true, },
-]
+const table2Data = ref([])
+const theGene = ref('ENSG00000103351')
 
 onMounted(async () => {
-  const data = await getTheData()
-  theData.value = data
+  table2Data.value = await getTheData(theGene.value)
 })
 
+const getNewGene = async () => {
+  table2Data.value = await getTheData(theGene.value)
+}
 </script>
 
 <style scoped>
 </style>
-
