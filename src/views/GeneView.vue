@@ -19,22 +19,18 @@
     </div>
 
     <v-data-table :headers="table2Headers" :items="table2Data">
-      <template v-slot:gwasTrait="{ gwasTrait }">{{ gwasTrait }}</template>
-      <template v-slot:gwasDataset="{ gwasDataset }">{{ gwasDataset }}</template>
-      <template v-slot:gwasLeadVariant="{ gwasLeadVariant }">{{ gwasLeadVariant }}</template>
-      <template v-slot:qtlDatset="{ qtlDatset }">{{ qtlDatset }}</template>
-      <template v-slot:qtlLeadVariant="{ qtlLeadVariant }">{{ qtlLeadVariant }}</template>
-      <template v-slot:qtlTissue="{ qtlTissue }">{{ qtlTissue }}</template>
-      <template v-slot:qtlGene="{ qtlGene }">{{ qtlGene }}</template>
-      <template v-slot:qtlSymbol="{ qtlSymbol }">{{ qtlSymbol }}</template>
-      <template v-slot:otherGenesAnyTissueCount="{ otherGenesAnyTissueCount }">{{ otherGenesAnyTissueCount }}</template>
-      <template v-slot:item.otherGenesAnyTissue="{ item }">
-        {{ item.otherGenesAnyTissue.join(', ') }}
-      </template>
+      <template v-slot:item.gwasTrait="{ item }">{{ item.gwasTrait }}</template>
+      <template v-slot:item.gwasDataset="{ item }">{{ item.gwasDataset }}</template>
+      <template v-slot:item.gwasLeadVariant="{ item }">{{ item.gwasLeadVariant }}</template>
+      <template v-slot:item.qtlDataset="{ item }">{{ item.qtlDataset }}</template>
+      <template v-slot:item.qtlLeadVariant="{ item }">{{ item.qtlLeadVariant }}</template>
+      <template v-slot:item.qtlTissue="{ item }">{{ item.qtlTissue }}</template>
+      <template v-slot:item.qtlGene="{ item }">{{ item.qtlGene }}</template>
+      <template v-slot:item.qtlSymbol="{ item }">{{ item.qtlSymbol }}</template>
+      <template v-slot:item.otherGenesAnyTissueCount="{ item }">{{ item.otherGenesAnyTissueCount }}</template>
+      <template v-slot:item.otherGenesAnyTissue="{ item }">{{ item.otherGenesAnyTissue.join(', ') }}</template>
       <template v-slot:otherGenesSameTissueCount="{ otherGenesSameTissueCount }">{{ otherGenesSameTissueCount }}</template>
-      <template v-slot:item.otherGenesSameTissue="{ item }">
-        {{ item.otherGenesSameTissue.join(', ') }}
-      </template>
+      <template v-slot:item.otherGenesSameTissue="{ item }">{{ item.otherGenesSameTissue.join(', ') }}</template>
     </v-data-table>
   </v-container>
 </template>
@@ -50,6 +46,7 @@ const theGene = ref('ENSG00000103351')
 
 onMounted(async () => {
   table2Data.value = await getTheData(theGene.value)
+  console.log(table2Data.value)
 })
 
 const getNewGene = async () => {

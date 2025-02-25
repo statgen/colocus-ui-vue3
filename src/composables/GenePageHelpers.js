@@ -10,7 +10,7 @@ export function useGenePageHelpers() {
   let flatData = ''
 
   const flattenData = (data) => {
-    let recs = [];
+    let recs = []
     data.forEach((item) => {
       const rec = {
         gwasTrait: item.signal1.analysis.trait.uuid,
@@ -40,6 +40,8 @@ export function useGenePageHelpers() {
     const rawData = await getRawData(url)
     flatData = flattenData(rawData)
     const tableAllGenes = aq.from(flatData)
+    // tableAllGenes.print()
+
     const uniqueTraits = [...new Set(tableAllGenes.array('gwasTrait'))].join(',')
     const uniqueLeads = [...new Set(tableAllGenes.array('gwasLeadVariant'))].join(',')
 
@@ -49,45 +51,45 @@ export function useGenePageHelpers() {
     // console.log('data2', data2)
     const data3 = flattenData(data2)
     // console.log('data3', data3)
-    const data4 = data3.filter((el) => el.qtlGene !== theGene);
+    const data4 = data3.filter((el) => el.qtlGene !== theGene)
     // console.log('data4', data4)
     const tableExceptThisGene = aq.from(data4)
     // tableExceptThisGene.print(999)
 
     const table3 = tableExceptThisGene.groupby('gwasTrait', 'gwasLeadVariant')
-    // console.log('table3')
     // table3.print(999)
 
     // 1. Group by gwasTrait and gwasLead, roll up qtlGene column into array of all qtlGene values per group
     const groupedAnyTissue = table3
       .groupby('gwasTrait', 'gwasLeadVariant')
-      .rollup({ allGenes: aq.op.array_agg('qtlGene') });
+      .rollup({ allGenes: aq.op.array_agg('qtlGene') })
+    // groupedAnyTissue.print(999)
 
     const groupedAnyTissueDeDuped = groupedAnyTissue.objects().map(row => {
-      const allGenes = row.allGenes ? [...new Set(row.allGenes)] : [];
-      const allGenesCount = allGenes.length ?? 0;
+      const allGenes = row.allGenes ? [...new Set(row.allGenes)] : []
+      const allGenesCount = allGenes.length ?? 0
       return {
         gwasTrait: row.gwasTrait,
         gwasLeadVariant: row.gwasLeadVariant,
         otherGenesAnyTissueCount: allGenesCount,
         otherGenesAnyTissue: allGenes
-      };
-    });
-    // console.log('groupedAnyTissueDeDuped', groupedAnyTissueDeDuped);
+      }
+    })
+    // console.log('groupedAnyTissueDeDuped', groupedAnyTissueDeDuped)
 
     const table4 = tableExceptThisGene.groupby('gwasTrait', 'gwasLeadVariant', 'qtlTissue')
-    // console.log('table4')
     // table4.print(999)
 
     // 1. Group by gwasTrait and gwasLead, roll up qtlGene column into array of all qtlGene values per group
     const groupedByTissue = table4
       .groupby('gwasTrait', 'gwasLeadVariant', 'qtlTissue')
-      .rollup({ allGenes: aq.op.array_agg('qtlGene') });
+      .rollup({ allGenes: aq.op.array_agg('qtlGene') })
+    // groupedByTissue.print(999)
 
     // 2. Post-process the rollup result to deduplicate the gene list.
     const groupedByTissueDeDuped = groupedByTissue.objects().map(row => {
-      const allGenes = row.allGenes ? [...new Set(row.allGenes)] : [];
-      const allGenesCount = allGenes.length;
+      const allGenes = row.allGenes ? [...new Set(row.allGenes)] : []
+      const allGenesCount = allGenes.length
       return {
         gwasTrait: row.gwasTrait,
         gwasLeadVariant: row.gwasLeadVariant,
@@ -95,8 +97,8 @@ export function useGenePageHelpers() {
         otherGenesSameTissueCount: allGenesCount,
         otherGenesSameTissue: allGenes
       }
-    });
-    // console.log('groupedByTissueDeDuped', groupedByTissueDeDuped);
+    })
+    // console.log('groupedByTissueDeDuped', groupedByTissueDeDuped)
 
     const t1 = aq.from(groupedAnyTissueDeDuped)
     const t2 = aq.from(groupedByTissueDeDuped)
@@ -107,14 +109,14 @@ export function useGenePageHelpers() {
     const semiFinalTable = tableAllGenes
       .join_left(t1)
       .join_left(t2)
+    // semiFinalTable.print(999)
 
     // this converts 'undefined' to 0 in the count columns
     const filledTable = semiFinalTable.derive({
       otherGenesSameTissueCount: d => d.otherGenesSameTissueCount ?? 0,
       otherGenesSameTissue: d => d.otherGenesSameTissue ?? []
-    });
-
-    // filledTable.print();
+    })
+    // filledTable.print()
 
     return filledTable.objects()
 
@@ -124,7 +126,7 @@ export function useGenePageHelpers() {
     { title: 'GWAS Trait', value: 'gwasTrait', sortable: true, },
     { title: 'GWAS Dataset', value: 'gwasDataset', sortable: true, },
     { title: 'GWAS Lead Variant', value: 'gwasLeadVariant', sortable: true, },
-    { title: 'QTL Datset', value: 'qtlDatset', sortable: true, },
+    { title: 'QTL Dataset', value: 'qtlDataset', sortable: true, },
     { title: 'QTL Lead Variant', value: 'qtlLeadVariant', sortable: true, },
     { title: 'QTL Tissue', value: 'qtlTissue', sortable: true, },
     { title: 'QTL Gene', value: 'qtlGene', sortable: true, },
@@ -135,5 +137,5 @@ export function useGenePageHelpers() {
     { title: 'Other Genes Same Tissue', value: 'otherGenesSameTissue', sortable: true, },
   ]
 
-  return { getTheData, table2Headers };
+  return { getTheData, table2Headers }
 }
