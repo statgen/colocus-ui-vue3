@@ -64,7 +64,7 @@ const appStore = useAppStore()
 const { toggleFilterPanel } = appStore
 const isFilterButtonVisible = computed(() => appStore.filterPanelControls.isFilterButtonShowing)
 
-const genePage = `/${PAGE_NAMES.GENES}`
+const genePage = `/${PAGE_NAMES.GENE}`
 const helpPage = `/${PAGE_NAMES.HELP}`
 const qcStatsPage = `/${PAGE_NAMES.STATS_QC}`
 const searchPage = `/${PAGE_NAMES.SEARCH}`

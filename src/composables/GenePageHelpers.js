@@ -3,7 +3,7 @@ import { PAGE_NAMES, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
 import * as aq from 'arquero'
 
-const genePage = PAGE_NAMES.GENES
+const genePage = PAGE_NAMES.GENE
 const { data, errorMessage, fetchData } = useFetchData()
 
 export function useGenePageHelpers() {

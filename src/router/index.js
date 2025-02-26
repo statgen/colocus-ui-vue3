@@ -6,7 +6,7 @@ import { titleCase } from '@/util/util'
 const SHOW_FILTER_PANEL = true
 
 const homePage = PAGE_NAMES.HOME
-const genePage = PAGE_NAMES.GENES
+const genePage = PAGE_NAMES.GENE
 const helpPage = PAGE_NAMES.HELP
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN

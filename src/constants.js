@@ -27,7 +27,7 @@ const COLORS = {
 const NEARBY_DIST = 500e3
 
 const PAGE_NAMES = {
-  GENES: 'gene',
+  GENE: 'gene',
   HELP: 'help',
   HOME: 'home',
   LOCUSZOOM: 'locuszoom',
@@ -46,7 +46,7 @@ const URLS = {
   [PAGE_NAMES.SEARCH]: '/api/v1/coloc/',
   [PAGE_NAMES.MANHATTAN]: '/api/v1/coloc/',
   [PAGE_NAMES.LOCUSZOOM]: '/api/v1/coloc/',
-  [PAGE_NAMES.GENES]: '/api/v1/coloc/',
+  [PAGE_NAMES.GENE]: '/api/v1/coloc/',
   // these are misc data links
   FILTER_DATA: '/api/v1/internal/search_metadata/',
   STUDY_DATA: '/data/studies.json',
