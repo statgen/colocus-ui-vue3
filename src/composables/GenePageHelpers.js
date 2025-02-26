@@ -36,23 +36,35 @@ export function useGenePageHelpers() {
   }
 
   const getTheData = async (settings) => {
-
     console.log('settings in helpers', settings)
     const { h4, r2, theGene } = settings
-    console.log('theGene', theGene)
 
-    const url = `${URLS[genePage]}?genes=${theGene}`
-    // console.log('url', url)
+    const url = new URL(URLS[genePage], window.location.origin)
+    url.searchParams.set('genes', theGene)
+    url.searchParams.set('min_h4', h4)
+    url.searchParams.set('min_r2', r2)
+    console.log('url', url)
+
     const rawData = await getRawData(url)
     flatData = flattenData(rawData)
+    console.log('flatData', flatData)
+
     const tableAllGenes = aq.from(flatData)
     // tableAllGenes.print()
 
     const uniqueTraits = [...new Set(tableAllGenes.array('gwasTrait'))].join(',')
+    console.log('uniqueTraits', uniqueTraits)
     const uniqueLeads = [...new Set(tableAllGenes.array('gwasLeadVariant'))].join(',')
+    console.log('uniqueLeads', uniqueLeads)
 
-    const url2 = `${URLS[genePage]}?traits=${uniqueTraits}&variants=${uniqueLeads}`
-    // console.log('url2', url2)
+    // const url2 = `${URLS[genePage]}?traits=${uniqueTraits}&variants=${uniqueLeads}`
+    const url2 = new URL(URLS[genePage], window.location.origin)
+    url2.searchParams.set('traits', uniqueTraits)
+    url2.searchParams.set('variants', uniqueLeads)
+    url2.searchParams.set('min_h4', h4)
+    url2.searchParams.set('min_r2', r2)
+    console.log('url2', url2)
+
     const data2 = await getRawData(url2)
     // console.log('data2', data2)
     const data3 = flattenData(data2)
