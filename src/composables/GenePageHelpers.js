@@ -35,8 +35,14 @@ export function useGenePageHelpers() {
     }
   }
 
-  const getTheData = async (theGene) => {
+  const getTheData = async (settings) => {
+
+    console.log('settings in helpers', settings)
+    const { h4, r2, theGene } = settings
+    console.log('theGene', theGene)
+
     const url = `${URLS[genePage]}?genes=${theGene}`
+    // console.log('url', url)
     const rawData = await getRawData(url)
     flatData = flattenData(rawData)
     const tableAllGenes = aq.from(flatData)
@@ -119,7 +125,6 @@ export function useGenePageHelpers() {
     // filledTable.print()
 
     return filledTable.objects()
-
   }
 
   const table2Headers = [
