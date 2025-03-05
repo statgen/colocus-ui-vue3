@@ -1,26 +1,34 @@
-import { isReactive, isRef, ref, toRaw } from 'vue'
+import { computed, ref, toRaw, watch } from 'vue'
 import { PAGE_NAMES, URLS } from '@/constants'
 import { useFetchData } from '@/composables/fetchData'
+import { useAppStore } from '@/stores/AppStore'
 import * as aq from 'arquero'
 
 const genePage = PAGE_NAMES.GENE
 const { data, errorMessage, fetchData } = useFetchData()
 
 export function useGenePageHelpers() {
-  let flatData = ''
+  const appStore = useAppStore()
 
   const flattenData = (data) => {
     let recs = []
     data.forEach((item) => {
       const rec = {
-        gwasTrait: item.signal1.analysis.trait.uuid,
         gwasDataset: item.signal1.analysis.dataset.uuid,
         gwasLeadVariant: item.signal1.lead_variant.vid,
+        gwasStudy: item.signal1.analysis.study.uuid,
+        gwasTrait: item.signal1.analysis.trait.uuid,
+        gwasType: item.signal1.analysis.analysis_type,
+
         qtlDataset: item.signal2.analysis.dataset.uuid,
-        qtlLeadVariant: item.signal2.lead_variant.vid,
-        qtlTissue: item.signal2.analysis.tissue,
+        // qtlEnsID: item.signal2.analysis.trait.gene.ens_id,
         qtlGene: item.signal2.analysis.trait.uuid,
-        qtlSymbol: item.signal2.analysis.trait.gene.symbol
+        qtlLeadVariant: item.signal2.lead_variant.vid,
+        qtlStudy: item.signal2.analysis.study.uuid,
+        qtlSymbol: item.signal2.analysis.trait.gene.symbol,
+        qtlTissue: item.signal2.analysis.tissue,
+        qtlTrait: item.signal2.analysis.trait,
+        qtlType: item.signal2.analysis.trait.biomarker_type.replace('-expression', ''),
       }
       recs.push(rec)
     })
@@ -35,145 +43,143 @@ export function useGenePageHelpers() {
     }
   }
 
-  const getTableAllGenes = async (dataURL, settings) => {
+  const getTableWithGene = async (dataURL, settings) => {
     const { h4, r2, theGene } = settings
 
     const url = new URL(dataURL, window.location.origin)
     url.searchParams.set('genes', theGene)
     url.searchParams.set('min_h4', h4)
     url.searchParams.set('min_r2', r2)
-    // console.log('url', url)
 
     const rawData = await getRawData(url)
-    // console.log('rawData', rawData)
-    flatData = flattenData(rawData)
-    // console.log('flatData', flatData)
+    const flatData = flattenData(rawData)
 
-    const tableAllGenes = aq.from(flatData)
-    // console.log('tableAllGenes')
-    // tableAllGenes.print()
-    return tableAllGenes
+    const tableWithGene = aq.from(flatData)
+    return tableWithGene
   }
 
-  const getTableExceptThisGene = async (dataURL, settings, uniqueTraits, uniqueLeadVariants) => {
-    const { h4, r2, theGene } = settings
+  const getTableWithTraitsVariants = async (dataURL, settings, uniqueTraits, uniqueLeadVariants) => {
+    const { h4, r2 } = settings
     const url = new URL(dataURL, window.location.origin)
     url.searchParams.set('traits', uniqueTraits)
     url.searchParams.set('variants', uniqueLeadVariants)
     url.searchParams.set('min_h4', h4)
     url.searchParams.set('min_r2', r2)
-    // console.log('url', url)
 
-    const data2 = await getRawData(url)
-    // console.log('data2', data2)
-    const data3 = flattenData(data2)
-    // console.log('data3', data3)
-    const data4 = data3.filter((el) => el.qtlGene !== theGene)
-    // console.log('data4', data4)
-    const tableExceptThisGene = aq.from(data4)
-    // console.log('tableExceptThisGene')
-    // tableExceptThisGene.print(999)
-    return tableExceptThisGene
+    const rawData = await getRawData(url)
+    const flatData = flattenData(rawData)
+    const tableWithTraitsVariants = aq.from(flatData)
+    return tableWithTraitsVariants
   }
 
-  const getTableGroupedAnyTissue = async (tableExceptThisGene) => {
-    const table3 = tableExceptThisGene.groupby('gwasTrait', 'gwasLeadVariant')
-    // table3.print(999)
+  const getTableGroupedSameTissue =async (inputTable, theGene) => {
 
-    // 1. Group by gwasTrait and gwasLead, roll up qtlGene column into array of all qtlGene values per group
-    const groupedAnyTissue = table3
-      .groupby('gwasTrait', 'gwasLeadVariant')
-      .rollup({ allGenes: aq.op.array_agg('qtlSymbol') })
-    // groupedAnyTissue.print(999)
+    const tableGrouped = inputTable.groupby('gwasTrait', 'gwasLeadVariant', 'qtlTissue')
 
-    const groupedAnyTissueDeDuped = groupedAnyTissue.objects().map(row => {
-      const allGenes = row.allGenes ? [...new Set(row.allGenes)] : []
-      const allGenesCount = allGenes.length ?? 0
-      return {
-        gwasTrait: row.gwasTrait,
-        gwasLeadVariant: row.gwasLeadVariant,
-        otherGenesAnyTissueCount: allGenesCount,
-        otherGenesAnyTissue: allGenes
-      }
-    })
-    // console.log('groupedAnyTissueDeDuped', groupedAnyTissueDeDuped)
-
-    const t1 = aq.from(groupedAnyTissueDeDuped)
-    return t1
-  }
-
-  const getTableGroupedATissue =async (tableExceptThisGene) => {
-    const table4 = tableExceptThisGene.groupby('gwasTrait', 'gwasLeadVariant', 'qtlTissue')
-    // table4.print(999)
-
-    // 1. Group by gwasTrait and gwasLead, roll up qtlGene column into array of all qtlGene values per group
-    const groupedByTissue = table4
+    const tableRollup = tableGrouped
       .groupby('gwasTrait', 'gwasLeadVariant', 'qtlTissue')
-      .rollup({ allGenes: aq.op.array_agg('qtlSymbol') })
-    // groupedByTissue.print(999)
+      .rollup({allGenesArray: aq.op.array_agg('qtlSymbol')})
 
-    // 2. Post-process the rollup result to deduplicate the gene list.
-    const groupedByTissueDeDuped = groupedByTissue.objects().map(row => {
-      const allGenes = row.allGenes ? [...new Set(row.allGenes)] : []
-      const allGenesCount = allGenes.length
+    const reified = tableRollup.objects()
+    // debugger
+
+    const mapped = reified.map((row) => {
+      const includedGenes = row.allGenesArray.filter((qtlSymbol) => qtlSymbol !== theGene)
+      includedGenes.sort()
       return {
         gwasTrait: row.gwasTrait,
         gwasLeadVariant: row.gwasLeadVariant,
         qtlTissue: row.qtlTissue,
-        otherGenesSameTissueCount: allGenesCount,
-        otherGenesSameTissue: allGenes
+        otherGenesSameTissue: includedGenes.join(', '),
+        otherGenesSameTissueCount: includedGenes.length > 0 ? includedGenes.length : '',
       }
     })
-    // console.log('groupedByTissueDeDuped', groupedByTissueDeDuped)
-    const t2 = aq.from(groupedByTissueDeDuped)
-    return t2
+
+    const tableFinal = aq.from(mapped)
+    return tableFinal
+  }
+
+  const getTableGroupedAnyTissue = async (inputTable, theGene) => {
+    const tableWithGeneTissue = inputTable.derive({
+      geneTissue: d => `${d.qtlSymbol} (${d.qtlTissue})`
+    })
+
+    const tableRollup = tableWithGeneTissue
+      .groupby('gwasTrait', 'gwasLeadVariant')
+      .rollup({ allGenesArray: aq.op.array_agg_distinct('geneTissue') })
+
+    const reified = tableRollup.objects()
+
+    const mapped = reified.map((row) => {
+      const includedGenes = row.allGenesArray.filter((geneTissueStr) => !geneTissueStr.startsWith(`${theGene} (`))
+      includedGenes.sort()
+      return {
+        gwasTrait: row.gwasTrait,
+        gwasLeadVariant: row.gwasLeadVariant,
+        otherGenesAnyTissue: includedGenes.join(', '),
+        otherGenesAnyTissueCount: includedGenes.length > 0 ? includedGenes.length : '',
+      }
+    })
+
+    const tableFinal = aq.from(mapped)
+    return tableFinal
   }
 
   const getTheData = async (settings) => {
-    console.log('settings in helpers', settings)
+    const tableWithGene = await getTableWithGene(URLS[genePage], settings)
 
-    const tableAllGenes = await getTableAllGenes(URLS[genePage], settings)
+    const theGene = tableWithGene.objects()[0].qtlSymbol // use this instead of settings.theGene as it may be an ensembl id
+    const uniqueTraits = [...new Set(tableWithGene.array('gwasTrait'))].join(',')
+    const uniqueLeadVariants = [...new Set(tableWithGene.array('gwasLeadVariant'))].join(',')
 
-    const uniqueTraits = [...new Set(tableAllGenes.array('gwasTrait'))].join(',')
-    console.log('uniqueTraits', uniqueTraits)
-    const uniqueLeadVariants = [...new Set(tableAllGenes.array('gwasLeadVariant'))].join(',')
-    console.log('uniqueLeadVariants', uniqueLeadVariants)
+    const tableWithTraitsVariants = await getTableWithTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
 
-    const tableExceptThisGene = await getTableExceptThisGene(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
+    const tableGroupedSameTissue = await getTableGroupedSameTissue(tableWithTraitsVariants, theGene)
 
-    const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableExceptThisGene)
+    const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableWithTraitsVariants, theGene)
 
-    const tableGroupedATissue = await getTableGroupedATissue(tableExceptThisGene)
-
-    const semiFinalTable = tableAllGenes
+    const finalTable = tableWithGene
+      .join_left(tableGroupedSameTissue)
       .join_left(tableGroupedAnyTissue)
-      .join_left(tableGroupedATissue)
-    // semiFinalTable.print(999)
 
-    // this converts 'undefined' to 0 in the count columns
-    const filledTable = semiFinalTable.derive({
-      otherGenesSameTissueCount: d => d.otherGenesSameTissueCount ?? 0,
-      otherGenesSameTissue: d => d.otherGenesSameTissue ?? []
-    })
-    // filledTable.print()
-
-    return filledTable.objects()
+    return finalTable.objects()
   }
 
+  const alwaysShow = () => true
+
+  const showDatasets = ref(false)
+  const showEnsIDs = ref(true)
+
+  watch(() => appStore[genePage].showDatasets, newValue => { showDatasets.value = newValue })
+  watch(() => appStore[genePage].showEnsIDs, newValue => { showEnsIDs.value = newValue })
+
+  const visibleColumns = computed(() => {
+    return table2Headers.filter(header => header.visible())
+  })
+
   const table2Headers = [
-    { title: 'GWAS Trait', value: 'gwasTrait', sortable: true, },
-    { title: 'GWAS Dataset', value: 'gwasDataset', sortable: true, },
-    { title: 'GWAS Lead Variant', value: 'gwasLeadVariant', sortable: true, },
-    { title: 'QTL Dataset', value: 'qtlDataset', sortable: true, },
-    { title: 'QTL Lead Variant', value: 'qtlLeadVariant', sortable: true, },
-    { title: 'QTL Tissue', value: 'qtlTissue', sortable: true, },
-    { title: 'QTL Gene', value: 'qtlGene', sortable: true, },
-    { title: 'QTL Symbol', value: 'qtlSymbol', sortable: true, },
-    { title: 'Other Genes Any Tissue Count', value: 'otherGenesAnyTissueCount', sortable: true, },
-    { title: 'Other Genes Any Tissue', value: 'otherGenesAnyTissue', sortable: true, },
-    { title: 'Other Genes Same Tissue Count', value: 'otherGenesSameTissueCount', sortable: true, },
-    { title: 'Other Genes Same Tissue', value: 'otherGenesSameTissue', sortable: true, },
+    { title: 'Study 1', sortable: true, value: 'gwasStudy', minWidth: '7rem', visible: alwaysShow },
+    { title: 'Trait 1', sortable: true, value: 'gwasTrait', minWidth: '7rem', visible: alwaysShow },
+    { title: 'Type 1', sortable: true, value: 'gwasType', minWidth: '5rem', visible: alwaysShow },
+
+    { title: 'Study 2', sortable: true, value: 'qtlStudy', minWidth: '7rem', visible: alwaysShow },
+    { title: 'Trait 2', sortable: true, value: 'qtlSymbol', minWidth: '10rem', visible: alwaysShow },
+    { title: 'Type 2', sortable: true, value: 'qtlType', minWidth: '7rem', visible: alwaysShow },
+    // { title: 'QTL Gene', sortable: true, value: 'qtlGene', visible: alwaysShow },
+    { title: 'Trait 2 ENSG', sortable: true, value: 'qtlTrait', minWidth: '12rem', visible: () => showEnsIDs.value },
+    { title: 'Tissue', sortable: true, value: 'qtlTissue', minWidth: '7rem', visible: alwaysShow },
+
+    { title: 'Trait 1 Variant', sortable: true, value: 'gwasLeadVariant', minWidth: '12rem', visible: alwaysShow },
+    { title: 'Trait 2 Variant', sortable: true, value: 'qtlLeadVariant', minWidth: '12rem', visible: alwaysShow },
+
+    { title: 'Other Genes Same Tissue Count', sortable: true, value: 'otherGenesSameTissueCount', visible: alwaysShow },
+    { title: 'Other Genes Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '12rem', visible: alwaysShow },
+    { title: 'Other Genes Any Tissue Count', sortable: true, value: 'otherGenesAnyTissueCount', visible: alwaysShow },
+    { title: 'Other Genes Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '12rem', visible: alwaysShow },
+
+    { title: 'GWAS Dataset', sortable: true, value: 'gwasDataset', visible: () => showDatasets.value },
+    { title: 'QTL Dataset', sortable: true, value: 'qtlDataset', visible: () => showDatasets.value  },
   ]
 
-  return { getTheData, table2Headers }
+  return { getTheData, visibleColumns }
 }

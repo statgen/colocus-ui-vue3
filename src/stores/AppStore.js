@@ -26,6 +26,11 @@ export const useAppStore = defineStore('appStore', {
       studies: markRaw([]),
       tissues: markRaw([]),
     },
+    [PAGE_NAMES.GENE]: {
+      colorCodeVariants: true,
+      showDatasets: false,
+      showEnsIDs: false,
+    },
     [PAGE_NAMES.LOCUSZOOM]: {
       colocData: markRaw({}),
       colocDataReady: false,

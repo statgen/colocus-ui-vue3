@@ -11,19 +11,36 @@
     <p class="text-caption">Sample gene: ENSG00000103351</p>
 
     <div class="table-container">
-      <v-data-table :headers="table2Headers" :items="table2Data">
+      <v-data-table :headers="visibleColumns" :items="table2Data" density="compact">
+        <template v-slot:item.gwasStudy="{ item }">{{ item.gwasStudy }}</template>
         <template v-slot:item.gwasTrait="{ item }">{{ item.gwasTrait }}</template>
-        <template v-slot:item.gwasDataset="{ item }">{{ item.gwasDataset }}</template>
-        <template v-slot:item.gwasLeadVariant="{ item }">{{ item.gwasLeadVariant }}</template>
-        <template v-slot:item.qtlDataset="{ item }">{{ item.qtlDataset }}</template>
-        <template v-slot:item.qtlLeadVariant="{ item }">{{ item.qtlLeadVariant }}</template>
+        <template v-slot:item.gwasType="{ item }">{{ item.gwasType }}</template>
+
+        <template v-slot:item.qtlStudy="{ item }">{{ item.qtlStudy }}</template>
+        <template v-slot:item.qtlType="{ item }">{{ item.qtlType }}</template>
+<!--        <template v-slot:item.qtlGene="{ item }">{{ item.qtlGene }}</template>-->
+
+        <template v-slot:item.qtlTrait="{ item }">
+          <EnsgLabel :trait="item.qtlTrait" />
+        </template>
+
         <template v-slot:item.qtlTissue="{ item }">{{ item.qtlTissue }}</template>
-        <template v-slot:item.qtlGene="{ item }">{{ item.qtlGene }}</template>
+
+
+        <template v-slot:item.gwasLeadVariant="{ item }">
+          <VariantLabel :variant="item.gwasLeadVariant" :showSplotch="true" />
+        </template>
+        <template v-slot:item.qtlLeadVariant="{ item }">
+          <VariantLabel :variant="item.qtlLeadVariant" :showSplotch="true" />
+        </template>
+
+        <template v-slot:item.qtlDataset="{ item }">{{ item.qtlDataset }}</template>
+        <template v-slot:item.gwasDataset="{ item }">{{ item.gwasDataset }}</template>
         <template v-slot:item.qtlSymbol="{ item }">{{ item.qtlSymbol }}</template>
         <template v-slot:item.otherGenesAnyTissueCount="{ item }">{{ item.otherGenesAnyTissueCount }}</template>
-        <template v-slot:item.otherGenesAnyTissue="{ item }">{{ item.otherGenesAnyTissue.join(', ') }}</template>
-        <template v-slot:otherGenesSameTissueCount="{ otherGenesSameTissueCount }">{{ otherGenesSameTissueCount }}</template>
-        <template v-slot:item.otherGenesSameTissue="{ item }">{{ item.otherGenesSameTissue.join(', ') }}</template>
+        <template v-slot:item.otherGenesAnyTissue="{ item }">{{ item.otherGenesAnyTissue }}</template>
+        <template v-slot:item.otherGenesSameTissueCount="{ item }">{{ item.otherGenesSameTissueCount }}</template>
+        <template v-slot:item.otherGenesSameTissue="{ item }">{{ item.otherGenesSameTissue }}</template>
       </v-data-table>
     </div>
   </v-container>
@@ -34,7 +51,7 @@
 import { onMounted, ref } from 'vue'
 import { useGenePageHelpers } from '@/composables/GenePageHelpers';
 
-const { getTheData, table2Headers } = useGenePageHelpers();
+const { getTheData, visibleColumns } = useGenePageHelpers();
 
 const table2Data = ref([])
 const theGene = ref('ENSG00000103351')

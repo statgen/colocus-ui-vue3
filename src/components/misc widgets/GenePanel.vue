@@ -1,6 +1,6 @@
 <template>
   <v-sheet class="bg-clcBackground mt-2" elevation="0" border>
-    <div class="d-flex align-center px-0">
+    <div class="d-flex align-center px-0 gene-panel">
       <ToolTippy>
         <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="reset-icon-class" />
         <template #tooltipContent>
@@ -52,13 +52,18 @@
           show-ticks="always"
           thumb-size="12"
         ></v-slider>
+
+        <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
+        <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
+        <CtlSwitch :controlSet="controlConfig.showDatasets" />
+
       </v-container>
   </v-sheet>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { inject, onMounted, ref, watch } from 'vue'
+import { inject, onMounted, provide, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { THRESHOLDS } from '@/constants'
 import { matchLowercase } from '@/util/util'
@@ -81,6 +86,9 @@ const slidersEnabled = ref(false)
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
+const resetInput = ref(false)
+
+provide('resetInput', resetInput)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 const emit = defineEmits(['onGeneSettingsChange'])
@@ -124,6 +132,7 @@ const onResetButtonClick = () => {
   r2value.value = THRESHOLDS.R2
   r2label.value = `r2 ≥ ${r2value.value}`
   slidersEnabled.value = false
+  resetInput.value = !resetInput.value
   onGeneSettingsChange()
 }
 
@@ -133,7 +142,15 @@ const mlc = ((itemTitle, queryText, item) => {
 })
 
 // *** Configuration data ******************************************************
+const controlConfig = {
+  colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
+  showDatasets: { title: 'Show datasets', storeKey: 'showDatasets', defaultValue: false },
+  showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false },
+}
 </script>
 
 <style scoped>
+.gene-panel {
+  min-width: 206px;
+}
 </style>
