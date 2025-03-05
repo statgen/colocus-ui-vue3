@@ -16,9 +16,9 @@ export const useAppStore = defineStore('appStore', {
     },
     filterPanelControls: {
       filterDataChanged: false,
-      isFilterButtonShowing: true,
+      isSidebarButtonShowing: true,
       isFilterDataLoaded: false,
-      isFilterPanelShowing: true,
+      isSidebarShowing: true,
       lastFilterUpdated: '',
       analysisTypes: markRaw([]),
       genes: markRaw([]),
@@ -28,8 +28,12 @@ export const useAppStore = defineStore('appStore', {
     },
     [PAGE_NAMES.GENE]: {
       colorCodeVariants: true,
+      h4: THRESHOLDS.H4,
+      r2: THRESHOLDS.R2,
+      selectedGene: '',
       showDatasets: false,
       showEnsIDs: false,
+      slidersEnabled: false,
     },
     [PAGE_NAMES.LOCUSZOOM]: {
       colocData: markRaw({}),
@@ -232,8 +236,8 @@ export const useAppStore = defineStore('appStore', {
       this[parentKey][key] = value
     },
 
-    toggleFilterPanel() {
-      this.filterPanelControls.isFilterPanelShowing = !this.filterPanelControls.isFilterPanelShowing
+    toggleSidebar() {
+      this.filterPanelControls.isSidebarShowing = !this.filterPanelControls.isSidebarShowing
     },
   },
   getters: {

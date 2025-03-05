@@ -1,8 +1,8 @@
 <template>
-  <v-col v-show="appStore.filterPanelControls.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
-  <v-col :cols="appStore.filterPanelControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
+  <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
     <v-row class="mx-0 my-0">
       <h1><BackButton />Manhattan Plot: <span class="analysis-id">{{ analysisID }}</span></h1>
     </v-row>

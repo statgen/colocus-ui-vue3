@@ -1,9 +1,9 @@
 <template>
-  <v-col v-show="appStore.filterPanelControls.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
 
-  <v-col :cols="appStore.filterPanelControls.isFilterPanelShowing ? 10 : 12" class="ml-3">
+  <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-3">
     <v-row class="mt-1 ml-2">
       <h1><BackButton />Locus Zoom</h1>
     </v-row>

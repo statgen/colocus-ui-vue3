@@ -1,6 +1,6 @@
 <template>
     <v-toolbar class="fixed-toolbar bg-clcBackground" flat density="compact" border height="72">
-      <v-icon v-if="isFilterButtonVisible" icon="mdi-filter-outline" @click="toggleFilterPanel" class="text-clcAction mx-3" size="40px"/>
+      <v-icon v-if="isSidebarButtonVisible" icon="mdi-filter-outline" @click="toggleSidebar" class="text-clcAction mx-3" size="40px"/>
 
       <AppLogo />
 
@@ -61,8 +61,8 @@ import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 
 const appStore = useAppStore()
-const { toggleFilterPanel } = appStore
-const isFilterButtonVisible = computed(() => appStore.filterPanelControls.isFilterButtonShowing)
+const { toggleSidebar } = appStore
+const isSidebarButtonVisible = computed(() => appStore.filterPanelControls.isSidebarButtonShowing)
 
 const genePage = `/${PAGE_NAMES.GENE}`
 const helpPage = `/${PAGE_NAMES.HELP}`

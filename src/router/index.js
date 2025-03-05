@@ -18,14 +18,14 @@ const summaryStatsPage = PAGE_NAMES.STATS_SUMMARY
 
 const enableFiltering = (panelIsVisible) => {
   const appStore = useAppStore()
-  appStore.filterPanelControls.isFilterButtonShowing = true
-  appStore.filterPanelControls.isFilterPanelShowing = panelIsVisible
+  appStore.filterPanelControls.isSidebarButtonShowing = true
+  appStore.filterPanelControls.isSidebarShowing = panelIsVisible
 }
 
 const disableFiltering = () => {
   const appStore = useAppStore()
-  appStore.filterPanelControls.isFilterButtonShowing = false
-  appStore.filterPanelControls.isFilterPanelShowing = false
+  appStore.filterPanelControls.isSidebarButtonShowing = false
+  appStore.filterPanelControls.isSidebarShowing = false
 }
 
 const routes = [
@@ -38,6 +38,10 @@ const routes = [
     path: `/${genePage}`,
     name: genePage,
     component: () => import('@/views/GeneView.vue'),
+    beforeEnter: (to, from, next) => {
+      enableFiltering(SHOW_FILTER_PANEL)
+      next()
+    },
   },
   {
     path: `/${helpPage}`,

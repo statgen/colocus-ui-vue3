@@ -1,8 +1,8 @@
 <template>
-  <v-col v-show="appStore.filterPanelControls.isFilterPanelShowing" class="filter-panel-container">
+  <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
-  <v-col :cols="appStore.filterPanelControls.isFilterPanelShowing ? 10 : 12" class="ml-2">
+  <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
     <div class="search-header">
       <h1>Search</h1>
       <p>You are viewing {{ appStore.dataTable.itemCount }} of {{ appStore.dataTable.countPairs }} records.</p>

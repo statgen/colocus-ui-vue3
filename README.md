@@ -70,7 +70,7 @@ The data structure includes global state variables (e.g., isDataLoaded), plus pa
 - updateFilter is a helper for the filter panel components. updateFilter updates the appropriate value in the appropriate key, depending on which page (Search or LocusZoom) the user is on.
 - updateSort updates the store key storing sort parameters that end up in the URL.
 - updateSwitch updates the booleans tracking the display of the ensemble IDs and the concordance values.
-- toggleFilterPanel is used by the <Toolbar> to show and hide the filter panel.
+- toggleSidebar is used by the <Toolbar> to show and hide the filter panel.
 
 ### Router
 For most pages, the router simply provides a link to the corresponding view file. The Search and LocusZoom pages enable the filter panel and button, and the LocusZoom page copies user filter panel selections and entries from the Search page data.
