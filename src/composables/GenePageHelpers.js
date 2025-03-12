@@ -71,6 +71,9 @@ export function useGenePageHelpers() {
 
     const t1Objects = t2Grouped.objects()
     t1Objects.forEach(row => {
+      row.traitsColocalizedCount = row.traitsColocalized.length
+      row.traitsColocalized = row.traitsColocalized.sort().join(', ')
+
       if(row.otherGenesSameTissueCount > 0) {
         const gwasLeadVariantPos = parseInt(row.gwasLeadVariant.split('_')[1])
         let genes = row.otherGenesSameTissue
@@ -202,7 +205,7 @@ export function useGenePageHelpers() {
     let t2Grouped = table2
       .groupby('gwasLeadVariant', 'qtlSymbol', 'qtlTissue', 'qtlStudy', 'otherGenesSameTissueCount', 'otherGenesSameTissue', )
       .rollup({
-        traitsColocalized: aq.op.array_agg_distinct('gwasTrait'),
+        traitsColocalized: aq.op.array_agg_distinct('gwasTrait')
       })
 
     const t1Objects = await getTable1Objects(t2Grouped)
@@ -221,33 +224,46 @@ export function useGenePageHelpers() {
   watch(() => appStore[genePage].showDatasets, newValue => { showDatasets.value = newValue })
   watch(() => appStore[genePage].showEnsIDs, newValue => { showEnsIDs.value = newValue })
 
-  const visibleColumns = computed(() => {
+  const visibleTable1Columns = computed(() => {
+    return table1Headers.filter(header => header.visible())
+  })
+
+  const table1Headers = [
+    { title: 'QTL Tissue', sortable : true, value: 'qtlTissue', width: '7rem', visible: alwaysShow },
+    { title: 'QTL Study', sortable: true, value: 'qtlStudy', width: '7rem', visible: alwaysShow },
+    { title: 'GWAS Lead Variant', sortable: true, value: 'gwasLeadVariant', maxWidth: '10rem', visible: alwaysShow },
+    { title: 'Traits Colocalized Count', sortable: true, value: 'traitsColocalizedCount', width: '10rem', align: 'center', visible: alwaysShow },
+    { title: 'Traits Colocalized', sortable: true, value: 'traitsColocalized', visible: alwaysShow },
+    { title: 'Other Genes Same GWAS Count', sortable: true, value: 'otherGenesSameTissueCount', width: '10rem', align: 'center', visible: alwaysShow },
+    { title: 'Other Genes Same GWAS', sortable: true, value: 'otherGenesSameTissue', visible: alwaysShow },
+  ]
+
+  const visibleTable2Columns = computed(() => {
     return table2Headers.filter(header => header.visible())
   })
 
   const table2Headers = [
     { title: 'Study 1', sortable: true, value: 'gwasStudy', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'gwasTrait', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Type 1', sortable: true, value: 'gwasType', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Type 1', sortable: true, value: 'gwasType', minWidth: '7rem', visible: alwaysShow },
 
     { title: 'Study 2', sortable: true, value: 'qtlStudy', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 2', sortable: true, value: 'qtlSymbol', minWidth: '10rem', visible: alwaysShow },
     { title: 'Type 2', sortable: true, value: 'qtlType', minWidth: '7rem', visible: alwaysShow },
-    // { title: 'QTL Gene', sortable: true, value: 'qtlGene', visible: alwaysShow },
     { title: 'Trait 2 ENSG', sortable: true, value: 'qtlTrait', minWidth: '12rem', visible: () => showEnsIDs.value },
     { title: 'Tissue', sortable: true, value: 'qtlTissue', minWidth: '7rem', visible: alwaysShow },
 
     { title: 'Trait 1 Variant', sortable: true, value: 'gwasLeadVariant', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 2 Variant', sortable: true, value: 'qtlLeadVariant', minWidth: '12rem', visible: alwaysShow },
 
-    { title: 'Other Genes Same Tissue Count', sortable: true, value: 'otherGenesSameTissueCount', visible: alwaysShow },
+    { title: 'Other Genes Same Tissue Count', sortable: true, value: 'otherGenesSameTissueCount', align: 'end', visible: alwaysShow },
     { title: 'Other Genes Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '12rem', visible: alwaysShow },
-    { title: 'Other Genes Any Tissue Count', sortable: true, value: 'otherGenesAnyTissueCount', visible: alwaysShow },
-    { title: 'Other Genes Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '12rem', visible: alwaysShow },
+    { title: 'Other Genes Any Tissue Count', sortable: true, value: 'otherGenesAnyTissueCount', align: 'end', visible: alwaysShow },
+    { title: 'Other Genes Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '24rem', visible: alwaysShow },
 
     { title: 'GWAS Dataset', sortable: true, value: 'gwasDataset', visible: () => showDatasets.value },
     { title: 'QTL Dataset', sortable: true, value: 'qtlDataset', visible: () => showDatasets.value  },
   ]
 
-  return { getTheData, visibleColumns }
+  return { getTheData, visibleTable1Columns, visibleTable2Columns }
 }

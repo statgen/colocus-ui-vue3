@@ -9,8 +9,24 @@
       <p>Descriptive text...</p>
       <p class="text-caption">Sample gene: ENSG00000103351</p>
 
+      <h2>Table 1</h2>
+      <p>Descriptive text...</p>
       <div class="table-container">
-        <v-data-table :headers="visibleColumns" :items="table2Data" density="compact">
+        <v-data-table :headers="visibleTable1Columns" :items="table1Data" density="compact" class="data-table-base">
+          <template v-slot:item.qtlTissue="{ item }">{{ item.qtlTissue }}</template>
+          <template v-slot:item.qtlStudy="{ item }">{{ item.qtlStudy }}</template>
+          <template v-slot:item.gwasLeadVariant="{ item }"><VariantLabel :variant="item.gwasLeadVariant" :showSplotch="true" /></template>
+          <template v-slot:item.traitsColocalizedCount="{ item }">{{ item.traitsColocalizedCount }}</template>
+          <template v-slot:item.traitsColocalized="{ item }">{{ item.traitsColocalized }}</template>
+          <template v-slot:item.otherGenesSameTissueCount="{ item }">{{ item.otherGenesSameTissueCount }}</template>
+          <template v-slot:item.otherGenesSameTissue="{ item }">{{ item.otherGenesSameTissue }}</template>
+        </v-data-table>
+      </div>
+
+      <h2>Table 2</h2>
+      <p>Descriptive text...</p>
+      <div class="table-container">
+        <v-data-table :headers="visibleTable2Columns" :items="table2Data" density="compact" class="data-table-base">
           <template v-slot:item.gwasStudy="{ item }">{{ item.gwasStudy }}</template>
           <template v-slot:item.gwasTrait="{ item }">{{ item.gwasTrait }}</template>
           <template v-slot:item.gwasType="{ item }">{{ item.gwasType }}</template>
@@ -44,7 +60,7 @@ import { PAGE_NAMES, THRESHOLDS } from "@/constants";
 import { useAppStore } from '@/stores/AppStore'
 
 const appStore = useAppStore()
-const { getTheData, visibleColumns } = useGenePageHelpers();
+const { getTheData, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
 
 const table1Data = ref([])
 const table2Data = ref([])
@@ -102,6 +118,11 @@ const loadData = async () => {
 }
 
 .table-container {
-  overflow-x: auto;
+  /*overflow-x: auto;*/
+}
+
+.data-table-base {
+  font-size: 1rem;
+  line-height: 1.3;
 }
 </style>
