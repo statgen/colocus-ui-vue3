@@ -23,6 +23,8 @@ export function useGenePageHelpers() {
         qtlDataset: item.signal2.analysis.dataset.uuid,
         // qtlEnsID: item.signal2.analysis.trait.gene.ens_id,
         qtlGene: item.signal2.analysis.trait.uuid,
+        qtlGeneStartPos: item.signal2.analysis.trait.gene.start,
+        qtlGeneEndPos: item.signal2.analysis.trait.gene.end,
         qtlLeadVariant: item.signal2.lead_variant.vid,
         qtlStudy: item.signal2.analysis.study.uuid,
         qtlSymbol: item.signal2.analysis.trait.gene.symbol,
@@ -33,6 +35,62 @@ export function useGenePageHelpers() {
       recs.push(rec)
     })
     return recs
+  }
+
+  const getGeneDetails = async (table) => {
+    let allAssocGenes = table
+      .array('otherGenesSameTissue')
+      .flatMap(row => row.split(','))  // split each string into array and flatten
+      .map(val => val.trim())          // remove whitespace
+      .filter(val => val !== '')       // remove empty strings
+      .join(',')
+
+    allAssocGenes = Array.from(new Set(allAssocGenes.split(','))).join(',') // remove duplicates
+
+    const url = new URL(URLS[genePage], window.location.origin)
+    url.searchParams.set('genes', allAssocGenes)
+    const rawData = await getRawData(url)
+
+    let recs = {}
+    let genes = []
+    rawData.forEach((item) => {
+      const gene = item.signal2.analysis.trait.gene.symbol
+      if(!genes.includes(gene)) {
+        genes.push(gene)
+        recs[gene] = {
+          start: item.signal2.analysis.trait.gene.start,
+          end: item.signal2.analysis.trait.gene.end,
+        }
+      }
+    })
+    return recs
+  }
+
+  const getTable1Objects = async (t2Grouped) => {
+    const geneDetails = await getGeneDetails(t2Grouped)
+
+    const t1Objects = t2Grouped.objects()
+    t1Objects.forEach(row => {
+      if(row.otherGenesSameTissueCount > 0) {
+        const gwasLeadVariantPos = parseInt(row.gwasLeadVariant.split('_')[1])
+        let genes = row.otherGenesSameTissue
+        genes = genes.replace(/ /g, '')
+        genes = genes.split(',')
+        const geneDistances = []
+        genes.forEach(gene => {
+          const details = geneDetails[gene]
+          const distance = Math.min(
+            Math.abs(gwasLeadVariantPos - details.start),
+            Math.abs(gwasLeadVariantPos - details.end),
+          )
+          geneDistances.push({ gene, distance })
+        })
+        const tc = aq.from(geneDistances).orderby('distance')
+        const sortedGeneList = tc.array('gene').join(', ')
+        row.otherGenesSameTissue = sortedGeneList
+      }
+    })
+    return t1Objects
   }
 
   const getRawData = async (url) => {
@@ -126,23 +184,33 @@ export function useGenePageHelpers() {
   }
 
   const getTheData = async (settings) => {
+    // first build table 2 ------------------------------------------------------------
     const tableWithGene = await getTableWithGene(URLS[genePage], settings)
-
     const theGene = tableWithGene.objects()[0].qtlSymbol // use this instead of settings.theGene as it may be an ensembl id
     const uniqueTraits = [...new Set(tableWithGene.array('gwasTrait'))].join(',')
     const uniqueLeadVariants = [...new Set(tableWithGene.array('gwasLeadVariant'))].join(',')
 
     const tableWithTraitsVariants = await getTableWithTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
-
     const tableGroupedSameTissue = await getTableGroupedSameTissue(tableWithTraitsVariants, theGene)
-
     const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableWithTraitsVariants, theGene)
 
-    const finalTable = tableWithGene
+    const table2 = tableWithGene
       .join_left(tableGroupedSameTissue)
       .join_left(tableGroupedAnyTissue)
 
-    return finalTable.objects()
+    // then build data for table 1 ------------------------------------------------------------
+    let t2Grouped = table2
+      .groupby('gwasLeadVariant', 'qtlSymbol', 'qtlTissue', 'qtlStudy', 'otherGenesSameTissueCount', 'otherGenesSameTissue', )
+      .rollup({
+        traitsColocalized: aq.op.array_agg_distinct('gwasTrait'),
+      })
+
+    const t1Objects = await getTable1Objects(t2Grouped)
+
+    return {
+      table1data: t1Objects,
+      table2data: table2.objects(),
+    }
   }
 
   const alwaysShow = () => true

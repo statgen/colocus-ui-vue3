@@ -46,6 +46,7 @@ import { useAppStore } from '@/stores/AppStore'
 const appStore = useAppStore()
 const { getTheData, visibleColumns } = useGenePageHelpers();
 
+const table1Data = ref([])
 const table2Data = ref([])
 
 const genePage = PAGE_NAMES.GENE
@@ -84,7 +85,9 @@ const loadData = async () => {
     r2: appStore[genePage].r2,
   }
   if(settings.theGene) {
-    table2Data.value = await getTheData(settings)
+    const allData = await getTheData(settings)
+    table1Data.value = allData.table1data
+    table2Data.value = allData.table2data
     appStore[genePage].slidersEnabled = true
   } else {
     table2Data.value = []
