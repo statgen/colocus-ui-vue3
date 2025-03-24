@@ -219,7 +219,7 @@ export function useGenePageHelpers() {
   const alwaysShow = () => true
 
   const showDatasets = ref(false)
-  const showEnsIDs = ref(true)
+  const showEnsIDs = ref(false)
 
   watch(() => appStore[genePage].showDatasets, newValue => { showDatasets.value = newValue })
   watch(() => appStore[genePage].showEnsIDs, newValue => { showEnsIDs.value = newValue })
