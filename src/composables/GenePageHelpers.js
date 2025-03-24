@@ -89,7 +89,7 @@ export function useGenePageHelpers() {
           geneDistances.push({ gene, distance })
         })
         const tc = aq.from(geneDistances).orderby('distance')
-        const sortedGeneList = tc.array('gene').join(', ')
+        const sortedGeneList = tc.array('gene').sort().join(', ')
         row.otherGenesSameTissue = sortedGeneList
       }
     })
