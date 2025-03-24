@@ -60,7 +60,7 @@ import { PAGE_NAMES, THRESHOLDS } from "@/constants";
 import { useAppStore } from '@/stores/AppStore'
 
 const appStore = useAppStore()
-const { getTheData, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
+const { getGeneData, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
 
 const table1Data = ref([])
 const table2Data = ref([])
@@ -101,7 +101,7 @@ const loadData = async () => {
     r2: appStore[genePage].r2,
   }
   if(settings.theGene) {
-    const allData = await getTheData(settings)
+    const allData = await getGeneData(settings)
     table1Data.value = allData.table1data
     table2Data.value = allData.table2data
     appStore[genePage].slidersEnabled = true

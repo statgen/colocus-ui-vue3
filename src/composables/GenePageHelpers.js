@@ -46,23 +46,24 @@ export function useGenePageHelpers() {
       .join(',')
 
     allAssocGenes = Array.from(new Set(allAssocGenes.split(','))).join(',') // remove duplicates
+    if(!allAssocGenes) return {}
 
     const url = new URL(URLS[genePage], window.location.origin)
     url.searchParams.set('genes', allAssocGenes)
-    const rawData = await getRawData(url)
+    const rawData = await getRawData(url, 'gene data: gene details')
 
     let recs = {}
-    let genes = []
     rawData.forEach((item) => {
       const gene = item.signal2.analysis.trait.gene.symbol
-      if(!genes.includes(gene)) {
-        genes.push(gene)
+      console.log('gene', gene)
+      if(!recs.hasOwnProperty(gene)) {
         recs[gene] = {
           start: item.signal2.analysis.trait.gene.start,
           end: item.signal2.analysis.trait.gene.end,
         }
       }
     })
+
     return recs
   }
 
@@ -96,15 +97,15 @@ export function useGenePageHelpers() {
     return t1Objects
   }
 
-  const getRawData = async (url) => {
-    if(await fetchData(url, 'gene coloc data', genePage)) {
+  const getRawData = async (url, reason) => {
+    if(await fetchData(url, reason, genePage)) {
       return toRaw(data.value.results)
     } else {
       throw new Error('Error loading gene data:\n' + errorMessage)
     }
   }
 
-  const getTableWithGene = async (dataURL, settings) => {
+  const getTableForGene = async (dataURL, settings) => {
     const { h4, r2, theGene } = settings
 
     const url = new URL(dataURL, window.location.origin)
@@ -112,14 +113,14 @@ export function useGenePageHelpers() {
     url.searchParams.set('min_h4', h4)
     url.searchParams.set('min_r2', r2)
 
-    const rawData = await getRawData(url)
+    const rawData = await getRawData(url, 'gene data: for gene')
     const flatData = flattenData(rawData)
 
-    const tableWithGene = aq.from(flatData)
-    return tableWithGene
+    const tableForGene = aq.from(flatData)
+    return tableForGene
   }
 
-  const getTableWithTraitsVariants = async (dataURL, settings, uniqueTraits, uniqueLeadVariants) => {
+  const gettableForTraitsVariants = async (dataURL, settings, uniqueTraits, uniqueLeadVariants) => {
     const { h4, r2 } = settings
     const url = new URL(dataURL, window.location.origin)
     url.searchParams.set('traits', uniqueTraits)
@@ -127,10 +128,10 @@ export function useGenePageHelpers() {
     url.searchParams.set('min_h4', h4)
     url.searchParams.set('min_r2', r2)
 
-    const rawData = await getRawData(url)
+    const rawData = await getRawData(url, 'gene data: for traits and variants')
     const flatData = flattenData(rawData)
-    const tableWithTraitsVariants = aq.from(flatData)
-    return tableWithTraitsVariants
+    const tableForTraitsVariants = aq.from(flatData)
+    return tableForTraitsVariants
   }
 
   const getTableGroupedSameTissue =async (inputTable, theGene) => {
@@ -186,16 +187,16 @@ export function useGenePageHelpers() {
     return tableFinal
   }
 
-  const getTheData = async (settings) => {
+  const getGeneData = async (settings) => {
     // first build table 2 ------------------------------------------------------------
-    const tableWithGene = await getTableWithGene(URLS[genePage], settings)
+    const tableWithGene = await getTableForGene(URLS[genePage], settings)
     const theGene = tableWithGene.objects()[0].qtlSymbol // use this instead of settings.theGene as it may be an ensembl id
     const uniqueTraits = [...new Set(tableWithGene.array('gwasTrait'))].join(',')
     const uniqueLeadVariants = [...new Set(tableWithGene.array('gwasLeadVariant'))].join(',')
 
-    const tableWithTraitsVariants = await getTableWithTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
-    const tableGroupedSameTissue = await getTableGroupedSameTissue(tableWithTraitsVariants, theGene)
-    const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableWithTraitsVariants, theGene)
+    const tableForTraitsVariants = await gettableForTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
+    const tableGroupedSameTissue = await getTableGroupedSameTissue(tableForTraitsVariants, theGene)
+    const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableForTraitsVariants, theGene)
 
     const table2 = tableWithGene
       .join_left(tableGroupedSameTissue)
@@ -208,6 +209,7 @@ export function useGenePageHelpers() {
         traitsColocalized: aq.op.array_agg_distinct('gwasTrait')
       })
 
+    console.log('t2grouped'); t2Grouped.print()
     const t1Objects = await getTable1Objects(t2Grouped)
 
     return {
@@ -265,5 +267,5 @@ export function useGenePageHelpers() {
     { title: 'QTL Dataset', sortable: true, value: 'qtlDataset', visible: () => showDatasets.value  },
   ]
 
-  return { getTheData, visibleTable1Columns, visibleTable2Columns }
+  return { getGeneData, visibleTable1Columns, visibleTable2Columns }
 }
