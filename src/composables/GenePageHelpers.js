@@ -55,7 +55,6 @@ export function useGenePageHelpers() {
     let recs = {}
     rawData.forEach((item) => {
       const gene = item.signal2.analysis.trait.gene.symbol
-      console.log('gene', gene)
       if(!recs.hasOwnProperty(gene)) {
         recs[gene] = {
           start: item.signal2.analysis.trait.gene.start,
@@ -162,11 +161,11 @@ export function useGenePageHelpers() {
   }
 
   const getTableGroupedAnyTissue = async (inputTable, theGene) => {
-    const tableWithGeneTissue = inputTable.derive({
+    const tableForGeneTissue = inputTable.derive({
       geneTissue: d => `${d.qtlSymbol} (${d.qtlTissue})`
     })
 
-    const tableRollup = tableWithGeneTissue
+    const tableRollup = tableForGeneTissue
       .groupby('gwasTrait', 'gwasLeadVariant')
       .rollup({ allGenesArray: aq.op.array_agg_distinct('geneTissue') })
 
@@ -189,16 +188,19 @@ export function useGenePageHelpers() {
 
   const getGeneData = async (settings) => {
     // first build table 2 ------------------------------------------------------------
-    const tableWithGene = await getTableForGene(URLS[genePage], settings)
-    const theGene = tableWithGene.objects()[0].qtlSymbol // use this instead of settings.theGene as it may be an ensembl id
-    const uniqueTraits = [...new Set(tableWithGene.array('gwasTrait'))].join(',')
-    const uniqueLeadVariants = [...new Set(tableWithGene.array('gwasLeadVariant'))].join(',')
+    const tableForGene = await getTableForGene(URLS[genePage], settings)
+
+    if(tableForGene.size < 1) return {}
+
+    const theGene = tableForGene.get('qtlSymbol', 0) // use this instead of settings.theGene as it may be an ensembl id
+    const uniqueTraits = [...new Set(tableForGene.array('gwasTrait'))].join(',')
+    const uniqueLeadVariants = [...new Set(tableForGene.array('gwasLeadVariant'))].join(',')
 
     const tableForTraitsVariants = await gettableForTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
     const tableGroupedSameTissue = await getTableGroupedSameTissue(tableForTraitsVariants, theGene)
     const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableForTraitsVariants, theGene)
 
-    const table2 = tableWithGene
+    const table2 = tableForGene
       .join_left(tableGroupedSameTissue)
       .join_left(tableGroupedAnyTissue)
 
@@ -209,7 +211,6 @@ export function useGenePageHelpers() {
         traitsColocalized: aq.op.array_agg_distinct('gwasTrait')
       })
 
-    console.log('t2grouped'); t2Grouped.print()
     const t1Objects = await getTable1Objects(t2Grouped)
 
     return {
