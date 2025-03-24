@@ -115,6 +115,10 @@ export const useAppStore = defineStore('appStore', {
       return url
     },
 
+    checkGene(gene) {
+      return this.filterPanelControls.genes.includes(gene)
+    },
+
     checkGenes(geneStr) {
       let testGenes = geneStr.replace(/ |\t|\r|\n/g, ',')   // replace space, tab, newline, return with comma
       testGenes = testGenes.split(',').filter(gene => gene) // make array and remove empty elements

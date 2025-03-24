@@ -54,25 +54,35 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+// *** Imports *****************************************************************
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from "vue-router"
 import { useGenePageHelpers } from '@/composables/GenePageHelpers';
 import { PAGE_NAMES, THRESHOLDS } from "@/constants";
 import { useAppStore } from '@/stores/AppStore'
 
+// *** Composables *************************************************************
 const appStore = useAppStore()
 const { getGeneData, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
 
+// *** Props *******************************************************************
+// *** Variables ***************************************************************
 const table1Data = ref([])
 const table2Data = ref([])
 
 const genePage = PAGE_NAMES.GENE
 
+// *** Computed ****************************************************************
 const pageHeader = computed(() => {
   return appStore[genePage].selectedGene
     ? `Gene: ${appStore[genePage].selectedGene}`
     : 'Gene'
 })
 
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
+// *** Watches *****************************************************************
 watch(
   [
     () => appStore[genePage].selectedGene,
@@ -94,6 +104,18 @@ watch(
   }
 )
 
+// *** Lifecycle hooks *********************************************************
+onMounted(() => {
+  const route = useRoute()
+  const geneStr = route.query.gene.toUpperCase()
+  if(appStore.checkGene(geneStr)) {
+    appStore[genePage].selectedGene = geneStr
+    loadData()
+  }
+})
+
+// *** Event handlers **********************************************************
+// *** Utility functions *******************************************************
 const loadData = async () => {
   const settings = {
     theGene: appStore[genePage].selectedGene,
@@ -110,6 +132,8 @@ const loadData = async () => {
     appStore[genePage].slidersEnabled = false
   }
 }
+
+// *** Configuration data ******************************************************
 </script>
 
 <style scoped>
