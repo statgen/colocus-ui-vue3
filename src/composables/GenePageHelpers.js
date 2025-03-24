@@ -200,9 +200,14 @@ export function useGenePageHelpers() {
     const tableGroupedSameTissue = await getTableGroupedSameTissue(tableForTraitsVariants, theGene)
     const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableForTraitsVariants, theGene)
 
+    // console.log('tableForGene', tableForGene.columnNames())
+    // console.log('tableGroupedSameTissue', tableGroupedSameTissue.columnNames())
+    // console.log('tableGroupedAnyTissue', tableGroupedAnyTissue.columnNames())
+
+    // explicit joins don't work, yield console error, so using implicit joins, not specifying join columns
     const table2 = tableForGene
-      .join_left(tableGroupedSameTissue)
-      .join_left(tableGroupedAnyTissue)
+      .join_left(tableGroupedSameTissue) //, ['gwasTrait', 'gwasLeadVariant'])
+      .join_left(tableGroupedAnyTissue) //, ['gwasTrait', 'gwasLeadVariant'])
 
     // then build data for table 1 ------------------------------------------------------------
     let t2Grouped = table2
