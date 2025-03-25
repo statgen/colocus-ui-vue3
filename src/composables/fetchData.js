@@ -33,7 +33,7 @@ export const useFetchData = () => {
           url?.search?.includes?.('page=') ||
           url?.includes?.('page=')
         ) {
-          console.log('doing pagination fetch')
+          // console.log('doing pagination fetch')
           break;
         }
 

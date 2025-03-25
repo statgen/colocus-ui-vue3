@@ -5,7 +5,7 @@
 
   <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
     <v-container fluid>
-      <h1>{{ pageHeader }}</h1>
+      <h1><BackButton />{{ pageHeader }}</h1>
       <p>Descriptive text...</p>
       <p class="text-caption">Sample gene: ENSG00000103351</p>
 
@@ -55,8 +55,8 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from "vue-router"
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from "vue-router"
 import { useGenePageHelpers } from '@/composables/GenePageHelpers';
 import { PAGE_NAMES, THRESHOLDS } from "@/constants";
 import { useAppStore } from '@/stores/AppStore'
@@ -64,6 +64,10 @@ import { useAppStore } from '@/stores/AppStore'
 // *** Composables *************************************************************
 const appStore = useAppStore()
 const { getGeneData, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
+
+const router = useRouter()
+const route = useRoute()
+
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -88,9 +92,11 @@ watch(
     () => appStore[genePage].selectedGene,
   ],
   async () => {
+    const theGene = appStore[genePage].selectedGene
     appStore[genePage].h4 = THRESHOLDS.H4
     appStore[genePage].r2 = THRESHOLDS.R2
     await loadData()
+    appStore[genePage].slidersEnabled = theGene?.length > 0
   }
 )
 
@@ -104,33 +110,44 @@ watch(
   }
 )
 
+watch(
+  () => route.query.gene,
+  () => appStore[genePage].selectedGene = route.query.gene
+)
+
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
-  const route = useRoute()
-  const geneStr = route.query.gene.toUpperCase()
-  if(appStore.checkGene(geneStr)) {
+  const geneStr = route.query?.gene?.toUpperCase()
+  if(geneStr && appStore.checkGene(geneStr)) {
     appStore[genePage].selectedGene = geneStr
     loadData()
+    nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
   }
 })
 
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
 const loadData = async () => {
+  const theGene = appStore[genePage].selectedGene
   const settings = {
-    theGene: appStore[genePage].selectedGene,
+    theGene,
     h4: appStore[genePage].h4,
     r2: appStore[genePage].r2,
   }
-  if(settings.theGene) {
+  if(theGene) {
     const allData = await getGeneData(settings)
     table1Data.value = allData.table1data
     table2Data.value = allData.table2data
     appStore[genePage].slidersEnabled = true
   } else {
+    table1Data.value = []
     table2Data.value = []
     appStore[genePage].slidersEnabled = false
   }
+  await router.push({
+    name: genePage,
+    query: { gene: theGene }
+  })
 }
 
 // *** Configuration data ******************************************************

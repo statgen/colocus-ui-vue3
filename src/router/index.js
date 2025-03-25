@@ -124,7 +124,7 @@ router.beforeEach(async(to, from, next) => {
   // console.log('Navigating from', from.fullPath, 'to', to.fullPath)
   const appStore = useAppStore()
   appStore.currentPageName = to.name
-  if(![searchPage, locuszoomPage, manhattanPage].includes(to.name)) disableFiltering()
+  if(![searchPage, locuszoomPage, manhattanPage, genePage].includes(to.name)) disableFiltering()
   if (!appStore.filterPanelControls.isFilterDataLoaded) await appStore.loadFilterData()
   next()
 })

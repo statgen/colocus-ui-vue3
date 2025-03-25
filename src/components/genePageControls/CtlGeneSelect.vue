@@ -42,6 +42,10 @@ const onGeneChanged = (newValue) => {
   appStore[genePage].slidersEnabled = newValue?.length > 0
 }
 
+onMounted (() => {
+  appStore[genePage].selectedGene = ''
+})
+
 const mlc = ((itemTitle, queryText, item) => {
   return matchLowercase(queryText, itemTitle)
 })

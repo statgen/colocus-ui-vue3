@@ -7,7 +7,9 @@
     <template #tooltipContent>
       <div @click.stop>
         <h3>{{ theGene }}</h3>
-        <a :href="geneLink" target="_blank">{{ geneLinkText }}</a>
+        <span class="coLink" @click.stop="onClick">View local gene page</span>
+        <br />
+        <a :href="geneLink" target="_blank" class="coLink">{{ geneLinkText }}</a>
       </div>
     </template>
   </ToolTippy>
@@ -15,13 +17,16 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import router from '@/router'
 import { useFetchData } from '@/composables/fetchData'
-import { URLS } from '@/constants'
+import { PAGE_NAMES, URLS } from '@/constants'
 import { middleTrim } from '@/util/util'
 import { useAppStore } from '@/stores/AppStore'
 
 const { data, errorMessage, fetchData } = useFetchData()
 const appStore = useAppStore()
+
+const genePage = PAGE_NAMES.GENE
 
 const props = defineProps({
   trait: Object,
@@ -54,6 +59,9 @@ const onTrigger = async () => {
   }
 }
 
+const onClick = () => {
+  router.push({ name: genePage, query: { gene: theGene.value } })
+}
 </script>
 
 <style scoped>
