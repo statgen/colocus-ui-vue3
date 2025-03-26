@@ -489,3 +489,56 @@ To set font size of axis labels and bars in multilayer plot:
 - textLayer.mark.fontSize: 14
 - textLayer.encoding.y.axis.labelFontSize: 14
 - textLayerTotalTop.encoding.y.axis.fontSize: 14
+
+## Gene page
+The detailed spec for this page is available at: [Notion ticket CMT-339](https://www.notion.so/amp-cmd-umich/Gene-page-tables-197475b71c4380ae83e5e23de37caf62).
+
+The page consists of two tables, Table 1 and Table 2. Table 1 is essentially a groupby and rollup of Table 2. Table 2 data must be therefore be generated first. The data processing occurs in composable GenePageHelpers.js, which also contains the config info for the data tables (i.e., the headers plus watchers to handle the UI switches for showing color-coded variants, ensemble IDs, and the dataset names).
+
+### Call tree
+The Call Tree below indicates the overall flow from the top-level routines, getTable1Data and getTable2Data. It's a bit complicated, but I've tried to arrange it so that each function has a meaningful name, has a single responsibility, and returns a single object of interest. All the functions are local, except fetchData, which is a from the app-wide composable of the same name.
+
+```
+getTable2Data
+  getTableForGene
+    getRawData
+      fetchData
+    flattenData
+  gettableForTraitsVariants
+    getRawData
+      fetchData
+    flattenData
+  getTableGroupedSameTissue
+  getTableGroupedAnyTissue
+
+getTable1Data
+  getTable1Objects
+    getGeneDetails
+      getRawData
+        fetchData
+```
+
+### Data loading
+There is a single mechanism to force loading of new datasets. This is a watcher located on the gene page. It watches appStore.genePage.selectedGene. Whenever that value changes, the watcher triggers. If a valid gene is specified, then the values of r2 and h4 are reset to their defaults, and the loadData function is called. Assuming it completes succesfully, it updates the local variables table1Data and table2Data, which are linked to the associated data tables.
+
+There is a second watcher that watches the store for changes to the r2 and h4 UI controls. Whenever either changes, data is reloaded.
+
+There is a third watcher that watches the value of the 'gene' query parameter in the URL. Whenever it changes, the specified gene is pushed to the appStore.genePage.selectedGene, watcher #1 fires, and a new dataset is loaded.
+
+### URL handling
+This page allows loading of a gene of interest through several means:
+1. On page load, if gene present in URL, load data, update route with cleaned up gene (or remove as query param if bad gene specified)
+2. If select gene from dropdown: load data, update route
+3. If click gene on data table: load data, update route
+4. If route changes from back/fore buttons, load data, don't update route (browser does it)
+
+A flag, updateRoute, was introduced into the appStore.genePage to track whether the route should be updated in the various scenarios. Also, 'load data' means to update appStore.genePage.selectedGene and let the watcher do its thing.
+
+### Ref data timing problem
+Late in development of this page, I experienced a situation where the gene list in column "Other Genes Same GWAS" in Table1, as well as the associated count column, weren't updating properly, sometimes. I refactored things such that:
+1. The `ref` variables holding the table data on the gene page were switched to `shallowRef' types, which matches what I had done long ago in the data tables for the search, LZ, and Manhattan plot pages.
+2. Originally, I had the composable return an object with entries for table1Data and table2Data. I refactored this into separate functions, which also helped clarify the code, and then call each in turn as appropriate in loadData on the gene page.
+
+### Gene label components
+The existing TraitLabelGene component was enhanced to provide a link from the current page (search, LZ, Manhattan) to the gene page. (That component also displays a link to the CMD portal.) However, this component was not used in the display of genes on the gene page. Instead, a new simpler component was developed that just displays the gene symbol as a link to the gene page.
+

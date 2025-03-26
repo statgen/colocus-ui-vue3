@@ -19,7 +19,12 @@
           <template v-slot:item.traitsColocalizedCount="{ item }">{{ item.traitsColocalizedCount }}</template>
           <template v-slot:item.traitsColocalized="{ item }">{{ item.traitsColocalized }}</template>
           <template v-slot:item.otherGenesSameTissueCount="{ item }">{{ item.otherGenesSameTissueCount }}</template>
-          <template v-slot:item.otherGenesSameTissue="{ item }">{{ item.otherGenesSameTissue }}</template>
+          <template v-slot:item.otherGenesSameTissue="{ item }">
+            <template v-for="(gene, index) in item.otherGenesSameTissue.split(',')" :key="index">
+              <SimpleGeneLabel :gene="gene" />
+              <span v-if="index < item.otherGenesSameTissue.split(',').length - 1">, </span>
+            </template>
+          </template>
         </v-data-table>
       </div>
 
@@ -41,9 +46,20 @@
           <template v-slot:item.qtlLeadVariant="{ item }"><VariantLabel :variant="item.qtlLeadVariant" :showSplotch="true" /></template>
 
           <template v-slot:item.otherGenesSameTissueCount="{ item }">{{ item.otherGenesSameTissueCount }}</template>
-          <template v-slot:item.otherGenesSameTissue="{ item }">{{ item.otherGenesSameTissue }}</template>
+          <template v-slot:item.otherGenesSameTissue="{ item }">
+            <template v-for="(gene, index) in item.otherGenesSameTissue.split(',')" :key="index">
+              <SimpleGeneLabel :gene="gene" />
+              <span v-if="index < item.otherGenesSameTissue.split(',').length - 1">, </span>
+            </template>
+          </template>
+
           <template v-slot:item.otherGenesAnyTissueCount="{ item }">{{ item.otherGenesAnyTissueCount }}</template>
-          <template v-slot:item.otherGenesAnyTissue="{ item }">{{ item.otherGenesAnyTissue }}</template>
+          <template v-slot:item.otherGenesAnyTissue="{ item }">
+            <template v-for="(gene, index) in item.otherGenesAnyTissue.split(',')" :key="index">
+              <SimpleGeneLabel :gene="gene" />
+              <span v-if="index < item.otherGenesAnyTissue.split(',').length - 1">, </span>
+            </template>
+          </template>
 
           <template v-slot:item.qtlDataset="{ item }">{{ item.qtlDataset }}</template>
           <template v-slot:item.gwasDataset="{ item }">{{ item.gwasDataset }}</template>
@@ -55,7 +71,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, shallowRef, toRaw, watch } from 'vue'
 import { useRoute, useRouter } from "vue-router"
 import { useGenePageHelpers } from '@/composables/GenePageHelpers';
 import { PAGE_NAMES, THRESHOLDS } from "@/constants";
@@ -63,16 +79,15 @@ import { useAppStore } from '@/stores/AppStore'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const { getGeneData, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
+const { getGeneData, getTable1Data, getTable2Data, visibleTable1Columns, visibleTable2Columns } = useGenePageHelpers();
 
 const router = useRouter()
 const route = useRoute()
 
-
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const table1Data = ref([])
-const table2Data = ref([])
+const table1Data = shallowRef([])
+const table2Data = shallowRef([])
 
 const genePage = PAGE_NAMES.GENE
 
@@ -93,10 +108,17 @@ watch(
   ],
   async () => {
     const theGene = appStore[genePage].selectedGene
+    if(!theGene) {
+      table1Data.value = []
+      table2Data.value = []
+      appStore[genePage].slidersEnabled = false
+      return
+    }
     appStore[genePage].h4 = THRESHOLDS.H4
     appStore[genePage].r2 = THRESHOLDS.R2
     await loadData()
     appStore[genePage].slidersEnabled = theGene?.length > 0
+    if(appStore[genePage].updateRoute) updateGeneRoute(theGene)
   }
 )
 
@@ -112,41 +134,63 @@ watch(
 
 watch(
   () => route.query.gene,
-  () => appStore[genePage].selectedGene = route.query.gene
+  () => {
+    const theGene = route.query.gene
+    appStore[genePage].updateRoute = false
+    appStore[genePage].selectedGene = theGene
+  }
 )
 
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
-  const geneStr = route.query?.gene?.toUpperCase()
-  if(geneStr && appStore.checkGene(geneStr)) {
-    appStore[genePage].selectedGene = geneStr
-    loadData()
-    nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
+  const theGene = route.query?.gene?.split(',')[0]?.trim()?.toUpperCase() // in case someone sends a comma list
+  if(!validateGene(theGene)) {
+    updateGeneRoute(undefined) // fixme: replace with undefined
+    return
   }
+  updateGeneRoute(theGene)
+  appStore[genePage].updateRoute = false
+  appStore[genePage].selectedGene = theGene
 })
 
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
+const validateGene = (gene) => {
+  if(!gene || !appStore.checkGene(gene)) return false
+  return true
+}
+
 const loadData = async () => {
   const theGene = appStore[genePage].selectedGene
+  if(!validateGene(theGene)) return
+
   const settings = {
     theGene,
     h4: appStore[genePage].h4,
     r2: appStore[genePage].r2,
   }
+
+  table1Data.value = []
+  table2Data.value = []
+  appStore[genePage].slidersEnabled = false
+
   if(theGene) {
-    const allData = await getGeneData(settings)
-    table1Data.value = allData.table1data
-    table2Data.value = allData.table2data
+    // note: table2 has to be built before table1
+    const t2 = toRaw(await getTable2Data(settings))
+    if(t2.length < 1) return
+
+    table2Data.value = t2
+
+    table1Data.value = toRaw(await getTable1Data(t2))
     appStore[genePage].slidersEnabled = true
-  } else {
-    table1Data.value = []
-    table2Data.value = []
-    appStore[genePage].slidersEnabled = false
+    await nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
   }
+}
+
+const updateGeneRoute = async (newGene) => {
   await router.push({
     name: genePage,
-    query: { gene: theGene }
+    query: { gene: newGene }
   })
 }
 
@@ -159,7 +203,7 @@ const loadData = async () => {
 }
 
 .table-container {
-  /*overflow-x: auto;*/
+  overflow-x: scroll;
 }
 
 .data-table-base {

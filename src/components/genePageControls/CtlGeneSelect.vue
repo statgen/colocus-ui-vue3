@@ -37,9 +37,9 @@ watch(() => resetInput.value, () => {
   appStore[genePage].selectedGene = ''
 })
 
-const onGeneChanged = (newValue) => {
-  appStore[genePage].selectedGene = newValue
-  appStore[genePage].slidersEnabled = newValue?.length > 0
+const onGeneChanged = (newGene) => {
+  appStore[genePage].updateRoute = true
+  appStore[genePage].selectedGene = newGene
 }
 
 onMounted (() => {

@@ -79,6 +79,7 @@ export function useGenePageHelpers() {
         let genes = row.otherGenesSameTissue
         genes = genes.replace(/ /g, '')
         genes = genes.split(',')
+        genes = [... new Set(genes)]
         const geneDistances = []
         genes.forEach(gene => {
           const details = geneDetails[gene]
@@ -89,7 +90,7 @@ export function useGenePageHelpers() {
           geneDistances.push({ gene, distance })
         })
         const tc = aq.from(geneDistances).orderby('distance')
-        const sortedGeneList = tc.array('gene').sort().join(', ')
+        const sortedGeneList = tc.array('gene').join(',')
         row.otherGenesSameTissue = sortedGeneList
       }
     })
@@ -141,17 +142,17 @@ export function useGenePageHelpers() {
       .groupby('gwasTrait', 'gwasLeadVariant', 'qtlTissue')
       .rollup({allGenesArray: aq.op.array_agg('qtlSymbol')})
 
-    const reified = tableRollup.objects()
+    const tableRollupObjects = tableRollup.objects()
     // debugger
 
-    const mapped = reified.map((row) => {
+    const mapped = tableRollupObjects.map((row) => {
       const includedGenes = row.allGenesArray.filter((qtlSymbol) => qtlSymbol !== theGene)
       includedGenes.sort()
       return {
         gwasTrait: row.gwasTrait,
         gwasLeadVariant: row.gwasLeadVariant,
         qtlTissue: row.qtlTissue,
-        otherGenesSameTissue: includedGenes.join(', '),
+        otherGenesSameTissue: includedGenes.join(','),
         otherGenesSameTissueCount: includedGenes.length > 0 ? includedGenes.length : '',
       }
     })
@@ -169,15 +170,15 @@ export function useGenePageHelpers() {
       .groupby('gwasTrait', 'gwasLeadVariant')
       .rollup({ allGenesArray: aq.op.array_agg_distinct('geneTissue') })
 
-    const reified = tableRollup.objects()
+    const tableRollupObjects = tableRollup.objects()
 
-    const mapped = reified.map((row) => {
+    const mapped = tableRollupObjects.map((row) => {
       const includedGenes = row.allGenesArray.filter((geneTissueStr) => !geneTissueStr.startsWith(`${theGene} (`))
       includedGenes.sort()
       return {
         gwasTrait: row.gwasTrait,
         gwasLeadVariant: row.gwasLeadVariant,
-        otherGenesAnyTissue: includedGenes.join(', '),
+        otherGenesAnyTissue: includedGenes.join(','),
         otherGenesAnyTissueCount: includedGenes.length > 0 ? includedGenes.length : '',
       }
     })
@@ -186,11 +187,10 @@ export function useGenePageHelpers() {
     return tableFinal
   }
 
-  const getGeneData = async (settings) => {
-    // first build table 2 ------------------------------------------------------------
+  const getTable2Data = async (settings) => {
     const tableForGene = await getTableForGene(URLS[genePage], settings)
 
-    if(tableForGene.size < 1) return {}
+    if(tableForGene.size < 1) return []
 
     const theGene = tableForGene.get('qtlSymbol', 0) // use this instead of settings.theGene as it may be an ensembl id
     const uniqueTraits = [...new Set(tableForGene.array('gwasTrait'))].join(',')
@@ -208,21 +208,21 @@ export function useGenePageHelpers() {
     const table2 = tableForGene
       .join_left(tableGroupedSameTissue) //, ['gwasTrait', 'gwasLeadVariant'])
       .join_left(tableGroupedAnyTissue) //, ['gwasTrait', 'gwasLeadVariant'])
-
-    // then build data for table 1 ------------------------------------------------------------
-    let t2Grouped = table2
-      .groupby('gwasLeadVariant', 'qtlSymbol', 'qtlTissue', 'qtlStudy', 'otherGenesSameTissueCount', 'otherGenesSameTissue', )
-      .rollup({
-        traitsColocalized: aq.op.array_agg_distinct('gwasTrait')
-      })
-
-    const t1Objects = await getTable1Objects(t2Grouped)
-
-    return {
-      table1data: t1Objects,
-      table2data: table2.objects(),
-    }
+    return table2.objects()
   }
+
+    const getTable1Data = async (table2) => {
+      const t2 = aq.from(table2)
+      if(t2.size < 1) return []
+      let t2Grouped = t2
+        .groupby('gwasLeadVariant', 'qtlSymbol', 'qtlTissue', 'qtlStudy', 'otherGenesSameTissueCount', 'otherGenesSameTissue', )
+        .rollup({
+          traitsColocalized: aq.op.array_agg_distinct('gwasTrait')
+        })
+
+      const t1Objects = await getTable1Objects(t2Grouped)
+      return t1Objects
+    }
 
   const alwaysShow = () => true
 
@@ -265,13 +265,13 @@ export function useGenePageHelpers() {
     { title: 'Trait 2 Variant', sortable: true, value: 'qtlLeadVariant', minWidth: '12rem', visible: alwaysShow },
 
     { title: 'Other Genes Same Tissue Count', sortable: true, value: 'otherGenesSameTissueCount', align: 'end', visible: alwaysShow },
-    { title: 'Other Genes Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '12rem', visible: alwaysShow },
+    { title: 'Other Genes Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '20rem', visible: alwaysShow },
     { title: 'Other Genes Any Tissue Count', sortable: true, value: 'otherGenesAnyTissueCount', align: 'end', visible: alwaysShow },
-    { title: 'Other Genes Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '24rem', visible: alwaysShow },
+    { title: 'Other Genes Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '20rem', visible: alwaysShow },
 
     { title: 'GWAS Dataset', sortable: true, value: 'gwasDataset', visible: () => showDatasets.value },
     { title: 'QTL Dataset', sortable: true, value: 'qtlDataset', visible: () => showDatasets.value  },
   ]
 
-  return { getGeneData, visibleTable1Columns, visibleTable2Columns }
+  return { getTable1Data, getTable2Data, visibleTable1Columns, visibleTable2Columns }
 }

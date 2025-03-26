@@ -34,6 +34,7 @@ export const useAppStore = defineStore('appStore', {
       showDatasets: false,
       showEnsIDs: false,
       slidersEnabled: false,
+      updateRoute: false,
     },
     [PAGE_NAMES.LOCUSZOOM]: {
       colocData: markRaw({}),
