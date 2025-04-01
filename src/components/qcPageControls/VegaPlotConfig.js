@@ -172,6 +172,7 @@ const VegaPlotConfig = {
     fontSizes: {
       "layer[0].encoding.y.axis.labelFontSize": FONT_SIZE.LABEL,
       "layer[1].mark.fontSize": FONT_SIZE.MARK,
+      "layer[2].mark.fontSize": FONT_SIZE.MARK,
     },
     plotTitle: "Proportion of signals per GWAS colocalized to at least 1 signal from %s",
     plotTitleSize: FONT_SIZE.TITLE,
