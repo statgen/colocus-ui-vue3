@@ -48,17 +48,25 @@ function makeAnalysisTitle(analysis) {
 }
 
 function makePlotTitle(signal) {
+  console.log('signal', signal)
   let part1 = ''
+  let analysisType = ''
   if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
-    part1 += signal.analysis.trait.uuid
+    part1 = signal.analysis.trait.uuid
+    analysisType = signal.analysis.analysis_type
+
   } else if (signal.analysis.trait.exon) { // This trait is an exon expression trait
-    part1 += signal.analysis.trait.gene.symbol
+    part1 = signal.analysis.trait.gene.symbol
+    analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
+
   } else if (signal.analysis.trait.gene) { // This trait is a gene expression trait
-    part1 += signal.analysis.trait.gene.symbol
+    part1 = signal.analysis.trait.gene.symbol
+    analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
   }
+
   const variant = formatVariantString(signal.lead_variant.vid)
   const study = signal.analysis.study.uuid
-  const title = `${part1}    ${study}    ${variant}`
+  const title = `${part1}    ${analysisType}    ${study}    ${variant}`
   const color = colorHasher.hex(signal.lead_variant.vid)
   return [title, color]
 }

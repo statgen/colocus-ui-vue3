@@ -141,8 +141,8 @@ A Vue watch is set up to watch the v-sheet that contains the help content. When 
 This is the most complicated page of the app thus far. It consists of five main files, plus references to the appStore, utils, etc. The main files are:
 - LocusZoomView.vue: This is the top-level page definition linked to by the router. It primarily consists of the Vue template definition, plus event handlers. 
 - lzPageHelpers.js: This is a composable that contains the meat of the functionality required by the page.
-- LzPlot.vue: This is a wrapper, lightly mofified from the Vue 2 app, that allows creation of the main containers for the compare and region plots.
-- lz-layouts.js: This is a configuration file, more heavily modifed from the Vue 2 app, to provide more flexitilty in creation containers and plots.
+- LzPlot.vue: This is a wrapper, lightly modified from the Vue 2 app, that allows creation of the main containers for the compare and region plots.
+- lz-layouts.js: This is a configuration file, more heavily modified from the Vue 2 app, to provide more flexibility in creation containers and plots.
 - LDPanel.vue: This ia Vue single-file component, the provides the UI controls for operating the page. 
 
 #### Data loading
@@ -156,7 +156,7 @@ Next we set the flag appStore.colocDataReady to false. The data table's loadData
 - the LDPanel component, which allows to set the correct radio button for the initial LD reference
 - the LocusZoom page, and this is what kicks off loading of the compare and region plots.
 
-This version of the code programmatically creates the compare container and plot, plus the region container and plots, including the gene panel. To accomplish this, we removed the static configuration data from the definitions in lz-layouts. Most of it was discarded, but we needed to use two static defintions (gene_selector_menu, and genes_layer_filtered), which we embedded in the LZPLot.vue file. We replaced the static definitions of the region plot and the gene panel with a programmatic approach. See the functions addRegionPanel() and addGenePanel in LZPLot for details.
+This version of the code programmatically creates the compare container and plot, plus the region container and plots, including the gene panel. To accomplish this, we removed the static configuration data from the definitions in lz-layouts. Most of it was discarded, but we needed to use two static definitions (gene_selector_menu, and genes_layer_filtered), which we embedded in the LZPLot.vue file. We replaced the static definitions of the region plot and the gene panel with a programmatic approach. See the functions addRegionPanel() and addGenePanel in LZPLot for details.
 
 We also refactored almost everything except the template definitions and event handlers out of the main page view (LocusZoomView.vue), and into the composable lzPageHelpers.js.
  
