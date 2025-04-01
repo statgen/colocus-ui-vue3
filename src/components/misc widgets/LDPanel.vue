@@ -6,13 +6,12 @@
         <h4 class="text-right mt-2">Blink:</h4>
       </v-col>
       <v-col class="my-0 py-0">
-        <v-checkbox
-          label="Blink lead variant marker"
-          @update:modelValue="onBlinkCheckboxChange"
-          color="clcAction"
-          density="compact"
-          :model-value="appStore[locuszoomPage].lzLeadVarBlink"
-        ></v-checkbox>
+        <v-btn
+          size="small"
+          variant="elevated"
+          class="text-clcAction mx-2"
+          @click="onBlinkButtonClick"
+        >Blink lead variant marker for {{ BLINK_TIME }} seconds</v-btn>
       </v-col>
     </v-row>
 
@@ -77,6 +76,8 @@ const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
 
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 
+const BLINK_TIME = 5
+
 const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange', 'onUniqueCheckboxChange'])
 
 watch(() => appStore[locuszoomPage].colocDataReady, async (newVal) => {
@@ -106,15 +107,24 @@ const onUniqueCheckboxChange = (value) => {
   emit('onUniqueCheckboxChange', value)
 }
 
-const onBlinkCheckboxChange = (value) => {
-  appStore[locuszoomPage].lzLeadVarBlink = value
+const onBlinkButtonClick = () => {
   appStore[locuszoomPage].lzLeadDOMIDs.forEach((element) => {
     const domID = `#${element}`
     const point = document.querySelector(domID)
-    value ? point.classList.add('blink') : point.classList.remove('blink')
+    point.classList.add('blink')
   })
+  setTimeout(() => {
+    appStore[locuszoomPage].lzLeadDOMIDs.forEach((element) => {
+      const domID = `#${element}`
+      const point = document.querySelector(domID)
+      try {
+        point.classList.remove('blink')
+      } catch {
+        // ignore errors (in case navigate to other page before timeout completes)
+      }
+    })
+  }, BLINK_TIME * 1000)
 }
-
 
 const panelStyle = {
   width: '600px',

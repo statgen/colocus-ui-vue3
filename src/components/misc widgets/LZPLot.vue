@@ -159,12 +159,6 @@ const connectListeners = (plot) => {
         if (point.parentNode) {
           point.parentNode.appendChild(point);
         }
-
-        if(appStore[locuszoomPage].lzLeadVarBlink) {
-          point.classList.add('blink');
-        }
-        // setTimeout(() => { point.classList.remove('blink') }, 10000)
-
       })
     }
   })
