@@ -11,7 +11,10 @@
           <h1 :id="STATS_PAGE_TOP">Colocalization statistics</h1>
         </v-row>
         <v-row>
-          <p>Overview and description of what this page is about.</p>
+          <p>This page contains summary information for GWAS signals colocalized with molecular QTLs
+            from a given tissue or cell type. The plots allow comparison of the number (proportion)
+            of eQTL colocalized across GWAS and conversely the number (proportion) of GWAS signals
+            colocalized with eQTLs from the given tissue or cell type.</p>
         </v-row>
 
         <v-row>

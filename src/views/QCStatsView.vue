@@ -11,7 +11,7 @@
           <h1 :id="STATS_PAGE_TOP">Colocalization statistics</h1>
         </v-row>
         <v-row>
-          <p>Overview and description of what this page is about.</p>
+          <p>This page provides a picture of the quality of the fine-mapped data underlying the colocalized signals.</p>
         </v-row>
 
         <v-row>
@@ -23,6 +23,16 @@
         </v-row>
 
         <v-row>
+          <p>
+            Ideally, for colocalized signals the H4 - the posterior probability that both traits are
+            associated and share the same single causal variant - will be close to 1. Also, ideally
+            the lead colocalized GWAS and the molecular QTL variants for the signal will have an r²
+            close to 1. Signals with lower H4 and/or r² can indicate signals which may be more likely
+            to be false positives. Lower values H4 and/or r² can occur because poor fine mapping
+            (which can be due to insufficient sample size) or because the fine-mapped signals do not
+            represent a shared causal variant. Note, some studies only test for colocalization for
+            signals with lead GWAS and QTL variants with r² > 0.5.
+          </p>
           <v-col class="ml-n3">
             <VegaPlotContainer :controlSet="vpc.r2VsH4ScatterPlot" :vegaSpec="r2VsH4ScatterPlotSpec" />
           </v-col>
