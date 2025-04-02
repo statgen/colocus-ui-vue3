@@ -15,11 +15,7 @@
         </v-row>
 
         <v-row>
-          <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
-        </v-row>
-
-        <v-row>
-          <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
+          <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
         </v-row>
 
         <v-row>
@@ -27,10 +23,14 @@
         </v-row>
 
         <v-row>
-          <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
+          <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
         </v-row>
 
-<!--        <v-row>-->
+        <v-row>
+          <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
+        </v-row>
+
+        <!--        <v-row>-->
 <!--          <VegaPlotContainer :controlSet="vpc.signalsPerDataset" :vegaSpec="signalsPerDatasetSpec" />-->
 <!--        </v-row>-->
       </v-col>
