@@ -90,7 +90,7 @@
 import { onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
-import { AXIS_OPTIONS, PAGE_NAMES } from '@/constants'
+import { CM_DATASET, PAGE_NAMES } from '@/constants'
 import { useLZPageHelpers } from '@/composables/lzPageHelpers'
 
 // *** Composables *************************************************************
@@ -109,7 +109,7 @@ const s2Variant = ref('')
 const s2color = ref('')
 
 // functional variables
-const conMarIndicator = ref(AXIS_OPTIONS.CONDITIONAL)
+const conMarIndicator = ref(CM_DATASET.CONDITIONAL)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 
@@ -153,6 +153,9 @@ onMounted(() => {
 const onAddPlotIconClick = (item) => {
   const {signal1, signal2} = item
   lzPageHelpers.addPanelsForSignalPair(signal1, signal2)
+  if(conMarIndicator.value === CM_DATASET.MARGINAL) {
+    lzPageHelpers.toggleConditionalMarginal(CM_DATASET.MARGINAL, CM_DATASET.CONDITIONAL)
+  }
 }
 
 const onDataTableRowClick = () => {

@@ -1,5 +1,5 @@
 // API endpoint uses generic prefix "t1" and "t2" to refer to the pair of results we get from this endpoint
-const AXIS_OPTIONS = Object.freeze({ MARGINAL: 't1', CONDITIONAL: 't2' });
+const CM_DATASET = Object.freeze({ MARGINAL: 't1', CONDITIONAL: 't2' });
 
 const BIOMARKER_TYPES = Object.freeze({
   PHENOTYPE: 'phenotype',
@@ -69,5 +69,5 @@ const THRESHOLDS = {
   R2: 0.3,
 }
 
-export { AXIS_OPTIONS, BIOMARKER_TYPES, COLORS, NEARBY_DIST, STATS_PAGE_TOP, PAGE_NAMES, THRESHOLDS, URLS
+export { CM_DATASET, BIOMARKER_TYPES, COLORS, NEARBY_DIST, STATS_PAGE_TOP, PAGE_NAMES, THRESHOLDS, URLS
 }

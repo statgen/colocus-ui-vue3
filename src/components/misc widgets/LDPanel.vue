@@ -35,10 +35,10 @@
       </v-col>
       <v-col class="my-0 py-0">
         <v-radio-group inline :model-value="selectedMCRadio" @update:model-value="onCMRadioChange" density="compact">
-          <v-radio value="t2" color="clcAction">
+          <v-radio :value="CM_DATASET.CONDITIONAL" color="clcAction">
             <template v-slot:label>Conditional -log<sub>10</sub> p </template>
           </v-radio>
-          <v-radio value="t1" color="clcAction">
+          <v-radio :value="CM_DATASET.MARGINAL" color="clcAction">
             <template v-slot:label>Marginal -log<sub>10</sub> p </template>
           </v-radio>
         </v-radio-group>
@@ -66,13 +66,13 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { AXIS_OPTIONS, COLORS, PAGE_NAMES } from '@/constants'
+import { CM_DATASET, COLORS, PAGE_NAMES } from '@/constants'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 
 const appStore = useAppStore()
 const selectedLDRadio = ref(null)
-const selectedMCRadio = ref(AXIS_OPTIONS.CONDITIONAL)
+const selectedMCRadio = ref(CM_DATASET.CONDITIONAL)
 
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 
