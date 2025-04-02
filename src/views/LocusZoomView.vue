@@ -31,6 +31,7 @@
             @onCMRadioChange="onCMRadioChange"
             @onLDRadioChange="onLDRadioChange"
             @onUniqueCheckboxChange="onUniqueCheckboxChange"
+            :conMarResetFlag="conMarResetFlag"
           />
         </v-row>
       </v-col>
@@ -112,6 +113,7 @@ const s2color = ref('')
 const conMarIndicator = ref(CM_DATASET.CONDITIONAL)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
+const conMarResetFlag = ref(false)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
@@ -160,6 +162,7 @@ const onAddPlotIconClick = (item) => {
 
 const onDataTableRowClick = () => {
   loadPageData()
+  conMarResetFlag.value = !conMarResetFlag.value
 }
 
 const onCMRadioChange = (val) => {

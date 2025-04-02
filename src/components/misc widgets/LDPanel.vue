@@ -71,6 +71,11 @@ import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 
 const appStore = useAppStore()
+
+const props = defineProps({
+  conMarResetFlag: Boolean,
+})
+
 const selectedLDRadio = ref(null)
 const selectedMCRadio = ref(CM_DATASET.CONDITIONAL)
 
@@ -93,6 +98,12 @@ watch(() => appStore[locuszoomPage].regionPanelRemoved, async (newVal) => {
   }
 })
 
+// watch(() => appStore[locuszoomPage].conMarReset, async (newVal) => {
+watch(() => props.conMarResetFlag, async (newVal) => {
+  selectedMCRadio.value = CM_DATASET.CONDITIONAL
+  onCMRadioChange(CM_DATASET.CONDITIONAL)
+})
+
 const onCMRadioChange = (value) => {
   selectedMCRadio.value = value
   emit('onCMRadioChange', value)
@@ -111,7 +122,7 @@ const onBlinkButtonClick = () => {
   appStore[locuszoomPage].lzLeadDOMIDs.forEach((element) => {
     const domID = `#${element}`
     const point = document.querySelector(domID)
-    point.classList.add('blink')
+    point?.classList.add('blink')
   })
   setTimeout(() => {
     appStore[locuszoomPage].lzLeadDOMIDs.forEach((element) => {

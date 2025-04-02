@@ -48,7 +48,6 @@ function makeAnalysisTitle(analysis) {
 }
 
 function makePlotTitle(signal) {
-  console.log('signal', signal)
   let part1 = ''
   let analysisType = ''
   if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
