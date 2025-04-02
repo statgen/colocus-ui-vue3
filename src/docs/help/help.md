@@ -138,3 +138,11 @@ Each red dot corresponds to a variant that colocalizes with another trait. Click
 * The tables can be very wide, and don't seem to scroll without a trackpad.
 
    If you have a mouse with a scroll wheel, you can scroll horizontally by holding the shift key and scrolling with the scroll wheel.
+
+* I can't seem to find a gene on the LocusZoom plot.
+
+   A few things may be happening here:
+
+   1. The gene may be filtered out if it is not a protein coding gene by default. To enable all genes, click the "Gene Filter" button in the LocusZoom plot, and select "All features."
+   2. LocusZoom only shows a few rows of genes by default. You can expand the gene panel by grabbing the bottom of the panel and dragging it down.
+   3. The gene could be in a version of GENCODE that we are not using. LocusZoom currently uses GENCODE v35.
