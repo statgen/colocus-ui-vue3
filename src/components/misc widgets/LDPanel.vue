@@ -116,6 +116,7 @@ watch(() => props.conMarResetFlag, async (newVal) => {
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 const onCMRadioChange = (value) => {
+  console.log('cm radio button changed to', value)
   selectedMCRadio.value = value
   emit('onCMRadioChange', value)
 }
