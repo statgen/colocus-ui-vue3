@@ -6,12 +6,12 @@
   <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
     <v-container fluid>
       <h1><BackButton />{{ pageHeader }}</h1>
-      <p>Descriptive text...</p>
-      <p class="text-caption">Sample gene: ENSG00000103351</p>
-
       <h2>Table 1</h2>
-      <p>Descriptive text...</p>
-      <div class="table-container">
+      <p>
+        Summary of GWAs signals associated with [gene name] and other genes associated with the same GWAS signal in the same tissue.
+        <span class="font-weight-bold">Grouped by lead GWAS variant (can have multiple GWASs with the same lead GWAS variant).</span>
+      </p>
+      <div class="table-container mt-2">
         <v-data-table :headers="visibleTable1Columns" :items="table1Data" density="compact" class="data-table-base">
           <template v-slot:item.qtlTissue="{ item }">{{ item.qtlTissue }}</template>
           <template v-slot:item.qtlStudy="{ item }">{{ item.qtlStudy }}</template>
@@ -29,7 +29,10 @@
       </div>
 
       <h2>Table 2</h2>
-      <p>Descriptive text...</p>
+      <p>
+        Summary of GWAs signals associated with [gene name] and other genes associated with the same GWAS signal in the same tissue and other tissues.
+        <span class="font-weight-bold">Grouped by each associated GWAS trait and lead variant.</span>
+      </p>
       <div class="table-container">
         <v-data-table :headers="visibleTable2Columns" :items="table2Data" density="compact" class="data-table-base">
           <template v-slot:item.gwasStudy="{ item }">{{ item.gwasStudy }}</template>
