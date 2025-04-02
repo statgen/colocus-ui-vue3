@@ -40,15 +40,20 @@ const setCellLabel = ((dirEffect) => {
   if(discord) {
     cellClass.value = 'text-red'
     cellLabel.value = '⚠'
-  } else if(missing) {
-    cellClass.value = 'text-red-lighten-1'
-    cellLabel.value = 'MISS'
   } else if(dir === '+') {
     cellClass.value = 'text-blue'
-    cellLabel.value = 'CON'
+    if (missing) {
+      cellLabel.value = 'CON*'
+    } else {
+      cellLabel.value = 'CON'
+    }
   } else if(dir === '-') {
     cellClass.value = 'text-purple'
-    cellLabel.value = 'DIS'
+    if (missing) {
+      cellLabel.value = 'DIS*'
+    } else {
+      cellLabel.value = 'DIS'
+    }
   }
 })
 
