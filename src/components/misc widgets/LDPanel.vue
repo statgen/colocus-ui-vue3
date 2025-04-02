@@ -65,17 +65,21 @@
 </template>
 
 <script setup>
+// *** Imports *****************************************************************
 import { ref, watch } from 'vue'
 import { CM_DATASET, COLORS, PAGE_NAMES } from '@/constants'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 
+// *** Composables *************************************************************
 const appStore = useAppStore()
 
+// *** Props *******************************************************************
 const props = defineProps({
   conMarResetFlag: Boolean,
 })
 
+// *** Variables ***************************************************************
 const selectedLDRadio = ref(null)
 const selectedMCRadio = ref(CM_DATASET.CONDITIONAL)
 
@@ -83,8 +87,13 @@ const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 
 const BLINK_TIME = 5
 
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
 const emit = defineEmits(['onCMRadioChange', 'onLDRadioChange', 'onUniqueCheckboxChange'])
 
+// *** Watches *****************************************************************
 watch(() => appStore[locuszoomPage].colocDataReady, async (newVal) => {
   if(newVal) {
     selectedLDRadio.value = appStore[locuszoomPage]?.colocData?.signal1?.lead_variant.vid || ''
@@ -104,6 +113,8 @@ watch(() => props.conMarResetFlag, async (newVal) => {
   onCMRadioChange(CM_DATASET.CONDITIONAL)
 })
 
+// *** Lifecycle hooks *********************************************************
+// *** Event handlers **********************************************************
 const onCMRadioChange = (value) => {
   selectedMCRadio.value = value
   emit('onCMRadioChange', value)
@@ -136,6 +147,9 @@ const onBlinkButtonClick = () => {
     })
   }, BLINK_TIME * 1000)
 }
+
+// *** Utility functions *******************************************************
+// *** Configuration data ******************************************************
 
 const panelStyle = {
   width: '600px',
