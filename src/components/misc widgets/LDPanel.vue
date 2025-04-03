@@ -112,9 +112,9 @@ watch(() => props.conMarResetFlag, async (newVal) => {
   onCMRadioChange(CM_DATASET.CONDITIONAL)
 })
 
-watch(() => selectedMCRadio.value, async (newVal) => {
-  console.log('cm radio changed, watcher, value:', newVal)
-})
+// watch(() => selectedMCRadio.value, async (newVal) => {
+//   console.log('cm radio changed, watcher, value:', newVal)
+// })
 
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
