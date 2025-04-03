@@ -142,13 +142,13 @@ watch(() => appStore[locuszoomPage].colocDataReady, (newVal) => {
   if (newVal) initializePage()
 })
 
-watch(() => conMarIndicator.value, (newVal, oldVal) => {
-  lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
-  // nextTick(() => { lzPageHelpers.toggleConditionalMarginal(newVal, oldVal) })
-  // setTimeout(() => {
-  //   lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
-  // }, 500)
-})
+// watch(() => conMarIndicator.value, (newVal, oldVal) => {
+//   lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+//   // nextTick(() => { lzPageHelpers.toggleConditionalMarginal(newVal, oldVal) })
+//   // setTimeout(() => {
+//   //   lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+//   // }, 500)
+// })
 
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
@@ -161,6 +161,7 @@ const onAddPlotIconClick = (item) => {
   lzPageHelpers.addPanelsForSignalPair(signal1, signal2)
   if(conMarIndicator.value === CM_DATASET.MARGINAL) {
     conMarIndicator.value = CM_DATASET.CONDITIONAL
+    lzPageHelpers.toggleConditionalMarginal(CM_DATASET.CONDITIONAL, CM_DATASET.MARGINAL)
   }
 }
 
@@ -171,6 +172,8 @@ const onDataTableRowClick = () => {
 
 const onCMRadioChange = (val) => {
   conMarIndicator.value = val
+  const oldVal = val === CM_DATASET.CONDITIONAL ? CM_DATASET.MARGINAL : CM_DATASET.CONDITIONAL
+  lzPageHelpers.toggleConditionalMarginal(val, oldVal)
 }
 
 const onLDRadioChange = (variant) => {
