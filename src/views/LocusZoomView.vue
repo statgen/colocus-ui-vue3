@@ -143,11 +143,11 @@ watch(() => appStore[locuszoomPage].colocDataReady, (newVal) => {
 })
 
 watch(() => conMarIndicator.value, (newVal, oldVal) => {
-  // lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+  lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
   // nextTick(() => { lzPageHelpers.toggleConditionalMarginal(newVal, oldVal) })
-  setTimeout(() => {
-    lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
-  }, 500)
+  // setTimeout(() => {
+  //   lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+  // }, 500)
 })
 
 // *** Lifecycle hooks *********************************************************

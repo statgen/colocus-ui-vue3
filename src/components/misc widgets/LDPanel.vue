@@ -108,8 +108,12 @@ watch(() => appStore[locuszoomPage].regionPanelRemoved, async (newVal) => {
 })
 
 watch(() => props.conMarResetFlag, async (newVal) => {
-  selectedMCRadio.value = CM_DATASET.CONDITIONAL
+  // selectedMCRadio.value = CM_DATASET.CONDITIONAL
   onCMRadioChange(CM_DATASET.CONDITIONAL)
+})
+
+watch(() => selectedMCRadio.value, async (newVal) => {
+  console.log('cm radio changed, watcher, value:', newVal)
 })
 
 // *** Lifecycle hooks *********************************************************
