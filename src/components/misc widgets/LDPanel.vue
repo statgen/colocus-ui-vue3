@@ -75,9 +75,9 @@ import { colorHasher, formatVariantString } from '@/util/util'
 const appStore = useAppStore()
 
 // *** Props *******************************************************************
-// const props = defineProps({
-//   conMarResetFlag: Boolean,
-// })
+const props = defineProps({
+  conMarResetFlag: Boolean,
+})
 
 // *** Variables ***************************************************************
 const selectedLDRadio = ref(null)
@@ -107,16 +107,14 @@ watch(() => appStore[locuszoomPage].regionPanelRemoved, async (newVal) => {
   }
 })
 
-// watch(() => appStore[locuszoomPage].conMarReset, async (newVal) => {
-// watch(() => props.conMarResetFlag, async (newVal) => {
-//   selectedMCRadio.value = CM_DATASET.CONDITIONAL
-//   onCMRadioChange(CM_DATASET.CONDITIONAL)
-// })
+watch(() => props.conMarResetFlag, async (newVal) => {
+  selectedMCRadio.value = CM_DATASET.CONDITIONAL
+  onCMRadioChange(CM_DATASET.CONDITIONAL)
+})
 
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 const onCMRadioChange = (value) => {
-  console.log('cm radio button changed to', value)
   selectedMCRadio.value = value
   emit('onCMRadioChange', value)
 }
