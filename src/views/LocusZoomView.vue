@@ -88,7 +88,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 import { CM_DATASET, PAGE_NAMES } from '@/constants'
@@ -143,7 +143,11 @@ watch(() => appStore[locuszoomPage].colocDataReady, (newVal) => {
 })
 
 watch(() => conMarIndicator.value, (newVal, oldVal) => {
-  lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+  // lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+  // nextTick(() => { lzPageHelpers.toggleConditionalMarginal(newVal, oldVal) })
+  setTimeout(() => {
+    lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
+  }, 500)
 })
 
 // *** Lifecycle hooks *********************************************************
