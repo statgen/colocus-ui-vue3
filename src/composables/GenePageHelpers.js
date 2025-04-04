@@ -164,7 +164,7 @@ export function useGenePageHelpers() {
     return tableFinal
   }
 
-  const getTableGroupedAnyTissue = async (inputTable, theGene, theTissue) => {
+  const getTableGroupedAnyTissue = async (inputTable, theGene, theTissues) => {
     const tableForGeneTissue = inputTable.derive({
       geneTissue: d => `${d.qtlSymbol} (${d.qtlTissue})`
     })
@@ -178,7 +178,10 @@ export function useGenePageHelpers() {
     const mapped = tableRollupObjects.map((row) => {
       let includedGenes = row.allGenesArray.filter((geneTissueStr) => {
         const [gene, tissue] = geneTissueStr.replace(/\(|\)/g, '').split(' ')
-        return (gene !== theGene) && (tissue !== theTissue)
+        if (theTissues.has(tissue)) {
+          return false;
+        }
+        return (gene !== theGene)
       })
       includedGenes.sort()
       return {
@@ -199,13 +202,13 @@ export function useGenePageHelpers() {
     if(tableForGene.size < 1) return []
 
     const theGene = tableForGene.get('qtlSymbol', 0) // use this instead of settings.theGene as it may be an ensembl id
-    const theTissue = tableForGene.get('qtlTissue', 0)
+    const theTissues = new Set(tableForGene.array('qtlTissue'))
     const uniqueTraits = [...new Set(tableForGene.array('gwasTrait'))].join(',')
     const uniqueLeadVariants = [...new Set(tableForGene.array('gwasLeadVariant'))].join(',')
 
     const tableForTraitsVariants = await gettableForTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
     const tableGroupedSameTissue = await getTableGroupedSameTissue(tableForTraitsVariants, theGene)
-    const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableForTraitsVariants, theGene, theTissue)
+    const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableForTraitsVariants, theGene, theTissues)
 
     // console.log('tableForGene', tableForGene.columnNames())
     // console.log('tableGroupedSameTissue', tableGroupedSameTissue.columnNames())
