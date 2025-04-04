@@ -266,8 +266,8 @@ export function useGenePageHelpers() {
 
     { title: 'Other Genes, Same GWAS, Same Tissue (Count)', sortable: true, value: 'otherGenesSameTissueCount', width: '10rem', align: 'end', visible: alwaysShow },
     { title: 'Other Genes, Same GWAS, Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '15rem', visible: alwaysShow },
-    { title: 'Other Genes, Same GWAS, Any Tissue (Count)', sortable: true, value: 'otherGenesAnyTissueCount', width: '10rem', align: 'end', visible: alwaysShow },
-    { title: 'Other Genes, Same GWAS, Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '15rem', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Other Tissue (Count)', sortable: true, value: 'otherGenesAnyTissueCount', width: '10rem', align: 'end', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Other Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '15rem', visible: alwaysShow },
 
     { title: 'GWAS Dataset', sortable: true, value: 'gwasDataset', visible: () => showDatasets.value },
     { title: 'QTL Dataset', sortable: true, value: 'qtlDataset', visible: () => showDatasets.value  },
