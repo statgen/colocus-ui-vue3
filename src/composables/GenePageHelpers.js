@@ -66,6 +66,8 @@ export function useGenePageHelpers() {
     return recs
   }
 
+  const safeSplit = (str, delimiter) => str ? str.split(delimiter) : [];
+
   const getTable1Objects = async (t2Grouped) => {
     const geneDetails = await getGeneDetails(t2Grouped)
 
@@ -73,6 +75,7 @@ export function useGenePageHelpers() {
     t1Objects.forEach(row => {
       row.traitsColocalizedCount = row.traitsColocalized.length
       row.traitsColocalized = row.traitsColocalized.sort().join(', ')
+      row.otherGenesSameTissueCount = safeSplit(row.otherGenesSameTissue, ',').length
 
       if(row.otherGenesSameTissueCount > 0) {
         const gwasLeadVariantPos = parseInt(row.gwasLeadVariant.split('_')[1])
@@ -219,10 +222,18 @@ export function useGenePageHelpers() {
       const t2 = aq.from(table2)
       if(t2.size < 1) return []
       let t2Grouped = t2
-        .groupby('gwasLeadVariant', 'qtlSymbol', 'qtlTissue', 'qtlStudy', 'otherGenesSameTissueCount', 'otherGenesSameTissue', )
+        .groupby('gwasLeadVariant', 'qtlSymbol', 'qtlTissue', 'qtlStudy')
         .rollup({
-          traitsColocalized: aq.op.array_agg_distinct('gwasTrait')
+          traitsColocalized: aq.op.array_agg_distinct('gwasTrait'),
+          otherGenesSameTissue: aq.op.array_agg_distinct(aq.op.split('otherGenesSameTissue', ','))
         })
+
+      let otherGenesSameTissueAgg = t2Grouped.objects().map(
+        row => ({ 
+          otherGenesSameTissue: Array.from(new Set(row.otherGenesSameTissue.map(v => v.split(",")).flat())).sort().join(',') 
+        })
+      )
+      t2Grouped = t2Grouped.assign(aq.from(otherGenesSameTissueAgg))
 
       const t1Objects = await getTable1Objects(t2Grouped)
       return t1Objects
