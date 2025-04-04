@@ -242,8 +242,8 @@ export function useGenePageHelpers() {
     { title: 'GWAS Lead Variant', sortable: true, value: 'gwasLeadVariant', width: '10rem', visible: alwaysShow },
     { title: 'Traits Colocalized Count', sortable: true, value: 'traitsColocalizedCount', width: '10rem', align: 'center', visible: alwaysShow },
     { title: 'Traits Colocalized', sortable: true, value: 'traitsColocalized', width: '15rem', visible: alwaysShow },
-    { title: 'Other Genes Same GWAS Count', sortable: true, value: 'otherGenesSameTissueCount', width: '10rem', align: 'center', visible: alwaysShow },
-    { title: 'Other Genes Same GWAS', sortable: true, value: 'otherGenesSameTissue', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Same Tissue (Count)', sortable: true, value: 'otherGenesSameTissueCount', width: '10rem', align: 'center', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Same Tissue', sortable: true, value: 'otherGenesSameTissue', visible: alwaysShow },
   ]
 
   const visibleTable2Columns = computed(() => {
