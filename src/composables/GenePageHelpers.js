@@ -239,9 +239,9 @@ export function useGenePageHelpers() {
   const table1Headers = [
     { title: 'QTL Tissue', sortable : true, value: 'qtlTissue', width: '7rem', visible: alwaysShow },
     { title: 'QTL Study', sortable: true, value: 'qtlStudy', width: '7rem', visible: alwaysShow },
-    { title: 'GWAS Lead Variant', sortable: true, value: 'gwasLeadVariant', maxWidth: '10rem', visible: alwaysShow },
+    { title: 'GWAS Lead Variant', sortable: true, value: 'gwasLeadVariant', width: '10rem', visible: alwaysShow },
     { title: 'Traits Colocalized Count', sortable: true, value: 'traitsColocalizedCount', width: '10rem', align: 'center', visible: alwaysShow },
-    { title: 'Traits Colocalized', sortable: true, value: 'traitsColocalized', visible: alwaysShow },
+    { title: 'Traits Colocalized', sortable: true, value: 'traitsColocalized', width: '15rem', visible: alwaysShow },
     { title: 'Other Genes Same GWAS Count', sortable: true, value: 'otherGenesSameTissueCount', width: '10rem', align: 'center', visible: alwaysShow },
     { title: 'Other Genes Same GWAS', sortable: true, value: 'otherGenesSameTissue', visible: alwaysShow },
   ]
@@ -264,10 +264,10 @@ export function useGenePageHelpers() {
     { title: 'Trait 1 Variant', sortable: true, value: 'gwasLeadVariant', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 2 Variant', sortable: true, value: 'qtlLeadVariant', minWidth: '12rem', visible: alwaysShow },
 
-    { title: 'Other Genes Same Tissue Count', sortable: true, value: 'otherGenesSameTissueCount', align: 'end', visible: alwaysShow },
-    { title: 'Other Genes Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '20rem', visible: alwaysShow },
-    { title: 'Other Genes Any Tissue Count', sortable: true, value: 'otherGenesAnyTissueCount', align: 'end', visible: alwaysShow },
-    { title: 'Other Genes Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '20rem', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Same Tissue (Count)', sortable: true, value: 'otherGenesSameTissueCount', width: '10rem', align: 'end', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Same Tissue', sortable: true, value: 'otherGenesSameTissue', minWidth: '15rem', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Any Tissue (Count)', sortable: true, value: 'otherGenesAnyTissueCount', width: '10rem', align: 'end', visible: alwaysShow },
+    { title: 'Other Genes, Same GWAS, Any Tissue', sortable: true, value: 'otherGenesAnyTissue', minWidth: '15rem', visible: alwaysShow },
 
     { title: 'GWAS Dataset', sortable: true, value: 'gwasDataset', visible: () => showDatasets.value },
     { title: 'QTL Dataset', sortable: true, value: 'qtlDataset', visible: () => showDatasets.value  },
