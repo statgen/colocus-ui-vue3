@@ -8,7 +8,7 @@
       <h1><BackButton />{{ pageHeader }}</h1>
       <h2>Table 1</h2>
       <p>
-        Summary of GWAs signals associated with [gene name] and other genes associated with the same GWAS signal in the same tissue.
+        Summary of GWAS signals associated with {{ selectedGene }} and other genes associated with the same GWAS signal in the same tissue.
         <span class="font-weight-bold">Grouped by lead GWAS variant (can have multiple GWASs with the same lead GWAS variant).</span>
       </p>
       <div class="table-container mt-2">
@@ -30,7 +30,7 @@
 
       <h2>Table 2</h2>
       <p>
-        Summary of GWAs signals associated with [gene name] and other genes associated with the same GWAS signal in the same tissue and other tissues.
+        Summary of GWAS signals associated with {{ selectedGene }} and other genes associated with the same GWAS signal in the same tissue and other tissues.
         <span class="font-weight-bold">Grouped by each associated GWAS trait and lead variant.</span>
       </p>
       <div class="table-container">
@@ -99,6 +99,10 @@ const pageHeader = computed(() => {
   return appStore[genePage].selectedGene
     ? `Gene: ${appStore[genePage].selectedGene}`
     : 'Gene'
+})
+
+const selectedGene = computed(() => {
+  return appStore[genePage].selectedGene
 })
 
 // *** Provides ****************************************************************
