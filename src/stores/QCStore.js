@@ -22,6 +22,7 @@ export const useQCStore = defineStore('qcStore', {
     r2Threshold: THRESHOLDS.R2,
     qtlStudies: markRaw([]),
     regenPlotFlag: true,
+    resetSlidersFlag: true,
     selectedStudy: '',      // full name: <study> (<tissue>)
     selectedStudyName: '',  // just study name
     selectedTissue: '',

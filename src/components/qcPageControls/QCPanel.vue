@@ -1,63 +1,35 @@
 <template>
-  <v-sheet class="position-fixed bg-clcBackground px-2 mt-2 pb-4" elevation="0" border >
-    <ToolTippy>
-      <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="reset-icon-class" />
-
-      <template #tooltipContent>
-        Reset to default values
-      </template>
-    </ToolTippy>
-
-    <h2 class="mb-2 d-inline-flex">Settings</h2>
-
-    <v-row><QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/></v-row>
-    <v-row><QCSlider :controlSet="controlSet.h4" /></v-row>
-    <v-row><QCSlider :controlSet="controlSet.r2" /></v-row>
-
-    <v-row>
-      <h2 class="ml-4">Plots</h2>
-    </v-row>
-    <v-row>
-      <ul>
-        <li v-for="link in plotHeadings" :key=link.id>
-          <ToolTippy>
-            <a :href="'#' + link.id" @click.prevent=scrollToHeading(link.id) class="coLink">
-              {{ truncateString(link.textContent, MAX_PLOT_TITLE_LEN) }}
-            </a>
-            <template #tooltipContent>
-              {{ link.textContent}}
-            </template>
-          </ToolTippy>
-        </li>
-      </ul>
-    </v-row>
-  </v-sheet>
+  <v-scroll-x-transition>
+    <v-sheet v-show=true class="nl-n2">
+      <FilterPanelSubpanel title="Settings" resetButton="true">
+        <QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/>
+        <QCSlider :controlSet="controlSet.h4" />
+        <QCSlider :controlSet="controlSet.r2" />
+        <ul>
+          <li v-for="link in plotHeadings" :key=link.id>
+            <ToolTippy>
+              <a :href="'#' + link.id" @click.prevent=scrollToHeading(link.id) class="coLink">
+                {{ truncateString(link.textContent, MAX_PLOT_TITLE_LEN) }}
+              </a>
+              <template #tooltipContent>
+                {{ link.textContent}}
+              </template>
+            </ToolTippy>
+          </li>
+        </ul>
+        </FilterPanelSubpanel>
+    </v-sheet>
+  </v-scroll-x-transition>
 </template>
 
 <script setup>
-import { nextTick, onMounted, provide, ref, toRaw } from 'vue'
-import { STATS_PAGE_TOP, THRESHOLDS } from '@/constants'
+import { nextTick, onMounted, ref } from 'vue'
+import { THRESHOLDS } from '@/constants'
 import { scrollToHeading, truncateString } from '@/util/util'
 
 const MAX_PLOT_TITLE_LEN = 40
 
 const plotHeadings = ref([])
-
-const resetSelect = ref(false)
-const resetSlider = ref(false)
-
-provide('resetSelect', resetSelect)
-provide('resetSlider', resetSlider)
-
-const onResetButtonClick = () => {
-  resetSelect.value = !resetSelect.value
-  resetSlider.value = !resetSlider.value
-  scrollToHeading(STATS_PAGE_TOP)
-}
-
-const resetSliders = () => {
-  resetSlider.value = !resetSlider.value
-}
 
 onMounted(async () => {
   await nextTick()

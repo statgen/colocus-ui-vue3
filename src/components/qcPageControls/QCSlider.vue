@@ -31,17 +31,25 @@ const { controlSet } = defineProps({
 })
 
 const controlText = ref(`${controlSet.caption} (${controlSet.defaultValue})`)
-const resetSlider = inject('resetSlider')
+const resetInput = inject('resetInput')
 
 const onSliderUpdate = (newValue) => {
   qcStore.updateQCStoreKey(controlSet.dataKey, newValue)
   controlText.value = `${controlSet.caption} (${newValue})`
 }
 
-watch(() => resetSlider.value, () => {
+watch(() => resetInput.value, () => {
+  resetSlider()
+})
+
+watch(() => qcStore.resetSlidersFlag, () => {
+  resetSlider()
+})
+
+const resetSlider = () => {
   controlText.value = `${controlSet.caption} (${controlSet.defaultValue})`
   qcStore.updateQCStoreKey(controlSet.dataKey, controlSet.defaultValue)
-})
+}
 </script>
 
 <style scoped>

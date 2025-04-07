@@ -32,17 +32,14 @@ const { controlSet } = defineProps({
   controlSet: {}
 })
 
-const resetSelect = inject('resetSelect')
-
-const emit = defineEmits(['resetSliders'])
-
+const resetInput = inject('resetInput')
 
 const onSelectUpdate = (newValue) => {
   qcStore.updateQCStoreKey(controlSet.dataKey, newValue)
-  emit('resetSliders')
+  qcStore.resetSlidersFlag = !qcStore.resetSlidersFlag
 }
 
-watch(() => resetSelect.value, () => {
+watch(() => resetInput.value, () => {
   qcStore.updateQCStoreKey(controlSet.dataKey, qcStore.defaultStudy)
 })
 </script>
