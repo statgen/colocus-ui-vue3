@@ -65,7 +65,8 @@ function makePlotTitle(signal) {
 
   const variant = formatVariantString(signal.lead_variant.vid)
   const study = signal.analysis.study.uuid
-  const title = `${part1}    ${analysisType}    ${study}    ${variant}`
+  const margOnly = signal?.is_marg ? '(marginal only)' : '';
+  const title = `${part1}    ${analysisType}    ${study}    ${variant}    ${margOnly}`
   const color = colorHasher.hex(signal.lead_variant.vid)
   return [title, color]
 }
