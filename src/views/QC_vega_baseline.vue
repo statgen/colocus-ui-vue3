@@ -14,7 +14,7 @@
 // import embed from 'vega-embed'
 //
 // const spec = {
-//   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+//   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
 //   "data": {
 //     "values": [
 //       {"a": "C", "b": 2},

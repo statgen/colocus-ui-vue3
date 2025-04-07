@@ -180,7 +180,7 @@ const barLayersBot = () => {
 }
 
 let signalCountsPerGWASSpec = {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
   "data": { "name": "placeholder", "values": [] },
   "width": "container",
   "title": {},
