@@ -1,7 +1,14 @@
 <template>
   <v-col cols="3">
     <v-row>
-      <QCPanel />
+      <QCPanel>
+        <template #anchors>
+          <QCAnchor :config="vpc.signalPropsPerGWAS"/>
+          <QCAnchor :config="vpc.signalCountsPerGWAS"/>
+          <QCAnchor :config="vpc.omicsPropsPerGWAS"/>
+          <QCAnchor :config="vpc.omicsCountsPerGWAS"/>
+        </template>
+      </QCPanel>
     </v-row>
   </v-col>
   <v-col class="mt-4">

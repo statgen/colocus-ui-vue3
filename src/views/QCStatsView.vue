@@ -1,7 +1,16 @@
 <template>
   <v-col cols="3">
     <v-row>
-      <QCPanel />
+      <QCPanel>
+        <template #anchors>
+          <QCAnchor :config="vpc.ColocalizationClass"/>
+          <QCAnchor :config="vpc.ColocalizationClassError"/>
+          <QCAnchor :config="vpc.r2VsH4ScatterPlot"/>
+          <QCAnchor :config="vpc.r2VsH4HeatMap"/>
+          <QCAnchor :config="vpc.histogramH4"/>
+          <QCAnchor :config="vpc.histogramR2"/>
+        </template>
+      </QCPanel>
     </v-row>
   </v-col>
   <v-col class="mt-4">

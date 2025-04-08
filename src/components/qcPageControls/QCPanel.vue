@@ -1,40 +1,18 @@
 <template>
-  <v-scroll-x-transition>
-    <v-sheet v-show=true class="nl-n2">
-      <FilterPanelSubpanel title="Settings" resetButton="true">
+  <v-sheet class="mt-3">
+    <FilterPanelSubpanel title="Settings" resetButton="true" class="pb-4">
+      <div class="ml-n2">
         <QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/>
         <QCSlider :controlSet="controlSet.h4" />
         <QCSlider :controlSet="controlSet.r2" />
-        <ul>
-          <li v-for="link in plotHeadings" :key=link.id>
-            <ToolTippy>
-              <a :href="'#' + link.id" @click.prevent=scrollToHeading(link.id) class="coLink">
-                {{ truncateString(link.textContent, MAX_PLOT_TITLE_LEN) }}
-              </a>
-              <template #tooltipContent>
-                {{ link.textContent}}
-              </template>
-            </ToolTippy>
-          </li>
-        </ul>
-        </FilterPanelSubpanel>
-    </v-sheet>
-  </v-scroll-x-transition>
+        <slot name="anchors"/>
+      </div>
+    </FilterPanelSubpanel>
+  </v-sheet>
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
 import { THRESHOLDS } from '@/constants'
-import { scrollToHeading, truncateString } from '@/util/util'
-
-const MAX_PLOT_TITLE_LEN = 40
-
-const plotHeadings = ref([])
-
-onMounted(async () => {
-  await nextTick()
-  plotHeadings.value = document.querySelectorAll('.gatherMe')
-})
 
 const controlSet = {
   "h4": { caption: "Set h4 threshold ≥", dataKey: "h4Threshold", defaultValue: THRESHOLDS.H4, },
