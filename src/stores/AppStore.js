@@ -175,7 +175,7 @@ export const useAppStore = defineStore('appStore', {
 
       sessionStorage.setItem('lastAnalysisID', analysisID)
 
-      const href = `${URLS.TRAIT_DATA}${analysisID}/manhattan/`
+      const href = `${URLS.TRAIT_DATA}/${analysisID}/manhattan/`
       const url = new URL(href, window.location.origin)
       const { data, errorMessage, fetchData } = useFetchData()
 

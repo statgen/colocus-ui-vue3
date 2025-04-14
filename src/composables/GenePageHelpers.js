@@ -48,7 +48,7 @@ export function useGenePageHelpers() {
     allAssocGenes = Array.from(new Set(allAssocGenes.split(','))).join(',') // remove duplicates
     if(!allAssocGenes) return {}
 
-    const url = new URL(URLS[genePage], window.location.origin)
+    const url = new URL(URLS.COLOC_DATA, window.location.origin)
     url.searchParams.set('genes', allAssocGenes)
     const rawData = await getRawData(url, 'gene data: gene details')
 
@@ -197,7 +197,7 @@ export function useGenePageHelpers() {
   }
 
   const getTable2Data = async (settings) => {
-    const tableForGene = await getTableForGene(URLS[genePage], settings)
+    const tableForGene = await getTableForGene(URLS.COLOC_DATA, settings)
 
     if(tableForGene.size < 1) return []
 
@@ -206,7 +206,7 @@ export function useGenePageHelpers() {
     const uniqueTraits = [...new Set(tableForGene.array('gwasTrait'))].join(',')
     const uniqueLeadVariants = [...new Set(tableForGene.array('gwasLeadVariant'))].join(',')
 
-    const tableForTraitsVariants = await gettableForTraitsVariants(URLS[genePage], settings, uniqueTraits, uniqueLeadVariants)
+    const tableForTraitsVariants = await gettableForTraitsVariants(URLS.COLOC_DATA, settings, uniqueTraits, uniqueLeadVariants)
     const tableGroupedSameTissue = await getTableGroupedSameTissue(tableForTraitsVariants, theGene)
     const tableGroupedAnyTissue = await getTableGroupedAnyTissue(tableForTraitsVariants, theGene, theTissues)
 
@@ -232,8 +232,8 @@ export function useGenePageHelpers() {
         })
 
       let otherGenesSameTissueAgg = t2Grouped.objects().map(
-        row => ({ 
-          otherGenesSameTissue: Array.from(new Set(row.otherGenesSameTissue.map(v => v.split(",")).flat())).sort().join(',') 
+        row => ({
+          otherGenesSameTissue: Array.from(new Set(row.otherGenesSameTissue.map(v => v.split(",")).flat())).sort().join(',')
         })
       )
       t2Grouped = t2Grouped.assign(aq.from(otherGenesSameTissueAgg))

@@ -42,26 +42,25 @@ const PAGE_NAMES = {
 const STATS_PAGE_TOP = 'topOfThePage'
 
 const URLS = {
-  // these are for the data tables that exist on the associated pages
-  [PAGE_NAMES.SEARCH]: '/api/v1/coloc/',
-  [PAGE_NAMES.MANHATTAN]: '/api/v1/coloc/',
-  [PAGE_NAMES.LOCUSZOOM]: '/api/v1/coloc/',
-  [PAGE_NAMES.GENE]: '/api/v1/coloc/',
-  // these are misc data links
-  FILTER_DATA: '/api/v1/internal/search_metadata/',
+  // our data
+  COLOC_DATA: '/api/v1/coloc',
+  FILTER_DATA: '/api/v1/internal/search_metadata',
+  LD_DATA: '/api/v1/ld',
+  QC_COLOC: '/api/v1/internal/coloc-slim',
+  QC_SIGNALS: '/api/v1/internal/signals-slim',
+  SIGNALS_DATA: '/api/v1/signals',
   STUDY_DATA: '/data/studies.json',
-  TRAIT_DATA: '/api/v1/internal/analysis/',
-  PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
-  SIGNALS_DATA: '/api/v1/signals/',
-  LD_DATA: '/api/v1/ld/',
+  TRAIT_DATA: '/api/v1/internal/analysis',
+
+  // CMD Portal data
   PORTAL_GENE_CHECK: 'https://bioindex.hugeamp.org/api/bio/query/gene',
   PORTAL_GENE_PAGE: 'https://hugeamp.org/gene.html',
   PORTAL_PHEN_CHECK: 'https://bioindex.hugeamp.org/api/bio/count/global-associations',
   PORTAL_PHEN_PAGE: 'https://hugeamp.org/phenotype.html',
   PORTAL_VAR_CHECK: 'https://bioindex.hugeamp.org/api/bio/query/variant',
   PORTAL_VAR_PAGE: 'https://hugeamp.org/variant.html',
-  QC_COLOC: '/api/v1/internal/coloc-slim/',
-  QC_SIGNALS: '/api/v1/internal/signals-slim/',
+
+  PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
 }
 
 const THRESHOLDS = {

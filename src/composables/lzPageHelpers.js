@@ -163,9 +163,9 @@ export function useLZPageHelpers() {
     const [s2Label, s2color] = makePlotTitle(signal2)
     const source_configs = get_region_sources(
       signal1.analysis.genome_build,
-      `${URLS.SIGNALS_DATA}${signal1.uuid}/region/`,
-      `${URLS.SIGNALS_DATA}${signal2.uuid}/region/`,
-      `${URLS.LD_DATA}${signal1.analysis.ld}/region/`,
+      `${URLS.SIGNALS_DATA}/${signal1.uuid}/region/`,
+      `${URLS.SIGNALS_DATA}/${signal2.uuid}/region/`,
+      `${URLS.LD_DATA}/${signal1.analysis.ld}/region/`,
     )
     return {
       signal1, signal2,

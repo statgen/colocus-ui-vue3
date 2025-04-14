@@ -247,12 +247,12 @@ const loadData = async () => {
   try {
     if (cpn === locuszoomPage) {
       if(!appStore[locuszoomPage].colocDataReady) {
-        const colocURL = `${URLS[cpn]}${colocID}`
+        const colocURL = `${URLS.COLOC_DATA}/${colocID}`
         await loadColocData(cpn, colocURL)
       }
       const signal1 = appStore[locuszoomPage].colocData.signal1
       const signal2 = appStore[locuszoomPage].colocData.signal2
-      url = appStore.buildLZdataTableURL(URLS[cpn], signal1, signal2)
+      url = appStore.buildLZdataTableURL(URLS.COLOC_DATA, signal1, signal2)
 
       if(!appStore[locuszoomPage].tableDataLoaded || appStore[locuszoomPage].filterDataChanged) {
         await loadTableData(cpn, url)
@@ -260,7 +260,7 @@ const loadData = async () => {
         appStore[locuszoomPage].filterDataChanged = false
       }
     } else { // must be search page or manhattan page
-      url = appStore.buildSearchURL(URLS[cpn])
+      url = appStore.buildSearchURL(URLS.COLOC_DATA)
       await loadTableData(cpn, url)
     }
   } catch (e) {

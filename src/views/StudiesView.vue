@@ -90,7 +90,6 @@ const search = ref('')
 onMounted(async () => {
   // const response = await fetch('/data/studies.json')
   // data.value = await response.json()
-  const url = '/data/studies.json'
   if(await fetchData(URLS.STUDY_DATA, 'study data', appStore.currentPageName)) {
     dataItems.value = data.value
   } else {

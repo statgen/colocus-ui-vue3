@@ -13,7 +13,7 @@ import LocusZoom from 'locuszoom'
 import 'locuszoom/dist/locuszoom.css'
 import { config_to_sources } from '@/util/lz-layouts';
 import { makePlotTitle, url } from '@/util/util';
-import { COLORS, PAGE_NAMES } from '@/constants'
+import { COLORS, PAGE_NAMES, URLS } from '@/constants'
 import { useAppStore } from '@/stores/AppStore'
 import { deepCopy, merge } from 'locuszoom/esm/helpers/layouts'
 
@@ -178,10 +178,10 @@ const addRegionPanel = (signal) => {
   regionPanelCounter += 1
   const signalID = signal.uuid
   const panelLabel = `assoc_${regionPanelCounter}_${signalID}`
-  const dataSourceURL = url`/api/v1/signals/${signalID}/region/`
+  const dataSourceURL = `${URLS.SIGNALS_DATA}/${signalID}/region/`
   const [variantLabel, variantColor] = makePlotTitle(signal)
   const ldSource = `ld_${regionPanelCounter}_${signalID}`
-  const ldURL = url`/api/v1/ld/${signal.analysis.ld}/region/`
+  const ldURL = `${URLS.LD_DATA}/${signal.analysis.ld}/region/`
 
   const panel = LocusZoom.Layouts.get('panel', 'association_with_cond', {
     id: panelLabel,
