@@ -1,4 +1,10 @@
 <template>
+  <ToolTippy>
+    <v-icon icon="mdi-information-outline" @click="start" class="info-icon-class" />
+    <template #tooltipContent>
+      View tutorial on page operation
+    </template>
+  </ToolTippy>
 </template>
 
 <script setup>

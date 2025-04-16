@@ -542,3 +542,20 @@ Late in development of this page, I experienced a situation where the gene list 
 ### Gene label components
 The existing TraitLabelGene component was enhanced to provide a link from the current page (search, LZ, Manhattan) to the gene page. (That component also displays a link to the CMD portal.) However, this component was not used in the display of genes on the gene page. Instead, a new simpler component was developed that just displays the gene symbol as a link to the gene page.
 
+## Tutorial system
+To add a tutorial to page, 
+
+First, add the component to the page, eg:
+``` <h1>Search <TutorialOverlay ref="tutorial" :buildSteps="buildSteps" /></h1>```
+
+Second, add a ref variable to match the component, eg:
+```const tutorial = ref()```
+
+Third, add a function to assemble the steps, eg:
+```const buildSteps = (tour) => tutorialHelpers.buildTourSteps(tour, steps)```
+
+Fourth, create file with a set of step defitions and import it in the page, eg:
+```import steps from '@/tutorials/tutSearchPage'```
+
+See tutorial step definition files in src/tutorials.
+
