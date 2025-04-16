@@ -1,7 +1,7 @@
 <template>
   <v-scroll-x-transition>
     <v-sheet v-show="appStore.filterPanelControls.isSidebarShowing" class="ml-n2" >
-      <FilterPanelSubpanel title="Select" resetButton="true">
+      <FilterPanelSubpanel title="Select" resetButton="true" id="subPanelSelect">
         <CtlAutocomplete :controlSet="controlConfig.study" />
         <CtlAutocomplete :controlSet="controlConfig.gene" />
         <CtlTextfield :controlSet="controlConfig.region" />
@@ -9,14 +9,14 @@
         <CtlAutocomplete :controlSet="controlConfig.tissue" />
       </FilterPanelSubpanel>
 
-      <FilterPanelSubpanel title="Set threshold" resetButton="true">
+      <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
         <CtlTextfield :controlSet="controlConfig.trait1" />
         <CtlTextfield :controlSet="controlConfig.trait2" />
         <CtlTextfield :controlSet="controlConfig.h4" />
         <CtlTextfield :controlSet="controlConfig.r2" />
       </FilterPanelSubpanel>
 
-      <FilterPanelSubpanel title="View">
+      <FilterPanelSubpanel title="View" id="subPanelView">
         <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
         <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
         <CtlSwitch :controlSet="controlConfig.showEffects" />
@@ -28,6 +28,7 @@
 <script setup>
 import { useAppStore } from '@/stores/AppStore'
 import { THRESHOLDS } from '@/constants'
+import FilterPanelSubpanel from "@/components/FilterPanel/FilterPanelSubpanel.vue";
 
 const appStore = useAppStore()
 

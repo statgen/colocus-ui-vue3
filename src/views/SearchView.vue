@@ -1,14 +1,24 @@
 <template>
+  <TutorialOverlay ref="tutorial" :buildSteps="buildSteps" />
   <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
     <FilterPanel />
   </v-col>
   <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
     <div class="search-header">
-      <h1>Search</h1>
+      <h1>
+        Search
+        <ToolTippy>
+          <v-icon icon="mdi-information-outline" @click="startTutorial" class="info-icon-class" />
+          <template #tooltipContent>
+            View tutorial on page operation
+          </template>
+        </ToolTippy>
+      </h1>
+
       <p>You are viewing {{ appStore.dataTable.itemCount }} of {{ appStore.dataTable.countPairs }} records.</p>
       <p>To view Locus Zoom and Locus Compare plots for a colocalized GWAS-eQTL pair of interest, click on the row containing the pair.</p>
-      <br />
     </div>
+
     <v-alert
       title="Invalid gene(s) specified"
       :text="alertText"
@@ -19,7 +29,8 @@
       closable
       max-width="50%"
     ></v-alert>
-    <div class="table-container">
+
+    <div class="table-container mt-2">
       <DataTable
         @onDataTableRowClick="onDataTableRowClick"
       ></DataTable>
@@ -34,9 +45,18 @@ import { useRoute } from "vue-router";
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 import router from '@/router'
+import steps from '@/tutorials/tutSearchPage'
+import { useTutorialHelpers } from '@/composables/TutorialHelpers'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
+const tutorialHelpers = useTutorialHelpers()
+
+const buildSteps = (tour) => tutorialHelpers.buildTourSteps(tour, steps)
+
+const startTutorial = () => {
+  tutorial.value.start()
+}
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -45,6 +65,7 @@ const alertVisible = ref(false)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const preloadGenes = ref([])
+const tutorial = ref()
 // const preloadTrait = ref('')
 
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM

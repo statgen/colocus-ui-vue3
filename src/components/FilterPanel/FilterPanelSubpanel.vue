@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="bg-clcBackground px-2 mt-2" elevation="0" border>
+  <v-sheet :id="props.id" class="bg-clcBackground px-2 mt-2" elevation="0" border>
     <div class="d-flex align-center">
       <ToolTippy>
         <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="reset-icon-class" />
@@ -19,9 +19,10 @@
 <script setup>
 import { provide, ref } from 'vue'
 
-const props = defineProps(['title', 'resetButton'])
+const props = defineProps(['title', 'resetButton', 'id'])
 
 const resetInput = ref(false)
+// const id = ref(props.id)
 
 provide('resetInput', resetInput)
 

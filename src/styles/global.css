@@ -40,6 +40,12 @@ p {
   color: rgba(var(--v-theme-clcAction), 1.0);
 }
 
+.info-icon-class {
+  font-size: 24px;
+  margin-bottom: 2px;
+  color: rgba(var(--v-theme-clcAction), 1.0);
+}
+
 /* these styles are for blinking the LocusZoom lead variant */
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -48,4 +54,24 @@ p {
 
 .blink {
   animation: blink 1s infinite;
+}
+
+.custom-shepherd-offset .shepherd-arrow {
+  height: 30px !important; /* Make the arrow longer */
+}
+
+.custom-shepherd-offset.shepherd-element[data-popper-placement^="right"] {
+  margin-left: 20px !important; /* Add more space when positioned on the right */
+}
+
+.custom-shepherd-offset.shepherd-element[data-popper-placement^="left"] {
+  margin-right: 20px !important; /* Add more space when positioned on the left */
+}
+
+.custom-shepherd-offset.shepherd-element[data-popper-placement^="top"] {
+  margin-bottom: 20px !important; /* Add more space when positioned on top */
+}
+
+.custom-shepherd-offset.shepherd-element[data-popper-placement^="bottom"] {
+  margin-top: 20px !important; /* Add more space when positioned on bottom */
 }
