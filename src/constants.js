@@ -19,9 +19,9 @@ const COLORS = {
   CLC_TABLE_HIGHLIGHT: '#f0f8ff',
   CLC_TOOLTIP_BACKGROUND: '#eee',
   CLC_TOOLTIP_BORDER: '#2962ff',
-  BAR_PRIMARY: "#8ef18f",
+  BAR_PRIMARY: "#c4e0f8",   // this is an HSL-lightened shade of CLC_HEADING
   BAR_SECONDARY: "#ffd1c7",
-  BAR_TERTIARY: "#eee",
+  BAR_TERTIARY: "#ddd",
 }
 
 const NEARBY_DIST = 500e3
