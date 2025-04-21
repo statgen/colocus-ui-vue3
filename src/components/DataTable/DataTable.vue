@@ -2,7 +2,7 @@
   <v-data-table-server
     :fixed-header="false"
     :headers="visibleColumns"
-    :row-props="({item}) => getRowClass(item)"
+    :id="props.id"
     :items="dataItems"
     :items-length="appStore.dataTable.countPairs"
     :items-per-page="itemsPerPage"
@@ -11,6 +11,7 @@
     :loading-text="loadingText"
     :multi-sort="true"
     :page="currentPage"
+    :row-props="({item}) => getRowClass(item)"
 
     @click:row="onRowClick"
     @update:itemsPerPage="onItemsPerPageChanged"
@@ -142,6 +143,7 @@ const appStore = useAppStore()
 const { fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
 
 // *** Props *******************************************************************
+const props = defineProps(['id'])
 
 // *** Variables ***************************************************************
 const currentPage = ref()

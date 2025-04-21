@@ -23,6 +23,7 @@
     <div class="table-container mt-2">
       <DataTable
         @onDataTableRowClick="onDataTableRowClick"
+        id="searchDataTable"
       ></DataTable>
     </div>
   </v-col>
@@ -35,7 +36,7 @@ import { useRoute } from "vue-router";
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 import router from '@/router'
-import steps from '@/tutorials/tutSearchPage'
+import steps from '@/tutorials/tutSearchPageSteps'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()

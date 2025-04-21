@@ -75,3 +75,10 @@ p {
 .custom-shepherd-offset.shepherd-element[data-popper-placement^="bottom"] {
   margin-top: 20px !important; /* Add more space when positioned on bottom */
 }
+
+.tut-ind-l1 {
+  margin-left: 10px;
+}
+.tut-ind-l2 {
+  margin-left: 20px;
+}
