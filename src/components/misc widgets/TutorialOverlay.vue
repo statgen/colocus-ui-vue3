@@ -13,10 +13,32 @@ import Shepherd from 'shepherd.js'
 import 'shepherd.js/dist/css/shepherd.css'
 
 const props = defineProps({
-  buildSteps: Function,
+  steps: Array,
 })
 
 const tour = ref(null)
+
+const buildTourStepActions = (tour, steps) => {
+  return steps.map(step => ({
+    ...step,
+    classes: 'custom-shepherd-offset', // see global.css for definition
+    buttons: step.buttons.map(button => {
+      if (typeof button.action === 'string') {
+        switch (button.action) {
+          case 'next':
+            return { ...button, action: () => tour.next() }
+          case 'back':
+            return { ...button, action: () => tour.back() }
+          case 'complete':
+            return { ...button, action: () => tour.complete() }
+          default:
+            return button
+        }
+      }
+      return button
+    })
+  }))
+}
 
 function initTour() {
   tour.value = new Shepherd.Tour({
@@ -28,7 +50,7 @@ function initTour() {
     useModalOverlay: true,
   })
 
-  const steps = props.buildSteps(tour.value)
+  const steps = buildTourStepActions(tour.value, props.steps)
   steps.forEach(step => tour.value.addStep(step))
 
   tour.value.on('complete', () => {
@@ -38,6 +60,7 @@ function initTour() {
   tour.value.on('cancel', () => {
     scrollTop()
   })
+
 }
 
 const scrollTop = () => {

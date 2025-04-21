@@ -4,7 +4,7 @@
   </v-col>
   <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
     <div class="search-header">
-      <h1>Search <TutorialOverlay ref="tutorial" :buildSteps="buildSteps" /></h1>
+      <h1>Search <TutorialOverlay ref="tutorial" :steps="steps" /></h1>
       <p>You are viewing {{ appStore.dataTable.itemCount }} of {{ appStore.dataTable.countPairs }} records.</p>
       <p>To view Locus Zoom and Locus Compare plots for a colocalized GWAS-eQTL pair of interest, click on the row containing the pair.</p>
     </div>
@@ -36,13 +36,9 @@ import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 import router from '@/router'
 import steps from '@/tutorials/tutSearchPage'
-import { useTutorialHelpers } from '@/composables/TutorialHelpers'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const tutorialHelpers = useTutorialHelpers()
-
-const buildSteps = (tour) => tutorialHelpers.buildTourSteps(tour, steps)
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
