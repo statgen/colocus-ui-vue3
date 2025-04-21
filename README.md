@@ -545,17 +545,14 @@ The existing TraitLabelGene component was enhanced to provide a link from the cu
 ## Tutorial system
 To add a tutorial to page, 
 
-First, add the component to the page, eg:
-``` <h1>Search <TutorialOverlay ref="tutorial" :buildSteps="buildSteps" /></h1>```
-
-Second, add a ref variable to match the component, eg:
-```const tutorial = ref()```
-
-Third, add a function to assemble the steps, eg:
-```const buildSteps = (tour) => tutorialHelpers.buildTourSteps(tour, steps)```
-
-Fourth, create file with a set of step defitions and import it in the page, eg:
+First, create file with a set of step definitions (see examples in src/tutorials):
 ```import steps from '@/tutorials/tutSearchPage'```
 
-See tutorial step definition files in src/tutorials.
+Second, add the tutorial component to the page template, eg:
+``` <h1>Search <TutorialOverlay ref="tutorial" :steps="steps" /></h1>```
 
+Third, import the step file and add a ref var for the tutorial:
+```aiignore
+import steps from '@/tutorials/tutSearchPageSteps'
+const tutorial = ref()
+```
