@@ -160,9 +160,8 @@ const onAddPlotIconClick = (item) => {
   const {signal1, signal2} = item
   lzPageHelpers.addPanelsForSignalPair(signal1, signal2)
   if(conMarIndicator.value === CM_DATASET.MARGINAL) {
-    conMarIndicator.value = CM_DATASET.CONDITIONAL
+    conMarResetFlag.value = !conMarResetFlag.value
     nextTick(() => { lzPageHelpers.toggleConditionalMarginal(CM_DATASET.CONDITIONAL, CM_DATASET.MARGINAL) })
-
   }
 }
 
