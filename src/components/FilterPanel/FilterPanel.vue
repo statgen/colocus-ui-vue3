@@ -1,6 +1,6 @@
 <template>
   <v-scroll-x-transition>
-    <v-sheet v-show="appStore.filterPanelControls.isSidebarShowing" class="ml-n2" >
+    <v-sheet v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container ml-n2" >
       <FilterPanelSubpanel title="Select" resetButton="true" id="subPanelSelect">
         <CtlAutocomplete :controlSet="controlConfig.study" />
         <CtlAutocomplete :controlSet="controlConfig.gene" />
@@ -12,8 +12,8 @@
       <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
         <CtlTextfield :controlSet="controlConfig.trait1" />
         <CtlTextfield :controlSet="controlConfig.trait2" />
-        <CtlTextfield :controlSet="controlConfig.h4" />
-        <CtlTextfield :controlSet="controlConfig.r2" />
+        <CtlSlider :controlSet="controlConfig.h4" />
+        <CtlSlider :controlSet="controlConfig.r2" />
       </FilterPanelSubpanel>
 
       <FilterPanelSubpanel title="View" id="subPanelView">
@@ -61,7 +61,7 @@ const controlConfig = {
   trait1: { title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   h4: { title: 'Colocalization PP(H4) ≥', storeKey: 'h4', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },
-  r2: { title: 'r<sup>2</sup> ≥', storeKey: 'r2', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
+  r2: { title: 'r² ≥', storeKey: 'r2', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
   showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false },
   showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false }
@@ -70,4 +70,8 @@ const controlConfig = {
 </script>
 
 <style scoped>
+.filter-panel-container {
+  min-width: 240px;
+  max-width: 240px;
+}
 </style>

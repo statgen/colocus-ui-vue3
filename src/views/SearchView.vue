@@ -120,10 +120,6 @@ const geneListHandler = (genes) => {
 </script>
 
 <style scoped>
-.filter-panel-container {
-  max-width: 275px;
-}
-
 .table-container {
   overflow-x: auto;
 }
