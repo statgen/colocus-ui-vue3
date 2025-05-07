@@ -1,7 +1,7 @@
 <template>
   <div>
     <span v-if="exonEnsID">
-      <ToolTippy>
+      <ToolTippy :isInteractive="true" >
         {{ middleTrim(exonEnsID, 3, 8) }}
         <template #tooltipContent>
           {{ exonEnsID }}
@@ -9,7 +9,7 @@
       </ToolTippy>
     </span>
     <span v-else>
-      <ToolTippy>
+      <ToolTippy :isInteractive="true" >
         {{ middleTrim(geneEnsID, 3, 8) }}
         <template #tooltipContent>
           {{ geneEnsID }}

@@ -1,5 +1,5 @@
 <template>
-  <ToolTippy>
+  <ToolTippy :isInteractive="true" >
     <span>{{ theAbbrev ? middleTrim(theStudy, 3, 6) : study }}</span>
     <template #tooltipContent>
       {{ theStudy }}

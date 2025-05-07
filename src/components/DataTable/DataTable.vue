@@ -7,13 +7,16 @@
     :items-length="appStore.dataTable.countPairs"
     :items-per-page="itemsPerPage"
     :items-per-page-options="ITEMS_PER_PAGE_OPTIONS"
+    item-value="uuid"
     :loading="isLoadingData"
     :loading-text="loadingText"
     :multi-sort="true"
     :page="currentPage"
     :row-props="({item}) => getRowClass(item)"
+    v-model:expanded="expandedRow"
 
     @click:row="onRowClick"
+    @keydown.escape="onClearExpandedRow"
     @update:itemsPerPage="onItemsPerPageChanged"
     @update:page="onPageChanged"
     @update:sortBy="onSortUpdate"
@@ -22,6 +25,29 @@
     density="compact"
     show-current-page
   >
+
+    <template v-slot:[`item.expand-left`]="{ item }">
+      <v-icon class="text-clcAction" @click.stop="onExpandRow(item, 'left')">
+        {{ isRowExpanded(item) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+      </v-icon>
+    </template>
+
+    <template v-slot:[`item.expand-right`]="{ item }">
+      <v-icon class="text-clcAction" @click.stop="onExpandRow(item, 'right')">
+        {{ isRowExpanded(item) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+      </v-icon>
+    </template>
+
+    <template v-slot:expanded-row="{ columns, item }">
+      <tr>
+        <td :colspan=columns.length>
+          <div class="d-flex mx-14 my-4" :class="expanderAlignment === 'left' ? 'justify-start' : 'justify-end'">
+            <DataTableDetails :item="item" />
+          </div>
+        </td>
+      </tr>
+    </template>
+
     <template v-slot:item.actions="{ item }">
       <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction" size="22px"/>
     </template>
@@ -146,8 +172,10 @@ const { fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHel
 const props = defineProps(['id'])
 
 // *** Variables ***************************************************************
+const expanderAlignment = ref('left')
 const currentPage = ref()
 const dataItems = shallowRef([])
+const expandedRow = ref([])
 const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
@@ -179,6 +207,16 @@ const onAddPlotIconClick = (item) => {
   emit('onAddPlotIconClick', item)
 }
 
+const onExpandRow = (item, side) => {
+  const colocID = item.uuid
+  appStore[locuszoomPage].colocID = colocID
+  expanderAlignment.value = side
+  if(expandedRow.value.indexOf(item.uuid) === -1) expandedRow.value = [item.uuid]
+  else expandedRow.value = []
+}
+
+const onClearExpandedRow = () => expandedRow.value.length = 0
+
 const onFileDownloadClick = () => {
   fileDownload(dataItems.value)
 }
@@ -205,6 +243,8 @@ const onSortUpdate = (newSort) => {
 }
 
 // *** Utility functions *******************************************************
+const isRowExpanded = item => expandedRow.value.includes(item.uuid)
+
 const loadColocData = async (cpn, url) => {
   const { data, errorMessage, fetchData } = useFetchData()
 

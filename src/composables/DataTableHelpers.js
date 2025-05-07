@@ -28,15 +28,16 @@ export const useDataTableHelpers = () => {
   const alwaysShow = () => true
 
   const allColumns= [
+    { title: '', value: 'expand-left', sortable: false, visible: () => alwaysShow },
     { title: 'Add plots', value: 'actions', sortable: false, visible: () => showAddPlotIcon() },
     { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '5rem', visible: alwaysShow },
     { title: 'Study 2', sortable: true, value: 'signal2.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Trait 2', sortable: true, value: 'signal2.analysis.trait.uuid', minWidth: '10rem', visible: alwaysShow },
+    { title: 'Trait 2', sortable: true, value: 'signal2.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Type 2', sortable: false, value: 'signal2.analysis.trait.biomarker_type', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Trait 2 ENSG', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '12rem', visible: () => showEnsIDs.value },
-    { title: 'Tissue', sortable: true, value: 'signal2.analysis.tissue', minWidth: '7rem', visible: alwaysShow },
+    { title: 'Trait 2 ENSG', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
+    { title: 'Tissue', sortable: true, value: 'signal2.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
     { title: 'Trait 1 Variant', sortable: true, value: 'signal1.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 2 Variant', sortable: true, value: 'signal2.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 1 −log10p', sortable: true, value: 'signal1.neg_log_p', align: "end", visible: alwaysShow },
@@ -44,13 +45,14 @@ export const useDataTableHelpers = () => {
     { title: 'H3', sortable: true, value: 'coloc_h3', align: "end", visible: alwaysShow },
     { title: 'H4', sortable: true, value: 'coloc_h4', align: "end", visible: alwaysShow },
     { title: 'R2', sortable: true, value: 'r2', visible: alwaysShow },
-    { title: 'Colocs', sortable: true, value: 'n_coloc_between_traits', width: '', align: "end", visible: alwaysShow },
+    { title: 'Colocs', sortable: true, value: 'n_coloc_between_traits', width: '2rem', align: "center", visible: alwaysShow },
     { title: 'Concord', align: 'center', sortable: false, value: 'cross_signal.effect', width: '140px', visible: alwaysShow },
     { title: 'Trait 1 Marginal Effect', sortable: false, value: 'signal1.effect_marg', align: "end", visible: () => showEffects.value },
     { title: 'Trait 2 Marginal Effect', sortable: false, value: 'signal2.effect_marg', align: "end", visible: () => showEffects.value },
     { title: 'Trait 1 Cond Effect', sortable: false, value: 'signal1.effect_cond', align: "end", visible: () => showEffects.value },
     { title: 'Trait 2 Cond Effect', sortable: false, value: 'signal2.effect_cond', align: "end", visible: () => showEffects.value },
     { title: 'Effect Flipped Marg ↔ Cond', sortable: false, value: 'marg_cond_flip', align: "end", visible: () => showEffects.value },
+    { title: '', value: 'expand-right', sortable: false, align: "center", visible: () => alwaysShow },
   ]
 
   const visibleColumns = computed(() => {

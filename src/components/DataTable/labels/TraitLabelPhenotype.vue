@@ -2,13 +2,14 @@
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
     <span @click.stop class="text-no-wrap">
       {{ theUUID }}
-      <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>
+<!--      <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>-->
     </span>
     <template #tooltipContent>
-      <h3>{{ theUUID }}: {{ thePhenotype }}</h3>
-      <span class="coLink" @click.stop="onClick">View local Manhattan plot</span>
-      <br />
-      <a :href="phenLink" target="_blank" :class="aStyle">{{ phenLinkText }}</a>
+      <span>{{ theUUID }}: {{ thePhenotype }}</span>
+<!--      <h3>{{ theUUID }}: {{ thePhenotype }}</h3>-->
+<!--      <span class="coLink" @click.stop="onClick">View local Manhattan plot</span>-->
+<!--      <br />-->
+<!--      <a :href="phenLink" target="_blank" :class="aStyle">{{ phenLinkText }}</a>-->
     </template>
   </ToolTippy>
 </template>
