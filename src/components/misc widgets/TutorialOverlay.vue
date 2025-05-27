@@ -1,6 +1,6 @@
 <template>
   <ToolTippy>
-    <v-icon icon="mdi-information-outline" @click="start" class="info-icon-class" />
+    <v-icon icon="mdi-information-outline" @click="onClick" class="info-icon-class" />
     <template #tooltipContent>
       View tutorial on page operation
     </template>
@@ -8,9 +8,12 @@
 </template>
 
 <script setup>
-import { ref, defineExpose } from 'vue'
+import { ref } from 'vue'
 import Shepherd from 'shepherd.js'
 import 'shepherd.js/dist/css/shepherd.css'
+import { useAppStore } from '@/stores/AppStore'
+
+const appStore = useAppStore()
 
 const props = defineProps({
   steps: Array,
@@ -40,6 +43,21 @@ const buildTourStepActions = (tour, steps) => {
   }))
 }
 
+async function waitForElement(selector, timeout = 1000) {
+  return new Promise((resolve, reject) => {
+    const interval = 50;
+    let elapsed = 0;
+    const check = () => {
+      const el = document.querySelector(selector)
+      if (el) return resolve(el)
+      elapsed += interval
+      if (elapsed >= timeout) return reject('Element not found: ' + selector)
+      setTimeout(check, interval)
+    }
+    check()
+  })
+}
+
 function initTour() {
   tour.value = new Shepherd.Tour({
     defaultStepOptions: {
@@ -54,25 +72,33 @@ function initTour() {
   steps.forEach(step => tour.value.addStep(step))
 
   tour.value.on('complete', () => {
-    scrollTop()
+    endTour()
   })
 
   tour.value.on('cancel', () => {
-    scrollTop()
+    endTour()
   })
+}
 
+const onClick = () => {
+  appStore.tutorialFlag = !appStore.tutorialFlag
+  startTour()
 }
 
 const scrollTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const start = () => {
+const endTour = () => {
+  appStore.dataTable.expandedRow.length = 0
+  scrollTop()
+}
+
+const startTour = () => {
     if (!tour.value) initTour()
     tour.value.start()
 }
 
-defineExpose({
-  start,
-})
 </script>
+<style scoped>
+</style>

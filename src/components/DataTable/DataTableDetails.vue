@@ -1,8 +1,9 @@
 <template>
+  <div id="dataTableDetails">
   <table>
     <thead>
       <tr>
-        <td colspan="2"><v-btn @click="onLZclick" size="small" variant="tonal" class="text-clcAction">Go to LocusZoom page</v-btn></td>
+        <td colspan="2"><ActionButton title="Go to LocusZoom page" @click="onLZclick"/></td>
         <td>View Local Page</td>
         <td>View Page on AMP CMD Portal</td>
       </tr>
@@ -25,7 +26,7 @@
       <tr>
         <td>Trait 2</td>
         <td>{{ s2TraitGene }} ({{ s2TraitUuid }})</td>
-        <td><a :href="geneLink" class="coLink" target="_blank">{{ s2TraitGene }}</a></td>
+        <td><a :href="geneLink" class="coLink" target="_blank">{{ s2TraitGene }} page</a></td>
         <td><DataTableDetailLink :args="{
           shortName: s2TraitGene,
           checkName: s2TraitGene,
@@ -65,6 +66,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
 </template>
 
 <script setup>

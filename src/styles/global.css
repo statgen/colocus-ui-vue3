@@ -76,9 +76,15 @@ p {
   margin-top: 20px !important; /* Add more space when positioned on bottom */
 }
 
-.tut-ind-l1 {
-  margin-left: 10px;
+.shepherd-step-limited .shepherd-content {
+  max-height: 240px;
+  overflow-y: auto;
 }
+
+.tut-ind-l1 {
+  margin-left: 1rem;
+}
+
 .tut-ind-l2 {
-  margin-left: 20px;
+  margin-left: 1rem;
 }

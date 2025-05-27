@@ -13,10 +13,10 @@
     :multi-sort="true"
     :page="currentPage"
     :row-props="({item}) => getRowClass(item)"
-    v-model:expanded="expandedRow"
+    v-model:expanded="appStore.dataTable.expandedRow"
 
     @click:row="onRowClick"
-    @keydown.escape="onClearExpandedRow"
+    @keydown.escape="onKeyDownEscape"
     @update:itemsPerPage="onItemsPerPageChanged"
     @update:page="onPageChanged"
     @update:sortBy="onSortUpdate"
@@ -175,7 +175,6 @@ const props = defineProps(['id'])
 const expanderAlignment = ref('left')
 const currentPage = ref()
 const dataItems = shallowRef([])
-const expandedRow = ref([])
 const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
@@ -201,6 +200,13 @@ watch(() => loadTableDataFlag.value, async () => {
   await loadData()
 })
 
+watch(() => appStore.tutorialFlag, async () => {
+  appStore.filterPanelControls.isSidebarShowing = true
+  clearExpandedRow()
+  const colocID = dataItems.value[0].uuid
+  appStore.dataTable.expandedRow.push(colocID)
+})
+
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
@@ -211,11 +217,9 @@ const onExpandRow = (item, side) => {
   const colocID = item.uuid
   appStore[locuszoomPage].colocID = colocID
   expanderAlignment.value = side
-  if(expandedRow.value.indexOf(item.uuid) === -1) expandedRow.value = [item.uuid]
-  else expandedRow.value = []
+  if(appStore.dataTable.expandedRow.indexOf(colocID) === -1) appStore.dataTable.expandedRow = [colocID]
+  else appStore.dataTable.expandedRow.length = 0
 }
-
-const onClearExpandedRow = () => expandedRow.value.length = 0
 
 const onFileDownloadClick = () => {
   fileDownload(dataItems.value)
@@ -225,6 +229,10 @@ const onItemsPerPageChanged = (ipp) => {
   appStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
   currentPage.value = 1
+}
+
+const onKeyDownEscape = () => {
+  clearExpandedRow()
 }
 
 const onPageChanged = (newPageNum) => {
@@ -243,7 +251,9 @@ const onSortUpdate = (newSort) => {
 }
 
 // *** Utility functions *******************************************************
-const isRowExpanded = item => expandedRow.value.includes(item.uuid)
+const clearExpandedRow = () => appStore.dataTable.expandedRow.length = 0
+
+const isRowExpanded = item => appStore.dataTable.expandedRow.includes(item.uuid)
 
 const loadColocData = async (cpn, url) => {
   const { data, errorMessage, fetchData } = useFetchData()

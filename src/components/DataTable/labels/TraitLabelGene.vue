@@ -2,15 +2,10 @@
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
     <span class="text-no-wrap">
       {{ middleTrim(theGene, 6, 6) }}
-<!--      <v-icon icon="mdi-star-four-points" size="1rem" class="text-clcAction"/>-->
     </span>
     <template #tooltipContent>
       <div @click.stop>
         <span>{{ theGene }}</span>
-<!--        <h3>{{ theGene }}</h3>-->
-<!--        <span class="coLink" @click.stop="onClick">View local gene page</span>-->
-<!--        <br />-->
-<!--        <a :href="geneLink" target="_blank" class="coLink">{{ geneLinkText }}</a>-->
       </div>
     </template>
   </ToolTippy>

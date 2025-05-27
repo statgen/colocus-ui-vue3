@@ -8,7 +8,9 @@ export const useAppStore = defineStore('appStore', {
   state: () => ({
     // preloadTrait: '',
     currentPageName: '',
+    tutorialFlag: false,
     dataTable: {
+      expandedRow: [],
       countPairs: 0,  // total records in the data set
       itemCount: 0,   // records shown in the data table
       dirEffect: {},

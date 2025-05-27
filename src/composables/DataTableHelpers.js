@@ -28,7 +28,7 @@ export const useDataTableHelpers = () => {
   const alwaysShow = () => true
 
   const allColumns= [
-    { title: '', value: 'expand-left', sortable: false, visible: () => alwaysShow },
+    { title: 'Expand', value: 'expand-left', sortable: false, visible: () => alwaysShow },
     { title: 'Add plots', value: 'actions', sortable: false, visible: () => showAddPlotIcon() },
     { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
@@ -52,7 +52,7 @@ export const useDataTableHelpers = () => {
     { title: 'Trait 1 Cond Effect', sortable: false, value: 'signal1.effect_cond', align: "end", visible: () => showEffects.value },
     { title: 'Trait 2 Cond Effect', sortable: false, value: 'signal2.effect_cond', align: "end", visible: () => showEffects.value },
     { title: 'Effect Flipped Marg ↔ Cond', sortable: false, value: 'marg_cond_flip', align: "end", visible: () => showEffects.value },
-    { title: '', value: 'expand-right', sortable: false, align: "center", visible: () => alwaysShow },
+    { title: 'Expand', value: 'expand-right', sortable: false, align: "center", visible: () => alwaysShow },
   ]
 
   const visibleColumns = computed(() => {
