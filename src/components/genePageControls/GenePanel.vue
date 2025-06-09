@@ -22,8 +22,8 @@ const appStore = useAppStore()
 
 const controlConfig = {
   geneSelect: { title: 'QTL Gene', storeKey: 'selectedGene', defaultValue: '', },
-  h4: { title: 'h4 ≥', storeKey: 'h4', defaultValue: THRESHOLDS.H4, enableKey: 'slidersEnabled'},
-  r2: { title: 'r2 ≥', storeKey: 'r2', defaultValue: THRESHOLDS.R2, enableKey: 'slidersEnabled'},
+  h4: { title: 'h4 ≥', topKey: 'gene', storeKey: 'h4', defaultValue: THRESHOLDS.H4, },
+  r2: { title: 'r2 ≥', topKey: 'gene', storeKey: 'r2', defaultValue: THRESHOLDS.R2, },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true, },
   showDatasets: { title: 'Show datasets', storeKey: 'showDatasets', defaultValue: false, },
   showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false, },

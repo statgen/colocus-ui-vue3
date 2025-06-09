@@ -3,8 +3,8 @@
     <FilterPanelSubpanel title="Settings" resetButton="true" class="pb-4">
       <div class="ml-n2">
         <QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/>
-        <QCSlider :controlSet="controlSet.h4" />
-        <QCSlider :controlSet="controlSet.r2" />
+        <CtlSlider :controlSet="controlSet.h4"/>
+        <CtlSlider :controlSet="controlSet.r2"/>
         <slot name="anchors"/>
       </div>
     </FilterPanelSubpanel>
@@ -15,9 +15,9 @@
 import { THRESHOLDS } from '@/constants'
 
 const controlSet = {
-  "h4": { caption: "Set h4 threshold ≥", dataKey: "h4Threshold", defaultValue: THRESHOLDS.H4, },
-  "r2": { caption: "Set r² threshold ≥", dataKey: "r2Threshold", defaultValue: THRESHOLDS.R2, },
-  "study": { caption: "Select omics study", dataKey: "selectedStudy", },
+  "h4": { title: "Set h4 threshold ≥", topKey: 'qcStats', storeKey: "h4Threshold", defaultValue: THRESHOLDS.H4, },
+  "r2": { title: "Set r² threshold ≥", topKey: 'qcStats', storeKey: "r2Threshold", defaultValue: THRESHOLDS.R2, },
+  "study": { title: "Select omics study", storeKey: "selectedStudy", },
 }
 
 </script>

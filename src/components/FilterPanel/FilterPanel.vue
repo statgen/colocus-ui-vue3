@@ -37,7 +37,6 @@ const CHR_REGION_REGEX = /^\d\d?:\d+-\d+$/
 
 const rules = {
   posDecRule: v => (!!v && POS_DECIMAL_REGEX.test(v)) || "Must be positive number ≥ 0",
-  probabilityRule: v => (!!v && POS_DECIMAL_REGEX.test(v) && v >= 0 && v <= 1) || "Must be positive, 0 ≤ value ≤ 1",
   chrRegionRule: v => !v || (!!v && CHR_REGION_REGEX.test(v)) || 'Must match chromosome:start-end, all integers',
 }
 
@@ -60,8 +59,8 @@ const controlConfig = {
   tissue: { title: 'QTL Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
   trait1: { title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
-  h4: { title: 'Colocalization PP(H4) ≥', storeKey: 'h4', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },
-  r2: { title: 'r² ≥', storeKey: 'r2', items: null, rules: [rules.probabilityRule], emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
+  h4: { title: 'Colocalization PP(H4) ≥', topKey: 'filter', storeKey: 'h4', items: null, emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },
+  r2: { title: 'r² ≥', topKey: 'filter', storeKey: 'r2', items: null, emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
   showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false },
   showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false }

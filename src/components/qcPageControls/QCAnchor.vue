@@ -43,4 +43,8 @@ const hasTitle = computed(() => !!computedTitle)
 a {
   display: block;
 }
+
+a:hover {
+  font-weight: bold;
+}
 </style>

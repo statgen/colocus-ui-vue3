@@ -8,6 +8,8 @@ export const useAppStore = defineStore('appStore', {
   state: () => ({
     // preloadTrait: '',
     currentPageName: '',
+    slidersEnabled: false,
+    clearPageData: false, // trigger when need to clear data on a page, initially for gene page
     tutorialFlag: false,
     dataTable: {
       expandedRow: [],
@@ -35,7 +37,6 @@ export const useAppStore = defineStore('appStore', {
       selectedGene: '',
       showDatasets: false,
       showEnsIDs: false,
-      slidersEnabled: false,
       updateRoute: false,
     },
     [PAGE_NAMES.LOCUSZOOM]: {

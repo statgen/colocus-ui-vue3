@@ -74,7 +74,7 @@ watch(() => appStore[searchPage].pastedGenes, (newVal, oldVal) => {
 })
 
 // *** Lifecycle hooks *********************************************************
-onMounted(() => {
+onMounted(async () => {
   loadFilterPanelControls()
 
   const route = useRoute()
@@ -84,6 +84,7 @@ onMounted(() => {
   } else {
     geneListHandler(geneStr)
   }
+  await nextTick(() => { appStore.slidersEnabled = true })
 })
 
 // *** Event handlers **********************************************************

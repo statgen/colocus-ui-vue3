@@ -15,7 +15,7 @@
     <v-row>
       <v-col class="ml-n4">
         <v-row>
-          <h1 :id="STATS_PAGE_TOP">Colocalization statistics</h1>
+          <h1 :id="STATS_PAGE_TOP">Summary statistics</h1>
         </v-row>
         <v-row>
           <p>This page contains summary information for GWAS signals colocalized with molecular QTLs
@@ -50,9 +50,10 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import { timeLog } from '@/util/util'
 import { useQCStore } from '@/stores/QCStore'
+import { useAppStore } from '@/stores/AppStore'
 import vpc from '@/components/qcPageControls/VegaPlotConfig'
 import VegaPlotContainer from "@/components/qcPageControls/VegaPlotContainer.vue"
 import { STATS_PAGE_TOP } from '@/constants'
@@ -66,6 +67,7 @@ import { signalPropsPerGWASSpec } from '@/vegaSpecs/signalPropsPerGWASSpec'
 
 // *** Composables *************************************************************
 const qcStore = useQCStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -77,6 +79,7 @@ const qcStore = useQCStore()
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   await qcStore.loadQCData()
+  appStore.slidersEnabled = true
 })
 
 // *** Event handlers **********************************************************

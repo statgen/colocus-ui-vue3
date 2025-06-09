@@ -94,6 +94,8 @@ const table2Data = shallowRef([])
 
 const genePage = PAGE_NAMES.GENE
 
+appStore.slidersEnabled = false
+
 // *** Computed ****************************************************************
 const pageHeader = computed(() => {
   return appStore[genePage].selectedGene
@@ -116,16 +118,16 @@ watch(
   async () => {
     const theGene = appStore[genePage].selectedGene
     if(!theGene) {
-      table1Data.value = []
-      table2Data.value = []
-      appStore[genePage].slidersEnabled = false
+      clearData()
+      appStore.slidersEnabled = false
+      await updateGeneRoute(undefined)
       return
     }
     appStore[genePage].h4 = THRESHOLDS.H4
     appStore[genePage].r2 = THRESHOLDS.R2
     await loadData()
-    appStore[genePage].slidersEnabled = theGene?.length > 0
-    if(appStore[genePage].updateRoute) updateGeneRoute(theGene)
+    appStore.slidersEnabled = true
+    if(appStore[genePage].updateRoute) await updateGeneRoute(theGene)
   }
 )
 
@@ -148,11 +150,19 @@ watch(
   }
 )
 
+watch(
+  () => appStore.clearData,
+  () => {
+    clearData()
+  }
+)
+
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
   const theGene = route.query?.gene?.split(',')[0]?.trim()?.toUpperCase() // in case someone sends a comma list
   if(!validateGene(theGene)) {
-    updateGeneRoute(undefined) // fixme: replace with undefined
+    appStore[genePage].selectedGene = undefined
+    updateGeneRoute(undefined)
     return
   }
   updateGeneRoute(theGene)
@@ -167,6 +177,11 @@ const validateGene = (gene) => {
   return true
 }
 
+const clearData = () => {
+  table1Data.value = []
+  table2Data.value = []
+}
+
 const loadData = async () => {
   const theGene = appStore[genePage].selectedGene
   if(!validateGene(theGene)) return
@@ -177,21 +192,18 @@ const loadData = async () => {
     r2: appStore[genePage].r2,
   }
 
-  table1Data.value = []
-  table2Data.value = []
-  appStore[genePage].slidersEnabled = false
+  clearData()
 
-  if(theGene) {
-    // note: table2 has to be built before table1
-    const t2 = toRaw(await getTable2Data(settings))
-    if(t2.length < 1) return
+  // note: table2 has to be built before table1
+  const t2 = toRaw(await getTable2Data(settings))
+  if(t2.length < 1) return
 
-    table2Data.value = t2
+  table2Data.value = t2
 
-    table1Data.value = toRaw(await getTable1Data(t2))
-    appStore[genePage].slidersEnabled = true
-    await nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
-  }
+  table1Data.value = toRaw(await getTable1Data(t2))
+  await nextTick(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
 }
 
 const updateGeneRoute = async (newGene) => {

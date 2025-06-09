@@ -17,7 +17,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import embed from 'vega-embed'
 import _ from 'lodash'
 import { useQCStore } from '@/stores/QCStore'
@@ -61,9 +61,9 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 
   vegaSpec.data.values = qcStore[dk]
 
-  // timeLog('embed start', domPlotID.value, controlSet.dataKey)
-  await embed(domSelector, vegaSpec, vegaOptions)
-  // timeLog('embed stop', domPlotID.value, controlSet.dataKey)
+  await nextTick(async () => {
+    await embed(domSelector, vegaSpec, vegaOptions)
+  })
 })
 
 // *** Lifecycle hooks *********************************************************

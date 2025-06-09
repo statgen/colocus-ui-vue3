@@ -1,7 +1,6 @@
 <template>
   <v-col cols="3">
-    <v-row>
-      <QCPanel>
+      <QCPanel style="width: 275px; max-width: 275px">
         <template #anchors>
           <QCAnchor :config="vpc.ColocalizationClass"/>
           <QCAnchor :config="vpc.ColocalizationClassError"/>
@@ -11,11 +10,10 @@
           <QCAnchor :config="vpc.histogramR2"/>
         </template>
       </QCPanel>
-    </v-row>
   </v-col>
   <v-col class="mt-4">
     <v-row>
-      <v-col class="ml-n4">
+      <v-col class="">
         <v-row>
           <h1 :id="STATS_PAGE_TOP">Colocalization statistics</h1>
         </v-row>
@@ -65,9 +63,10 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import { timeLog } from '@/util/util'
 import { useQCStore } from '@/stores/QCStore'
+import { useAppStore } from '@/stores/AppStore'
 import vpc from '@/components/qcPageControls/VegaPlotConfig'
 import VegaPlotContainer from "@/components/qcPageControls/VegaPlotContainer.vue"
 import { STATS_PAGE_TOP } from '@/constants'
@@ -82,6 +81,7 @@ import { histogramR2Spec } from '@/vegaSpecs/histogramR2Spec'
 
 // *** Composables *************************************************************
 const qcStore = useQCStore()
+const appStore = useAppStore()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -93,6 +93,7 @@ const qcStore = useQCStore()
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   await qcStore.loadQCData()
+  appStore.slidersEnabled = true
 })
 
 // *** Event handlers **********************************************************

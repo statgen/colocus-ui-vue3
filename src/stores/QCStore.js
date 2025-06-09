@@ -72,7 +72,7 @@ export const useQCStore = defineStore('qcStore', {
       this.colocClass = makeColocClassPlotRecords(this.colocWithStTiH4R2)
       this.colocWithout11 = this.makeColocWithout11()
 
-    const mcff = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
+      const mcff = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
       this.countsByGwas = mcff['byGwas']
       this.countsByOmics = mcff['byOmics']
       this.regeneratePlots()
