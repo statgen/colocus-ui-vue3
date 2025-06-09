@@ -57,7 +57,7 @@
     </template>
 
     <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait" :analysisID="item.signal1.analysis.uuid"/>
+      <TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait"/>
     </template>
 
     <template v-slot:item.signal1.analysis.analysis_type="{item}">

@@ -117,7 +117,8 @@ const onLZclick = async () => {
 }
 
 const onMHclick = () => {
-  appStore.setPageKey(manhattanPage, 'analysisID', props.analysisID)
+  const analysisID = props.item.signal1.analysis.uuid
+  appStore.setPageKey(manhattanPage, 'analysisID', analysisID)
   const cpn = appStore.currentPageName
   if(cpn === manhattanPage) {
     loadManhattanData()
