@@ -38,6 +38,7 @@ export const useDataTableHelpers = () => {
     { title: 'Type 2', sortable: false, value: 'signal2.analysis.trait.biomarker_type', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 2 ENSG', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
     { title: 'Tissue', sortable: true, value: 'signal2.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Cell Type', sortable: true, value: 'signal2.analysis.cell_type', minWidth: '5rem', visible: alwaysShow },
     { title: 'Trait 1 Variant', sortable: true, value: 'signal1.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 2 Variant', sortable: true, value: 'signal2.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 1 −log10p', sortable: true, value: 'signal1.neg_log_p', align: "end", visible: alwaysShow },

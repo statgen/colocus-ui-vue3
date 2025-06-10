@@ -32,6 +32,7 @@ export const useAppStore = defineStore('appStore', {
       phenotypes: markRaw([]),
       studies: markRaw([]),
       tissues: markRaw([]),
+      cell_types: markRaw([]),
     },
     [PAGE_NAMES.GENE]: {
       colorCodeVariants: true,
@@ -163,6 +164,7 @@ export const useAppStore = defineStore('appStore', {
         this.filterPanelControls.phenotypes = d.phenotypes.sort()
         this.filterPanelControls.studies = d.studies.sort()
         this.filterPanelControls.tissues = d.tissues.sort()
+        this.filterPanelControls.cell_types = d.cell_types.sort()
         this.filterPanelControls.isFilterDataLoaded = true
       } else {
         throw new Error('Error loading filter data:\n' + errorMessage)
@@ -266,6 +268,7 @@ function getFilterPanelSettings() {
       region: '',
       phenotypes: [],
       tissues: [],
+      cell_types: [],
       trait1log10p: "0",
       trait2log10p: "0",
       h4: THRESHOLDS.H4,
@@ -287,6 +290,7 @@ const dataMapAPI = {
   region: 'signal1_region',
   phenotypes: 'phenotypes',
   tissues: 'tissues',
+  cell_types: 'cell_types',
   trait1log10p: 'signal1_min_logp',
   trait2log10p: 'signal2_min_logp',
   h4: 'min_h4',
@@ -318,6 +322,7 @@ const sortKeyMapAPI = {
   'signal2.analysis.trait.gene.ens_id': 'signal2_gene_ens_id',
   'signal2.analysis.trait.gene.symbol': 'signal2_gene_symbol',
   'signal2.analysis.tissue': 'signal2_tissue',
+  'signal2.analysis.cell_type': 'signal2_cell_type',
   'signal2.analysis.trait.exon.ens_id': 'signal2_exon_ens_id',
   'signal1.analysis.study.uuid': 'signal1_study',
   'signal2.analysis.study.uuid': 'signal2_study',

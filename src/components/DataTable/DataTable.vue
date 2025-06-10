@@ -84,6 +84,10 @@
       {{ item.signal2.analysis.tissue }}
     </template>
 
+    <template v-slot:item.signal2.analysis.cell_type="{item}">
+      {{ item.signal2.analysis.cell_type }}
+    </template>
+
     <template v-slot:item.signal1.lead_variant.vid="{item}">
       <VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" />
     </template>
