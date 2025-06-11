@@ -15,8 +15,8 @@ export const useQCStore = defineStore('qcStore', {
     colocWithout11: markRaw([]),    // exclude signals marked 'oneToOneSignal'
     colocWithStTiH4: markRaw([]),   // filter for study, tissue. h4
     colocWithStTiH4R2: markRaw([]), // filter for study, tissue, h4, r2
-    countsByGwas: 0,
-    countsByOmics: 0,
+    countsByGwas: markRaw([]),
+    countsByOmics: markRaw([]),
     defaultStudy: '',
     h4Threshold: THRESHOLDS.H4,
     r2Threshold: THRESHOLDS.R2,
@@ -70,9 +70,10 @@ export const useQCStore = defineStore('qcStore', {
       this.colocWithStTiH4R2 = this.makeColocWithStTiH4R2(this.colocForStTi)
 
       this.colocClass = makeColocClassPlotRecords(this.colocWithStTiH4R2)
-      this.colocWithout11 = this.makeColocWithout11()
+      this.colocWithout11 = this.makeColocWithout11(this.colocClass)
 
-      const mcff = makeCountsForFigures(this.colocWithStTiH4, this.signalsAll, this.selectedStudyName, this.selectedTissue)
+      const mcff = makeCountsForFigures(this.colocWithStTiH4R2, this.signalsAll, this.selectedStudyName, this.selectedTissue)
+      console.log('mcff', mcff)
       this.countsByGwas = mcff['byGwas']
       this.countsByOmics = mcff['byOmics']
       this.regeneratePlots()
@@ -120,9 +121,9 @@ export const useQCStore = defineStore('qcStore', {
       return markRaw(results)
     },
 
-    makeColocWithout11() {
+    makeColocWithout11(colocClass) {
       const results = []
-      for(const y of this.colocClass) {
+      for(const y of colocClass) {
         const x = toRaw(y)
         if(x.variable !== 'oneToOneSignal') results.push(x)
       }

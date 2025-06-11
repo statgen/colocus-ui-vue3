@@ -1,6 +1,6 @@
 <template>
   <v-sheet class="ml-n2">
-    <FilterPanelSubpanel title="Settings" resetButton="true" class="pb-4">
+    <FilterPanelSubpanel title="Settings" resetButton class="pb-4">
       <QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/>
       <CtlSlider :controlSet="controlSet.h4"/>
       <CtlSlider :controlSet="controlSet.r2"/>

@@ -48,6 +48,7 @@ const onSliderChangeEnd = (val) => {
     appStore[genePage][controlSet.storeKey] = val
 
   } else if(controlSet.topKey === 'qcStats') {
+    console.log('slider updating', controlSet.storeKey, val)
     qcStore.updateQCStoreKey(controlSet.storeKey, val)
 
   } else console.error('Invalid store specified to slider control')
@@ -55,7 +56,6 @@ const onSliderChangeEnd = (val) => {
 
 watch(() => resetInput.value, () => {
   inputValue.value = controlSet.defaultValue
-  appStore.clearPageData = !appStore.clearData
 })
 
 </script>

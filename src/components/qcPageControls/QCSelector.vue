@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { inject, ref, watch } from 'vue'
+import { inject, watch } from 'vue'
 import { useQCStore } from '@/stores/QCStore'
 
 const qcStore = useQCStore()
