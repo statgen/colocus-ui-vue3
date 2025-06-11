@@ -88,3 +88,12 @@ p {
 .tut-ind-l2 {
   margin-left: 1rem;
 }
+
+.text-content-block {
+  min-width: 500px;
+  max-width: 1100px;
+}
+
+a:hover {
+  font-weight: bold;
+}

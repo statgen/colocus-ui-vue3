@@ -1,28 +1,26 @@
 <template>
-  <v-scroll-x-transition>
-    <v-sheet v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container ml-n2" >
-      <FilterPanelSubpanel title="Select" resetButton="true" id="subPanelSelect">
-        <CtlAutocomplete :controlSet="controlConfig.study" />
-        <CtlAutocomplete :controlSet="controlConfig.gene" />
-        <CtlTextfield :controlSet="controlConfig.region" />
-        <CtlAutocomplete :controlSet="controlConfig.phenotype" />
-        <CtlAutocomplete :controlSet="controlConfig.tissue" />
-      </FilterPanelSubpanel>
+  <v-sheet v-show="appStore.isSidebarShowing" class="ml-n2" >
+    <FilterPanelSubpanel title="Select" resetButton="true" id="subPanelSelect">
+      <CtlAutocomplete :controlSet="controlConfig.study" />
+      <CtlAutocomplete :controlSet="controlConfig.gene" />
+      <CtlTextfield :controlSet="controlConfig.region" />
+      <CtlAutocomplete :controlSet="controlConfig.phenotype" />
+      <CtlAutocomplete :controlSet="controlConfig.tissue" />
+    </FilterPanelSubpanel>
 
-      <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
-        <CtlTextfield :controlSet="controlConfig.trait1" />
-        <CtlTextfield :controlSet="controlConfig.trait2" />
-        <CtlSlider :controlSet="controlConfig.h4" />
-        <CtlSlider :controlSet="controlConfig.r2" />
-      </FilterPanelSubpanel>
+    <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
+      <CtlTextfield :controlSet="controlConfig.trait1" />
+      <CtlTextfield :controlSet="controlConfig.trait2" />
+      <CtlSlider :controlSet="controlConfig.h4" />
+      <CtlSlider :controlSet="controlConfig.r2" />
+    </FilterPanelSubpanel>
 
-      <FilterPanelSubpanel title="View" id="subPanelView">
-        <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
-        <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
-        <CtlSwitch :controlSet="controlConfig.showEffects" />
-      </FilterPanelSubpanel>
-    </v-sheet>
-  </v-scroll-x-transition>
+    <FilterPanelSubpanel title="View" id="subPanelView">
+      <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
+      <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
+      <CtlSwitch :controlSet="controlConfig.showEffects" />
+    </FilterPanelSubpanel>
+  </v-sheet>
 </template>
 
 <script setup>
@@ -69,8 +67,4 @@ const controlConfig = {
 </script>
 
 <style scoped>
-.filter-panel-container {
-  min-width: 240px;
-  max-width: 240px;
-}
 </style>

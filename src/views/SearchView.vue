@@ -1,15 +1,16 @@
 <template>
-  <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
-    <FilterPanel />
-  </v-col>
-  <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
+  <SidebarLayout>
+    <template #sidebar>
+      <FilterPanel />
+    </template>
     <div class="search-header">
       <h1>Search <TutorialOverlay ref="tutorial" :steps="steps" /></h1>
       <p>You are viewing {{ appStore.dataTable.itemCount }} of {{ appStore.dataTable.countPairs }} records.</p>
       <p>Click <v-icon icon="mdi-information-outline" class="info-icon-class" /> above for a Tutorial introduction to this page.</p>
       <p>In the data table below, click <v-icon class="text-clcAction">{{ 'mdi-chevron-down' }}</v-icon>
         in the Expand column to see the Details panel with links to further resources.</p>
-      <p>To view Locus Zoom plots for a colocalized pair of interest, click on the row containing the pair, or the button in the Details panel.</p>
+      <p>To view Locus Zoom plots for a colocalized pair of interest, click on the row containing the pair,
+        or the button in the Details panel.</p>
     </div>
 
     <v-alert
@@ -29,12 +30,13 @@
         id="searchDataTable"
       ></DataTable>
     </div>
-  </v-col>
+  </SidebarLayout>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
 import { nextTick, onMounted, provide, ref, watch } from 'vue'
+import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useRoute } from "vue-router";
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
@@ -103,9 +105,7 @@ const loadTableData = () => {
 
 const geneListHandler = (genes) => {
   const { goodGenes, badGenes } = appStore.checkGenes(genes)
-  // console.log('bad genes length:', badGenes.length)
   if(badGenes.length > 0) {
-    // console.log(badGenes)
     alertText.value = `Invalid gene(s): ${badGenes.join(', ')}`
     alertVisible.value = false
     nextTick(() => {

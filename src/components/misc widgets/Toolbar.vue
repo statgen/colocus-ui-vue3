@@ -90,9 +90,4 @@ const summaryStatsPage = `/${PAGE_NAMES.STATS_SUMMARY}`
 a.router-link-active {
   border-bottom: 2px solid;
 }
-
-a:hover {
-  font-weight: bold;
-}
-
 </style>

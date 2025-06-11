@@ -1,10 +1,5 @@
 <template>
-<v-container class="ml-2">
-  <v-row class="mt-1">
-    <h3>{{ controlSet.caption }}</h3>
-  </v-row>
-
-  <v-row class="mt-n2">
+  <h3>{{ controlSet.caption }}</h3>
 
   <v-select
     :items="qcStore.studyList"
@@ -18,8 +13,6 @@
     flat
     variant="outlined"
   ></v-select>
-  </v-row>
-</v-container>
 </template>
 
 <script setup>

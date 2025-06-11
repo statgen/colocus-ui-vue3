@@ -1,57 +1,47 @@
 <template>
-  <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
-    <FilterPanel />
-  </v-col>
-  <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-2">
-    <v-row class="mx-0 my-0">
+  <SidebarLayout>
+    <template #sidebar>
+      <FilterPanel />
+    </template>
       <h1><BackButton />Manhattan Plot: <span class="analysis-id">{{ analysisID }}</span></h1>
-    </v-row>
-    <v-row class="ml-2 mt-14 plot-container">
-      <ManhattanPlot
-        @onSelectSignals="addSignals"
-      />
-    </v-row>
-    <v-row class="ml-2 mt-4">
-        <h2 v-if="Object.keys(selectedSignals).length===0">All colocalized signals</h2>
-        <div v-else>
-          <h2>Selected colocalized signals</h2>
-          <div style="display: flex; flex-wrap: wrap;">
-          <VariantLabel v-for="signal in sortedSignals" :key="signal"
-            :variant="signal"
-            :show-splotch="false"
-            :show-close="true"
-            :margin-left="4"
-            @onClose="removeSignal(signal)"
-          />
+      <ManhattanPlot @onSelectSignals="addSignals"/>
+      <h2 v-if="Object.keys(selectedSignals).length===0">All colocalized signals</h2>
+      <div v-else>
+        <h2>Selected colocalized signals</h2>
+        <div style="display: flex; flex-wrap: wrap;">
+        <VariantLabel v-for="signal in sortedSignals" :key="signal"
+          :variant="signal"
+          :show-splotch="false"
+          :show-close="true"
+          :margin-left="4"
+          @onClose="removeSignal(signal)"
+        />
 
-          <v-btn
-            class="text-clcAction ml-2"
-            variant="tonal"
-            size="small"
-            @click="clearSignals"
-          >
-            Clear
-          </v-btn>
-          </div>
+        <v-btn
+          class="text-clcAction ml-2"
+          variant="tonal"
+          size="small"
+          @click="clearSignals"
+        >
+          Clear
+        </v-btn>
         </div>
-    </v-row>
-    <v-row>
+      </div>
       <div class="table-container mt-2">
         <DataTable
           @onDataTableRowClick="onDataTableRowClick"
           @select_signals="addSignals"
         ></DataTable>
       </div>
-    </v-row>
-  </v-col>
+  </SidebarLayout>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
 import { computed, onBeforeMount, onMounted, provide, ref } from 'vue'
+import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { useRoute } from 'vue-router'
-import VariantLabel from '@/components/DataTable/labels/VariantLabel.vue'
 import { sortVariantArray } from '@/util/util'
 import { PAGE_NAMES } from '@/constants'
 import router from '@/router'
@@ -127,13 +117,9 @@ const loadManhattanData = () => {
 const addSignals = (signals) => {
   for (const signal of signals) {
     const key = signal.signal_uuid
-    // console.log('k, v:', key, signal)
     const existingVariants = Object.values(selectedSignals.value).map(item => item.variant)
-    // console.log('ev:', existingVariants)
     if (existingVariants.includes(signal.variant)) {
-      // console.log('skipping dupe:', signal.variant)
     } else {
-      // console.log('adding signal:', key, signal)
       selectedSignals.value[key] = signal
     }
   }

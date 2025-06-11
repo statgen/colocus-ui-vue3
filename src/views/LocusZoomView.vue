@@ -1,94 +1,64 @@
 <template>
-  <v-col v-show="appStore.filterPanelControls.isSidebarShowing" class="filter-panel-container">
-    <FilterPanel />
-  </v-col>
+  <SidebarLayout>
+    <template #sidebar>
+      <FilterPanel />
+    </template>
 
-  <v-col :cols="appStore.filterPanelControls.isSidebarShowing ? 10 : 12" class="ml-3">
-    <v-row class="mt-1 ml-2">
-      <h1><BackButton />Locus Zoom</h1>
-    </v-row>
+    <h1><BackButton />Locus Zoom</h1>
 
-    <v-row class="ml-2 mb-2">
-      <div class="d-flex align-center flex-nowrap">
-        <p>
-          Colocalization of {{ s1trait }} <span class="mx-1" :style="{color: s1color}">({{ formatVariantString(s1Variant) }})</span>
-          with {{ s2trait }} <span class="mx-1" :style="{color: s2color}">({{ formatVariantString(s2Variant) }})</span>.
-          The y-axis of all plots is -log<sub>10</sub> p, as is the x-axis of the LZ Compare Plot.
-          The x-axis of the LZ Region Plots is the location on the specified chromosome.
-        </p>
-      </div>
-    </v-row>
+    <p class="text-content-block">
+      Colocalization of {{ s1trait }} <span class="mx-1" :style="{color: s1color}">({{ formatVariantString(s1Variant) }})</span>
+      with {{ s2trait }} <span class="mx-1" :style="{color: s2color}">({{ formatVariantString(s2Variant) }})</span>.
+      The y-axis of all plots is -log<sub>10</sub> p, as is the x-axis of the LZ Compare Plot.
+      The x-axis of the LZ Region Plots is the location on the specified chromosome.
+    </p>
 
-    <v-row class="ml-2 mt-2 pt-2">
-      <v-col cols="6">
-        <v-row>
-          <h2>LZ Compare Plot</h2>
-          <div ref="comparePlot"></div>
-        </v-row>
-
-        <v-row class="d-flex justify-end mb-2 mr-16">
+    <div class="two-column-layout">
+      <div class="left-panel">
+        <h2>LZ Compare Plot</h2>
+        <div ref="comparePlot"></div>
+        <div class="ldpanel-wrapper">
           <LDPanel
+            class="mt-4"
             @onCMRadioChange="onCMRadioChange"
             @onLDRadioChange="onLDRadioChange"
             @onUniqueCheckboxChange="onUniqueCheckboxChange"
             :conMarResetFlag="conMarResetFlag"
           />
-        </v-row>
-      </v-col>
-      <v-col cols="6">
-        <v-row>
-          <h2>LZ Region Plots</h2>
-          <div ref="regionPlot" class="region-plot"></div>
-        </v-row>
+        </div>
+      </div>
 
-        <v-row>
-          <LZSignalError />
-        </v-row>
-      </v-col>
-    </v-row>
+      <div class="right-panel">
+        <h2>LZ Region Plots</h2>
+        <div ref="regionPlot" class="region-plot"></div>
+      </div>
+    </div>
 
-    <v-row class="ml-2">
-      <v-col cols="12">
-        <v-row>
+    <LZSignalError />
 
-          <h2>
-            <ToolTippy>
-              <v-icon icon="mdi-help-circle-outline" size="1.5rem" class="text-clcAction mb-1" />
-              <template #tooltipContent>
-                If you want to...
-              </template>
-            </ToolTippy>
+    <h2>Data table</h2>
 
-            Data table
-          </h2>
-        </v-row>
+    <p class="my-2 text-content-block">All colocalized signals within a 500kb window centered around the lead variants (
+      <span class="mx-1" :style="{color: s1color}">{{ formatVariantString(s1Variant) }}</span> and
+      <span class="mx-1" :style="{color: s2color}">{{ formatVariantString(s2Variant) }}</span> )
+      from the originally selected colocalized signal pair.
+      <span class="font-weight-bold bg-clcTableHighlight"> Bold highlighted text </span>
+      denotes the initial signals shown in the plots above.
+    </p>
 
-        <v-row>
-          <p class="my-2">All colocalized signals within a 500kb window centered around the lead variants (
-            <span class="mx-1" :style="{color: s1color}">{{ formatVariantString(s1Variant) }}</span> and
-            <span class="mx-1" :style="{color: s2color}">{{ formatVariantString(s2Variant) }}</span> )
-            from the originally selected colocalized signal pair.
-            <span class="font-weight-bold bg-clcTableHighlight"> Bold highlighted text </span>
-            denotes the initial signals shown in the plots above.
-          </p>
-        </v-row>
-
-        <v-row>
-          <div class="table-container mb-8">
-            <DataTable
-              @onDataTableRowClick="onDataTableRowClick"
-              @onAddPlotIconClick="onAddPlotIconClick"
-            ></DataTable>
-          </div>
-        </v-row>
-      </v-col>
-    </v-row>
-  </v-col>
+    <div class="table-container mb-8">
+      <DataTable
+        @onDataTableRowClick="onDataTableRowClick"
+        @onAddPlotIconClick="onAddPlotIconClick"
+      ></DataTable>
+    </div>
+  </SidebarLayout>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
 import { nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
 import { CM_DATASET, PAGE_NAMES } from '@/constants'
@@ -141,14 +111,6 @@ provide('preloadGenes', preloadGenes)
 watch(() => appStore[locuszoomPage].colocDataReady, (newVal) => {
   if (newVal) initializePage()
 })
-
-// watch(() => conMarIndicator.value, (newVal, oldVal) => {
-//   lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
-//   // nextTick(() => { lzPageHelpers.toggleConditionalMarginal(newVal, oldVal) })
-//   // setTimeout(() => {
-//   //   lzPageHelpers.toggleConditionalMarginal(newVal, oldVal)
-//   // }, 500)
-// })
 
 // *** Lifecycle hooks *********************************************************
 onMounted(() => {
@@ -213,10 +175,6 @@ const loadPageData = async () => {
 </script>
 
 <style scoped>
-.filter-panel-container {
-  max-width: 275px;
-}
-
 .table-container {
   overflow-x: auto;
 }
@@ -228,5 +186,27 @@ const loadPageData = async () => {
 /* this updates a class from locuszoom to allow multiple spaces in a string to display as such */
 :deep(.lz-panel-title) {
   white-space: pre;
+}
+
+.two-column-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  padding: 16px;
+}
+
+.left-panel {
+  width: 650px;
+  flex-shrink: 0;
+}
+
+.right-panel {
+  width: 650px;
+  flex-shrink: 0;
+}
+
+.ldpanel-wrapper {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

@@ -4,7 +4,7 @@
   </span>
   <span v-else>
     <ToolTippy>
-      <a @click.prevent=scrollToHeading(linkID) class="coLink ml-3 mb-1">{{ truncateString(computedTitle, MAX_PLOT_TITLE_LEN) }}</a>
+      <a @click.prevent=scrollToHeading(linkID) class="coLink mb-1 text-no-wrap d-block">{{ truncateString(computedTitle, MAX_PLOT_TITLE_LEN) }}</a>
       <template #tooltipContent>{{ computedTitle }}</template>
     </ToolTippy>
   </span>
@@ -41,10 +41,9 @@ const hasTitle = computed(() => !!computedTitle)
 
 <style scoped>
 a {
-  display: block;
-}
-
-a:hover {
-  font-weight: bold;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

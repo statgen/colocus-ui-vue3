@@ -26,7 +26,7 @@ const qcStore = useQCStore()
 const genePage = PAGE_NAMES.GENE
 
 const inputValue = ref(controlSet.defaultValue)
-const controlLabel = ref(`${controlSet.title} (${inputValue.value})`)
+const controlLabel = ref(`${controlSet.title} ${inputValue.value}`)
 
 const enabled = computed(() => {
   return appStore.slidersEnabled
@@ -35,11 +35,11 @@ const enabled = computed(() => {
 const resetInput = inject('resetInput')
 
 const onSliderChange = (val) => {
-  controlLabel.value = `${controlSet.title} (${val})`
+  controlLabel.value = `${controlSet.title} ${val}`
 }
 
 const onSliderChangeEnd = (val) => {
-  controlLabel.value = `${controlSet.title} (${val})`
+  controlLabel.value = `${controlSet.title} ${val}`
 
   if(controlSet.topKey === 'filter') {
     appStore.updateFilter(controlSet.storeKey, val)

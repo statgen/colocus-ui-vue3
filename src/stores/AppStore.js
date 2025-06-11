@@ -7,10 +7,14 @@ import { findPlotRegion } from '@/util/util'
 export const useAppStore = defineStore('appStore', {
   state: () => ({
     // preloadTrait: '',
-    currentPageName: '',
-    slidersEnabled: false,
+
+    // global flags / variables
     clearPageData: false, // trigger when need to clear data on a page, initially for gene page
+    currentPageName: '',
+    isSidebarShowing: true,
+    slidersEnabled: false,
     tutorialFlag: false,
+
     dataTable: {
       expandedRow: [],
       countPairs: 0,  // total records in the data set
@@ -22,7 +26,6 @@ export const useAppStore = defineStore('appStore', {
       filterDataChanged: false,
       isSidebarButtonShowing: true,
       isFilterDataLoaded: false,
-      isSidebarShowing: true,
       lastFilterUpdated: '',
       analysisTypes: markRaw([]),
       genes: markRaw([]),
@@ -244,7 +247,7 @@ export const useAppStore = defineStore('appStore', {
     },
 
     toggleSidebar() {
-      this.filterPanelControls.isSidebarShowing = !this.filterPanelControls.isSidebarShowing
+      this.isSidebarShowing = !this.isSidebarShowing
     },
   },
   getters: {

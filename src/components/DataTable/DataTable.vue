@@ -201,7 +201,7 @@ watch(() => loadTableDataFlag.value, async () => {
 })
 
 watch(() => appStore.tutorialFlag, async () => {
-  appStore.filterPanelControls.isSidebarShowing = true
+  appStore.isSidebarShowing = true
   clearExpandedRow()
   const colocID = dataItems.value[0].uuid
   appStore.dataTable.expandedRow.push(colocID)
@@ -350,9 +350,5 @@ const scrollTop = () => {
 .table-base {
   font-size: 1rem;
   line-height: 1.3;
-}
-
-a:hover {
-  font-weight: bold;
 }
 </style>

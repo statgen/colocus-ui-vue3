@@ -1,14 +1,25 @@
 <template>
-  <v-app>
+  <v-app class="app-shell">
     <Toolbar />
-    <v-main>
-      <v-row class="mt-14 mb-2 ml-2" no-gutters>
-        <router-view :key="$route.name" />
-      </v-row>
-    </v-main>
+    <div class="app-content">
+      <router-view :key="$route.name" class="ml-2 mt-14"/>
+    </div>
     <Footer />
   </v-app>
 </template>
 
 <script setup>
 </script>
+
+<style scoped>
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1 0 auto;
+  overflow: hidden; /* or scroll if needed */
+}
+</style>

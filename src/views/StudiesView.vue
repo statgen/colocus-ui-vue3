@@ -1,66 +1,52 @@
 <template>
-  <v-row>
-    <v-col>
-      <h1 class="mt-4">Studies</h1>
-      <v-row>
-        <v-col cols="5">
-          <v-text-field
-            v-model="search"
-            label="Search"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            hide-details
-            single-line
-            clearable
-            density="comfortable"
-          ></v-text-field>
-        </v-col>
-      </v-row>
+  <DefaultLayout>
+    <h1 class="mt-4">Studies</h1>
 
-      <v-row class="mb-4">
-        <v-data-table
-          :items="dataItems"
-          :headers="headers"
-          :search="search"
-          :fixed-header="false"
-          :items-per-page-options="ITEMS_PER_PAGE_OPTIONS"
-          :items-per-page=10
-          :multi-sort="true"
-          class="table-base mt-4"
-          density="compact"
-          show-current-page
-        >
-          <template v-slot:item.trait="{ value }">
-            {{ value.split(',').join(', ') }} <!-- allow table to wrap column elements -->
-          </template>
+    <v-text-field
+      v-model="search"
+      label="Search all fields"
+      prepend-inner-icon="mdi-magnify"
+      variant="outlined"
+      hide-details
+      single-line
+      clearable
+      density="comfortable"
+      width="300"
+      class="mt-4"
+    ></v-text-field>
 
-          <template v-slot:item.link="{ value }">
-            <a class="coLink" :href="value" target="_blank">{{ value }}</a>
-          </template>
-
-          <template v-slot:item.pmid="{ value }">
-            <a class="coLink" :href="'https://pubmed.ncbi.nlm.nih.gov/' + value" target="_blank">{{ value }}</a>
-          </template>
-
-          <template v-slot:footer.prepend>
-            <div>
-              <ToolTippy>
-                <v-icon icon="mdi-file-download-outline" @click="onFileDownloadClick()" class="text-clcAction mx-3" size="32px"/>
-                <template #tooltipContent>
-                  Click to download currently displayed data
-                </template>
-              </ToolTippy>
-            </div>
-          </template>
-
-        </v-data-table>
-      </v-row>
-    </v-col>
-  </v-row>
+    <v-data-table
+      :items="dataItems"
+      :headers="headers"
+      :search="search"
+      :fixed-header="false"
+      :items-per-page-options="ITEMS_PER_PAGE_OPTIONS"
+      :items-per-page=10
+      :multi-sort="true"
+      class="table-base mt-4 ml-n2"
+      density="compact"
+      show-current-page
+    >
+      <template v-slot:item.trait="{ value }">{{ value.split(',').join(', ') }}</template>
+      <template v-slot:item.link="{ value }"><a class="coLink" :href="value" target="_blank">{{ value }}</a></template>
+      <template v-slot:item.pmid="{ value }"><a class="coLink" :href="'https://pubmed.ncbi.nlm.nih.gov/' + value" target="_blank">{{ value }}</a></template>
+      <template v-slot:footer.prepend>
+        <div>
+          <ToolTippy>
+            <v-icon icon="mdi-file-download-outline" @click="onFileDownloadClick()" class="text-clcAction mx-3" size="32px"/>
+            <template #tooltipContent>
+              Click to download currently displayed data
+            </template>
+          </ToolTippy>
+        </div>
+      </template>
+    </v-data-table>
+  </DefaultLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useFetchData } from '@/composables/fetchData'
 import { useAppStore } from '@/stores/AppStore'
@@ -84,12 +70,9 @@ const headers = ref([
   { title: 'External Link', value: 'link', sortable: true }
 ])
 
-const itemsPerPage = ref(10);
 const search = ref('')
 
 onMounted(async () => {
-  // const response = await fetch('/data/studies.json')
-  // data.value = await response.json()
   if(await fetchData(URLS.STUDY_DATA, 'study data', appStore.currentPageName)) {
     dataItems.value = data.value
   } else {

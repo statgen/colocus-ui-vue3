@@ -1,17 +1,15 @@
 <template>
-  <v-scroll-x-transition>
-    <v-sheet v-show="appStore.filterPanelControls.isSidebarShowing" class="nl-n2">
-      <FilterPanelSubpanel title="Settings" resetButton="true">
-        <CtlGeneSelect :controlSet="controlConfig.geneSelect" />
-        <CtlSlider :controlSet="controlConfig.h4" />
-        <CtlSlider :controlSet="controlConfig.r2" />
+  <v-sheet v-show="appStore.isSidebarShowing" class="ml-n2">
+    <FilterPanelSubpanel title="Settings" resetButton="true">
+      <CtlGeneSelect :controlSet="controlConfig.geneSelect" />
+      <CtlSlider :controlSet="controlConfig.h4" />
+      <CtlSlider :controlSet="controlConfig.r2" />
 
-        <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
-        <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
-        <CtlSwitch :controlSet="controlConfig.showDatasets" />
-      </FilterPanelSubpanel>
-    </v-sheet>
-  </v-scroll-x-transition>
+      <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
+      <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
+      <CtlSwitch :controlSet="controlConfig.showDatasets" />
+    </FilterPanelSubpanel>
+  </v-sheet>
 </template>
 
 <script setup>

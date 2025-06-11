@@ -1,12 +1,10 @@
 <template>
-  <v-sheet class="mt-3">
+  <v-sheet class="ml-n2">
     <FilterPanelSubpanel title="Settings" resetButton="true" class="pb-4">
-      <div class="ml-n2">
-        <QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/>
-        <CtlSlider :controlSet="controlSet.h4"/>
-        <CtlSlider :controlSet="controlSet.r2"/>
-        <slot name="anchors"/>
-      </div>
+      <QCSelector :controlSet="controlSet.study" @resetSliders="resetSliders"/>
+      <CtlSlider :controlSet="controlSet.h4"/>
+      <CtlSlider :controlSet="controlSet.r2"/>
+      <slot name="anchors"/>
     </FilterPanelSubpanel>
   </v-sheet>
 </template>
@@ -23,13 +21,4 @@ const controlSet = {
 </script>
 
 <style scoped>
-a:hover {
-  font-weight: bold;
-}
-
-ul {
-  margin-left: 1rem;
-  list-style: none;
-}
-
 </style>

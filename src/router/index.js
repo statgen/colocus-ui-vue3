@@ -19,13 +19,13 @@ const summaryStatsPage = PAGE_NAMES.STATS_SUMMARY
 const enableFiltering = (panelIsVisible) => {
   const appStore = useAppStore()
   appStore.filterPanelControls.isSidebarButtonShowing = true
-  appStore.filterPanelControls.isSidebarShowing = panelIsVisible
+  appStore.isSidebarShowing = panelIsVisible
 }
 
 const disableFiltering = () => {
   const appStore = useAppStore()
   appStore.filterPanelControls.isSidebarButtonShowing = false
-  appStore.filterPanelControls.isSidebarShowing = false
+  appStore.isSidebarShowing = false
 }
 
 const routes = [

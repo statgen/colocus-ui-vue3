@@ -1,6 +1,6 @@
 <template>
-  <v-col cols="3">
-    <v-row>
+  <SidebarLayout>
+    <template #sidebar>
       <QCPanel>
         <template #anchors>
           <QCAnchor :config="vpc.signalPropsPerGWAS"/>
@@ -9,49 +9,28 @@
           <QCAnchor :config="vpc.omicsCountsPerGWAS"/>
         </template>
       </QCPanel>
-    </v-row>
-  </v-col>
-  <v-col class="mt-4">
-    <v-row>
-      <v-col class="ml-n4">
-        <v-row>
-          <h1 :id="STATS_PAGE_TOP">Summary statistics</h1>
-        </v-row>
-        <v-row>
-          <p>This page contains summary information for GWAS signals colocalized with molecular QTLs
-            from a given tissue or cell type. The plots allow comparison of the number (proportion)
-            of eQTL colocalized across GWAS and conversely the number (proportion) of GWAS signals
-            colocalized with eQTLs from the given tissue or cell type.</p>
-        </v-row>
+    </template>
 
-        <v-row>
-          <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
-        </v-row>
+    <h1 :id="STATS_PAGE_TOP">Summary statistics</h1>
 
-        <v-row>
-          <VegaPlotContainer :controlSet="vpc.signalCountsPerGWAS" :vegaSpec="signalCountsPerGWASSpec" />
-        </v-row>
+    <p>
+      This page contains summary information for GWAS signals colocalized with molecular QTLs
+      from a given tissue or cell type. The plots allow comparison of the number (proportion)
+      of eQTL colocalized across GWAS and conversely the number (proportion) of GWAS signals
+      colocalized with eQTLs from the given tissue or cell type.
+    </p>
 
-        <v-row>
-          <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
-        </v-row>
-
-        <v-row>
-          <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
-        </v-row>
-
-        <!--        <v-row>-->
-<!--          <VegaPlotContainer :controlSet="vpc.signalsPerDataset" :vegaSpec="signalsPerDatasetSpec" />-->
-<!--        </v-row>-->
-      </v-col>
-    </v-row>
-  </v-col>
+    <VegaPlotContainer :controlSet="vpc.signalPropsPerGWAS" :vegaSpec="signalPropsPerGWASSpec" />
+    <VegaPlotContainer :controlSet="vpc.signalCountsPerGWAS" :vegaSpec="signalCountsPerGWASSpec" />
+    <VegaPlotContainer :controlSet="vpc.omicsPropsPerGWAS" :vegaSpec="omicsPropsPerGWASSpec" />
+    <VegaPlotContainer :controlSet="vpc.omicsCountsPerGWAS" :vegaSpec="omicsCountsPerGWASSpec" />
+  </SidebarLayout>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { nextTick, onMounted } from 'vue'
-import { timeLog } from '@/util/util'
+import { onMounted } from 'vue'
+import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useQCStore } from '@/stores/QCStore'
 import { useAppStore } from '@/stores/AppStore'
 import vpc from '@/components/qcPageControls/VegaPlotConfig'
@@ -78,6 +57,7 @@ const appStore = useAppStore()
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
+  appStore.isSidebarShowing = true
   await qcStore.loadQCData()
   appStore.slidersEnabled = true
 })
