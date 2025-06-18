@@ -50,7 +50,8 @@ const URLS = {
   QC_COLOC: '/api/v1/internal/coloc-slim',
   QC_SIGNALS: '/api/v1/internal/signals-slim',
   SIGNALS_DATA: '/api/v1/signals',
-  STUDY_DATA: '/data/studies.json',
+  STUDY_DATA: '/api/v1/datasets',
+  RELEASE_DATA: '/api/v1/submissions',
   TRAIT_DATA: '/api/v1/internal/analysis',
 
   // CMD Portal data
