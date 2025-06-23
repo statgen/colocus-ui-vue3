@@ -31,6 +31,7 @@ const PAGE_NAMES = {
   HELP: 'help',
   HOME: 'home',
   LOCUSZOOM: 'locuszoom',
+  LZ2TEST: 'lz2test',
   MANHATTAN: 'manhattan',
   SEARCH: 'search',
   STATS_QC: 'qcstats',

@@ -9,6 +9,7 @@ const homePage = PAGE_NAMES.HOME
 const genePage = PAGE_NAMES.GENE
 const helpPage = PAGE_NAMES.HELP
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+const lz2TestPage = PAGE_NAMES.LZ2TEST
 const manhattanPage = PAGE_NAMES.MANHATTAN
 const searchPage = PAGE_NAMES.SEARCH
 const studyPage = PAGE_NAMES.STUDIES
@@ -58,6 +59,10 @@ const routes = [
       appStore.copySearchFiltersToNextPage(to.name)
       next()
     }
+  },
+  {
+    path: `/${lz2TestPage}`,
+    component: () => import('@/views/LZ2TestView.vue')
   },
   {
     // path: `/${manhattanPage}/:analysisID/:trait`,
