@@ -24,6 +24,12 @@ const COLORS = {
   BAR_TERTIARY: "#ddd",
 }
 
+const LZ_COLOR_THEMES = {
+  locuszoom: ['rgba(70, 54, 153)', 'rgb(38, 188, 225)', 'rgb(110, 254, 104)', 'rgb(248, 195, 42)', 'rgb(219, 61, 17)', 'rgb(150, 50, 184)'],
+  modern: ['rgba(70, 54, 153, 0.2)', 'rgb(38, 188, 225)', 'rgb(110, 254, 104)', 'rgb(248, 195, 42)', 'rgb(219, 61, 17)', 'rgb(150, 50, 184)'],
+  greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
+}
+
 const NEARBY_DIST = 500e3
 
 const PAGE_NAMES = {
@@ -71,5 +77,5 @@ const THRESHOLDS = {
   R2: 0.3,
 }
 
-export { CM_DATASET, BIOMARKER_TYPES, COLORS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP, PAGE_NAMES, THRESHOLDS, URLS
+export { CM_DATASET, BIOMARKER_TYPES, COLORS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP, LZ_COLOR_THEMES, PAGE_NAMES, THRESHOLDS, URLS
 }

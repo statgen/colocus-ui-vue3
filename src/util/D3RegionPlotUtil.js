@@ -1,4 +1,9 @@
 import * as d3 from 'd3v7'
+import { toRaw } from 'vue'
+import { useFetchData } from '@/composables/fetchData'
+import { LZ_COLOR_THEMES, URLS } from '@/constants'
+import * as aq from 'arquero'
+
 
 function createSVG(container, dimensions) {
   return d3.select(container)
@@ -41,6 +46,69 @@ function createTooltip() {
     .style('pointer-events', 'none')
     .style('font-size', '1rem')
 }
+
+function getLDColor(r2, theme = 'locuszoom') {
+  const colors = LZ_COLOR_THEMES[theme] || LZ_COLOR_THEMES.locuszoom
+  if (r2 == null) return '#eeeeee' // fallback for null
+  if (r2 > 0.999999) return colors[5]
+  if (r2 > 0.8)       return colors[4]
+  if (r2 > 0.6)       return colors[3]
+  if (r2 > 0.4)       return colors[2]
+  if (r2 > 0.2)       return colors[1]
+  return colors[0]
+}
+
+
+const loadLZPlotData = async (v, signal) => {
+  const { data, errorMessage, fetchData } = useFetchData()
+
+  let base = `${URLS.LD_DATA}/UKBB_GRCh37_ALL/region/`
+  let url = `${base}?chrom=${v.chr}&start=${v.start}&end=${v.end}&variant=${v.chr}:${v.loc}_${v.ref}/${v.alt}`
+  let ldData = []
+  if(await fetchData(url, 'lz2 ld data', 'lz2test')) {
+    ldData = toRaw(data.value)
+  }
+
+  base = `/api/v1/signals/${signal}/region`
+  url = `${base}?chrom=${v.chr}&start=${v.start}&end=${v.end}`
+  let signalData
+  if(await fetchData(url, 'lz2 signal data', 'lz2test')) {
+    signalData = toRaw(data.value)
+  }
+
+  const t1 = aq.from(signalData)
+  const t2 = aq.from(ldData).rename({ variant2: 'variant' }).rename({ correlation: 'r2' })
+  const t3 = t1.join_left(t2, 'variant')
+  const t4 = t3.derive ({
+    variant: d => aq.op.replace(d.variant, /[:/]/g, '_'),
+    variant1: d => aq.op.replace(d.variant1, /[:/]/g, '_'),
+  })
+  const t5 = t4.objects()
+
+  const t6 = t5.map(row => ({
+    x: row.position,
+    y: row.t1_neg_log_pvalue,
+    color: getLDColor(row.r2, 'modern'),
+    size: 4,
+  }))
+
+  return t6
+}
+
+
+const parseVariant = (variant) => {
+  const pieces = variant.split('_')
+  let v = {
+    chr: +pieces[0],
+    loc: +pieces[1],
+    ref: pieces[2],
+    alt: pieces[3],
+  }
+  v.start = v.loc - 250e3 - 1000
+  v.end = v.loc + 250e3 + 1000
+  return v
+}
+
 
 function renderXaxis(ctr, xScale, dimensions, chromosome) {
   const xAxis = d3.axisBottom(xScale)
@@ -99,4 +167,6 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
     })
 }
 
-export { createContainer, createSVG, createTooltip, createXscale, createYscale, renderXaxis, renderYaxis, renderData }
+export { createContainer, createSVG, createTooltip, createXscale, createYscale, loadLZPlotData, parseVariant,
+  renderXaxis, renderYaxis, renderData
+}

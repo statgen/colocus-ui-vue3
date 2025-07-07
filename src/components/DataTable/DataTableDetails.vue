@@ -64,6 +64,18 @@
           }"/>
         </td>
       </tr>
+<!--      <tr>-->
+<!--        <td>signal1ID</td>-->
+<!--        <td>{{ signal1ID }}</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--      </tr>-->
+<!--      <tr>-->
+<!--        <td>signal2ID</td>-->
+<!--        <td>{{ signal2ID }}</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--      </tr>-->
     </tbody>
   </table>
   </div>
@@ -96,6 +108,9 @@ const s1TraitKPID = s1trait?.phenotype?.kp_id
 
 const s2TraitGene = s2trait.gene.symbol
 const s2TraitUuid = s2trait.uuid
+
+// const signal1ID = props.item.signal1.uuid
+// const signal2ID = props.item.signal2.uuid
 
 const variant1 = props.item.signal1.lead_variant.vid
 const variant2 = props.item.signal2.lead_variant.vid

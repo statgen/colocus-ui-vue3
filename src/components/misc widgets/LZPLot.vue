@@ -183,9 +183,6 @@ const addRegionPanel = (signal) => {
   const [variantLabel, variantColor] = makePlotTitle(signal)
   const ldSource = `ld_${regionPanelCounter}_${signalID}`
   const ldURL = `${URLS.LD_DATA}/${signal.analysis.ld}/region/`
-  console.log('ldurl: ' + ldURL)
-
-  console.log('dataSourceURL', dataSourceURL, 'signal.lead_variant.vid', signal.lead_variant.vid, 'variantLabel', variantLabel, 'signal.analysis.ld', signal.analysis.ld)
 
   const panel = LocusZoom.Layouts.get('panel', 'association_with_cond', {
     id: panelLabel,

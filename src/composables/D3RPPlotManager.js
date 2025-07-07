@@ -1,24 +1,27 @@
-import { createVNode, render } from 'vue'
+import { createVNode, ref, render } from 'vue'
 import D3RegionPlot from '@/components/D3components/D3RegionPlot.vue'
+import { loadLZPlotData, parseVariant } from '@/util/D3RegionPlotUtil'
 
+const plotCounter = ref(1)
 const plotRegistry = new Map()
 
 export function usePlotManager() {
-  function mountPlot({ id, plotContainer, type = 'region', data, dimensions, chartClass, chartStyle, title, chromosome }) {
-    if (plotRegistry.has(id)) {
-      console.warn(`Plot with id "${id}" already exists`)
-      return
-    }
 
-    const component = resolvePlotComponent(type)
+  const mountPlot = async(plotContainer, variant, signal, type, chartClass, chartStyle) => {
+    const pv = parseVariant(variant)
+    const id = `plot_${plotCounter.value}`
+    const chromosome = pv.chr
+    const title = `Plot ${plotCounter.value}`
 
+    const data = await loadLZPlotData(pv, signal)
+
+    const component = resolvePlotType(type)
     const mountEl = document.createElement('div')
     mountEl.className = 'plot-wrapper'
-    plotContainer.appendChild(mountEl)
+    plotContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
       data,
-      dimensions,
       chartClass,
       chartStyle,
       id,
@@ -27,8 +30,8 @@ export function usePlotManager() {
     })
 
     render(vnode, mountEl)
-
     plotRegistry.set(id, { vnode, el: mountEl })
+    plotCounter.value++
   }
 
   function unmountPlot(id) {
@@ -46,13 +49,13 @@ export function usePlotManager() {
     }
   }
 
-  function resolvePlotComponent(type) {
+  function resolvePlotType(type) {
     switch (type) {
       case 'region':
         return D3RegionPlot
       // case 'compare': return D3ComparePlot
       default:
-        throw new Error(`Unknown plot type: ${type}`)
+        console.error(`Unknown plot type: ${type}`)
     }
   }
 
