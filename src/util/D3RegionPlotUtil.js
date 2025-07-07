@@ -42,11 +42,11 @@ function createTooltip() {
     .style('font-size', '1rem')
 }
 
-function renderAxes(ctr, xScale, yScale, dimensions) {
+function renderXaxis(ctr, xScale, dimensions, chromosome) {
   const xAxis = d3.axisBottom(xScale)
     .ticks(5)
     .tickSizeOuter(0)
-    .tickFormat((d) => d)
+    .tickFormat((d) => (d/1e6).toFixed(1))
 
   const xAxisGroup = ctr.append('g')
     .call(xAxis)
@@ -57,8 +57,10 @@ function renderAxes(ctr, xScale, yScale, dimensions) {
     .attr('x', dimensions.ctrWidth / 2)
     .attr('y', dimensions.margins.bottom - 4)
     .attr('fill', 'black')
-    .text('Humidity')
+    .text(`Chromosome: ${chromosome} (Mb)`)
+}
 
+function renderYaxis(ctr, yScale, dimensions) {
   const yAxis = d3.axisLeft(yScale)
     .ticks(5)
     .tickSizeOuter(0)
@@ -71,7 +73,7 @@ function renderAxes(ctr, xScale, yScale, dimensions) {
     .attr('x', -dimensions.ctrHeight / 2)
     .attr('y', -dimensions.margins.left + 15)
     .attr('fill', 'black')
-    .html('Temperature &deg;F')
+    .html('-log10 p-value')
     .style('transform', 'rotate(270deg)')
     .style('text-anchor', 'middle')
 }
@@ -83,8 +85,8 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
     .append('circle')
     .attr('cx', d => xScale(xAccessor(d)))
     .attr('cy', d => yScale(yAccessor(d)))
-    .attr('r', 3)
-    .attr('fill', 'steelblue')
+    .attr('r', d => d.size)
+    .attr('fill', d => d.color)
     .on('mouseover', (event, d) => {
       tooltip
         .style('left', `${event.pageX + 10}px`)
@@ -97,4 +99,4 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
     })
 }
 
-export { createContainer, createSVG, createTooltip, createXscale, createYscale, renderAxes, renderData }
+export { createContainer, createSVG, createTooltip, createXscale, createYscale, renderXaxis, renderYaxis, renderData }

@@ -4,7 +4,7 @@ import D3RegionPlot from '@/components/D3components/D3RegionPlot.vue'
 const plotRegistry = new Map()
 
 export function usePlotManager() {
-  function mountPlot({ id, plotContainer, type = 'region', data, dimensions, chartClass, chartStyle, title }) {
+  function mountPlot({ id, plotContainer, type = 'region', data, dimensions, chartClass, chartStyle, title, chromosome }) {
     if (plotRegistry.has(id)) {
       console.warn(`Plot with id "${id}" already exists`)
       return
@@ -23,6 +23,7 @@ export function usePlotManager() {
       chartStyle,
       id,
       title,
+      chromosome,
     })
 
     render(vnode, mountEl)

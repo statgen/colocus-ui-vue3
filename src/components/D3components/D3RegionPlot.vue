@@ -15,8 +15,9 @@
 
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
+import * as d3 from 'd3v7'
 import D3BasePlot from '@/components/D3components/D3BasePlot.vue'
-import { createContainer, createSVG, createTooltip, createXscale, createYscale, renderAxes, renderData } from '@/util/D3RegionPlotUtil'
+import { createContainer, createSVG, createTooltip, createXscale, createYscale, renderXaxis, renderYaxis, renderData } from '@/util/D3RegionPlotUtil'
 
 const props = defineProps({
   data: Array,
@@ -24,6 +25,7 @@ const props = defineProps({
   chartStyle: [String, Object],
   title: String,
   id: String,
+  chromosome: Number,
 })
 
 const dimensions = {
@@ -34,6 +36,7 @@ const dimensions = {
 
 dimensions.ctrWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right
 dimensions.ctrHeight = dimensions.height - dimensions.margins.top - dimensions.margins.bottom
+
 
 const baseRef = ref(null)
 
@@ -55,7 +58,9 @@ function renderPlot(container, data, dimensions) {
 
   tooltip = createTooltip()
 
-  renderAxes(ctr, xScale, yScale, dimensions)
+  renderXaxis(ctr, xScale, dimensions, props.chromosome)
+  renderYaxis(ctr, yScale, dimensions)
+
   renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip)
 
   return svg
