@@ -13,7 +13,7 @@ export function usePlotManager() {
     const chromosome = pv.chr
     const title = `Plot ${plotCounter.value}: ${variant}`
 
-    const data = await loadLZPlotData(pv, signal)
+    const data = await loadLZPlotData(variant, pv, signal)
 
     const component = resolvePlotType(type)
     const mountEl = document.createElement('div')

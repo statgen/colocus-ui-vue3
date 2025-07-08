@@ -58,19 +58,26 @@ function getLDColor(r2, theme = 'locuszoom') {
   return colors[0]
 }
 
+const getShape = (beta, v1, v2) => {
+  console.log(v1, v2)
+  if (v1 === v2) return 'diamond'
+  else if (beta > 0) return 'up-triangle'
+  else if (beta < 0) return 'down-triangle'
+  else return 'circle'
+}
 
-const loadLZPlotData = async (v, signal) => {
+const loadLZPlotData = async (variant, pv, signal) => {
   const { data, errorMessage, fetchData } = useFetchData()
 
   let base = `${URLS.LD_DATA}/UKBB_GRCh37_ALL/region/`
-  let url = `${base}?chrom=${v.chr}&start=${v.start}&end=${v.end}&variant=${v.chr}:${v.loc}_${v.ref}/${v.alt}`
+  let url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}&variant=${pv.chr}:${pv.loc}_${pv.ref}/${pv.alt}`
   let ldData = []
   if(await fetchData(url, 'lz2 ld data', 'lz2test')) {
     ldData = toRaw(data.value)
   }
 
   base = `/api/v1/signals/${signal}/region`
-  url = `${base}?chrom=${v.chr}&start=${v.start}&end=${v.end}`
+  url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}`
   let signalData
   if(await fetchData(url, 'lz2 signal data', 'lz2test')) {
     signalData = toRaw(data.value)
@@ -93,6 +100,7 @@ const loadLZPlotData = async (v, signal) => {
     variant: row.variant,
     refAllele: row.ref_allele,
     color: getLDColor(row.r2, 'modern'),
+    shape: getShape(row.t1_beta, variant, row.variant),
     size: 4,
   }))
 
@@ -150,16 +158,52 @@ function renderYaxis(ctr, yScale, dimensions) {
     .style('text-anchor', 'middle')
 }
 
+import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
+// import * as d3 from 'd3-selection' // ensure you’re importing d3 if needed
+
 function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
-  console.log(data)
-  ctr.selectAll('circle')
+  // Data join: dynamically create element based on shape
+  const points = ctr.selectAll('.data-point')
     .data(data)
     .enter()
-    .append('circle')
-    .attr('cx', d => xScale(xAccessor(d)))
-    .attr('cy', d => yScale(yAccessor(d)))
-    .attr('r', d => d.size)
+    .append(d => {
+      return d.shape === 'circle'
+        ? document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+        : document.createElementNS('http://www.w3.org/2000/svg', 'path')
+    })
+    .attr('class', 'data-point')
     .attr('fill', d => d.color)
+
+  // Position and shape
+  points.each(function (d) {
+    const el = d3.select(this)
+    const x = xScale(xAccessor(d))
+    const y = yScale(yAccessor(d))
+    const size = d.size * d.size * 2.5  // d3.symbol uses area, not radius
+
+    if (d.shape === 'circle') {
+      el
+        .attr('cx', x)
+        .attr('cy', y)
+        .attr('r', d.size)
+    } else if (d.shape === 'up-triangle') {
+      el
+        .attr('d', symbol().type(symbolTriangle).size(size)())
+        .attr('transform', `translate(${x}, ${y}) rotate(0)`)
+    } else if (d.shape === 'down-triangle') {
+      el
+        .attr('d', symbol().type(symbolTriangle).size(size)())
+        .attr('transform', `translate(${x}, ${y}) rotate(180)`)
+    } else if (d.shape === 'diamond') {
+      el
+        .attr('d', symbol().type(symbolDiamond).size(size * 2)())
+        .attr('transform', `translate(${x}, ${y}) rotate(0)`)
+        .classed('lead-variant', true)
+    }
+  })
+
+  // Tooltip events
+  points
     .on('mouseover', (event, d) => {
       tooltip
         .style('left', `${event.pageX + 10}px`)
@@ -170,7 +214,7 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
             <tr><td>Variant</td><td>${d.variant}</td></tr>
             <tr><td>Position</td><td>${d.x}</td></tr>
             <tr><td>Ref Allele</td><td>${d.refAllele}</td></tr>
-            <tr><td>-log10 p-value</td><td>${d.y ? d.y.toFixed(1) : 'NA'}</td></tr>
+            <tr><td>-log<sub>10</sub> p-value</td><td>${d.y ? d.y.toFixed(1) : 'NA'}</td></tr>
             <tr><td>r²</td><td>${d.r2 ? d.r2.toFixed(3) : 'NA'}</td></tr>
           </table>
         `)
@@ -179,6 +223,7 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
       tooltip.style('display', 'none')
     })
 }
+
 
 export { createContainer, createSVG, createTooltip, createXscale, createYscale, loadLZPlotData, parseVariant,
   renderXaxis, renderYaxis, renderData
