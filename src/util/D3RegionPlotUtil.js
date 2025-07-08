@@ -84,10 +84,14 @@ const loadLZPlotData = async (v, signal) => {
     variant1: d => aq.op.replace(d.variant1, /[:/]/g, '_'),
   })
   const t5 = t4.objects()
+  console.log('t5', t5)
 
   const t6 = t5.map(row => ({
     x: row.position,
     y: row.t1_neg_log_pvalue,
+    r2: row.r2,
+    variant: row.variant,
+    refAllele: row.ref_allele,
     color: getLDColor(row.r2, 'modern'),
     size: 4,
   }))
@@ -114,7 +118,7 @@ function renderXaxis(ctr, xScale, dimensions, chromosome) {
   const xAxis = d3.axisBottom(xScale)
     .ticks(5)
     .tickSizeOuter(0)
-    .tickFormat((d) => (d/1e6).toFixed(1))
+    .tickFormat((d) => (d/1e6).toFixed(2))
 
   const xAxisGroup = ctr.append('g')
     .call(xAxis)
@@ -147,6 +151,7 @@ function renderYaxis(ctr, yScale, dimensions) {
 }
 
 function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
+  console.log(data)
   ctr.selectAll('circle')
     .data(data)
     .enter()
@@ -160,7 +165,15 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
         .style('left', `${event.pageX + 10}px`)
         .style('top', `${event.pageY + 10}px`)
         .style('display', 'block')
-        .html(`x: ${d.x.toFixed(1)}<br/>y: ${d.y.toFixed(1)}`)
+        .html(`
+          <table>
+            <tr><td>Variant</td><td>${d.variant}</td></tr>
+            <tr><td>Position</td><td>${d.x}</td></tr>
+            <tr><td>Ref Allele</td><td>${d.refAllele}</td></tr>
+            <tr><td>-log10 p-value</td><td>${d.y ? d.y.toFixed(1) : 'NA'}</td></tr>
+            <tr><td>r²</td><td>${d.r2 ? d.r2.toFixed(3) : 'NA'}</td></tr>
+          </table>
+        `)
     })
     .on('mouseout', () => {
       tooltip.style('display', 'none')

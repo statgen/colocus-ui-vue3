@@ -11,7 +11,7 @@ export function usePlotManager() {
     const pv = parseVariant(variant)
     const id = `plot_${plotCounter.value}`
     const chromosome = pv.chr
-    const title = `Plot ${plotCounter.value}`
+    const title = `Plot ${plotCounter.value}: ${variant}`
 
     const data = await loadLZPlotData(pv, signal)
 

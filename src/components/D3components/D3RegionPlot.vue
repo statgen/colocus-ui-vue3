@@ -15,7 +15,6 @@
 
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
-import * as d3 from 'd3v7'
 import D3BasePlot from '@/components/D3components/D3BasePlot.vue'
 import { createContainer, createSVG, createTooltip, createXscale, createYscale, renderXaxis, renderYaxis, renderData } from '@/util/D3RegionPlotUtil'
 
@@ -31,7 +30,7 @@ const props = defineProps({
 const dimensions = {
   height: 200,
   width: 600,
-  margins: { top: 30, right: 30, bottom: 45, left: 55 }
+  margins: { top: 10, right: 30, bottom: 45, left: 45 }
 }
 
 dimensions.ctrWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right
