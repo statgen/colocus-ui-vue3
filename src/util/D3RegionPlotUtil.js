@@ -3,7 +3,7 @@ import { toRaw } from 'vue'
 import { useFetchData } from '@/composables/fetchData'
 import { LZ_COLOR_THEMES, URLS } from '@/constants'
 import * as aq from 'arquero'
-
+import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
 
 function createSVG(container, dimensions) {
   return d3.select(container)
@@ -59,7 +59,6 @@ function getLDColor(r2, theme = 'locuszoom') {
 }
 
 const getShape = (beta, v1, v2) => {
-  console.log(v1, v2)
   if (v1 === v2) return 'diamond'
   else if (beta > 0) return 'up-triangle'
   else if (beta < 0) return 'down-triangle'
@@ -74,13 +73,19 @@ const loadLZPlotData = async (variant, pv, signal) => {
   let ldData = []
   if(await fetchData(url, 'lz2 ld data', 'lz2test')) {
     ldData = toRaw(data.value)
+  } else {
+    console.error("Failed to fetch LD data")
+    return
   }
 
-  base = `/api/v1/signals/${signal}/region`
+  base = `${URLS.SIGNALS_DATA}/${signal}/region`
   url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}`
   let signalData
   if(await fetchData(url, 'lz2 signal data', 'lz2test')) {
     signalData = toRaw(data.value)
+  } else {
+    console.error("Failed to fetch signal data")
+    return
   }
 
   const t1 = aq.from(signalData)
@@ -91,7 +96,6 @@ const loadLZPlotData = async (variant, pv, signal) => {
     variant1: d => aq.op.replace(d.variant1, /[:/]/g, '_'),
   })
   const t5 = t4.objects()
-  console.log('t5', t5)
 
   const t6 = t5.map(row => ({
     x: row.position,
@@ -106,7 +110,6 @@ const loadLZPlotData = async (variant, pv, signal) => {
 
   return t6
 }
-
 
 const parseVariant = (variant) => {
   const pieces = variant.split('_')
@@ -158,8 +161,6 @@ function renderYaxis(ctr, yScale, dimensions) {
     .style('text-anchor', 'middle')
 }
 
-import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
-// import * as d3 from 'd3-selection' // ensure you’re importing d3 if needed
 
 function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
   // Data join: dynamically create element based on shape
