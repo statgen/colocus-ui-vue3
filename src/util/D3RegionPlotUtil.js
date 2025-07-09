@@ -124,7 +124,6 @@ const parseVariant = (variant) => {
   return v
 }
 
-
 function renderXaxis(ctr, xScale, dimensions, chromosome) {
   const xAxis = d3.axisBottom(xScale)
     .ticks(5)
@@ -161,9 +160,8 @@ function renderYaxis(ctr, yScale, dimensions) {
     .style('text-anchor', 'middle')
 }
 
-
 function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
-  // Data join: dynamically create element based on shape
+
   const points = ctr.selectAll('.data-point')
     .data(data)
     .enter()
@@ -180,7 +178,7 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
     const el = d3.select(this)
     const x = xScale(xAccessor(d))
     const y = yScale(yAccessor(d))
-    const size = d.size * d.size * 2.5  // d3.symbol uses area, not radius
+    const size = d.size * d.size * 2.5  // d3.symbol uses area, not radius; size is relative to the size of a circle (4 by default)
 
     if (d.shape === 'circle') {
       el
@@ -212,11 +210,11 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
         .style('display', 'block')
         .html(`
           <table>
-            <tr><td>Variant</td><td>${d.variant}</td></tr>
-            <tr><td>Position</td><td>${d.x}</td></tr>
-            <tr><td>Ref Allele</td><td>${d.refAllele}</td></tr>
-            <tr><td>-log<sub>10</sub> p-value</td><td>${d.y ? d.y.toFixed(1) : 'NA'}</td></tr>
-            <tr><td>r²</td><td>${d.r2 ? d.r2.toFixed(3) : 'NA'}</td></tr>
+            <tr><td>Variant</td><td class="pl-2">${d.variant}</td></tr>
+            <tr><td>Position</td><td class="pl-2">${d.x}</td></tr>
+            <tr><td>Ref Allele</td><td class="pl-2">${d.refAllele}</td></tr>
+            <tr><td>-log<sub>10</sub> p-value</td><td class="pl-2">${d.y?.toFixed(1) || 'NA'}</td></tr>
+            <tr><td>r²</td><td class="pl-2">${d.r2?.toFixed(3) || 'NA'}</td></tr>
           </table>
         `)
     })
@@ -224,7 +222,6 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
       tooltip.style('display', 'none')
     })
 }
-
 
 export { createContainer, createSVG, createTooltip, createXscale, createYscale, loadLZPlotData, parseVariant,
   renderXaxis, renderYaxis, renderData

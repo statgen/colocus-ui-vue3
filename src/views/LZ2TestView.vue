@@ -18,13 +18,13 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from 'vue'
+import { onBeforeUnmount, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { usePlotManager } from '@/composables/D3RPPlotManager'
 
 const { mountPlot, clearAllPlots } = usePlotManager()
 
-const plotContainer = ref(null)
+const plotContainer = useTemplateRef('plotContainer')
 const selectedVariant = ref()
 
 const testData = [
@@ -45,10 +45,15 @@ onBeforeUnmount(() => {
 })
 
 const onSelectVariant = (v) => {
-  mountPlot(plotContainer, v.variant, v.signal, 'region')
+  mountPlot({
+    plotContainer,
+    variant: v.variant,
+    signal: v.signal,
+    type: 'region',
+    // chartClass: '',
+    // chartStyle: {}
+  })
 }
-
-
 </script>
 
 <style scoped>

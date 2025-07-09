@@ -7,7 +7,8 @@ const plotRegistry = new Map()
 
 export function usePlotManager() {
 
-  const mountPlot = async(plotContainer, variant, signal, type, chartClass, chartStyle) => {
+  const mountPlot = async(args) => {
+    const { plotContainer, variant, signal, type, chartClass, chartStyle } = args
     const pv = parseVariant(variant)
     const id = `plot_${plotCounter.value}`
     const chromosome = pv.chr
