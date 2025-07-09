@@ -205,6 +205,19 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCall
     .on('mouseout', () => {
       tooltipCallbacks.hide()
     })
+
+  // Add horizontal dashed line at genome-wide significance threshold
+  const genomeWideSignificance = Math.log10(5e-8); // ≈ -7.301
+  const yThreshold = yScale(-genomeWideSignificance);
+
+  ctr.append('line')
+    .attr('x1', xScale.range()[0])
+    .attr('x2', xScale.range()[1])
+    .attr('y1', yThreshold)
+    .attr('y2', yThreshold)
+    .attr('stroke', LZ_COLOR_THEMES.linecolor)
+    .attr('stroke-dasharray', '4 6')
+    .attr('stroke-width', 1);
 }
 
 export { createContainer, createSVG, createXscale, createYscale, loadLZPlotData, parseVariant,

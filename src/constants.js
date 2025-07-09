@@ -28,6 +28,7 @@ const LZ_COLOR_THEMES = {
   locuszoom: ['rgba(70, 54, 153)', 'rgb(38, 188, 225)', 'rgb(110, 254, 104)', 'rgb(248, 195, 42)', 'rgb(219, 61, 17)', 'rgb(150, 50, 184)'],
   modern: ['rgba(70, 54, 153, 0.2)', 'rgb(38, 188, 225)', 'rgb(110, 254, 104)', 'rgb(248, 195, 42)', 'rgb(219, 61, 17)', 'rgb(150, 50, 184)'],
   greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
+  linecolor: '#a8a9ad', // silvery for recomb and significance lines
 }
 
 const NEARBY_DIST = 500e3
