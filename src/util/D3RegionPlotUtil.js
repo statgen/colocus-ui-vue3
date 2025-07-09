@@ -34,19 +34,6 @@ function createYscale(yAccessor, yPaddingFactor, data, dimensions) {
     .range([dimensions.ctrHeight, 0])
 }
 
-function createTooltip() {
-  return d3.select('body')
-    .append('div')
-    .attr('class', 'D3RPTooltip')
-    .style('position', 'absolute')
-    .style('display', 'none')
-    .style('background', '#fff')
-    .style('padding', '6px')
-    .style('border', '1px solid #ccc')
-    .style('pointer-events', 'none')
-    .style('font-size', '1rem')
-}
-
 function getLDColor(r2, theme = 'locuszoom') {
   const colors = LZ_COLOR_THEMES[theme] || LZ_COLOR_THEMES.locuszoom
   if (r2 == null) return '#eeeeee' // fallback for null
@@ -160,7 +147,7 @@ function renderYaxis(ctr, yScale, dimensions) {
     .style('text-anchor', 'middle')
 }
 
-function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
+function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) {
 
   const points = ctr.selectAll('.data-point')
     .data(data)
@@ -204,25 +191,22 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip) {
   // Tooltip events
   points
     .on('mouseover', (event, d) => {
-      tooltip
-        .style('left', `${event.pageX + 10}px`)
-        .style('top', `${event.pageY + 10}px`)
-        .style('display', 'block')
-        .html(`
-          <table>
-            <tr><td>Variant</td><td class="pl-2">${d.variant}</td></tr>
-            <tr><td>Position</td><td class="pl-2">${d.x}</td></tr>
-            <tr><td>Ref Allele</td><td class="pl-2">${d.refAllele}</td></tr>
-            <tr><td>-log<sub>10</sub> p-value</td><td class="pl-2">${d.y?.toFixed(1) || 'NA'}</td></tr>
-            <tr><td>r²</td><td class="pl-2">${d.r2?.toFixed(3) || 'NA'}</td></tr>
-          </table>
-        `)
+      tooltipCallbacks.show({
+        variant: d.variant,
+        position: d.x,
+        refAllele: d.refAllele,
+        pValue: d.y?.toFixed(1) || 'NA',
+        r2: d.r2?.toFixed(3) || 'NA'
+      }, event)
+    })
+    .on('mousemove', (event) => {
+      tooltipCallbacks.updatePosition(event)
     })
     .on('mouseout', () => {
-      tooltip.style('display', 'none')
+      tooltipCallbacks.hide()
     })
 }
 
-export { createContainer, createSVG, createTooltip, createXscale, createYscale, loadLZPlotData, parseVariant,
+export { createContainer, createSVG, createXscale, createYscale, loadLZPlotData, parseVariant,
   renderXaxis, renderYaxis, renderData
 }

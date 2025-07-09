@@ -13,6 +13,7 @@
       label="Select variant to plot"
       variant="outlined"
     ></v-select>
+    <D3Tooltip />
     <div ref="plotContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
 </template>

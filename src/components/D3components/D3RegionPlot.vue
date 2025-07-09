@@ -16,7 +16,10 @@
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
 import D3BasePlot from '@/components/D3components/D3BasePlot.vue'
-import { createContainer, createSVG, createTooltip, createXscale, createYscale, renderXaxis, renderYaxis, renderData } from '@/util/D3RegionPlotUtil'
+import { useD3TooltipStore } from '@/stores/D3TooltipStore'
+import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderData } from '@/util/D3RegionPlotUtil'
+
+const tooltipStore = useD3TooltipStore()
 
 const props = defineProps({
   data: Array,
@@ -36,8 +39,13 @@ const dimensions = {
 dimensions.ctrWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right
 dimensions.ctrHeight = dimensions.height - dimensions.margins.top - dimensions.margins.bottom
 
-
 const baseRef = ref(null)
+
+const tooltipCallbacks = {
+  show: tooltipStore.showTooltip,
+  updatePosition: tooltipStore.updatePosition,
+  hide: tooltipStore.hideTooltip
+}
 
 let svg = null
 let tooltip = null
@@ -49,18 +57,16 @@ function renderPlot(container, data, dimensions) {
   const xAccessor = d => d.x
   const yAccessor = d => d.y
 
-  const xPaddingFactor = 0.005
-  const yPaddingFactor = 0.014
+  const xPaddingFactor = 0.01
+  const yPaddingFactor = 0.03
 
   const xScale = createXscale(xAccessor, xPaddingFactor, data, dimensions)
   const yScale = createYscale(yAccessor, yPaddingFactor, data, dimensions)
 
-  tooltip = createTooltip()
-
   renderXaxis(ctr, xScale, dimensions, props.chromosome)
   renderYaxis(ctr, yScale, dimensions)
 
-  renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltip)
+  renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks)
 
   return svg
 }
@@ -69,11 +75,6 @@ onBeforeUnmount(() => {
   if (svg) {
     svg.remove()
     svg = null
-  }
-
-  if (tooltip) {
-    tooltip.remove()
-    tooltip = null
   }
 })
 </script>
