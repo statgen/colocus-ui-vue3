@@ -1,7 +1,7 @@
 <template>
   <div class="plot-wrapper">
     <h2>{{ props.title }}</h2>
-    <D3BasePlot
+    <LzBasePlot
       class="plot-container"
       ref="baseRef"
       :data="props.data"
@@ -15,11 +15,11 @@
 
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
-import D3BasePlot from '@/components/D3components/D3BasePlot.vue'
-import { useD3TooltipStore } from '@/stores/D3TooltipStore'
-import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderData, renderGenSigLine } from '@/util/D3RegionPlotUtil'
+import LzBasePlot from '@/components/LZComponents/LZBasePlot.vue'
+import { useLZTooltipStore } from '@/stores/LZTooltipStore'
+import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderData, renderGenSigLine } from '@/util/LZRegionPlotUtil'
 
-const tooltipStore = useD3TooltipStore()
+const tooltipStore = useLZTooltipStore()
 
 const props = defineProps({
   data: Array,

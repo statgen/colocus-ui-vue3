@@ -1,6 +1,6 @@
 import { createVNode, ref, render } from 'vue'
-import D3RegionPlot from '@/components/D3components/D3RegionPlot.vue'
-import { loadLZPlotData, parseVariant } from '@/util/D3RegionPlotUtil'
+import LzRegionPlot from '@/components/LZComponents/LZRegionPlot.vue'
+import { loadLZPlotData, parseVariant } from '@/util/LZRegionPlotUtil'
 
 const plotCounter = ref(1)
 const plotRegistry = new Map()
@@ -53,7 +53,7 @@ export function usePlotManager() {
   function resolvePlotType(type) {
     switch (type) {
       case 'region':
-        return D3RegionPlot
+        return LzRegionPlot
       // case 'compare': return D3ComparePlot
       default:
         console.error(`Unknown plot type: ${type}`)

@@ -25,7 +25,7 @@ const plotContainer = ref(null)
 let svg = null
 
 function renderPlot(containerEl, data, dimensions) {
-  console.warn('D3BasePlot: renderPlot not implemented')
+  console.warn('LzBasePlot: renderPlot not implemented')
 }
 
 function render() {

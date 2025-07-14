@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { markRaw, ref, reactive } from 'vue'
 
-export const useD3TooltipStore = defineStore('D3tooltip', () => {
+export const useLZTooltipStore = defineStore('D3tooltip', () => {
   const isVisible = ref(false)
   const position = reactive({ x: 0, y: 0 })
   const content = ref(null)

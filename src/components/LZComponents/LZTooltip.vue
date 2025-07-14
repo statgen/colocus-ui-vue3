@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div
       v-if="tooltipStore.isVisible && tooltipStore.content"
-      class="d3-tooltip-content"
+      class="lz-tooltip-content"
       :style="{
         position: 'fixed',
         left: `${tooltipStore.position.x + 10}px`,
@@ -26,13 +26,13 @@
 </template>
 
 <script setup>
-import { useD3TooltipStore } from '@/stores/D3TooltipStore'
+import { useLZTooltipStore } from '@/stores/LZTooltipStore'
 
-const tooltipStore = useD3TooltipStore()
+const tooltipStore = useLZTooltipStore()
 </script>
 
 <style scoped>
-.d3-tooltip-content {
+.lz-tooltip-content {
   background-color: rgba(var(--v-theme-clcTooltipBackground), 1.0);
   color: black;
   padding: 2px 4px;
@@ -42,11 +42,11 @@ const tooltipStore = useD3TooltipStore()
   white-space: nowrap;
 }
 
-.d3-tooltip-content table {
+.lz-tooltip-content table {
   border-collapse: collapse;
 }
 
-.d3-tooltip-content td {
+.lz-tooltip-content td {
   padding: 2px 0 0 8px;
 }
 </style>

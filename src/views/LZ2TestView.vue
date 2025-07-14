@@ -13,7 +13,7 @@
       label="Select variant to plot"
       variant="outlined"
     ></v-select>
-    <D3Tooltip />
+    <LZTooltip />
     <div ref="plotContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
 </template>
@@ -21,7 +21,7 @@
 <script setup>
 import { onBeforeUnmount, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import { usePlotManager } from '@/composables/D3RPPlotManager'
+import { usePlotManager } from '@/composables/LZRegionPlotManager'
 
 const { mountPlot, clearAllPlots } = usePlotManager()
 
