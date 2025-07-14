@@ -148,7 +148,6 @@ function renderYaxis(ctr, yScale, dimensions) {
 }
 
 function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) {
-
   const points = ctr.selectAll('.data-point')
     .data(data)
     .enter()
@@ -205,8 +204,9 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCall
     .on('mouseout', () => {
       tooltipCallbacks.hide()
     })
+}
 
-  // Add horizontal dashed line at genome-wide significance threshold
+const renderGenSigLine = (ctr, xScale, yScale) => {
   const genomeWideSignificance = Math.log10(5e-8); // ≈ -7.301
   const yThreshold = yScale(-genomeWideSignificance);
 
@@ -221,5 +221,5 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCall
 }
 
 export { createContainer, createSVG, createXscale, createYscale, loadLZPlotData, parseVariant,
-  renderXaxis, renderYaxis, renderData
+  renderXaxis, renderYaxis, renderData, renderGenSigLine,
 }

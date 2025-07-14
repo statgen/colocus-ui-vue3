@@ -17,7 +17,7 @@
 import { onBeforeUnmount, ref, watch } from 'vue'
 import D3BasePlot from '@/components/D3components/D3BasePlot.vue'
 import { useD3TooltipStore } from '@/stores/D3TooltipStore'
-import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderData } from '@/util/D3RegionPlotUtil'
+import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderData, renderGenSigLine } from '@/util/D3RegionPlotUtil'
 
 const tooltipStore = useD3TooltipStore()
 
@@ -67,6 +67,7 @@ function renderPlot(container, data, dimensions) {
   renderYaxis(ctr, yScale, dimensions)
 
   renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks)
+  renderGenSigLine (ctr, xScale, yScale)
 
   return svg
 }
