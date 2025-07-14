@@ -95,6 +95,11 @@ const loadLZPlotData = async (variant, pv, signal) => {
     size: 4,
   }))
 
+  t6.sort((a, b) => {
+    if(a.r2 !== b.r2) return a.r2 - b.r2
+    return a.y - b.y
+  })
+
   return t6
 }
 
