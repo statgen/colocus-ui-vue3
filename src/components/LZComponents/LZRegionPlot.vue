@@ -1,10 +1,10 @@
 <template>
   <div class="plot-wrapper">
     <h2>{{ props.title }}</h2>
-    <LzBasePlot
+    <LZBasePlot
       class="plot-container"
       ref="baseRef"
-      :data="props.data"
+      :data="props.signalData"
       :dimensions="dimensions"
       :chart-class="props.chartClass"
       :chart-style="props.chartStyle"
@@ -15,14 +15,17 @@
 
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
-import LzBasePlot from '@/components/LZComponents/LZBasePlot.vue'
+// import LZBasePlot from '@/components/LZComponents/LZBasePlot.vue'
+import LZBasePlot from '@/components/LZComponents/LZBasePlot.vue'
 import { useLZTooltipStore } from '@/stores/LZTooltipStore'
-import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderData, renderGenSigLine } from '@/util/LZRegionPlotUtil'
+import { createContainer, createSVG, createXscale, createYscale, renderXaxis, renderYaxis, renderSignalData, renderGenSigLine,
+  renderRecombLine } from '@/util/LZRegionPlotUtil'
 
 const tooltipStore = useLZTooltipStore()
 
 const props = defineProps({
-  data: Array,
+  signalData: Array,
+  recombData: Object,
   chartClass: [String, Object, Array],
   chartStyle: [String, Object],
   title: String,
@@ -33,7 +36,7 @@ const props = defineProps({
 const dimensions = {
   height: 200,
   width: 600,
-  margins: { top: 10, right: 30, bottom: 45, left: 45 }
+  margins: { top: 15, right: 75, bottom: 45, left: 45 }
 }
 
 dimensions.ctrWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right
@@ -48,7 +51,6 @@ const tooltipCallbacks = {
 }
 
 let svg = null
-let tooltip = null
 
 function renderPlot(container, data, dimensions) {
   svg = createSVG(container, dimensions)
@@ -66,8 +68,15 @@ function renderPlot(container, data, dimensions) {
   renderXaxis(ctr, xScale, dimensions, props.chromosome)
   renderYaxis(ctr, yScale, dimensions)
 
-  renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks)
-  renderGenSigLine (ctr, xScale, yScale)
+  renderSignalData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks)
+
+  if(true) {
+    renderGenSigLine (ctr, xScale, yScale)
+  }
+
+  if(true) {
+    renderRecombLine(ctr, props.recombData, xScale, yPaddingFactor, dimensions)
+  }
 
   return svg
 }

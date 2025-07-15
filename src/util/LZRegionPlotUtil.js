@@ -52,10 +52,10 @@ const getShape = (beta, v1, v2) => {
   else return 'circle'
 }
 
-const loadLZPlotData = async (variant, pv, signal) => {
+const loadSignalData = async (variant, pv, signal, build) => {
   const { data, errorMessage, fetchData } = useFetchData()
 
-  let base = `${URLS.LD_DATA}/UKBB_GRCh37_ALL/region/`
+  let base = `${URLS.LD_DATA}/${build}/region/`
   let url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}&variant=${pv.chr}:${pv.loc}_${pv.ref}/${pv.alt}`
   let ldData = []
   if(await fetchData(url, 'lz2 ld data', 'lz2test')) {
@@ -99,8 +99,24 @@ const loadLZPlotData = async (variant, pv, signal) => {
     if(a.r2 !== b.r2) return a.r2 - b.r2
     return a.y - b.y
   })
-
   return t6
+}
+
+const loadRecombData = async (pv, build) => {
+  const { data, errorMessage, fetchData } = useFetchData()
+  const url = new URL("https://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/");
+  url.searchParams.set('filter', `chromosome eq '${pv.chr}' and position le ${pv.end} and position ge ${pv.start}`)
+  url.searchParams.set('build', build)
+  if(await fetchData(url, "recombination data", "region-plot")) {
+    const recombData = toRaw(data.value).data
+    const recombArray = recombData.position.map((_, i) => ({
+      position: recombData.position[i],
+      recomb_rate: recombData.recomb_rate[i],
+    }))
+    return recombArray
+  } else {
+    console.error("Failed to fetch recomb data")
+  }
 }
 
 const parseVariant = (variant) => {
@@ -111,7 +127,7 @@ const parseVariant = (variant) => {
     ref: pieces[2],
     alt: pieces[3],
   }
-  v.start = v.loc - 250e3 - 1000
+  v.start = Math.max(1, v.loc - 250e3 - 1000)
   v.end = v.loc + 250e3 + 1000
   return v
 }
@@ -120,12 +136,12 @@ function renderXaxis(ctr, xScale, dimensions, chromosome) {
   const xAxis = d3.axisBottom(xScale)
     .ticks(5)
     .tickSizeOuter(0)
-    .tickFormat((d) => (d/1e6).toFixed(2))
+    .tickFormat((d) => (d/1e6).toFixed(1))
 
   const xAxisGroup = ctr.append('g')
     .call(xAxis)
     .style('transform', `translateY(${dimensions.ctrHeight}px)`)
-    .classed('axis', true)
+    .classed('lzrp-axis', true)
 
   xAxisGroup.append('text')
     .attr('x', dimensions.ctrWidth / 2)
@@ -141,7 +157,7 @@ function renderYaxis(ctr, yScale, dimensions) {
 
   const yAxisGroup = ctr.append('g')
     .call(yAxis)
-    .classed('axis', true)
+    .classed('lzrp-axis', true)
 
   yAxisGroup.append('text')
     .attr('x', -dimensions.ctrHeight / 2)
@@ -152,7 +168,29 @@ function renderYaxis(ctr, yScale, dimensions) {
     .style('text-anchor', 'middle')
 }
 
-function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) {
+function renderYaxisRecomb(ctr, yScale, dimensions) {
+  const { ctrWidth, ctrHeight, margins } = dimensions
+
+  const yAxis = d3.axisRight(yScale)
+    .ticks(5)
+    .tickSizeOuter(0)
+
+  const yAxisGroup = ctr.append('g')
+    .attr('transform', `translate(${ctrWidth}, 0)`) // move to right edge
+    .call(yAxis)
+    .classed('lzrp-axis', true)
+
+  yAxisGroup.append('text')
+    .attr('transform', `rotate(-90)`)
+    .attr('x', -ctrHeight / 2)
+    .attr('y', 50)
+    .attr('fill', 'black')
+    .attr('text-anchor', 'middle')
+    .text('Recomb (cM/Mb)')
+}
+
+
+function renderSignalData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) {
   const points = ctr.selectAll('.data-point')
     .data(data)
     .enter()
@@ -186,10 +224,15 @@ function renderData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCall
         .attr('transform', `translate(${x}, ${y}) rotate(180)`)
     } else if (d.shape === 'diamond') {
       el
-        .attr('d', symbol().type(symbolDiamond).size(size * 2)())
+        .attr('d', symbol().type(symbolDiamond).size(size * 3.5)())
         .attr('transform', `translate(${x}, ${y}) rotate(0)`)
         .classed('lead-variant', true)
+        .attr('fill', d.color)
+        // .attr('stroke', 'white')         // outline
+        // .attr('stroke-width', 2)
     }
+
+    ctr.selectAll('.lead-variant').raise()
   })
 
   // Tooltip events
@@ -220,11 +263,33 @@ const renderGenSigLine = (ctr, xScale, yScale) => {
     .attr('x2', xScale.range()[1])
     .attr('y1', yThreshold)
     .attr('y2', yThreshold)
-    .attr('stroke', LZ_COLOR_THEMES.linecolor)
+    .attr('stroke', LZ_COLOR_THEMES.sigLineColor)
     .attr('stroke-dasharray', '4 6')
     .attr('stroke-width', 1);
 }
 
-export { createContainer, createSVG, createXscale, createYscale, loadLZPlotData, parseVariant,
-  renderXaxis, renderYaxis, renderData, renderGenSigLine,
+const renderRecombLine = (ctr, data, xScale, yPaddingFactor, dimensions) => {
+  const xAccessor = d => d.position
+  const yAccessor = d => d.recomb_rate
+  const yScale = d3.scaleLinear()
+    .domain([0, 100])
+    .range([dimensions.ctrHeight, 0])
+  renderYaxisRecomb(ctr, yScale, dimensions)
+
+  const lineGenerator = d3.line()
+    .x(d => xScale(xAccessor(d)))
+    .y(d => yScale(yAccessor(d)))
+    .curve(d3.curveLinear); // equivalent to straight lines
+
+  ctr.append('path')
+    .datum(data)
+    .attr('class', 'recomb-line')
+    .attr('d', lineGenerator)
+    .attr('fill', 'none')
+    .attr('stroke', LZ_COLOR_THEMES.recLineColor)
+    .attr('stroke-width', 1);
+}
+
+export { createContainer, createSVG, createXscale, createYscale, loadRecombData, loadSignalData, parseVariant,
+  renderXaxis, renderYaxis, renderSignalData, renderGenSigLine, renderRecombLine
 }

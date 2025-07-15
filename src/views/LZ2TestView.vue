@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { usePlotManager } from '@/composables/LZRegionPlotManager'
 
@@ -41,20 +41,31 @@ const testData = [
   { variant:'11_62200176_C_T', signal: '7UVfykntk2QLPZqSrnmCaL'},
 ]
 
+onMounted(async () => {
+  for(let i=0; i<testData.length; i++){
+    await renderPlot(testData[i])
+  }
+})
+
 onBeforeUnmount(() => {
   clearAllPlots()
 })
 
-const onSelectVariant = (v) => {
-  mountPlot({
+const onSelectVariant = async (vs) => {
+  await renderPlot(vs)
+}
+
+const renderPlot = async(vs) => {
+  await mountPlot({
     plotContainer,
-    variant: v.variant,
-    signal: v.signal,
+    variant: vs.variant,
+    signal: vs.signal,
     type: 'region',
     // chartClass: '',
     // chartStyle: {}
   })
 }
+
 </script>
 
 <style scoped>

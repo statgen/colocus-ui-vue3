@@ -97,3 +97,8 @@ p {
 a:hover {
   font-weight: bold;
 }
+
+/* lz region plot axis */
+.lzrp-axis text {
+  font-size: 1rem;
+}

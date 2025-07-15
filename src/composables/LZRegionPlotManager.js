@@ -1,6 +1,7 @@
 import { createVNode, ref, render } from 'vue'
 import LzRegionPlot from '@/components/LZComponents/LZRegionPlot.vue'
-import { loadLZPlotData, parseVariant } from '@/util/LZRegionPlotUtil'
+import { loadRecombData, loadSignalData, parseVariant } from '@/util/LZRegionPlotUtil'
+import { REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
 
 const plotCounter = ref(1)
 const plotRegistry = new Map()
@@ -14,7 +15,8 @@ export function usePlotManager() {
     const chromosome = pv.chr
     const title = `Plot ${plotCounter.value}: ${variant}`
 
-    const data = await loadLZPlotData(variant, pv, signal)
+    const signalData = await loadSignalData(variant, pv, signal, REF_BUILD)
+    const recombData = await loadRecombData(pv, REF_BUILD_PORTAL)
 
     const component = resolvePlotType(type)
     const mountEl = document.createElement('div')
@@ -22,7 +24,8 @@ export function usePlotManager() {
     plotContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
-      data,
+      signalData,
+      recombData,
       chartClass,
       chartStyle,
       id,
