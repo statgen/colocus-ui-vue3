@@ -14,6 +14,7 @@ export const useAppStore = defineStore('appStore', {
     isSidebarShowing: true,
     slidersEnabled: false,
     tutorialFlag: false,
+    showCellType: false, // Set this at a more "global" level; applies to all tables & only updates at app load time
 
     dataTable: {
       expandedRow: [],
@@ -166,6 +167,8 @@ export const useAppStore = defineStore('appStore', {
         this.filterPanelControls.tissues = d.tissues.sort()
         this.filterPanelControls.cell_types = d.cell_types.sort()
         this.filterPanelControls.isFilterDataLoaded = true
+
+        this.showCellType = (d.cell_types.length > 0)
       } else {
         throw new Error('Error loading filter data:\n' + errorMessage)
       }

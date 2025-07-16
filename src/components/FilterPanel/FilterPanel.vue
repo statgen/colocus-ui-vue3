@@ -6,7 +6,9 @@
       <CtlTextfield :controlSet="controlConfig.region" />
       <CtlAutocomplete :controlSet="controlConfig.phenotype" />
       <CtlAutocomplete :controlSet="controlConfig.tissue" />
-      <CtlAutocomplete :controlSet="controlConfig.cell_type" />
+      <div v-if="appStore.showCellType">
+        <CtlAutocomplete :controlSet="controlConfig.cell_type" />
+      </div>
     </FilterPanelSubpanel>
 
     <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
