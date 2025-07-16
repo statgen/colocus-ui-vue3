@@ -1,7 +1,7 @@
 import * as d3 from 'd3v7'
 import { toRaw } from 'vue'
 import { useFetchData } from '@/composables/fetchData'
-import { LZ_COLOR_THEMES, URLS } from '@/constants'
+import { LZ_DISPLAY_OPTIONS, URLS } from '@/constants'
 import * as aq from 'arquero'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
 
@@ -35,7 +35,7 @@ function createYscale(yAccessor, yPaddingFactor, data, dimensions) {
 }
 
 function getLDColor(r2, theme = 'locuszoom') {
-  const colors = LZ_COLOR_THEMES[theme] || LZ_COLOR_THEMES.locuszoom
+  const colors = LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES[theme] || LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES.locuszoom
   if (r2 == null) return '#eeeeee' // fallback for null
   if (r2 > 0.999999) return colors[5]
   if (r2 > 0.8)       return colors[4]
@@ -180,11 +180,14 @@ function renderYaxisRecomb(ctr, yScale, dimensions) {
     .call(yAxis)
     .classed('lzrp-axis', true)
 
+  yAxisGroup.selectAll('text')
+    .attr('fill', LZ_DISPLAY_OPTIONS.rightAxisColor)
+
   yAxisGroup.append('text')
     .attr('transform', `rotate(-90)`)
     .attr('x', -ctrHeight / 2)
     .attr('y', 50)
-    .attr('fill', 'black')
+    .attr('fill', LZ_DISPLAY_OPTIONS.rightAxisColor)
     .attr('text-anchor', 'middle')
     .text('Recomb (cM/Mb)')
 }
@@ -263,7 +266,7 @@ const renderGenSigLine = (ctr, xScale, yScale) => {
     .attr('x2', xScale.range()[1])
     .attr('y1', yThreshold)
     .attr('y2', yThreshold)
-    .attr('stroke', LZ_COLOR_THEMES.sigLineColor)
+    .attr('stroke', LZ_DISPLAY_OPTIONS.sigLineColor)
     .attr('stroke-dasharray', '4 6')
     .attr('stroke-width', 1);
 }
@@ -286,7 +289,7 @@ const renderRecombLine = (ctr, data, xScale, yPaddingFactor, dimensions) => {
     .attr('class', 'recomb-line')
     .attr('d', lineGenerator)
     .attr('fill', 'none')
-    .attr('stroke', LZ_COLOR_THEMES.recLineColor)
+    .attr('stroke', LZ_DISPLAY_OPTIONS.recombLineColor)
     .attr('stroke-width', 1);
 }
 

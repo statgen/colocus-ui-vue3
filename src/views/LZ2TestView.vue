@@ -13,6 +13,14 @@
       label="Select variant to plot"
       variant="outlined"
     ></v-select>
+    <v-select
+      v-model="selectedTheme"
+      :items="themes"
+      width="300"
+      @update:model-value="onSelectTheme"
+      label="Select theme"
+      variant="outlined"
+    ></v-select>
     <LZTooltip />
     <div ref="plotContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
@@ -22,10 +30,15 @@
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { usePlotManager } from '@/composables/LZRegionPlotManager'
+import { LZ_DISPLAY_OPTIONS } from '@/constants'
+
+const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
+console.log(themes)
 
 const { mountPlot, clearAllPlots } = usePlotManager()
 
 const plotContainer = useTemplateRef('plotContainer')
+const selectedTheme = ref()
 const selectedVariant = ref()
 
 const testData = [
@@ -50,6 +63,10 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   clearAllPlots()
 })
+
+const onSelectTheme = (newValue) => {
+  console.log(newValue)
+}
 
 const onSelectVariant = async (vs) => {
   await renderPlot(vs)

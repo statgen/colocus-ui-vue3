@@ -24,12 +24,15 @@ const COLORS = {
   BAR_TERTIARY: "#ddd",
 }
 
-const LZ_COLOR_THEMES = {
-  locuszoom: ['rgba(70, 54, 153)', 'rgb(38, 188, 225)', 'rgb(110, 254, 104)', 'rgb(248, 195, 42)', 'rgb(219, 61, 17)', 'rgb(150, 50, 184)'],
-  modern: ['rgba(70, 54, 153, 0.2)', 'rgb(38, 188, 225)', 'rgb(110, 254, 104)', 'rgb(248, 195, 42)', 'rgb(219, 61, 17)', 'rgb(150, 50, 184)'],
-  greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
-  sigLineColor: '#a8a9ad', // silvery for significance line
-  recLineColor: '#00ff00', // for recomb line
+const LZ_DISPLAY_OPTIONS = {
+  LZ_COLOR_THEMES: {
+    locuszoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
+    modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
+    greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
+  },
+  sigLineColor: '#a8a9ad',
+  recombLineColor: '#f69979', // '#369979',
+  rightAxisColor: '#f69979',
 }
 
 const REF_BUILD = 'UKBB_GRCh37_ALL'
@@ -82,6 +85,6 @@ const THRESHOLDS = {
   R2: 0.3,
 }
 
-export { CM_DATASET, BIOMARKER_TYPES, COLORS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP, LZ_COLOR_THEMES, PAGE_NAMES,
+export { CM_DATASET, BIOMARKER_TYPES, COLORS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP, LZ_DISPLAY_OPTIONS, PAGE_NAMES,
   REF_BUILD, REF_BUILD_PORTAL, THRESHOLDS, URLS
 }
