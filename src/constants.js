@@ -26,9 +26,9 @@ const COLORS = {
 
 const LZ_DISPLAY_OPTIONS = {
   LZ_COLOR_THEMES: {
-    locuszoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
-    modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
-    greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
+    LocusZoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
+    Modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
+    Greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
   },
   sigLineColor: '#a8a9ad',
   recombLineColor: '#f69979', // '#369979',

@@ -9,13 +9,13 @@ const plotRegistry = new Map()
 export function usePlotManager() {
 
   const mountPlot = async(args) => {
-    const { plotContainer, variant, signal, type, chartClass, chartStyle } = args
+    const { plotContainer, variant, signal, type, chartClass, chartStyle, theme } = args
     const pv = parseVariant(variant)
     const id = `plot_${plotCounter.value}`
     const chromosome = pv.chr
     const title = `Plot ${plotCounter.value}: ${variant}`
 
-    const signalData = await loadSignalData(variant, pv, signal, REF_BUILD)
+    const signalData = await loadSignalData(variant, pv, signal, REF_BUILD, theme)
     const recombData = await loadRecombData(pv, REF_BUILD_PORTAL)
 
     const component = resolvePlotType(type)

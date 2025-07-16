@@ -1,26 +1,34 @@
 <template>
   <DefaultLayout>
     <h1>LocusZoom plotter v2 test page</h1>
-    <v-select
-      v-model="selectedVariant"
-      :items="testData"
-      item-title="variant"
-      item-value="signal"
-      return-object
-      single-line
-      width="300"
-      @update:modelValue="onSelectVariant"
-      label="Select variant to plot"
-      variant="outlined"
-    ></v-select>
-    <v-select
-      v-model="selectedTheme"
-      :items="themes"
-      width="300"
-      @update:model-value="onSelectTheme"
-      label="Select theme"
-      variant="outlined"
-    ></v-select>
+    <div class="d-flex align-center flex-wrap ga-2">
+      <v-select
+        v-model="selectedTheme"
+        :items="themes"
+        style="max-width: 200px"
+        @update:model-value="onSelectTheme"
+        label="Select theme"
+        variant="outlined"
+        hide-details
+        density="compact"
+      ></v-select>
+      <v-select
+        v-model="selectedVariant"
+        :items="testData"
+        item-title="variant"
+        item-value="signal"
+        return-object
+        style="max-width: 225px"
+        @update:modelValue="onSelectVariant"
+        label="Select variant to plot"
+        variant="outlined"
+        hide-details
+        density="compact"
+      ></v-select>
+      <v-btn @click="onPlotSelected">Plot selected</v-btn>
+      <v-btn @click="onAddAllPlots">Plot all</v-btn>
+      <v-btn @click="clearAllPlots">Clear all</v-btn>
+    </div>
     <LZTooltip />
     <div ref="plotContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
@@ -30,10 +38,9 @@
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { usePlotManager } from '@/composables/LZRegionPlotManager'
-import { LZ_DISPLAY_OPTIONS } from '@/constants'
+import { LZ_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 
 const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
-console.log(themes)
 
 const { mountPlot, clearAllPlots } = usePlotManager()
 
@@ -55,9 +62,8 @@ const testData = [
 ]
 
 onMounted(async () => {
-  for(let i=0; i<testData.length; i++){
-    await renderPlot(testData[i])
-  }
+  selectedVariant.value = testData[0]
+  selectedTheme.value = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)[1]
 })
 
 onBeforeUnmount(() => {
@@ -65,22 +71,33 @@ onBeforeUnmount(() => {
 })
 
 const onSelectTheme = (newValue) => {
-  console.log(newValue)
+  selectedTheme.value = newValue
 }
 
 const onSelectVariant = async (vs) => {
-  await renderPlot(vs)
+  selectedVariant.value = vs
 }
 
-const renderPlot = async(vs) => {
+const renderPlot = async(vs, theme) => {
   await mountPlot({
     plotContainer,
     variant: vs.variant,
     signal: vs.signal,
     type: 'region',
+    theme,
     // chartClass: '',
     // chartStyle: {}
   })
+}
+
+const onPlotSelected = async () => {
+  await renderPlot(selectedVariant.value, selectedTheme.value)
+}
+
+const onAddAllPlots = async (vs) => {
+  for(let i=0; i<testData.length; i++){
+    await renderPlot(testData[i], selectedTheme.value)
+  }
 }
 
 </script>

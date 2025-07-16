@@ -52,7 +52,7 @@ const getShape = (beta, v1, v2) => {
   else return 'circle'
 }
 
-const loadSignalData = async (variant, pv, signal, build) => {
+const loadSignalData = async (variant, pv, signal, build, theme) => {
   const { data, errorMessage, fetchData } = useFetchData()
 
   let base = `${URLS.LD_DATA}/${build}/region/`
@@ -90,7 +90,7 @@ const loadSignalData = async (variant, pv, signal, build) => {
     r2: row.r2,
     variant: row.variant,
     refAllele: row.ref_allele,
-    color: getLDColor(row.r2, 'modern'),
+    color: getLDColor(row.r2, theme),
     shape: getShape(row.t1_beta, variant, row.variant),
     size: 4,
   }))
