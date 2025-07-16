@@ -277,6 +277,7 @@ const renderRecombLine = (ctr, data, xScale, yPaddingFactor, dimensions) => {
   const yScale = d3.scaleLinear()
     .domain([0, 100])
     .range([dimensions.ctrHeight, 0])
+
   renderYaxisRecomb(ctr, yScale, dimensions)
 
   const lineGenerator = d3.line()

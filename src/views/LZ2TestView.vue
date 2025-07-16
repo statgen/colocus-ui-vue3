@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <h1>LocusZoom plotter v2 test page</h1>
-    <div class="d-flex align-center flex-wrap ga-2">
+    <div class="d-flex align-center flex-wrap ga-2 mt-2">
       <v-select
         v-model="selectedTheme"
         :items="themes"
@@ -85,8 +85,6 @@ const renderPlot = async(vs, theme) => {
     signal: vs.signal,
     type: 'region',
     theme,
-    // chartClass: '',
-    // chartStyle: {}
   })
 }
 
