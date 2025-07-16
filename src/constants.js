@@ -31,9 +31,17 @@ const LZ_DISPLAY_OPTIONS = {
     Greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
   },
   sigLineColor: '#a8a9ad',
-  recombLineColor: '#f69979', // '#369979',
-  rightAxisColor: '#f69979',
+  recombLineColor: '#6ccbac', // '#369979',
+  rightAxisColor: '#6ccbac',
+  dimensions: {
+    height: 200,
+    width: 600,
+    margins: { top: 15, right: 75, bottom: 45, left: 45 },
+  }
 }
+
+LZ_DISPLAY_OPTIONS.dimensions.ctrWidth = LZ_DISPLAY_OPTIONS.dimensions.width - LZ_DISPLAY_OPTIONS.dimensions.margins.left - LZ_DISPLAY_OPTIONS.dimensions.margins.right
+LZ_DISPLAY_OPTIONS.dimensions.ctrHeight = LZ_DISPLAY_OPTIONS.dimensions.height - LZ_DISPLAY_OPTIONS.dimensions.margins.top - LZ_DISPLAY_OPTIONS.dimensions.margins.bottom
 
 const REF_BUILD = 'UKBB_GRCh37_ALL'
 const REF_BUILD_PORTAL = 'GRCh37'

@@ -18,7 +18,7 @@ import {
   renderXaxis, renderYaxis, renderSignalData, renderGenSigLine, renderRecombLine,
   loadRecombData, loadSignalData, parseVariant
 } from '@/util/LZRegionPlotUtil'
-import { REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
+import { LZ_DISPLAY_OPTIONS, REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
 
 // *** Composables *************************************************************
 const tooltipStore = useLZTooltipStore()
@@ -48,13 +48,7 @@ const svg = ref(null)
 const signalData = ref(null)
 const recombData = ref(null)
 
-const dimensions = {
-  height: 200,
-  width: 600,
-  margins: { top: 15, right: 75, bottom: 45, left: 45 },
-}
-dimensions.ctrWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right
-dimensions.ctrHeight = dimensions.height - dimensions.margins.top - dimensions.margins.bottom
+const dimensions = LZ_DISPLAY_OPTIONS.dimensions
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
