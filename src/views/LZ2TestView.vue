@@ -28,6 +28,7 @@
       <v-btn @click="onPlotSelected">Plot selected</v-btn>
       <v-btn @click="onAddAllPlots">Plot all</v-btn>
       <v-btn @click="clearAllPlots">Clear all</v-btn>
+      <v-btn @click="onBlinkButtonClick">Blink</v-btn>
     </div>
     <LZTooltip />
     <div ref="plotsContainer" class="plot-container mt-4"></div>
@@ -47,6 +48,8 @@ const { mountPlot, clearAllPlots } = usePlotManager()
 const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
 const selectedVariant = ref()
+
+const BLINK_TIME = 5
 
 const testData = [
   { variant:'3_33457493_C_A', signal: 'WLMxNbszTbHrtf2X3FqRu9'},
@@ -96,6 +99,15 @@ const onAddAllPlots = async (vs) => {
   for(let i=0; i<testData.length; i++){
     await renderPlot(testData[i], selectedTheme.value)
   }
+}
+
+const onBlinkButtonClick = () => {
+  document.querySelectorAll('.lead-variant')
+    .forEach(el => {el?.classList.add('blink')})
+  setTimeout(() => {
+    document.querySelectorAll('.lead-variant')
+      .forEach(el => {el?.classList.remove('blink')})
+  }, BLINK_TIME * 1000)
 }
 
 </script>
