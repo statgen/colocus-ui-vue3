@@ -37,7 +37,7 @@ const LZ_DISPLAY_OPTIONS = {
   DIMENSIONS: {
     height: 200,
     width: 600,
-    margins: { top: 15, right: 65, bottom: 45, left: 45 },
+    margins: { top: 15, right: 55, bottom: 45, left: 60 },
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
 }

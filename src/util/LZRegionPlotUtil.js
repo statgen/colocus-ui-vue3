@@ -172,11 +172,12 @@ const renderYaxisSignal = (ctr, yScale, dimensions) => {
 
   yAxisGroup.append('text')
     .attr('x', -dimensions.ctrHeight / 2)
-    .attr('y', -dimensions.margins.left + 15)
+    .attr('y', -dimensions.margins.left + 17)
     .attr('fill', 'black')
     .html('-log10 p-value')
     .style('transform', 'rotate(270deg)')
     .style('text-anchor', 'middle')
+    .classed('lzrp-axis', true)
 }
 
 const renderYaxisRecomb = (ctr, yScale, dimensions) => {
