@@ -34,16 +34,25 @@ const LZ_DISPLAY_OPTIONS = {
   RECOMB_LINE_COLOR: '#6ccbac', // '#369979',
   RECOMB_AXIS_COLOR: '#6ccbac',
   PLOT_BACKGROUND_COLOR: '#ffffff', // '#fbfbfb'
+  PLOT_BORDER_COLOR: '#777777',
+  PLOT_HEADER_COLOR: '#fbfbfb', // 'hsl(208, 60%, 97%)', //'#F0F8FF', //'aliceblue',
   DIMENSIONS: {
-    height: 200,
+    height: 230,
+    headerHeight: 30,
+    plotHeight: 200,
     width: 600,
-    margins: { top: 15, right: 55, bottom: 45, left: 60 },
+    margins: { top: 15, right: 65, bottom: 48, left: 60 },
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
 }
 
-LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrWidth = LZ_DISPLAY_OPTIONS.DIMENSIONS.width - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.left - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.right
-LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrHeight = LZ_DISPLAY_OPTIONS.DIMENSIONS.height - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.top - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.bottom
+LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrWidth = LZ_DISPLAY_OPTIONS.DIMENSIONS.width
+  - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.left
+  - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.right
+LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrHeight = LZ_DISPLAY_OPTIONS.DIMENSIONS.height
+  - LZ_DISPLAY_OPTIONS.DIMENSIONS.headerHeight
+  - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.top
+  - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.bottom
 
 const REF_BUILD = 'UKBB_GRCh37_ALL'
 const REF_BUILD_PORTAL = 'GRCh37'

@@ -4,6 +4,7 @@ import { useFetchData } from '@/composables/fetchData'
 import { LZ_DISPLAY_OPTIONS, URLS } from '@/constants'
 import * as aq from 'arquero'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
+import { colorHasher } from '@/util/util'
 
 const createSVG = (container, dimensions) => {
   return d3.select(container)
@@ -13,8 +14,9 @@ const createSVG = (container, dimensions) => {
 }
 
 const createPlotContainer = (svg, dimensions) => {
+  const verticalOffset = dimensions.headerHeight + dimensions.margins.top
   return svg.append('g')
-  .attr('transform', `translate(${dimensions.margins.left}, ${dimensions.margins.top})`)
+    .attr('transform', `translate(${dimensions.margins.left}, ${verticalOffset})`)
 }
 
 const createXscale = (xAccessor, data, dimensions) => {
@@ -151,13 +153,12 @@ const renderXaxis = (ctr, xScale, dimensions, chromosome) => {
 
   xAxisGroup.append('text')
     .attr('x', dimensions.ctrWidth / 2)
-    .attr('y', dimensions.margins.bottom - 4)
+    .attr('y', dimensions.margins.bottom - 8)
     .attr('fill', 'black')
     .text(`Chromosome: ${chromosome} (Mb)`)
 }
 
 const renderYaxisSignal = (ctr, yScale, dimensions) => {
-  // Get default ticks and ensure 0 is included
   let ticks = yScale.ticks(5)
   if (!ticks.includes(0)) ticks = [0, ...ticks]
 
@@ -181,14 +182,12 @@ const renderYaxisSignal = (ctr, yScale, dimensions) => {
 }
 
 const renderYaxisRecomb = (ctr, yScale, dimensions) => {
-  const { ctrWidth, ctrHeight } = dimensions
-
   const yAxis = d3.axisRight(yScale)
     .ticks(5)
     .tickSizeOuter(0)
 
   const yAxisGroup = ctr.append('g')
-    .attr('transform', `translate(${ctrWidth}, 0)`) // move to right edge
+    .attr('transform', `translate(${dimensions.ctrWidth}, 0)`) // move to right edge
     .call(yAxis)
     .classed('lzrp-axis', true)
 
@@ -197,11 +196,12 @@ const renderYaxisRecomb = (ctr, yScale, dimensions) => {
 
   yAxisGroup.append('text')
     .attr('transform', `rotate(-90)`)
-    .attr('x', -ctrHeight / 2)
-    .attr('y', 55)
+    .attr('x', -dimensions.ctrHeight / 2)
+    .attr('y', dimensions.margins.right - 8)
     .attr('fill', LZ_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
     .attr('text-anchor', 'middle')
     .text('Recomb (cM/Mb)')
+    .classed('lzrp-axis', true)
 }
 
 
@@ -299,6 +299,50 @@ const renderRecombLine = (plotGroup, data, xScale, yScale) => {
     .attr('stroke-width', 1)
 }
 
+const drawBorder = (svg, dimensions, color) => {
+  svg.append('rect')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height)
+    .attr('fill', 'none')
+    .attr('stroke', color)
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', '2,2'); // dotted line effect
+}
+
+function renderHeader(svg, dimensions, color, variant, title, onClick) {
+  const headerGroup = svg.append('g')
+    .attr('class', 'lzrp-header')
+    .attr('transform', 'translate(0, 0)')
+
+  // Background
+  headerGroup.append('rect')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.headerHeight)
+    .attr('fill', color)
+
+  // Title
+  headerGroup.append('text')
+    .attr('x', 8)
+    .attr('y', 20)
+    .attr('font-size', '1rem')
+    .attr('font-weight', 'bold')
+    .attr('fill', colorHasher.hex(variant))
+    .text(title)
+
+  headerGroup.append('text')
+    .attr('x', dimensions.width - 24)
+    .attr('y', 20)
+    .attr('font-size', '1.25rem')
+    .attr('font-weight', 'bold')
+    .text('\u2630') // Unicode for ☰
+    .style('cursor', 'pointer')
+    .on('click', onClick)
+}
+
 export { createPlotContainer, createSVG, createXscale, createYscaleSignal, createYscaleRecomb, loadRecombData, loadSignalData, parseVariant,
-  renderXaxis, renderYaxisRecomb, renderYaxisSignal, renderSignalData, renderGenSigLine, renderRecombLine
+  renderXaxis, renderYaxisRecomb, renderYaxisSignal, renderSignalData, renderGenSigLine, renderRecombLine, drawBorder, renderHeader
 }

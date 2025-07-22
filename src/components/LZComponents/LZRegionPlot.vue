@@ -1,13 +1,5 @@
 <template>
-  <div class="outerWrapper">
-    <div class="header">
-      <h3 class="ml-2">{{ title }}</h3>
-      <button class="hamburger" @click="onHamburgerClick" aria-label="Open plot menu">
-        &#9776;
-      </button>
-    </div>
     <div ref="plotContainer" class="plot-container" :style="{ backgroundColor: plotBackgroundColor }"/>
-  </div>
 </template>
 
 <script setup>
@@ -18,9 +10,10 @@ import { useLZTooltipStore } from '@/stores/LZTooltipStore'
 import {
   createPlotContainer, createSVG, createXscale, createYscaleSignal, createYscaleRecomb,
   renderXaxis, renderYaxisRecomb, renderYaxisSignal, renderSignalData, renderGenSigLine, renderRecombLine,
-  loadRecombData, loadSignalData, parseVariant
+  loadRecombData, loadSignalData, parseVariant, drawBorder, renderHeader
 } from '@/util/LZRegionPlotUtil'
 import { LZ_DISPLAY_OPTIONS, REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
+import { formatVariantString } from '@/util/util'
 
 // *** Composables *************************************************************
 const tooltipStore = useLZTooltipStore()
@@ -67,6 +60,11 @@ watch( // render when both signal and recomb data are ready
     d3.select(plotContainer.value).selectAll('*').remove()
 
     svg.value = createSVG(plotContainer.value, DIMENSIONS)
+
+    drawBorder(svg.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+
+    renderHeader(svg.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onHamburgerClick)
+
     const plotSVGCtr = createPlotContainer(svg.value, DIMENSIONS)
 
     const xAccessor = d => d.x
@@ -115,7 +113,7 @@ onMounted(async () => {
 
 // *** Event handlers **********************************************************
 const onHamburgerClick = () => {
-  console.log(`Clicked hamburger on plot ${props.ID}`)
+  console.log(`Hamburger ${props.ID} clicked!`)
 }
 // *** Utility functions *******************************************************
 // *** Configuration data ******************************************************
