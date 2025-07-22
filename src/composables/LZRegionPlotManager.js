@@ -7,13 +7,13 @@ const plotRegistry = new Map()
 export function usePlotManager() {
 
   const mountPlot = async(args) => {
-    const { plotContainer, variant, signal, type, theme } = args
+    const { plotsContainer, variant, signal, type, theme } = args
     const plotID = `plot_${plotCounter.value}`
 
     const component = resolvePlotType(type)
     const mountEl = document.createElement('div')
     mountEl.className = 'plot-wrapper'
-    plotContainer.value.appendChild(mountEl)
+    plotsContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
       ID: plotCounter.value,

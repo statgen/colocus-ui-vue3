@@ -26,22 +26,24 @@ const COLORS = {
 
 const LZ_DISPLAY_OPTIONS = {
   LZ_COLOR_THEMES: {
-    LocusZoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
-    Modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8'],
-    Greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000'],
+    LocusZoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8', '#eeeeee'],
+    Modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8', '#eeeeee'],
+    Greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000', '#eeeeee'],
   },
-  sigLineColor: '#a8a9ad',
-  recombLineColor: '#6ccbac', // '#369979',
-  rightAxisColor: '#6ccbac',
-  dimensions: {
+  SIG_LINE_COLOR: '#a8a9ad',
+  RECOMB_LINE_COLOR: '#6ccbac', // '#369979',
+  RECOMB_AXIS_COLOR: '#6ccbac',
+  PLOT_BACKGROUND_COLOR: '#ffffff', // '#fbfbfb'
+  DIMENSIONS: {
     height: 200,
     width: 600,
-    margins: { top: 15, right: 75, bottom: 45, left: 45 },
-  }
+    margins: { top: 15, right: 65, bottom: 45, left: 45 },
+  },
+  GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
 }
 
-LZ_DISPLAY_OPTIONS.dimensions.ctrWidth = LZ_DISPLAY_OPTIONS.dimensions.width - LZ_DISPLAY_OPTIONS.dimensions.margins.left - LZ_DISPLAY_OPTIONS.dimensions.margins.right
-LZ_DISPLAY_OPTIONS.dimensions.ctrHeight = LZ_DISPLAY_OPTIONS.dimensions.height - LZ_DISPLAY_OPTIONS.dimensions.margins.top - LZ_DISPLAY_OPTIONS.dimensions.margins.bottom
+LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrWidth = LZ_DISPLAY_OPTIONS.DIMENSIONS.width - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.left - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.right
+LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrHeight = LZ_DISPLAY_OPTIONS.DIMENSIONS.height - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.top - LZ_DISPLAY_OPTIONS.DIMENSIONS.margins.bottom
 
 const REF_BUILD = 'UKBB_GRCh37_ALL'
 const REF_BUILD_PORTAL = 'GRCh37'
@@ -86,6 +88,7 @@ const URLS = {
   PORTAL_VAR_PAGE: 'https://hugeamp.org/variant.html',
 
   PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
+  PORTALDEV_RECOMB: 'https://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/',
 }
 
 const THRESHOLDS = {

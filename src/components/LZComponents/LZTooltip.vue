@@ -14,7 +14,7 @@
       <table v-if="typeof tooltipStore.content === 'object'">
         <tbody>
           <tr><td>Variant</td><td>{{ tooltipStore.content.variant }}</td></tr>
-          <tr><td>Position</td><td>{{ tooltipStore.content.position }}</td></tr>
+          <tr><td>Position</td><td>{{ tooltipStore.content.position.toLocaleString('en-US') }}</td></tr>
           <tr><td>Ref Allele</td><td>{{ tooltipStore.content.refAllele }}</td></tr>
           <tr><td>-log<sub>10</sub> p-value</td><td>{{ tooltipStore.content.pValue }}</td></tr>
           <tr><td>r²</td><td>{{ tooltipStore.content.r2 }}</td></tr>

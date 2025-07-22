@@ -5,43 +5,49 @@ import { LZ_DISPLAY_OPTIONS, URLS } from '@/constants'
 import * as aq from 'arquero'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
 
-function createSVG(container, dimensions) {
+const createSVG = (container, dimensions) => {
   return d3.select(container)
     .append('svg')
     .attr('width', dimensions.width)
     .attr('height', dimensions.height)
 }
 
-function createContainer(svg, dimensions) {
+const createPlotContainer = (svg, dimensions) => {
   return svg.append('g')
   .attr('transform', `translate(${dimensions.margins.left}, ${dimensions.margins.top})`)
 }
 
-function createXscale(xAccessor, xPaddingFactor, data, dimensions) {
+const createXscale = (xAccessor, data, dimensions) => {
   const [xMin, xMax] = d3.extent(data, xAccessor)
   const xRange = xMax - xMin
 
   return d3.scaleLinear()
-    .domain([xMin - xRange * xPaddingFactor, xMax + xRange * xPaddingFactor])
+    .domain([xMin, xMax])
     .range([0, dimensions.ctrWidth])
 }
 
-function createYscale(yAccessor, yPaddingFactor, data, dimensions) {
+const createYscaleSignal = (yAccessor, data, dimensions) => {
   const [yMin, yMax] = d3.extent(data, yAccessor)
   const yRange = yMax - yMin
   return d3.scaleLinear()
-    .domain([yMin - yRange * yPaddingFactor, yMax + yRange * yPaddingFactor])
+    .domain([yMin, yMax])
     .range([dimensions.ctrHeight, 0])
 }
 
-function getLDColor(r2, theme = 'locuszoom') {
+const createYscaleRecomb = (dimensions) => {
+  return d3.scaleLinear()
+    .domain([0, 100])
+    .range([dimensions.ctrHeight, 0])
+}
+
+const getLDColor = (r2, theme = 'locuszoom') => {
   const colors = LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES[theme] || LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES.locuszoom
-  if (r2 == null) return '#eeeeee' // fallback for null
+  if (r2 == null) return colors[6]
   if (r2 > 0.999999) return colors[5]
-  if (r2 > 0.8)       return colors[4]
-  if (r2 > 0.6)       return colors[3]
-  if (r2 > 0.4)       return colors[2]
-  if (r2 > 0.2)       return colors[1]
+  if (r2 > 0.8) return colors[4]
+  if (r2 > 0.6) return colors[3]
+  if (r2 > 0.4) return colors[2]
+  if (r2 > 0.2) return colors[1]
   return colors[0]
 }
 
@@ -104,7 +110,7 @@ const loadSignalData = async (variant, pv, signal, build, theme) => {
 
 const loadRecombData = async (pv, build) => {
   const { data, errorMessage, fetchData } = useFetchData()
-  const url = new URL("https://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/");
+  const url = new URL(URLS.PORTALDEV_RECOMB)
   url.searchParams.set('filter', `chromosome eq '${pv.chr}' and position le ${pv.end} and position ge ${pv.start}`)
   url.searchParams.set('build', build)
   if(await fetchData(url, "recombination data", "region-plot")) {
@@ -132,7 +138,7 @@ const parseVariant = (variant) => {
   return v
 }
 
-function renderXaxis(ctr, xScale, dimensions, chromosome) {
+const renderXaxis = (ctr, xScale, dimensions, chromosome) => {
   const xAxis = d3.axisBottom(xScale)
     .ticks(5)
     .tickSizeOuter(0)
@@ -150,9 +156,14 @@ function renderXaxis(ctr, xScale, dimensions, chromosome) {
     .text(`Chromosome: ${chromosome} (Mb)`)
 }
 
-function renderYaxis(ctr, yScale, dimensions) {
+const renderYaxisSignal = (ctr, yScale, dimensions) => {
+  // Get default ticks and ensure 0 is included
+  let ticks = yScale.ticks(5)
+  if (!ticks.includes(0)) ticks = [0, ...ticks]
+
   const yAxis = d3.axisLeft(yScale)
-    .ticks(5)
+    .tickValues(ticks)
+    .tickFormat(d3.format("d")) // "d" = integer format, no decimals
     .tickSizeOuter(0)
 
   const yAxisGroup = ctr.append('g')
@@ -168,8 +179,8 @@ function renderYaxis(ctr, yScale, dimensions) {
     .style('text-anchor', 'middle')
 }
 
-function renderYaxisRecomb(ctr, yScale, dimensions) {
-  const { ctrWidth, ctrHeight, margins } = dimensions
+const renderYaxisRecomb = (ctr, yScale, dimensions) => {
+  const { ctrWidth, ctrHeight } = dimensions
 
   const yAxis = d3.axisRight(yScale)
     .ticks(5)
@@ -181,19 +192,19 @@ function renderYaxisRecomb(ctr, yScale, dimensions) {
     .classed('lzrp-axis', true)
 
   yAxisGroup.selectAll('text')
-    .attr('fill', LZ_DISPLAY_OPTIONS.rightAxisColor)
+    .attr('fill', LZ_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
 
   yAxisGroup.append('text')
     .attr('transform', `rotate(-90)`)
     .attr('x', -ctrHeight / 2)
-    .attr('y', 50)
-    .attr('fill', LZ_DISPLAY_OPTIONS.rightAxisColor)
+    .attr('y', 55)
+    .attr('fill', LZ_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
     .attr('text-anchor', 'middle')
     .text('Recomb (cM/Mb)')
 }
 
 
-function renderSignalData(ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) {
+const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) => {
   const points = ctr.selectAll('.data-point')
     .data(data)
     .enter()
@@ -238,7 +249,6 @@ function renderSignalData(ctr, data, xScale, yScale, xAccessor, yAccessor, toolt
     ctr.selectAll('.lead-variant').raise()
   })
 
-  // Tooltip events
   points
     .on('mouseover', (event, d) => {
       tooltipCallbacks.show({
@@ -258,42 +268,36 @@ function renderSignalData(ctr, data, xScale, yScale, xAccessor, yAccessor, toolt
 }
 
 const renderGenSigLine = (ctr, xScale, yScale) => {
-  const genomeWideSignificance = Math.log10(5e-8); // ≈ -7.301
-  const yThreshold = yScale(-genomeWideSignificance);
+  const yThreshold = yScale(-LZ_DISPLAY_OPTIONS.GEN_SIGNIFICANCE)
 
   ctr.append('line')
     .attr('x1', xScale.range()[0])
     .attr('x2', xScale.range()[1])
     .attr('y1', yThreshold)
     .attr('y2', yThreshold)
-    .attr('stroke', LZ_DISPLAY_OPTIONS.sigLineColor)
+    .attr('stroke', LZ_DISPLAY_OPTIONS.SIG_LINE_COLOR)
     .attr('stroke-dasharray', '4 6')
-    .attr('stroke-width', 1);
+    .attr('stroke-width', 1)
 }
 
-const renderRecombLine = (ctr, data, xScale, yPaddingFactor, dimensions) => {
+const renderRecombLine = (plotGroup, data, xScale, yScale) => {
   const xAccessor = d => d.position
   const yAccessor = d => d.recomb_rate
-  const yScale = d3.scaleLinear()
-    .domain([0, 100])
-    .range([dimensions.ctrHeight, 0])
-
-  renderYaxisRecomb(ctr, yScale, dimensions)
 
   const lineGenerator = d3.line()
     .x(d => xScale(xAccessor(d)))
     .y(d => yScale(yAccessor(d)))
-    .curve(d3.curveLinear); // equivalent to straight lines
+    .curve(d3.curveLinear)
 
-  ctr.append('path')
+  plotGroup.append('path')
     .datum(data)
     .attr('class', 'recomb-line')
     .attr('d', lineGenerator)
     .attr('fill', 'none')
-    .attr('stroke', LZ_DISPLAY_OPTIONS.recombLineColor)
-    .attr('stroke-width', 1);
+    .attr('stroke', LZ_DISPLAY_OPTIONS.RECOMB_LINE_COLOR)
+    .attr('stroke-width', 1)
 }
 
-export { createContainer, createSVG, createXscale, createYscale, loadRecombData, loadSignalData, parseVariant,
-  renderXaxis, renderYaxis, renderSignalData, renderGenSigLine, renderRecombLine
+export { createPlotContainer, createSVG, createXscale, createYscaleSignal, createYscaleRecomb, loadRecombData, loadSignalData, parseVariant,
+  renderXaxis, renderYaxisRecomb, renderYaxisSignal, renderSignalData, renderGenSigLine, renderRecombLine
 }

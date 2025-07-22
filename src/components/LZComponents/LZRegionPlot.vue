@@ -1,21 +1,23 @@
 <template>
-  <div class="header-row">
-    <h2>{{ title }}</h2>
-    <button class="hamburger" @click="onHamburgerClick" aria-label="Open plot menu">
-      &#9776;
-    </button>
+  <div class="outerWrapper">
+    <div class="header">
+      <h3 class="ml-2">{{ title }}</h3>
+      <button class="hamburger" @click="onHamburgerClick" aria-label="Open plot menu">
+        &#9776;
+      </button>
+    </div>
+    <div ref="plotContainer" class="plot-container" :style="{ backgroundColor: plotBackgroundColor }"/>
   </div>
-  <div ref="plotContainer" class="plot-container" />
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import * as d3 from 'd3v7'
 import { useLZTooltipStore } from '@/stores/LZTooltipStore'
 import {
-  createContainer, createSVG, createXscale, createYscale,
-  renderXaxis, renderYaxis, renderSignalData, renderGenSigLine, renderRecombLine,
+  createPlotContainer, createSVG, createXscale, createYscaleSignal, createYscaleRecomb,
+  renderXaxis, renderYaxisRecomb, renderYaxisSignal, renderSignalData, renderGenSigLine, renderRecombLine,
   loadRecombData, loadSignalData, parseVariant
 } from '@/util/LZRegionPlotUtil'
 import { LZ_DISPLAY_OPTIONS, REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
@@ -42,13 +44,15 @@ const pv = parseVariant(props.variant)
 const chromosome = pv.chr
 const title = `Plot ${props.ID}: ${props.variant}`
 
-const plotContainer = ref(null)
+const plotContainer = useTemplateRef('plotContainer')
 const svg = ref(null)
 
 const signalData = ref(null)
 const recombData = ref(null)
 
-const dimensions = LZ_DISPLAY_OPTIONS.dimensions
+const DIMENSIONS = LZ_DISPLAY_OPTIONS.DIMENSIONS
+
+const plotBackgroundColor = LZ_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -57,26 +61,44 @@ const dimensions = LZ_DISPLAY_OPTIONS.dimensions
 // *** Watches *****************************************************************
 watch( // render when both signal and recomb data are ready
   () => [signalData.value, recombData.value],
-  ([signal, recomb]) => {
-    if (!signal || !recomb || !plotContainer.value) return
+  ([signalData, recombData]) => {
+    if (!signalData || !recombData || !plotContainer.value) return
 
     d3.select(plotContainer.value).selectAll('*').remove()
 
-    svg.value = createSVG(plotContainer.value, dimensions)
-    const ctr = createContainer(svg.value, dimensions)
+    svg.value = createSVG(plotContainer.value, DIMENSIONS)
+    const plotSVGCtr = createPlotContainer(svg.value, DIMENSIONS)
 
     const xAccessor = d => d.x
     const yAccessor = d => d.y
 
-    const xScale = createXscale(xAccessor, 0.01, signal, dimensions)
-    const yScale = createYscale(yAccessor, 0.03, signal, dimensions)
+    const xScale = createXscale(xAccessor, signalData, DIMENSIONS)
+    const yScaleSignal = createYscaleSignal(yAccessor, signalData, DIMENSIONS)
+    const yScaleRecomb = createYscaleRecomb(DIMENSIONS)
 
-    renderXaxis(ctr, xScale, dimensions, chromosome)
-    renderYaxis(ctr, yScale, dimensions)
+    renderXaxis(plotSVGCtr, xScale, DIMENSIONS, chromosome)
+    renderYaxisSignal(plotSVGCtr, yScaleSignal, DIMENSIONS)
+    renderYaxisRecomb(plotSVGCtr, yScaleRecomb, DIMENSIONS)
 
-    renderSignalData(ctr, signal, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks)
-    renderGenSigLine(ctr, xScale, yScale)
-    renderRecombLine(ctr, recomb, xScale, 0.03, dimensions)
+    const clipID = `plot-area-clip-${props.ID}`
+    const diamondMargin = 12 // allow extra space for lead variant diamond
+
+    // clipPath prevents shapes from overplotting axes
+    svg.value.append("defs")
+      .append("clipPath")
+      .attr("id", clipID)
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", -diamondMargin)
+      .attr("width", DIMENSIONS.ctrWidth)
+      .attr("height", DIMENSIONS.ctrHeight + diamondMargin)
+
+    const plotGroup = plotSVGCtr.append('g')
+      .attr('clip-path', `url(#${clipID})`)
+
+    renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks)
+    renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
+    renderGenSigLine(plotGroup, xScale, yScaleSignal)
   },
   { immediate: true }
 )
@@ -100,8 +122,10 @@ const onHamburgerClick = () => {
 </script>
 
 <style scoped>
+.outerWrapper {
+  border: 1px dotted #cccccc
+}
 .plot-container {
-  background-color: #fbfbfb;
   margin-right: 1rem;
   margin-top: 0;
 }
@@ -111,11 +135,13 @@ const onHamburgerClick = () => {
   width: 600px;
 }
 
-.header-row {
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.25rem;
+  border-bottom: 1px dotted #cccccc;
+  background-color: #fbfbfb;
 }
 
 .hamburger {
@@ -123,7 +149,7 @@ const onHamburgerClick = () => {
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0 0;
-  margin: 0 0.8rem 0 0;
+  margin: 0 0.4rem 0.2rem 0;
   line-height: 1;
 }
 

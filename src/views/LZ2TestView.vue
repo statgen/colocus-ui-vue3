@@ -30,7 +30,7 @@
       <v-btn @click="clearAllPlots">Clear all</v-btn>
     </div>
     <LZTooltip />
-    <div ref="plotContainer" class="plot-container mt-4"></div>
+    <div ref="plotsContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
 </template>
 
@@ -44,7 +44,7 @@ const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
 
 const { mountPlot, clearAllPlots } = usePlotManager()
 
-const plotContainer = useTemplateRef('plotContainer')
+const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
 const selectedVariant = ref()
 
@@ -80,7 +80,7 @@ const onSelectVariant = async (vs) => {
 
 const renderPlot = async(vs, theme) => {
   await mountPlot({
-    plotContainer,
+    plotsContainer,
     variant: vs.variant,
     signal: vs.signal,
     type: 'region',
