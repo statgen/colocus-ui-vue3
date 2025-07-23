@@ -28,7 +28,7 @@ const LZ_DISPLAY_OPTIONS = {
   LZ_COLOR_THEMES: {
     LocusZoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8', '#eeeeee'],
     Modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8', '#eeeeee'],
-    Greyscale: ['#aaaaaa', '#888888', '#666666', '#444444', '#222222', '#000000', '#eeeeee'],
+    Greyscale: ['rgba(170, 170, 170, 0.2)', '#888888', '#666666', '#444444', '#222222', '#000000', '#eeeeee'],
   },
   SIG_LINE_COLOR: '#a8a9ad',
   RECOMB_LINE_COLOR: '#6ccbac', // '#369979',
