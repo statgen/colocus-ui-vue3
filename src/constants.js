@@ -44,6 +44,7 @@ const LZ_DISPLAY_OPTIONS = {
     margins: { top: 15, right: 65, bottom: 48, left: 60 },
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
+  DIAMOND_MARGIN: 12, // allow extra space for lead variant diamond
 }
 
 LZ_DISPLAY_OPTIONS.DIMENSIONS.ctrWidth = LZ_DISPLAY_OPTIONS.DIMENSIONS.width

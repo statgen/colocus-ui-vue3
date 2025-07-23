@@ -26,9 +26,9 @@
 </template>
 
 <script setup>
-import { useLZTooltipStore } from '@/stores/LZTooltipStore'
+import { useLZ2TooltipStore } from '@/stores/LZ2TooltipStore'
 
-const tooltipStore = useLZTooltipStore()
+const tooltipStore = useLZ2TooltipStore()
 </script>
 
 <style scoped>

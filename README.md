@@ -556,3 +556,28 @@ Third, import the step file and add a ref var for the tutorial:
 import steps from '@/tutorials/tutSearchPageSteps'
 const tutorial = ref()
 ```
+
+## LocusZoom replacement
+```aiignore
+Component hierarchy
+plotsContainer (div on host page)
+  plotContainer (div/ref in LZRegionPlot)
+    rootSVG (Vue variable)
+      svg
+        rect (border)
+          g (headerGroup)
+            rect (fill color)
+            text (title)
+            text (hamburger icon, click handler)
+        thePlot (Vue variable)
+          g
+            xAxis
+            yAxisSignal
+            yAxisRecomb
+            plotGroup (Vue variable)
+              g (clipPath)
+                signalData
+                recombLine
+                genSigLine
+```
+

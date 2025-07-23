@@ -104,6 +104,19 @@ const parseVariant = (variant) => {
   }
 }
 
+const parseVariant2 = (variant) => {
+  const pieces = variant.split('_')
+  let v = {
+    chr: +pieces[0],
+    loc: +pieces[1],
+    ref: pieces[2],
+    alt: pieces[3],
+  }
+  v.start = Math.max(1, v.loc - 250e3 - 1000)
+  v.end = v.loc + 250e3 + 1000
+  return v
+}
+
 const scrollToHeading = (id) => {
   const target = document.getElementById(id)
   if (target) {
@@ -172,4 +185,4 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
-  middleTrim, ppURL, scrollToHeading, sleeper, sortVariantArray, timeLog, titleCase, truncateString, url }
+  middleTrim, parseVariant2, ppURL, scrollToHeading, sleeper, sortVariantArray, timeLog, titleCase, truncateString, url }

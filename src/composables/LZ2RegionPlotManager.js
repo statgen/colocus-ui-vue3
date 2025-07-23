@@ -1,5 +1,5 @@
 import { createVNode, ref, render } from 'vue'
-import LZRegionPlot from '@/components/LZComponents/LZRegionPlot.vue'
+import Lz2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
 
 const plotCounter = ref(1)
 const plotRegistry = new Map()
@@ -11,8 +11,7 @@ export function usePlotManager() {
     const plotID = `plot_${plotCounter.value}`
 
     const component = resolvePlotType(type)
-    const mountEl = document.createElement('div')
-    mountEl.className = 'plot-wrapper'
+    const mountEl = document.createElement('svg')
     plotsContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
@@ -46,7 +45,7 @@ export function usePlotManager() {
   function resolvePlotType(type) {
     switch (type) {
       case 'region':
-        return LZRegionPlot
+        return Lz2RegionPlot
       // case 'compare': return D3ComparePlot
       default:
         console.error(`Unknown plot type: ${type}`)

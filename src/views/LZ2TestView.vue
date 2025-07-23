@@ -30,8 +30,8 @@
       <v-btn @click="clearAllPlots">Clear all</v-btn>
       <v-btn @click="onBlinkButtonClick">Blink</v-btn>
     </div>
-    <LZTooltip />
-    <PlotActionMenu
+    <LZ2Tooltip />
+    <LZ2ActionMenu
       v-if="showMenu"
       :menu-style="{
         position: 'absolute',
@@ -51,7 +51,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import { usePlotManager } from '@/composables/LZRegionPlotManager'
+import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { LZ_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 
 const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
@@ -130,7 +130,6 @@ const onBlinkButtonClick = () => {
 }
 
 const onActionMenuClick = async (arg) => {
-  console.log('arg', arg)
   const rect = arg.event.target.getBoundingClientRect()
   activePlotID.value = arg.plotID
 

@@ -1,0 +1,34 @@
+import * as d3 from 'd3v7'
+
+export function useLZ2Scales() {
+  const createXscale = (xAccessor, data, dimensions) => {
+    const [xMin, xMax] = d3.extent(data, xAccessor)
+    const xRange = xMax - xMin
+
+    return d3.scaleLinear()
+      .domain([xMin, xMax])
+      .range([0, dimensions.ctrWidth])
+  }
+
+  const createYscaleSignal = (yAccessor, data, dimensions) => {
+    const [yMin, yMax] = d3.extent(data, yAccessor)
+    const yRange = yMax - yMin
+    return d3.scaleLinear()
+      .domain([yMin, yMax])
+      .range([dimensions.ctrHeight, 0])
+  }
+
+  const createYscaleRecomb = (dimensions) => {
+    return d3.scaleLinear()
+      .domain([0, 100])
+      .range([dimensions.ctrHeight, 0])
+  }
+
+
+  return {
+    createXscale,
+    createYscaleSignal,
+    createYscaleRecomb,
+  }
+}
+
