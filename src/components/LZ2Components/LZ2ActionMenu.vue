@@ -55,13 +55,13 @@ onBeforeUnmount(() => {
 <style scoped>
 .plot-action-menu {
   position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-color: rgba(var(--v-theme-clcTooltipBackground), 1.0);
+  border: 1px solid rgba(var(--v-theme-clcTooltipBorder), 1.0);
+  border-radius: 6px;
   z-index: 9999;
-  padding: 8px;
+  padding: 2px 4px;
   min-width: 160px;
+  font-size: 0.9rem;
 }
 
 .plot-action-menu ul {
@@ -71,12 +71,12 @@ onBeforeUnmount(() => {
 }
 
 .plot-action-menu li {
-  padding: 8px;
+  padding: 2px 8px;
   cursor: pointer;
   user-select: none;
 }
 
 .plot-action-menu li:hover {
-  background-color: #f0f0f0;
+  background-color: #ffffff;
 }
 </style>

@@ -1,5 +1,5 @@
 import * as d3 from 'd3v7'
-import { LZ_DISPLAY_OPTIONS, URLS } from '@/constants'
+import { LZ_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Axes() {
   const renderXaxis = (ctr, xScale, dimensions, chromosome) => {
