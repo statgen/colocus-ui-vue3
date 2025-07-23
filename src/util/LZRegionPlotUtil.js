@@ -311,7 +311,7 @@ const drawBorder = (svg, dimensions, color) => {
     .attr('stroke-dasharray', '2,2'); // dotted line effect
 }
 
-function renderHeader(svg, dimensions, color, variant, title, onClick) {
+function renderHeader(svg, dimensions, color, variant, title, onActionMenuClick) {
   const headerGroup = svg.append('g')
     .attr('class', 'lzrp-header')
     .attr('transform', 'translate(0, 0)')
@@ -340,7 +340,7 @@ function renderHeader(svg, dimensions, color, variant, title, onClick) {
     .attr('font-weight', 'bold')
     .text('\u2630') // Unicode for ☰
     .style('cursor', 'pointer')
-    .on('click', onClick)
+    .on('click', onActionMenuClick)
 }
 
 export { createPlotContainer, createSVG, createXscale, createYscaleSignal, createYscaleRecomb, loadRecombData, loadSignalData, parseVariant,

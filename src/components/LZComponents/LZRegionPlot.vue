@@ -4,7 +4,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { defineEmits, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import * as d3 from 'd3v7'
 import { useLZTooltipStore } from '@/stores/LZTooltipStore'
 import {
@@ -23,6 +23,9 @@ const tooltipCallbacks = {
   updatePosition: tooltipStore.updatePosition,
   hide: tooltipStore.hideTooltip
 }
+
+const emit = defineEmits(['actionMenu-click'])
+
 
 // *** Props *******************************************************************
 const props = defineProps({
@@ -63,7 +66,7 @@ watch( // render when both signal and recomb data are ready
 
     drawBorder(svg.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
 
-    renderHeader(svg.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onHamburgerClick)
+    renderHeader(svg.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onActionMenuClick)
 
     const plotSVGCtr = createPlotContainer(svg.value, DIMENSIONS)
 
@@ -112,8 +115,9 @@ onMounted(async () => {
 })
 
 // *** Event handlers **********************************************************
-const onHamburgerClick = () => {
-  console.log(`Hamburger ${props.ID} clicked!`)
+const onActionMenuClick = (event) => {
+  console.log(`ActionMenu ${props.ID} clicked!`)
+  emit('actionMenu-click', {plotID: props.ID, event})
 }
 // *** Utility functions *******************************************************
 // *** Configuration data ******************************************************

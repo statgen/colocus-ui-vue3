@@ -7,7 +7,7 @@ const plotRegistry = new Map()
 export function usePlotManager() {
 
   const mountPlot = async(args) => {
-    const { plotsContainer, variant, signal, type, theme } = args
+    const { plotsContainer, variant, signal, type, theme, onActionMenuClick } = args
     const plotID = `plot_${plotCounter.value}`
 
     const component = resolvePlotType(type)
@@ -20,6 +20,7 @@ export function usePlotManager() {
       variant,
       signal,
       theme,
+      onActionMenuClick,
     })
 
     render(vnode, mountEl)

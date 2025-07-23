@@ -13,6 +13,9 @@ import 'tippy.js/dist/tippy.css'    // Required CSS for animations
 import 'tippy.js/animations/scale.css'
 import '@/styles/tippy-theme.css'   // our custom theme
 
+import clickOutside from './directives/clickOutside'
+
+
 const app = createApp(App)
 
 registerPlugins(app)
@@ -49,5 +52,7 @@ app.use(pinia)
 app.use(router)
 
 app.config.globalProperties.$log = console.log // use {{ $log(something) }} inside templates
+
+app.directive('click-outside', clickOutside)
 
 app.mount('#app')

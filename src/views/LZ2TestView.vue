@@ -31,6 +31,19 @@
       <v-btn @click="onBlinkButtonClick">Blink</v-btn>
     </div>
     <LZTooltip />
+    <PlotActionMenu
+      v-if="showMenu"
+      :menu-style="{
+        position: 'absolute',
+        top: `${menuPosition.y}px`,
+        left: `${menuPosition.x}px`
+      }"
+      @delete="onDeletePlot"
+      @toggle-recomb="onToggleRecomb"
+      @toggle-gen-sig="onToggleGenSig"
+      @export="onExportPlot"
+      @close="showMenu = false"
+    />
     <div ref="plotsContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
 </template>
@@ -48,6 +61,11 @@ const { mountPlot, clearAllPlots } = usePlotManager()
 const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
 const selectedVariant = ref()
+
+const activePlotID = ref(0)
+const showMenu = ref(false)
+const menuPosition = ref({ x: 0, y: 0 })
+const menuEl = ref(null)
 
 const BLINK_TIME = 5
 
@@ -88,6 +106,7 @@ const renderPlot = async(vs, theme) => {
     signal: vs.signal,
     type: 'region',
     theme,
+    onActionMenuClick,
   })
 }
 
@@ -109,6 +128,35 @@ const onBlinkButtonClick = () => {
       .forEach(el => {el?.classList.remove('blink')})
   }, BLINK_TIME * 1000)
 }
+
+const onActionMenuClick = async (arg) => {
+  console.log('arg', arg)
+  const rect = arg.event.target.getBoundingClientRect()
+  activePlotID.value = arg.plotID
+
+  // Temporarily place menu directly under the button
+  menuPosition.value = { x: rect.left, y: rect.bottom }
+  showMenu.value = false
+
+  requestAnimationFrame(() => {
+    showMenu.value = true
+  })
+
+  const menuWidth = menuEl.value?.offsetWidth || 160
+  const spacing = 4
+
+  // Now shift it left
+  menuPosition.value = {
+    x: rect.left - menuWidth - spacing,
+    y: rect.bottom + spacing
+  }
+}
+
+const onDeletePlot = () => {console.log('onDeletePlot')}
+const onToggleRecomb = () => {console.log('onToggleRecomb')}
+const onToggleGenSig = () => {console.log('onToggleGenSig')}
+const onExportPlot = () => {console.log('onExportPlot')}
+
 
 </script>
 
