@@ -1,23 +1,10 @@
 <template>
   <div class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
     <ul>
-      <li @click="onDeletePlot">🗑 Delete Plot</li>
-
-      <li @click="onToggleRecombLine">
-        <label>
-          <input type="checkbox" checked readonly />
-          Show Recombination Line
-        </label>
-      </li>
-
-      <li @click="onToggleGenSigLine">
-        <label>
-          <input type="checkbox" checked readonly />
-          Show Gen Sig Line
-        </label>
-      </li>
-
+      <li @click="onToggleRecombLine"><label><input type="checkbox" checked readonly /> Show recombination line</label></li>
+      <li @click="onToggleGenSigLine"><label><input type="checkbox" checked readonly /> Show gen sig line</label></li>
       <li @click="onExportPlot">⬇ Export PNG</li>
+      <li @click="onDeletePlot">🗑 Delete Plot</li>
     </ul>
   </div>
 </template>
@@ -84,6 +71,7 @@ onBeforeUnmount(() => {
   padding: 2px 4px;
   min-width: 160px;
   font-size: 0.9rem;
+  width: 225px;
 }
 
 .plot-action-menu ul {

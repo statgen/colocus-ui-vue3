@@ -118,24 +118,20 @@ const onBlinkButtonClick = () => {
 
 const onActionMenuClick = async (arg) => {
   const rect = arg.event.target.getBoundingClientRect()
+  const scrollX = window.scrollX || window.pageXOffset
+  const scrollY = window.scrollY || window.pageYOffset
+
   activePlotID.value = arg.plotID
 
-  // Temporarily place menu directly under the button
-  menuPosition.value = { x: rect.left, y: rect.bottom }
-  showMenu.value = false
-
-  requestAnimationFrame(() => {
-    showMenu.value = true
-  })
-
-  const menuWidth = menuEl.value?.offsetWidth || 160
   const spacing = 4
+  const menuWidth = 225
 
-  // Now shift it left
   menuPosition.value = {
-    x: rect.left - menuWidth - spacing,
-    y: rect.bottom + spacing
+    x: rect.left + scrollX - menuWidth - spacing,
+    y: rect.bottom + scrollY + spacing,
   }
+
+  showMenu.value = true
 }
 
 const onDeletePlot = () => {
