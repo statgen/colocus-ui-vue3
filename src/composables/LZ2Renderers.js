@@ -19,6 +19,7 @@ export function useLZ2Renders() {
   function renderHeader(svg, dimensions, color, variant, title, onActionMenuClick) {
     const headerGroup = svg.append('g')
       .attr('transform', 'translate(0, 0)')
+      .classed('lzrp-header', true)
 
     // Background
     headerGroup.append('rect')

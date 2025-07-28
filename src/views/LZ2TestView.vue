@@ -56,7 +56,7 @@ import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { LZ_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
-const { mountPlot, unmountPlot, unmountAllPlots } = usePlotManager()
+const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -85,7 +85,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  unMountAllPlots()
+  plotManager.unmountAllPlots()
 })
 
 // *** Event handlers **********************************************************
@@ -140,15 +140,24 @@ const onActionMenuClick = async (arg) => {
 
 const onDeletePlot = () => {
   console.log('onDeletePlot:', activePlotID.value)
-  unmountPlot(`plot_${activePlotID.value}`)
+  plotManager.unmountPlot(`plot_${activePlotID.value}`)
 }
 const onToggleRecombLine = () => {console.log('onToggleRecomb')}
+
 const onToggleGenSig = () => {console.log('onToggleGenSig')}
-const onExportPlot = () => {console.log('onExportPlot')}
+
+const onExportPlot = () => {
+  console.log('onExportPlot')
+  plotManager.exportPlotAsPNG(`plot_${activePlotID.value}`)
+}
+
+const unmountAllPlots = () => {
+  plotManager.unmountAllPlots()
+}
 
 // *** Utility functions *******************************************************
 const renderPlot = async(vs, theme) => {
-  await mountPlot({
+  await plotManager.mountPlot({
     plotsContainer,
     variant: vs.variant,
     signal: vs.signal,

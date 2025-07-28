@@ -6,6 +6,7 @@ export function useLZ2Containers() {
       .append('svg')
       .attr('width', dimensions.width)
       .attr('height', dimensions.height)
+      .classed('lzrp-body', true)
   }
 
   const createPlotContainer = (svg, dimensions) => {
