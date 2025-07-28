@@ -27,7 +27,7 @@
       ></v-select>
       <v-btn @click="onPlotSelected">Plot selected</v-btn>
       <v-btn @click="onAddAllPlots">Plot all</v-btn>
-      <v-btn @click="clearAllPlots">Clear all</v-btn>
+      <v-btn @click="unmountAllPlots">Clear all</v-btn>
       <v-btn @click="onBlinkButtonClick">Blink</v-btn>
     </div>
     <LZ2Tooltip />
@@ -38,25 +38,29 @@
         top: `${menuPosition.y}px`,
         left: `${menuPosition.x}px`
       }"
-      @delete="onDeletePlot"
-      @toggle-recomb="onToggleRecomb"
-      @toggle-gen-sig="onToggleGenSig"
-      @export="onExportPlot"
-      @close="showMenu = false"
+      @deletePlot="onDeletePlot"
+      @toggleGenSigLine="onToggleGenSig"
+      @toggleRecombLine="onToggleRecombLine"
+      @exportPlot="onExportPlot"
+      @closeMenu="showMenu = false"
     />
     <div ref="plotsContainer" class="plot-container mt-4"></div>
   </DefaultLayout>
 </template>
 
 <script setup>
+// *** Imports *****************************************************************
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { LZ_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 
-const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
+// *** Composables *************************************************************
+const { mountPlot, unmountPlot, unmountAllPlots } = usePlotManager()
 
-const { mountPlot, clearAllPlots } = usePlotManager()
+// *** Props *******************************************************************
+// *** Variables ***************************************************************
+const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
 
 const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
@@ -69,45 +73,28 @@ const menuEl = ref(null)
 
 const BLINK_TIME = 5
 
-const testData = [
-  { variant:'3_33457493_C_A', signal: 'WLMxNbszTbHrtf2X3FqRu9'},
-  { variant:'3_33457493_C_A', signal: 'Y7was11zaKDGC2LdxouRsL'},
-  { variant:'2_121310269_A_C', signal: 'SuRGPY5RpQ9Rr9kdg3XdbG'},
-  { variant:'2_121310269_A_C', signal: '5juihxSC8XWtQ1bqgjfZqZ'},
-  { variant:'4_154191226_G_A', signal: 'QwiPuqumS4kaWdgPM3g3Hj'},
-  { variant:'4_154191226_G_A', signal: '4YXv6oX83vVxnsARnY9qwm'},
-  { variant:'3_119818585_G_C', signal: '7vFUBkShuKxdY91APzC9bJ'},
-  { variant:'3_119813282_A_G', signal: 'MhbYBj7DMhsr71MG9J62dS'},
-  { variant:'11_62200269_A_T', signal: '6r2LoamTfQNFKaahEFPT4A'},
-  { variant:'11_62200176_C_T', signal: '7UVfykntk2QLPZqSrnmCaL'},
-]
-
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
+// *** Watches *****************************************************************
+// *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   selectedVariant.value = testData[0]
   selectedTheme.value = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)[1]
 })
 
 onBeforeUnmount(() => {
-  clearAllPlots()
+  unMountAllPlots()
 })
 
+// *** Event handlers **********************************************************
 const onSelectTheme = (newValue) => {
   selectedTheme.value = newValue
 }
 
 const onSelectVariant = async (vs) => {
   selectedVariant.value = vs
-}
-
-const renderPlot = async(vs, theme) => {
-  await mountPlot({
-    plotsContainer,
-    variant: vs.variant,
-    signal: vs.signal,
-    type: 'region',
-    theme,
-    onActionMenuClick,
-  })
 }
 
 const onPlotSelected = async () => {
@@ -151,11 +138,39 @@ const onActionMenuClick = async (arg) => {
   }
 }
 
-const onDeletePlot = () => {console.log('onDeletePlot')}
-const onToggleRecomb = () => {console.log('onToggleRecomb')}
+const onDeletePlot = () => {
+  console.log('onDeletePlot:', activePlotID.value)
+  unmountPlot(`plot_${activePlotID.value}`)
+}
+const onToggleRecombLine = () => {console.log('onToggleRecomb')}
 const onToggleGenSig = () => {console.log('onToggleGenSig')}
 const onExportPlot = () => {console.log('onExportPlot')}
 
+// *** Utility functions *******************************************************
+const renderPlot = async(vs, theme) => {
+  await mountPlot({
+    plotsContainer,
+    variant: vs.variant,
+    signal: vs.signal,
+    type: 'region',
+    theme,
+    onActionMenuClick,
+  })
+}
+
+// *** Configuration data ******************************************************
+const testData = [
+  { variant:'3_33457493_C_A', signal: 'WLMxNbszTbHrtf2X3FqRu9'},
+  { variant:'3_33457493_C_A', signal: 'Y7was11zaKDGC2LdxouRsL'},
+  { variant:'2_121310269_A_C', signal: 'SuRGPY5RpQ9Rr9kdg3XdbG'},
+  { variant:'2_121310269_A_C', signal: '5juihxSC8XWtQ1bqgjfZqZ'},
+  { variant:'4_154191226_G_A', signal: 'QwiPuqumS4kaWdgPM3g3Hj'},
+  { variant:'4_154191226_G_A', signal: '4YXv6oX83vVxnsARnY9qwm'},
+  { variant:'3_119818585_G_C', signal: '7vFUBkShuKxdY91APzC9bJ'},
+  { variant:'3_119813282_A_G', signal: 'MhbYBj7DMhsr71MG9J62dS'},
+  { variant:'11_62200269_A_T', signal: '6r2LoamTfQNFKaahEFPT4A'},
+  { variant:'11_62200176_C_T', signal: '7UVfykntk2QLPZqSrnmCaL'},
+]
 
 </script>
 

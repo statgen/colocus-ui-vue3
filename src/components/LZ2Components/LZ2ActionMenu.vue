@@ -1,23 +1,23 @@
 <template>
-  <div class="plot-action-menu" :style="menuStyle" v-click-outside="() => $emit('close')">
+  <div class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
     <ul>
-      <li @click="$emit('delete')">🗑 Delete Plot</li>
+      <li @click="onDeletePlot">🗑 Delete Plot</li>
 
-      <li @click="$emit('toggle-recomb')">
+      <li @click="onToggleRecombLine">
         <label>
           <input type="checkbox" checked readonly />
-          Show Recomb
+          Show Recombination Line
         </label>
       </li>
 
-      <li @click="$emit('toggle-gen-sig')">
+      <li @click="onToggleGenSigLine">
         <label>
           <input type="checkbox" checked readonly />
-          Show GenSig
+          Show Gen Sig Line
         </label>
       </li>
 
-      <li @click="$emit('export')">⬇ Export PNG</li>
+      <li @click="onExportPlot">⬇ Export PNG</li>
     </ul>
   </div>
 </template>
@@ -26,21 +26,43 @@
 import { onMounted, onBeforeUnmount } from 'vue'
 
 defineProps({
-  menuStyle: Object // or use `top/left` numeric props if preferred
+  menuStyle: Object
 })
 
 const emit = defineEmits([
-  'delete',
-  'toggle-recomb',
-  'toggle-gen-sig',
-  'export',
-  'close'
+  'deletePlot',
+  'toggleRecombLine',
+  'toggleGenSigLine',
+  'exportPlot',
+  'closeMenu'
 ])
 
-function onKeydown(event) {
+const onCloseMenu = () => {
+  emit('closeMenu')
+}
+
+const onDeletePlot = () => {
+  emit('deletePlot')
+  emit('closeMenu')
+}
+
+const onExportPlot = () => {
+  emit('exportPlot')
+  emit('closeMenu')
+}
+
+const onKeydown = (event) => {
   if (event.key === 'Escape') {
-    emit('close')
+    emit('closeMenu')
   }
+}
+
+const onToggleGenSigLine = () => {
+  emit('onToggleGenSigLine')
+}
+
+const onToggleRecombLine = () => {
+  emit('toggleRecombLine')
 }
 
 onMounted(() => {

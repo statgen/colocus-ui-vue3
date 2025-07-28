@@ -27,7 +27,7 @@ export function usePlotManager() {
     plotCounter.value++
   }
 
-  function unmountPlot(plotID) {
+  const unmountPlot = (plotID) => {
     const entry = plotRegistry.get(plotID)
     if (entry) {
       render(null, entry.el)
@@ -36,7 +36,7 @@ export function usePlotManager() {
     }
   }
 
-  function clearAllPlots() {
+  function unmountAllPlots() {
     for (const plotID of plotRegistry.keys()) {
       unmountPlot(plotID)
     }
@@ -55,7 +55,7 @@ export function usePlotManager() {
   return {
     mountPlot,
     unmountPlot,
-    clearAllPlots,
+    unmountAllPlots,
     get mountedPlotplotIDs() {
       return [...plotRegistry.keys()]
     },
