@@ -45,7 +45,7 @@ const onKeydown = (event) => {
 }
 
 const onToggleGenSigLine = () => {
-  emit('onToggleGenSigLine')
+  emit('toggleGenSigLine')
 }
 
 const onToggleRecombLine = () => {

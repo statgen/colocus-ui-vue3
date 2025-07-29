@@ -558,26 +558,35 @@ const tutorial = ref()
 ```
 
 ## LocusZoom replacement
+### Plot styling
+Plot styling is complicated because (among other reasons) duplicate styles have to be defined for the on-screen and exported renderings.
+Both screen and export styling depend on a common file, @/styles/d3-font-defaults.css.
+That file defines a css class, D3FontDefaults. It is imported by @/styles/global.css, so may be used anywhere as needed.
+Screen styling is handled by the usual d3 functions: .attr, .style, .classed, etc. 
+Export styling is handled by the export function in LZ2RegionPlotManager, where the raw css in d3-font-defaults.css 
+is imported and applied directly to the export component.
+
+### Component hierarchy
 ```aiignore
-Component hierarchy
 plotsContainer (div on host page)
-  plotContainer (div/ref in LZRegionPlot)
-    rootSVG (Vue variable)
-      svg
-        rect (border)
-          g (headerGroup)
-            rect (fill color)
-            text (title)
-            text (hamburger icon, click handler)
-        thePlot (Vue variable)
-          g
-            xAxis
-            yAxisSignal
-            yAxisRecomb
-            plotGroup (Vue variable)
-              g (clipPath)
-                signalData
-                recombLine
-                genSigLine
+  mountEl (div in region plot manager, required for plot export))
+    plotContainer (div/ref in LZRegionPlot)
+      rootSVG (Vue variable in LZRegionPlot)
+        svg
+          rect (border)
+            g (headerGroup)
+              rect (fill color)
+              text (title)
+              text (hamburger icon, click handler)
+          thePlot (Vue variable)
+            g
+              xAxis
+              yAxisSignal
+              yAxisRecomb
+              plotGroup (Vue variable)
+                g (clipPath)
+                  signalData
+                  recombLine
+                  genSigLine
 ```
 

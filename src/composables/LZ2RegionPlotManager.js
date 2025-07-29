@@ -1,13 +1,12 @@
 import { createVNode, ref, render } from 'vue'
 import Lz2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
-import { LZ_DISPLAY_OPTIONS } from '@/constants'
+import { D3_FONT_DEFAULTS, LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 const plotCounter = ref(1)
 const plotRegistry = new Map()
 
 export function usePlotManager() {
-
-  function exportPlotAsPNG(plotID) {
+  const exportPlotAsPNG = (plotID) => {
     const plotEntry = plotRegistry.get(plotID)
     if (!plotEntry) {
       console.error(`Plot ${plotID} not found!`)
@@ -20,21 +19,15 @@ export function usePlotManager() {
       return
     }
 
-    const clonedSvg = svg.cloneNode(true)
+    const clonedSVG = svg.cloneNode(true)
 
+    // Inject styles (fonts only)
     const style = document.createElement('style')
-    style.textContent = `
-    .lzrp-header {
-      fill: LZ_DISPLAY_OPTIONS.PLOT_HEADER_COLOR;
-    }
-    .lzrp-body {
-      fill: LZ_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR;
-    }
-  `
-    clonedSvg.insertBefore(style, clonedSvg.firstChild)
+    style.textContent = D3_FONT_DEFAULTS
+    clonedSVG.insertBefore(style, clonedSVG.firstChild)
 
     const serializer = new XMLSerializer()
-    const svgString = serializer.serializeToString(clonedSvg)
+    const svgString = serializer.serializeToString(clonedSVG)
     const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
     const url = URL.createObjectURL(svgBlob)
 
@@ -45,7 +38,7 @@ export function usePlotManager() {
       canvas.height = svg.clientHeight || svg.getBoundingClientRect().height
 
       const ctx = canvas.getContext('2d')
-      ctx.fillStyle = LZ_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
+      ctx.fillStyle = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       ctx.drawImage(image, 0, 0)
 

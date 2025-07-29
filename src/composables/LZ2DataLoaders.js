@@ -1,12 +1,12 @@
 import { toRaw } from 'vue'
 import * as aq from 'arquero'
 import { useFetchData } from '@/composables/fetchData'
-import { LZ_DISPLAY_OPTIONS, URLS } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, URLS } from '@/constants'
 
 
 export function useLZ2DataLoaders() {
   const getLDColor = (r2, theme = 'locuszoom') => {
-    const colors = LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES[theme] || LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES.locuszoom
+    const colors = LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES[theme] || LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES.locuszoom
     if (r2 == null) return colors[6]
     if (r2 > 0.999999) return colors[5]
     if (r2 > 0.8) return colors[4]

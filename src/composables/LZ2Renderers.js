@@ -1,7 +1,7 @@
 import * as d3 from 'd3v7'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
 import { colorHasher } from '@/util/util'
-import { LZ_DISPLAY_OPTIONS } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Renders() {
   const renderBorder = (svg, dimensions, color) => {
@@ -19,6 +19,7 @@ export function useLZ2Renders() {
   function renderHeader(svg, dimensions, color, variant, title, onActionMenuClick) {
     const headerGroup = svg.append('g')
       .attr('transform', 'translate(0, 0)')
+      .attr('fill', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR)
       .classed('lzrp-header', true)
 
     // Background
@@ -33,16 +34,17 @@ export function useLZ2Renders() {
     headerGroup.append('text')
       .attr('x', 8)
       .attr('y', 20)
-      .attr('font-size', '1rem')
-      .attr('font-weight', 'bold')
       .attr('fill', colorHasher.hex(variant))
+      .classed('lzrp-header', true)
       .text(title)
 
+    // hamburger icon
     headerGroup.append('text')
       .attr('x', dimensions.width - 24)
       .attr('y', 20)
       .attr('font-size', '1.25rem')
-      .attr('font-weight', 'bold')
+      .attr('font-weight', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_WEIGHT)
+      .attr('fill', 'black')
       .text('\u2630') // Unicode for ☰
       .style('cursor', 'pointer')
       .on('click', onActionMenuClick)
@@ -112,14 +114,14 @@ export function useLZ2Renders() {
   }
 
   const renderGenSigLine = (ctr, xScale, yScale) => {
-    const yThreshold = yScale(-LZ_DISPLAY_OPTIONS.GEN_SIGNIFICANCE)
+    const yThreshold = yScale(-LZ2_DISPLAY_OPTIONS.GEN_SIGNIFICANCE)
 
     ctr.append('line')
       .attr('x1', xScale.range()[0])
       .attr('x2', xScale.range()[1])
       .attr('y1', yThreshold)
       .attr('y2', yThreshold)
-      .attr('stroke', LZ_DISPLAY_OPTIONS.SIG_LINE_COLOR)
+      .attr('stroke', LZ2_DISPLAY_OPTIONS.SIG_LINE_COLOR)
       .attr('stroke-dasharray', '4 6')
       .attr('stroke-width', 1)
   }
@@ -138,7 +140,7 @@ export function useLZ2Renders() {
       .attr('class', 'recomb-line')
       .attr('d', lineGenerator)
       .attr('fill', 'none')
-      .attr('stroke', LZ_DISPLAY_OPTIONS.RECOMB_LINE_COLOR)
+      .attr('stroke', LZ2_DISPLAY_OPTIONS.RECOMB_LINE_COLOR)
       .attr('stroke-width', 1)
   }
 

@@ -8,7 +8,7 @@ import { defineEmits, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } f
 import * as d3 from 'd3v7'
 import { useLZ2TooltipStore } from '@/stores/LZ2TooltipStore'
 import { formatVariantString, parseVariant2 } from '@/util/util'
-import { LZ_DISPLAY_OPTIONS, REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
 import { useLZ2Containers } from '@/composables/LZ2Containers'
 import { useLZ2Scales } from '@/composables/LZ2Scales'
 import { useLZ2DataLoaders  } from '@/composables/LZ2DataLoaders'
@@ -50,9 +50,9 @@ const rootSVG = ref(null)
 const signalData = ref(null)
 const recombData = ref(null)
 
-const DIMENSIONS = LZ_DISPLAY_OPTIONS.DIMENSIONS
+const DIMENSIONS = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
-const plotBackgroundColor = LZ_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
+const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -85,9 +85,9 @@ const onActionMenuClick = (event) => {
 const renderPlot = (signalData, recombData) => {
   d3.select(plotContainer.value).selectAll('*').remove()
 
-  rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS)
-  LZ2Renders.renderBorder(rootSVG.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
-  LZ2Renders.renderHeader(rootSVG.value, DIMENSIONS, LZ_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onActionMenuClick)
+  rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR)
+  LZ2Renders.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+  LZ2Renders.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onActionMenuClick)
 
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 
@@ -103,7 +103,7 @@ const renderPlot = (signalData, recombData) => {
   LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
   const clipID = `plot-area-clip-${props.ID}`
-  LZ2Renders.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ_DISPLAY_OPTIONS.DIAMOND_MARGIN)
+  LZ2Renders.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
   LZ2Renders.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks)

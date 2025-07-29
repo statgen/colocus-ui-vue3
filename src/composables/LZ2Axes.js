@@ -1,5 +1,5 @@
 import * as d3 from 'd3v7'
-import { LZ_DISPLAY_OPTIONS } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Axes() {
   const renderXaxis = (ctr, xScale, dimensions, chromosome) => {
@@ -54,13 +54,13 @@ export function useLZ2Axes() {
       .classed('lzrp-axis', true)
 
     yAxisGroup.selectAll('text')
-      .attr('fill', LZ_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
+      .attr('fill', LZ2_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
 
     yAxisGroup.append('text')
       .attr('transform', `rotate(-90)`)
       .attr('x', -dimensions.ctrHeight / 2)
       .attr('y', dimensions.margins.right - 8)
-      .attr('fill', LZ_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
+      .attr('fill', LZ2_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
       .attr('text-anchor', 'middle')
       .text('Recomb (cM/Mb)')
       .classed('lzrp-axis', true)

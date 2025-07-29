@@ -53,14 +53,14 @@
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
-import { LZ_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 
 // *** Composables *************************************************************
 const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const themes = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)
+const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES)
 
 const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
@@ -81,7 +81,7 @@ const BLINK_TIME = 5
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   selectedVariant.value = testData[0]
-  selectedTheme.value = Object.keys(LZ_DISPLAY_OPTIONS.LZ_COLOR_THEMES)[1]
+  selectedTheme.value = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES)[1]
 })
 
 onBeforeUnmount(() => {
