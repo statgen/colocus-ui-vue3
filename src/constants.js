@@ -34,10 +34,37 @@ const LZ2_DISPLAY_OPTIONS = {
     margins: { top: 15, right: 65, bottom: 48, left: 60 },
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
-  LZ2_COLOR_THEMES: {
-    LocusZoom: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8', '#eeeeee'],
-    Modern: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#9632b8', '#eeeeee'],
-    Greyscale: ['rgba(170, 170, 170, 0.2)', '#888888', '#666666', '#444444', '#222222', '#000000', '#eeeeee'],
+  LZ2_THEMES: {
+    LocusZoom: {
+      colors: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#eeeeee'],
+      leadBorderColor: 'lightgreen',
+      leadShape: 'diamond',
+      sizes: {
+        circle: 4,
+        triangle: 4 * 4 * 2.5,    // d3.symbol uses area, not radius, for size
+        lead: 4 * 4 * 2.5 * 3.5,  // d3.symbol uses area, not radius, for size
+      },
+    },
+    Modern: {
+      colors: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#eeeeee'],
+      leadBorderColor: '#11AFDB',
+      leadShape: 'triangle',
+      sizes: {
+        circle: 4,
+        triangle: 4 * 4 * 2.5,
+        lead: 4 * 4 * 7,
+      },
+    },
+    Greyscale: {
+      colors: ['rgba(170, 170, 170, 0.2)', '#888888', '#666666', '#444444', '#222222', '#eeeeee'],
+      leadBorderColor: 'black',
+      leadShape: 'triangle',
+      sizes: {
+        circle: 4,
+        triangle: 4 * 4 * 2.5,
+        lead: 4 * 4 * 7,
+      },
+    },
   },
   PLOT_AXIS_FONT_SIZE: '1rem',
   PLOT_AXIS_FONT_WEIGHT: 400,
@@ -50,6 +77,11 @@ const LZ2_DISPLAY_OPTIONS = {
   PLOT_HEADER_FONT_WEIGHT: 700,
   PLOT_FONT_FAMILY: 'Helvetica, Arial, sans-serif',
   PLOT_FONT_SIZE: '1rem',
+  PLOT_POINT_SIZES: {
+    CIRCLE: 4,
+    TRIANGLE: 4 * 4 * 2.5,  // d3.symbol uses area, not radius
+    LEAD: 4 * 4 * 7,      // d3.symbol uses area, not radius
+  },
   RECOMB_LINE_COLOR: '#6ccbac', // '#369979',
   RECOMB_AXIS_COLOR: '#6ccbac',
   SIG_LINE_COLOR: '#a8a9ad',

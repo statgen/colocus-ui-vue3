@@ -73,7 +73,7 @@ onBeforeUnmount(() => {
 })
 
 onMounted(async () => {
-  signalData.value = await LZ2DataLoaders.loadSignalData(props.variant, pv, props.signal, REF_BUILD, props.theme)
+  signalData.value = await LZ2DataLoaders.loadSignalData(props.variant, pv, props.signal, REF_BUILD)
   recombData.value = await LZ2DataLoaders.loadRecombData(pv, REF_BUILD_PORTAL)
 })
 
@@ -85,7 +85,7 @@ const onActionMenuClick = (event) => {
 const renderPlot = (signalData, recombData) => {
   d3.select(plotContainer.value).selectAll('*').remove()
 
-  rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR)
+  rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
   LZ2Renders.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
   LZ2Renders.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onActionMenuClick)
 
@@ -106,7 +106,7 @@ const renderPlot = (signalData, recombData) => {
   LZ2Renders.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
-  LZ2Renders.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks)
+  LZ2Renders.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, props.theme)
   LZ2Renders.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
   LZ2Renders.renderGenSigLine(plotGroup, xScale, yScaleSignal)
 }

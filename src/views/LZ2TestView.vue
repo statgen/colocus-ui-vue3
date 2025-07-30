@@ -60,7 +60,7 @@ const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES)
+const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 
 const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
@@ -81,7 +81,7 @@ const BLINK_TIME = 5
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
   selectedVariant.value = testData[0]
-  selectedTheme.value = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES)[1]
+  selectedTheme.value = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[1]
 })
 
 onBeforeUnmount(() => {

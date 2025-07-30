@@ -5,24 +5,6 @@ import { LZ2_DISPLAY_OPTIONS, URLS } from '@/constants'
 
 
 export function useLZ2DataLoaders() {
-  const getLDColor = (r2, theme = 'locuszoom') => {
-    const colors = LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES[theme] || LZ2_DISPLAY_OPTIONS.LZ2_COLOR_THEMES.locuszoom
-    if (r2 == null) return colors[6]
-    if (r2 > 0.999999) return colors[5]
-    if (r2 > 0.8) return colors[4]
-    if (r2 > 0.6) return colors[3]
-    if (r2 > 0.4) return colors[2]
-    if (r2 > 0.2) return colors[1]
-    return colors[0]
-  }
-
-  const getShape = (beta, v1, v2) => {
-    if (v1 === v2) return 'diamond'
-    else if (beta > 0) return 'up-triangle'
-    else if (beta < 0) return 'down-triangle'
-    else return 'circle'
-  }
-
   const loadSignalData = async (variant, pv, signal, build, theme) => {
     const { data, errorMessage, fetchData } = useFetchData()
 
@@ -61,9 +43,8 @@ export function useLZ2DataLoaders() {
       r2: row.r2,
       variant: row.variant,
       refAllele: row.ref_allele,
-      color: getLDColor(row.r2, theme),
-      shape: getShape(row.t1_beta, variant, row.variant),
-      size: 4,
+      isLead: variant === row.variant,
+      beta: row.t1_beta,
     }))
 
     t6.sort((a, b) => {

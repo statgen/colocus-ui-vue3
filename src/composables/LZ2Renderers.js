@@ -4,6 +4,15 @@ import { colorHasher } from '@/util/util'
 import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Renders() {
+  const getColorFromR2 = (r2, colorSet) => {
+    if (r2 == null) return colorSet[5]
+    if (r2 > 0.8) return colorSet[4]
+    if (r2 > 0.6) return colorSet[3]
+    if (r2 > 0.4) return colorSet[2]
+    if (r2 > 0.2) return colorSet[1]
+    return colorSet[0]
+  }
+
   const renderBorder = (svg, dimensions, color) => {
     svg.append('rect')
       .attr('x', 0)
@@ -50,50 +59,53 @@ export function useLZ2Renders() {
       .on('click', onActionMenuClick)
   }
 
-  const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks) => {
+  const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks, themeName) => {
+    const theme = LZ2_DISPLAY_OPTIONS.LZ2_THEMES[themeName]
+    const colorSet = theme.colors
+    const sizeSet = theme.sizes
     const points = ctr.selectAll('.data-point')
       .data(data)
       .enter()
       .append(d => {
-        return d.shape === 'circle'
+        return d.beta === 0
           ? document.createElementNS('http://www.w3.org/2000/svg', 'circle')
           : document.createElementNS('http://www.w3.org/2000/svg', 'path')
       })
       .attr('class', 'data-point')
-      .attr('fill', d => d.color)
+      .attr('fill', d => getColorFromR2(d.r2, colorSet))
 
     // Position and shape
     points.each(function (d) {
       const el = d3.select(this)
       const x = xScale(xAccessor(d))
       const y = yScale(yAccessor(d))
-      const size = d.size * d.size * 2.5  // d3.symbol uses area, not radius; size is relative to the size of a circle (4 by default)
 
-      if (d.shape === 'circle') {
+      if(d.beta === 0) {
         el
           .attr('cx', x)
           .attr('cy', y)
-          .attr('r', d.size)
-      } else if (d.shape === 'up-triangle') {
+          .attr('r', sizeSet.circle)
+      } else if(d.isLead) {
+        if(theme.leadShape === 'triangle') {
+          el.attr('d', symbol().type(symbolTriangle).size(sizeSet.lead)())
+        } else {
+          el.attr('d', symbol().type(symbolDiamond).size(sizeSet.lead)())
+        }
         el
-          .attr('d', symbol().type(symbolTriangle).size(size)())
-          .attr('transform', `translate(${x}, ${y}) rotate(0)`)
-      } else if (d.shape === 'down-triangle') {
-        el
-          .attr('d', symbol().type(symbolTriangle).size(size)())
-          .attr('transform', `translate(${x}, ${y}) rotate(180)`)
-      } else if (d.shape === 'diamond') {
-        el
-          .attr('d', symbol().type(symbolDiamond).size(size * 3.5)())
-          .attr('transform', `translate(${x}, ${y}) rotate(0)`)
           .classed('lead-variant', true)
-          .attr('fill', d.color)
-        // .attr('stroke', 'white')         // outline
-        // .attr('stroke-width', 2)
+          .attr('fill', getColorFromR2(d.r2, colorSet))
+          .attr('stroke', theme.leadBorderColor) // outline
+          .attr('stroke-width', 1)
+      } else {
+        el.attr('d', symbol().type(symbolTriangle).size(sizeSet.triangle)())
       }
 
-      ctr.selectAll('.lead-variant').raise()
+      d.beta < 0
+        ? el.attr('transform', `translate(${x}, ${y}) rotate(180)`)
+        : el.attr('transform', `translate(${x}, ${y}) rotate(0)`)
     })
+
+    ctr.selectAll('.lead-variant').raise()
 
     points
       .on('mouseover', (event, d) => {
