@@ -13,7 +13,7 @@
     >
       <table v-if="typeof tooltipStore.content === 'object'">
         <tbody>
-          <tr><td>Variant</td><td>{{ tooltipStore.content.variant }}</td></tr>
+          <tr><td>Variant</td><td :style="{color: colorHasher.hex(tooltipStore.content.variant)}">{{ tooltipStore.content.variant }}</td></tr>
           <tr><td>Position</td><td>{{ tooltipStore.content.position.toLocaleString('en-US') }}</td></tr>
           <tr><td>Ref Allele</td><td>{{ tooltipStore.content.refAllele }}</td></tr>
           <tr><td>-log<sub>10</sub> p-value</td><td>{{ tooltipStore.content.pValue }}</td></tr>
@@ -27,6 +27,7 @@
 
 <script setup>
 import { useLZ2TooltipStore } from '@/stores/LZ2TooltipStore'
+import { colorHasher } from '@/util/util'
 
 const tooltipStore = useLZ2TooltipStore()
 </script>
@@ -47,6 +48,6 @@ const tooltipStore = useLZ2TooltipStore()
 }
 
 .lz-tooltip-content td {
-  padding: 2px 0 0 8px;
+  padding: 2px 4px 0 4px;
 }
 </style>
