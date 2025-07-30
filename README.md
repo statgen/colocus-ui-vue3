@@ -560,11 +560,14 @@ const tutorial = ref()
 ## LocusZoom replacement
 ### Plot styling
 Plot styling is complicated because (among other reasons) duplicate styles have to be defined for the on-screen and exported renderings.
-Both screen and export styling depend on a common file, @/styles/d3-font-defaults.css.
-That file defines a css class, D3FontDefaults. It is imported by @/styles/global.css, so may be used anywhere as needed.
-Screen styling is handled by the usual d3 functions: .attr, .style, .classed, etc. 
-Export styling is handled by the export function in LZ2RegionPlotManager, where the raw css in d3-font-defaults.css 
-is imported and applied directly to the export component.
+Both screen and export styling depend on a common style, D3FontDefaults.
+That style is built dynmically in constants.js, based on config values in LZ_DISPLAY_OPTIONS.
+That style is loaded by main.js and assign to a root style element, thus is available globally with further declaration.
+In addition, the style is applied to exported plots in the plot manager.
+Unfortunately, it is not fully acted upon, thus fonts appear bolder in export files than on-screen.
+Extensive attempts to resolve this issue using built-in broweser export functionality proved fruitless.
+Extensive attempts to resolve this issue using third-party export libraries also proved fruitless.
+The problem is not browser-specific; it appears the same in Chrome, Firefox and Safari.
 
 ### Component hierarchy
 ```aiignore
