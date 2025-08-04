@@ -61,8 +61,6 @@ watch(() => qcStore.regenPlotFlag, async (newVal, oldVal) => {
 
   vegaSpec.data.values = qcStore[dk]
 
-  console.log('dk', dk, 'VPC data', vegaSpec.data.values)
-
   await nextTick(async () => {
     await embed(domSelector, vegaSpec, vegaOptions)
   })
