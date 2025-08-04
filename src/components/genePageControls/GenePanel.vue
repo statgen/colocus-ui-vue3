@@ -1,6 +1,6 @@
 <template>
   <v-sheet v-show="appStore.isSidebarShowing" class="ml-n2">
-    <FilterPanelSubpanel title="Settings" resetButton="true">
+    <FilterPanelSubpanel title="Settings" resetButton>
       <CtlGeneSelect :controlSet="controlConfig.geneSelect" />
       <CtlSlider :controlSet="controlConfig.h4" />
       <CtlSlider :controlSet="controlConfig.r2" />

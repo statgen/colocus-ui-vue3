@@ -1,6 +1,6 @@
 <template>
   <v-sheet v-show="appStore.isSidebarShowing" class="ml-n2" >
-    <FilterPanelSubpanel title="Select" resetButton="true" id="subPanelSelect">
+    <FilterPanelSubpanel title="Select" resetButton id="subPanelSelect">
       <CtlAutocomplete :controlSet="controlConfig.study" />
       <CtlAutocomplete :controlSet="controlConfig.gene" />
       <CtlTextfield :controlSet="controlConfig.region" />
@@ -11,7 +11,7 @@
       </div>
     </FilterPanelSubpanel>
 
-    <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
+    <FilterPanelSubpanel title="Set threshold" resetButton id="subPanelThreshold">
       <CtlTextfield :controlSet="controlConfig.trait1" />
       <CtlTextfield :controlSet="controlConfig.trait2" />
       <CtlSlider :controlSet="controlConfig.h4" />
