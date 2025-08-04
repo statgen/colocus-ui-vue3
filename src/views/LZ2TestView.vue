@@ -165,16 +165,16 @@ const renderPlot = async(vs, theme) => {
 
 // *** Configuration data ******************************************************
 const testData = [
-  { variant:'3_33457493_C_A', signal: 'WLMxNbszTbHrtf2X3FqRu9'},
-  { variant:'3_33457493_C_A', signal: 'Y7was11zaKDGC2LdxouRsL'},
-  { variant:'2_121310269_A_C', signal: 'SuRGPY5RpQ9Rr9kdg3XdbG'},
-  { variant:'2_121310269_A_C', signal: '5juihxSC8XWtQ1bqgjfZqZ'},
-  { variant:'4_154191226_G_A', signal: 'QwiPuqumS4kaWdgPM3g3Hj'},
-  { variant:'4_154191226_G_A', signal: '4YXv6oX83vVxnsARnY9qwm'},
-  { variant:'3_119818585_G_C', signal: '7vFUBkShuKxdY91APzC9bJ'},
-  { variant:'3_119813282_A_G', signal: 'MhbYBj7DMhsr71MG9J62dS'},
-  { variant:'11_62200269_A_T', signal: '6r2LoamTfQNFKaahEFPT4A'},
-  { variant:'11_62200176_C_T', signal: '7UVfykntk2QLPZqSrnmCaL'},
+  { variant:'3_33457493_C_A', signal: '53jzmtE5Qyrp5fU4AW4v3Z'},
+  { variant:'3_33457493_C_A', signal: 'M32qDgoc7bYwuhRBeibpnk'},
+  { variant:'2_121310269_A_C', signal: 'Mv3F6hgrCYBfHNix1m2zUG'},
+  { variant:'2_121310269_A_C', signal: 'DM3f9cjpeKFEJR3cNgrreW'},
+  { variant:'4_154191226_G_A', signal: 'ShWQxwoQGvvbRBfDuGsAsB'},
+  { variant:'4_154191226_G_A', signal: 'TGpDqH4HAmdbih8diDeCxF'},
+  { variant:'3_119818585_G_C', signal: 'F3yfqaxqsndhrruw1MUaEw'},
+  { variant:'3_119813282_A_G', signal: 'L241oBosBPbCwXVWWqNzeM'},
+  { variant:'11_62200269_A_T', signal: 'E7HQiqkMn7wPfL7bd4ebWs'},
+  { variant:'11_62200176_C_T', signal: 'Ccw9CZkAVYkAbgcBN3ugGX'},
 ]
 
 </script>
