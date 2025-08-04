@@ -37,6 +37,7 @@ const LZ2_DISPLAY_OPTIONS = {
   LZ2_THEMES: {
     LocusZoom: {
       colors: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#eeeeee'],
+      leadColor: '#9632b8',
       leadBorderColor: 'lightgreen',
       leadShape: 'diamond',
       sizes: {

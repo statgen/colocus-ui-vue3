@@ -218,6 +218,7 @@ const onAddPlotIconClick = (item) => {
 }
 
 const onExpandRow = (item, side) => {
+  // console.log(`Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
   const colocID = item.uuid
   appStore[locuszoomPage].colocID = colocID
   expanderAlignment.value = side

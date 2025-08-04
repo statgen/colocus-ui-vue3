@@ -93,7 +93,7 @@ export function useLZ2Renders() {
         }
         el
           .classed('lead-variant', true)
-          .attr('fill', getColorFromR2(d.r2, colorSet))
+          .attr('fill', themeName === 'LocusZoom' ? theme.leadColor : getColorFromR2(d.r2, colorSet))
           .attr('stroke', theme.leadBorderColor) // outline
           .attr('stroke-width', 1)
       } else {
