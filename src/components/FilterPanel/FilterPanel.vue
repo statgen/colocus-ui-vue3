@@ -6,6 +6,9 @@
       <CtlTextfield :controlSet="controlConfig.region" />
       <CtlAutocomplete :controlSet="controlConfig.phenotype" />
       <CtlAutocomplete :controlSet="controlConfig.tissue" />
+      <div v-if="appStore.showCellType">
+        <CtlAutocomplete :controlSet="controlConfig.cell_type" />
+      </div>
     </FilterPanelSubpanel>
 
     <FilterPanelSubpanel title="Set threshold" resetButton="true" id="subPanelThreshold">
@@ -55,6 +58,7 @@ const controlConfig = {
   region: { title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], emptyValue: null, defaultValue: '', placeholder: 'chr:start-end' },
   phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
   tissue: { title: 'QTL Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
+  cell_type: { title: 'QTL Cell Type', storeKey: 'cell_types', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select cell type(s)'},
   trait1: { title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   h4: { title: 'Colocalization PP(H4) ≥', topKey: 'filter', storeKey: 'h4', items: null, emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },

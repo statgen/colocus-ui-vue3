@@ -12,6 +12,7 @@ export const useDataTableHelpers = () => {
 
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
+  const showCellType = ref(false)
 
   const showAddPlotIcon = () => {
     return [PAGE_NAMES.LOCUSZOOM].includes(appStore.currentPageName)
@@ -24,6 +25,8 @@ export const useDataTableHelpers = () => {
   watch(() => appStore[locuszoomPage].showEffects, newValue => {showEffects.value = newValue})
   watch(() => appStore[manhattanPage].showEffects, newValue => {showEffects.value = newValue})
   watch(() => appStore[searchPage].showEffects, newValue => {showEffects.value = newValue})
+
+  watch(() => appStore.showCellType, newValue => {showCellType.value = newValue}, { immediate: true })
 
   const alwaysShow = () => true
 
@@ -38,6 +41,7 @@ export const useDataTableHelpers = () => {
     { title: 'Type 2', sortable: false, value: 'signal2.analysis.trait.biomarker_type', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 2 ENSG', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
     { title: 'Tissue', sortable: true, value: 'signal2.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Cell Type', sortable: true, value: 'signal2.analysis.cell_type', minWidth: '5rem', visible: () => showCellType.value },
     { title: 'Trait 1 Variant', sortable: true, value: 'signal1.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 2 Variant', sortable: true, value: 'signal2.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
     { title: 'Trait 1 −log10p', sortable: true, value: 'signal1.neg_log_p', align: "end", visible: alwaysShow },
