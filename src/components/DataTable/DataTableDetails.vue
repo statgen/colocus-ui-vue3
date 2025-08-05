@@ -118,7 +118,7 @@ const variant2 = props.item.signal2.lead_variant.vid
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN
 
-const geneLink = ref(`${PAGE_NAMES.GENE}?gene=${s2TraitGene}`)
+const geneLink = ref(`/${PAGE_NAMES.GENE}?gene=${s2TraitGene}`)
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
