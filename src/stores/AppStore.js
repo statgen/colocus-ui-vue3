@@ -1,4 +1,4 @@
-import { markRaw } from 'vue'
+import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
@@ -217,7 +217,7 @@ export const useAppStore = defineStore('appStore', {
       }
     },
 
-    updateFilter(key, value) {
+    async updateFilter(key, value) {
       // following is to ignore a double hit when changing page size in <DataTable>; page num also changes and generates event
       if(this.filterPanelControls.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
 
@@ -236,6 +236,7 @@ export const useAppStore = defineStore('appStore', {
         }
 
         this.filterPanelControls.lastFilterUpdated = key
+        await nextTick()
         this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
       }
     },

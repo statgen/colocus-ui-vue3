@@ -230,8 +230,8 @@ const onFileDownloadClick = () => {
   fileDownload(dataItems.value)
 }
 
-const onItemsPerPageChanged = (ipp) => {
-  appStore.updateFilter('pageSize', ipp)
+const onItemsPerPageChanged = async (ipp) => {
+  await appStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
   currentPage.value = 1
 }
@@ -240,8 +240,8 @@ const onKeyDownEscape = () => {
   clearExpandedRow()
 }
 
-const onPageChanged = (newPageNum) => {
-  appStore.updateFilter('pageNum', newPageNum)
+const onPageChanged = async (newPageNum) => {
+  await appStore.updateFilter('pageNum', newPageNum)
   currentPage.value = newPageNum
 }
 

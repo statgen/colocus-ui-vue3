@@ -114,7 +114,7 @@ const loadManhattanData = () => {
   appStore[manhattanPage].loadManhattanDataFlag = !appStore[manhattanPage].loadManhattanDataFlag
 }
 
-const addSignals = (signals) => {
+const addSignals = async (signals) => {
   for (const signal of signals) {
     const key = signal.signal_uuid
     const existingVariants = Object.values(selectedSignals.value).map(item => item.variant)
@@ -123,20 +123,20 @@ const addSignals = (signals) => {
       selectedSignals.value[key] = signal
     }
   }
-  appStore.updateFilter('signals', Object.keys(selectedSignals.value))
+  await appStore.updateFilter('signals', Object.keys(selectedSignals.value))
 }
 
-const removeSignal = (variant) => {
+const removeSignal = async (variant) => {
   const keyToDelete = Object.keys(selectedSignals.value).find(key => selectedSignals.value[key].variant === variant);
   if (keyToDelete) {
     delete selectedSignals.value[keyToDelete];
-    appStore.updateFilter('signals', Object.keys(selectedSignals.value))
+    await appStore.updateFilter('signals', Object.keys(selectedSignals.value))
   }
 }
 
-const clearSignals = () => {
+const clearSignals = async () => {
   selectedSignals.value = {}
-  appStore.updateFilter('signals', Object.keys(selectedSignals.value))
+  await appStore.updateFilter('signals', Object.keys(selectedSignals.value))
 }
 
 // *** Configuration data ******************************************************
