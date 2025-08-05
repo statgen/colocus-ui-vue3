@@ -156,8 +156,8 @@ const URLS = {
   PORTAL_VAR_CHECK: 'https://bioindex.hugeamp.org/api/bio/query/variant',
   PORTAL_VAR_PAGE: 'https://hugeamp.org/variant.html',
 
-  PORTALDEV_API: 'https://portaldev.sph.umich.edu/api/v1/',
-  PORTALDEV_RECOMB: 'https://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/',
+  PORTALDEV_API: 'https://services.locuszoom.org/api/v1/',
+  PORTALDEV_RECOMB: 'https://services.locuszoom.org/api/v1/annotation/recomb/results/',
 }
 
 const THRESHOLDS = {
