@@ -237,7 +237,7 @@ export const useAppStore = defineStore('appStore', {
 
         this.filterPanelControls.lastFilterUpdated = key
         await nextTick()
-        this.filterPanelControls.filterDataChanged++ // = !this.filterPanelControls.filterDataChanged
+        this.filterPanelControls.filterDataChanged++
         await nextTick()
       }
     },
@@ -245,7 +245,7 @@ export const useAppStore = defineStore('appStore', {
     async updateSort(newSort) {
       const parentKey = this.currentPageName
       this[parentKey].filters.sortKeys = newSort
-      this.filterPanelControls.filterDataChanged++ // = !this.filterPanelControls.filterDataChanged
+      this.filterPanelControls.filterDataChanged++
     },
 
     updateSwitch(key, value) {
