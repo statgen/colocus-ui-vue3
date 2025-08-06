@@ -1,7 +1,7 @@
 <template>
   <v-sheet :id="props.id" class="bg-clcBackground px-2 mt-2" elevation="0" border>
     <div class="d-flex align-center">
-      <ToolTippy>
+      <ToolTippy v-if="resetButton">
         <v-icon icon="mdi-minus-circle-outline" @click="onResetButtonClick" class="reset-icon-class" />
 
         <template #tooltipContent>

@@ -179,6 +179,7 @@ const props = defineProps(['id'])
 const expanderAlignment = ref('left')
 const currentPage = ref()
 const dataItems = shallowRef([])
+let debounceTimer = null
 const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
@@ -196,8 +197,8 @@ const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
-  appStore[locuszoomPage].filterDataChanged = true;
-  await loadData()
+  appStore[locuszoomPage].lzfilterDataChanged = true;
+  await loadDataDebounced()
 })
 
 watch(() => loadTableDataFlag.value, async () => {
@@ -258,6 +259,14 @@ const onSortUpdate = (newSort) => {
 // *** Utility functions *******************************************************
 const clearExpandedRow = () => appStore.dataTable.expandedRow.length = 0
 
+// this works by scheduling a timeout for *after* the current event loop tick
+const loadDataDebounced = async () => {
+  clearTimeout(debounceTimer) // cancel pending call, if any
+  debounceTimer = setTimeout(() => {
+    loadData()
+  }, 0)
+}
+
 const isRowExpanded = item => appStore.dataTable.expandedRow.includes(item.uuid)
 
 const loadColocData = async (cpn, url) => {
@@ -311,10 +320,10 @@ const loadData = async () => {
       const signal2 = appStore[locuszoomPage].colocData.signal2
       url = appStore.buildLZdataTableURL(URLS.COLOC_DATA, signal1, signal2)
 
-      if(!appStore[locuszoomPage].tableDataLoaded || appStore[locuszoomPage].filterDataChanged) {
+      if(!appStore[locuszoomPage].tableDataLoaded || appStore[locuszoomPage].lzfilterDataChanged) {
         await loadTableData(cpn, url)
         appStore[locuszoomPage].tableDataLoaded = true
-        appStore[locuszoomPage].filterDataChanged = false
+        appStore[locuszoomPage].lzfilterDataChanged = false
       }
     } else { // must be search page or manhattan page
       url = appStore.buildSearchURL(URLS.COLOC_DATA)

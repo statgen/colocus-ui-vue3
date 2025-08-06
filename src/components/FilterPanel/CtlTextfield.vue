@@ -40,9 +40,9 @@ const resetInput = inject('resetInput')
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(resetInput, async () => {
+watch(resetInput, () => {
   inputValue.value = controlSet.defaultValue
-  await appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
 // *** Lifecycle hooks *********************************************************

@@ -24,7 +24,7 @@ export const useAppStore = defineStore('appStore', {
       isDirEffectReady: false,
     },
     filterPanelControls: {
-      filterDataChanged: false,
+      filterDataChanged: 0,
       isSidebarButtonShowing: true,
       isFilterDataLoaded: false,
       lastFilterUpdated: '',
@@ -48,7 +48,7 @@ export const useAppStore = defineStore('appStore', {
       colocData: markRaw({}),
       colocDataReady: false,
       colocID: '',
-      filterDataChanged: false,
+      lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotID: 0,
       regionPanelRemoved: false,
@@ -237,14 +237,15 @@ export const useAppStore = defineStore('appStore', {
 
         this.filterPanelControls.lastFilterUpdated = key
         await nextTick()
-        this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
+        this.filterPanelControls.filterDataChanged++ // = !this.filterPanelControls.filterDataChanged
+        await nextTick()
       }
     },
 
     async updateSort(newSort) {
       const parentKey = this.currentPageName
       this[parentKey].filters.sortKeys = newSort
-      this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
+      this.filterPanelControls.filterDataChanged++ // = !this.filterPanelControls.filterDataChanged
     },
 
     updateSwitch(key, value) {

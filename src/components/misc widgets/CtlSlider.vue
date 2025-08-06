@@ -54,8 +54,14 @@ const onSliderChangeEnd = async (val) => {
 }
 
 watch(() => resetInput.value, () => {
+  const cpn = appStore.currentPageName
   inputValue.value = controlSet.defaultValue
-  appStore.clearPageData = !appStore.clearData
+  if(cpn === PAGE_NAMES.GENE) {
+    appStore.clearPageData = !appStore.clearPageData
+  } else { // assume search, lz, lz2, manhattan
+    appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  }
+
 })
 
 </script>
