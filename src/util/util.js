@@ -129,6 +129,9 @@ const scrollToHeading = (id) => {
   }
 }
 
+const scrollTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 // call with await sleeper(n); this is only for analysis/debugging, not production use
@@ -185,4 +188,6 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
-  middleTrim, parseVariant2, ppURL, scrollToHeading, sleeper, sortVariantArray, timeLog, titleCase, truncateString, url }
+  middleTrim, parseVariant2, ppURL, scrollToHeading, scrollTop, sleeper, sortVariantArray, timeLog, titleCase,
+  truncateString, url
+}

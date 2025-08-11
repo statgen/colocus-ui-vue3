@@ -52,97 +52,29 @@
       <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction" size="22px"/>
     </template>
 
-    <template v-slot:item.signal1.analysis.study.uuid="{item}">
-      <StudyLabel :study="item.signal1.analysis.study.uuid" abbrev/>
-    </template>
-
-    <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait"/>
-    </template>
-
-    <template v-slot:item.signal1.analysis.analysis_type="{item}">
-      {{ item.signal1.analysis.analysis_type }}
-    </template>
-
-    <template v-slot:item.signal2.analysis.study.uuid="{item}">
-      <StudyLabel :study="item.signal2.analysis.study.uuid" abbrev/>
-    </template>
-
-    <template v-slot:item.signal2.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal2.analysis.trait" :key="item.signal2.analysis.trait"/>
-    </template>
-
-    <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">
-        {{ item.signal2.analysis.trait.biomarker_type.replace("-expression", "") }}
-    </template>
-
-    <template v-slot:item.signal2.analysis.trait.gene.ens_id="{item}">
-      <EnsgLabel :trait="item.signal2.analysis.trait" />
-    </template>
-
-    <template v-slot:item.signal2.analysis.tissue="{item}">
-      {{ item.signal2.analysis.tissue }}
-    </template>
-
-    <template v-slot:item.signal2.analysis.cell_type="{item}">
-      {{ item.signal2.analysis.cell_type }}
-    </template>
-
-    <template v-slot:item.signal1.lead_variant.vid="{item}">
-      <VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" />
-    </template>
-
-    <template v-slot:item.signal2.lead_variant.vid="{item}">
-      <VariantLabel :variant="item.signal2.lead_variant.vid" :showSplotch="true" />
-    </template>
-
-    <template v-slot:item.signal1.neg_log_p="{item}">
-      {{ (+item.signal1.neg_log_p).toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal2.neg_log_p="{item}">
-      {{ (+item.signal2.neg_log_p).toFixed(2) }}
-    </template>
-
-    <template v-slot:item.coloc_h3="{item}">
-      {{ item.coloc_h3.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.coloc_h4="{item}">
-      {{ item.coloc_h4.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.r2="{item}">
-      {{ item.r2.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.n_coloc_between_traits="{item}">
-      {{ item.n_coloc_between_traits }}
-    </template>
-
-    <template #item.cross_signal.effect="{item}">
-      <ConcordanceLabel :item="item"/>
-    </template>
-
-    <template v-slot:item.signal1.effect_marg="{item}">
-      {{ item.signal1.effect_marg.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal2.effect_marg="{item}">
-      {{ item.signal2.effect_marg.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal1.effect_cond="{item}">
-      {{ item.signal1.effect_cond.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal2.effect_cond="{item}">
-      {{ item.signal2.effect_cond.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.marg_cond_flip="{item}">
-      {{ +item.marg_cond_flip }}
-    </template>
+    <!-- data columns -->
+    <template v-slot:item.signal1.analysis.study.uuid="{item}"><StudyLabel :study="item.signal1.analysis.study.uuid" abbrev/></template>
+    <template v-slot:item.signal1.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait"/></template>
+    <template v-slot:item.signal1.analysis.analysis_type="{item}">{{ item.signal1.analysis.analysis_type }}</template>
+    <template v-slot:item.signal2.analysis.study.uuid="{item}"><StudyLabel :study="item.signal2.analysis.study.uuid" abbrev/></template>
+    <template v-slot:item.signal2.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal2.analysis.trait" :key="item.signal2.analysis.trait"/></template>
+    <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">{{ item.signal2.analysis.trait.biomarker_type.replace("-expression", "") }}</template>
+    <template v-slot:item.signal2.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal2.analysis.trait" /></template>
+    <template v-slot:item.signal2.analysis.tissue="{item}">{{ item.signal2.analysis.tissue }}</template>
+    <template v-slot:item.signal1.lead_variant.vid="{item}"><VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" /></template>
+    <template v-slot:item.signal2.lead_variant.vid="{item}"><VariantLabel :variant="item.signal2.lead_variant.vid" :showSplotch="true" /></template>
+    <template v-slot:item.signal1.neg_log_p="{item}">{{ (+item.signal1.neg_log_p).toFixed(2) }}</template>
+    <template v-slot:item.signal2.neg_log_p="{item}">{{ (+item.signal2.neg_log_p).toFixed(2) }}</template>
+    <template v-slot:item.coloc_h3="{item}">{{ item.coloc_h3.toFixed(2) }}</template>
+    <template v-slot:item.coloc_h4="{item}">{{ item.coloc_h4.toFixed(2) }}</template>
+    <template v-slot:item.r2="{item}">{{ item.r2.toFixed(2) }}</template>
+    <template v-slot:item.n_coloc_between_traits="{item}">{{ item.n_coloc_between_traits }}</template>
+    <template #item.cross_signal.effect="{item}"><ConcordanceLabel :item="item"/></template>
+    <template v-slot:item.signal1.effect_marg="{item}">{{ item.signal1.effect_marg.toFixed(2) }}</template>
+    <template v-slot:item.signal2.effect_marg="{item}">{{ item.signal2.effect_marg.toFixed(2) }}</template>
+    <template v-slot:item.signal1.effect_cond="{item}">{{ item.signal1.effect_cond.toFixed(2) }}</template>
+    <template v-slot:item.signal2.effect_cond="{item}">{{ item.signal2.effect_cond.toFixed(2) }}</template>
+    <template v-slot:item.marg_cond_flip="{item}">{{ +item.marg_cond_flip }}</template>
 
     <template v-slot:footer.prepend>
       <div>
@@ -164,6 +96,7 @@ import { inject, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES, URLS } from '@/constants'
+import { scrollTop } from '@/util/util'
 import { useFetchData } from '@/composables/fetchData'
 import { useDirectionOfEffect } from '@/composables/DirectionOfEffect'
 import router from '@/router'
@@ -184,7 +117,6 @@ let debounceTimer = null
 const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
-const manhattanPage = PAGE_NAMES.MANHATTAN
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const searchPage = PAGE_NAMES.SEARCH
@@ -306,7 +238,6 @@ const loadTableData = async (cpn, url) => {
 }
 
 const loadData = async () => {
-  // console.log('currentPageName', currentPageName.value)
   const cpn = currentPageName.value
   const colocID = appStore.colocID
   if([locuszoomPage, multizoomPage].includes(cpn) && !colocID) {
@@ -355,12 +286,6 @@ const getRowClass = (item) => {
     return { class: 'bg-clcTableHighlight font-weight-bold' }
   } else {
     return {}
-  }
-}
-
-const scrollTop = () => {
-  if(appStore.currentPageName === searchPage) {
-    nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
   }
 }
 
