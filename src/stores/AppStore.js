@@ -10,6 +10,7 @@ export const useAppStore = defineStore('appStore', {
 
     // global flags / variables
     clearPageData: false, // trigger when need to clear data on a page, initially for gene page
+    colocID: '',
     currentPageName: '',
     isSidebarShowing: true,
     slidersEnabled: false,
@@ -47,7 +48,6 @@ export const useAppStore = defineStore('appStore', {
     [PAGE_NAMES.LOCUSZOOM]: {
       colocData: markRaw({}),
       colocDataReady: false,
-      colocID: '',
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotID: 0,
@@ -63,9 +63,21 @@ export const useAppStore = defineStore('appStore', {
       manhattanDataReady: false,
       ...getFilterPanelSettings()
     },
+    [PAGE_NAMES.MULTIZOOM]: {
+      colocData: markRaw({}),
+      colocDataReady: false,
+      lzfilterDataChanged: false,
+      lzLeadDOMIDs: [],
+      plotID: 0,
+      regionPanelRemoved: false,
+      tableDataLoaded: false,
+      uniqueLDrefs: [],
+      ...getFilterPanelSettings()
+    },
     [PAGE_NAMES.SEARCH]: {
       pastedGenes: null,
-      ...getFilterPanelSettings()
+      ...getFilterPanelSettings(),
+      colocID: '',
     },
   }),
 

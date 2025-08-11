@@ -3,7 +3,10 @@
   <table>
     <thead>
       <tr>
-        <td colspan="2"><ActionButton title="Go to LocusZoom page" @click="onLZclick"/></td>
+        <td colspan="2">
+          <ActionButton title="LocusZoom page" @click="onLZclick"/>
+          <ActionButton title="MultiZoom page" @click="onMZclick"/>
+        </td>
         <td>View Local Page</td>
         <td>View Page on AMP CMD Portal</td>
       </tr>
@@ -117,6 +120,7 @@ const variant2 = props.item.signal2.lead_variant.vid
 
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN
+const multizoomPage = PAGE_NAMES.MULTIZOOM
 
 const geneLink = ref(`/${PAGE_NAMES.GENE}?gene=${s2TraitGene}`)
 
@@ -140,6 +144,10 @@ const onMHclick = () => {
   } else {
     router.push({name: manhattanPage})
   }
+}
+
+const onMZclick = async () => {
+  await router.push({name: multizoomPage, params: {}})
 }
 
 // *** Utility functions *******************************************************

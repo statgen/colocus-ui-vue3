@@ -11,7 +11,7 @@
     :loading="isLoadingData"
     :loading-text="loadingText"
     :multi-sort="true"
-    :page="currentPage"
+    :page="currentPageNum"
     :row-props="({item}) => getRowClass(item)"
     v-model:expanded="appStore.dataTable.expandedRow"
 
@@ -160,7 +160,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { inject, nextTick, ref, shallowRef, watch } from 'vue'
+import { inject, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES, URLS } from '@/constants'
@@ -177,7 +177,8 @@ const props = defineProps(['id'])
 
 // *** Variables ***************************************************************
 const expanderAlignment = ref('left')
-const currentPage = ref()
+const currentPageName = ref('')
+const currentPageNum = ref()
 const dataItems = shallowRef([])
 let debounceTimer = null
 const isLoadingData = ref(false)
@@ -185,6 +186,7 @@ const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
 const manhattanPage = PAGE_NAMES.MANHATTAN
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+const multizoomPage = PAGE_NAMES.MULTIZOOM
 const searchPage = PAGE_NAMES.SEARCH
 
 // *** Computed ****************************************************************
@@ -197,7 +199,7 @@ const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
-  appStore[locuszoomPage].lzfilterDataChanged = true;
+  appStore[currentPageName.value].lzfilterDataChanged = true;
   await loadDataDebounced()
 })
 
@@ -213,15 +215,18 @@ watch(() => appStore.tutorialFlag, async () => {
 })
 
 // *** Lifecycle hooks *********************************************************
+onMounted(async () => {
+  currentPageName.value = appStore.currentPageName
+})
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
   emit('onAddPlotIconClick', item)
 }
 
 const onExpandRow = (item, side) => {
-  console.log(`Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
   const colocID = item.uuid
-  appStore[locuszoomPage].colocID = colocID
+  console.log(`ColocID: ${colocID} Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
+  appStore.colocID = colocID
   expanderAlignment.value = side
   if(appStore.dataTable.expandedRow.indexOf(colocID) === -1) appStore.dataTable.expandedRow = [colocID]
   else appStore.dataTable.expandedRow.length = 0
@@ -234,7 +239,7 @@ const onFileDownloadClick = () => {
 const onItemsPerPageChanged = async (ipp) => {
   await appStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
-  currentPage.value = 1
+  currentPageNum.value = 1
 }
 
 const onKeyDownEscape = () => {
@@ -243,12 +248,12 @@ const onKeyDownEscape = () => {
 
 const onPageChanged = async (newPageNum) => {
   await appStore.updateFilter('pageNum', newPageNum)
-  currentPage.value = newPageNum
+  currentPageNum.value = newPageNum
 }
 
 const onRowClick = async (event, item) => {
   const colocID = item.item.uuid
-  appStore[locuszoomPage].colocID = colocID
+  appStore.colocID = colocID
   emit('onDataTableRowClick', item)
 }
 
@@ -273,8 +278,8 @@ const loadColocData = async (cpn, url) => {
   const { data, errorMessage, fetchData } = useFetchData()
 
   if(await fetchData(url, 'coloc plot data', cpn)) {
-    appStore[locuszoomPage].colocData = data.value
-    appStore[locuszoomPage].colocDataReady = true
+    appStore[cpn].colocData = data.value
+    appStore[cpn].colocDataReady = true
   } else {
     throw new Error('Error loading coloc plot data:\n' + errorMessage)
   }
@@ -292,7 +297,7 @@ const loadTableData = async (cpn, url) => {
     appStore.dataTable.isDirEffectReady = true
 
     const parentKey = cpn
-    currentPage.value = appStore[parentKey].filters.pageNum
+    currentPageNum.value = appStore[parentKey].filters.pageNum
     itemsPerPage.value = appStore[parentKey].filters.pageSize
 
   } else {
@@ -301,9 +306,10 @@ const loadTableData = async (cpn, url) => {
 }
 
 const loadData = async () => {
-  const colocID = appStore[locuszoomPage].colocID
-  const cpn = appStore.currentPageName
-  if(cpn === locuszoomPage && !colocID) {
+  // console.log('currentPageName', currentPageName.value)
+  const cpn = currentPageName.value
+  const colocID = appStore.colocID
+  if([locuszoomPage, multizoomPage].includes(cpn) && !colocID) {
     await router.push({ name: searchPage })
     return
   }
@@ -311,19 +317,19 @@ const loadData = async () => {
   isLoadingData.value = true
 
   try {
-    if (cpn === locuszoomPage) {
-      if(!appStore[locuszoomPage].colocDataReady) {
+    if ([locuszoomPage, multizoomPage].includes(cpn)) {
+      if(!appStore[cpn].colocDataReady) {
         const colocURL = `${URLS.COLOC_DATA}/${colocID}`
         await loadColocData(cpn, colocURL)
       }
-      const signal1 = appStore[locuszoomPage].colocData.signal1
-      const signal2 = appStore[locuszoomPage].colocData.signal2
+      const signal1 = appStore[cpn].colocData.signal1
+      const signal2 = appStore[cpn].colocData.signal2
       url = appStore.buildLZdataTableURL(URLS.COLOC_DATA, signal1, signal2)
 
-      if(!appStore[locuszoomPage].tableDataLoaded || appStore[locuszoomPage].lzfilterDataChanged) {
+      if(!appStore[cpn].tableDataLoaded || appStore[cpn].lzfilterDataChanged) {
         await loadTableData(cpn, url)
-        appStore[locuszoomPage].tableDataLoaded = true
-        appStore[locuszoomPage].lzfilterDataChanged = false
+        appStore[cpn].tableDataLoaded = true
+        appStore[cpn].lzfilterDataChanged = false
       }
     } else { // must be search page or manhattan page
       url = appStore.buildSearchURL(URLS.COLOC_DATA)
@@ -338,11 +344,12 @@ const loadData = async () => {
 }
 
 const getRowClass = (item) => {
-  if(appStore.currentPageName !== locuszoomPage) return
-  if(!appStore[locuszoomPage].colocDataReady) return
+  const cpn = currentPageName.value
+  if(![locuszoomPage, multizoomPage].includes(cpn)) return
+  if(!appStore[cpn].colocDataReady) return
 
-  const s1 = appStore[locuszoomPage].colocData.signal1
-  const s2 = appStore[locuszoomPage].colocData.signal2
+  const s1 = appStore[cpn].colocData.signal1
+  const s2 = appStore[cpn].colocData.signal2
 
   if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
     return { class: 'bg-clcTableHighlight font-weight-bold' }

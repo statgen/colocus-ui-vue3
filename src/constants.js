@@ -123,6 +123,7 @@ const PAGE_NAMES = {
   LOCUSZOOM: 'locuszoom',
   LZ2TEST: 'lz2test',
   MANHATTAN: 'manhattan',
+  MULTIZOOM: 'multizoom',
   SEARCH: 'search',
   STATS_QC: 'qcstats',
   STATS_SUMMARY: 'summarystats',

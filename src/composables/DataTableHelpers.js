@@ -7,15 +7,16 @@ export const useDataTableHelpers = () => {
   const appStore = useAppStore()
 
   const locuszoomPage = PAGE_NAMES.LOCUSZOOM
-  const searchPage = PAGE_NAMES.SEARCH
+  const multizoomPage = PAGE_NAMES.MULTIZOOM
   const manhattanPage = PAGE_NAMES.MANHATTAN
+  const searchPage = PAGE_NAMES.SEARCH
 
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
   const showCellType = ref(false)
 
   const showAddPlotIcon = () => {
-    return [PAGE_NAMES.LOCUSZOOM].includes(appStore.currentPageName)
+    return [locuszoomPage, multizoomPage].includes(appStore.currentPageName)
   }
 
   watch(() => appStore[locuszoomPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
