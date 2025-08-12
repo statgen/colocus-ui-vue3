@@ -60,16 +60,14 @@ export function usePlotManager() {
   }
 
   const mountPlot = async(args) => {
-    const { plotsContainer, variant, signal, type, theme, onActionMenuClick } = args
+    const { plotsContainer, signal, type, theme, onActionMenuClick } = args
     const plotID = `plot_${plotCounter.value}`
-
     const component = resolvePlotType(type)
     const mountEl = document.createElement('div')
     plotsContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
       ID: plotCounter.value,
-      variant,
       signal,
       theme,
       onActionMenuClick,

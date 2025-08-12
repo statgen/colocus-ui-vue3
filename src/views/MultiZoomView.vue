@@ -36,7 +36,6 @@
     />
     <div ref="plotsContainer" class="plot-container mt-4"></div>
 
-
     <h2>Data table</h2>
 
     <div class="table-container mb-8">
@@ -53,14 +52,11 @@
 import { onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
-import { colorHasher, formatVariantString } from '@/util/util'
-import { CM_DATASET, LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
-import { useLZPageHelpers } from '@/composables/lzPageHelpers'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const lzPageHelpers = useLZPageHelpers()
 const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
@@ -80,7 +76,6 @@ const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 // still have to provide the preloadGenes variable for the underlying controls
 const preloadGenes = ref([])
 
-
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
@@ -93,13 +88,9 @@ provide('preloadGenes', preloadGenes)
 watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
-    const s1variant = appStore[multizoomPage].colocData.signal1.lead_variant.vid
-    const s1ID = appStore[multizoomPage].colocData.signal1.uuid
-    const s2variant = appStore[multizoomPage].colocData.signal2.lead_variant.vid
-    const s2ID = appStore[multizoomPage].colocData.signal2.uuid
-    // console.log(`s1variant: ${s1variant}, s1ID: ${s1ID} s2variant: ${s2variant} s2ID: ${s2ID}`)
-    renderPlot(s1variant, s1ID, selectedTheme.value)
-    renderPlot(s2variant, s2ID, selectedTheme.value)
+    const theme = selectedTheme.value
+    renderPlot(appStore[multizoomPage].colocData.signal1, theme)
+    renderPlot(appStore[multizoomPage].colocData.signal2, theme)
   }
 })
 
@@ -117,13 +108,9 @@ onMounted(() => {
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
   const { signal1, signal2 } = item
-  const s1variant = signal1.lead_variant.vid
-  const s1ID = signal1.uuid
-  renderPlot(s1variant, s1ID, selectedTheme.value)
-
-  const s2variant = signal2.lead_variant.vid
-  const s2ID = signal2.uuid
-  renderPlot(s2variant, s2ID, selectedTheme.value)
+  const theme = selectedTheme.value
+  renderPlot(signal1, theme)
+  renderPlot(signal2, theme)
 }
 
 const onBlinkButtonClick = () => {
@@ -183,10 +170,9 @@ const loadPageData = async () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
-const renderPlot = async(variant, signal, theme) => {
+const renderPlot = async(signal, theme) => {
   await plotManager.mountPlot({
     plotsContainer,
-    variant,
     signal,
     type: 'region',
     theme,

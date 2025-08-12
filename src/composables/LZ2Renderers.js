@@ -25,7 +25,7 @@ export function useLZ2Renders() {
       .attr('stroke-dasharray', '2,2'); // dotted line effect
   }
 
-  function renderHeader(svg, dimensions, color, variant, title, onActionMenuClick) {
+  function renderHeader(svg, dimensions, color, variant, title, titleColor, onActionMenuClick) {
     const headerGroup = svg.append('g')
       .attr('transform', 'translate(0, 0)')
       .attr('fill', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR)
@@ -43,8 +43,9 @@ export function useLZ2Renders() {
     headerGroup.append('text')
       .attr('x', 8)
       .attr('y', 20)
-      .attr('fill', colorHasher.hex(variant))
+      .attr('fill', titleColor)
       .classed('lzrp-header', true)
+      .style('white-space', 'pre')
       .text(title)
 
     // hamburger icon

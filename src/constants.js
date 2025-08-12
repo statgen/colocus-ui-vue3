@@ -74,10 +74,11 @@ const LZ2_DISPLAY_OPTIONS = {
   PLOT_BODY_FONT_WEIGHT: 400,
   PLOT_BORDER_COLOR: '#777777',
   PLOT_HEADER_COLOR: '#fbfbfb', // 'hsl(208, 60%, 97%)', //'#F0F8FF', //'aliceblue',
-  PLOT_HEADER_FONT_SIZE: '1.1rem',
-  PLOT_HEADER_FONT_WEIGHT: 700,
   PLOT_FONT_FAMILY: 'Helvetica, Arial, sans-serif',
   PLOT_FONT_SIZE: '1rem',
+  PLOT_HEADER_FONT_FAMILY: 'Helvetica, Arial, sans-serif', // matching monospaced fonts: 'Menlo, Consolas, Monaco, monospace',
+  PLOT_HEADER_FONT_SIZE: '1.1rem',
+  PLOT_HEADER_FONT_WEIGHT: 400,
   PLOT_POINT_SIZES: {
     CIRCLE: 4,
     TRIANGLE: 4 * 4 * 2.5,  // d3.symbol uses area, not radius
@@ -100,7 +101,7 @@ const D3_FONT_DEFAULTS = `
     font-weight: ${LZ2_DISPLAY_OPTIONS.PLOT_AXIS_FONT_WEIGHT};
   }
   .lzrp-header {
-    font-family: ${LZ2_DISPLAY_OPTIONS.PLOT_FONT_FAMILY} !important;
+    font-family: ${LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_FAMILY} !important;
     font-size: ${LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_SIZE} !important;
     font-weight: ${LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_WEIGHT} !important;
   }

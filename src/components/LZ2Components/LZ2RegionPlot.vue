@@ -7,7 +7,7 @@
 import { defineEmits, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import * as d3 from 'd3v7'
 import { useLZ2TooltipStore } from '@/stores/LZ2TooltipStore'
-import { formatVariantString, parseVariant2 } from '@/util/util'
+import { makePlotTitle, parseVariant2 } from '@/util/util'
 import { LZ2_DISPLAY_OPTIONS, REF_BUILD, REF_BUILD_PORTAL } from '@/constants'
 import { useLZ2Containers } from '@/composables/LZ2Containers'
 import { useLZ2Scales } from '@/composables/LZ2Scales'
@@ -34,15 +34,16 @@ const emit = defineEmits(['actionMenu-click'])
 // *** Props *******************************************************************
 const props = defineProps({
   ID: Number,
-  variant: String,
-  signal: String,
+  signal: Object,
   theme: String,
 })
 
 // *** Variables ***************************************************************
-const pv = parseVariant2(props.variant)
-const chromosome = pv.chr
-const title = `Plot ${props.ID}: ${props.variant}`
+const variant = props.signal.lead_variant.vid
+const parsedVariant = parseVariant2(variant)
+const chromosome = parsedVariant.chr
+const title = ref('')
+const titleColor = ref('')
 
 const plotContainer = useTemplateRef('plotContainer')
 const rootSVG = ref(null)
@@ -73,21 +74,26 @@ onBeforeUnmount(() => {
 })
 
 onMounted(async () => {
-  signalData.value = await LZ2DataLoaders.loadSignalData(props.variant, pv, props.signal, REF_BUILD)
-  recombData.value = await LZ2DataLoaders.loadRecombData(pv, REF_BUILD_PORTAL)
+  const [t, c] = makePlotTitle(props.signal)
+  title.value = t
+  titleColor.value = c
+
+  signalData.value = await LZ2DataLoaders.loadSignalData(props.signal, parsedVariant, REF_BUILD)
+  recombData.value = await LZ2DataLoaders.loadRecombData(parsedVariant, REF_BUILD_PORTAL)
 })
 
 // *** Event handlers **********************************************************
 const onActionMenuClick = (event) => {
   emit('actionMenu-click', {plotID: props.ID, event})
 }
+
 // *** Utility functions *******************************************************
 const renderPlot = (signalData, recombData) => {
   d3.select(plotContainer.value).selectAll('*').remove()
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
   LZ2Renders.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
-  LZ2Renders.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.variant, formatVariantString(title), onActionMenuClick)
+  LZ2Renders.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.signal.lead_variant.vid, title.value, titleColor.value, onActionMenuClick)
 
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 

@@ -50,6 +50,7 @@ function makeAnalysisTitle(analysis) {
 function makePlotTitle(signal) {
   let part1 = ''
   let analysisType = ''
+
   if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
     part1 = signal.analysis.trait.uuid
     analysisType = signal.analysis.analysis_type
@@ -61,7 +62,8 @@ function makePlotTitle(signal) {
   } else if (signal.analysis.trait.gene) { // This trait is a gene expression trait
     part1 = signal.analysis.trait.gene.symbol
     analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
-  }
+
+  } else return ['unknown type', '#000000']
 
   const variant = formatVariantString(signal.lead_variant.vid)
   const study = signal.analysis.study.uuid

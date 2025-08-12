@@ -1,11 +1,12 @@
 import { toRaw } from 'vue'
 import * as aq from 'arquero'
 import { useFetchData } from '@/composables/fetchData'
-import { LZ2_DISPLAY_OPTIONS, URLS } from '@/constants'
+import { URLS } from '@/constants'
+import { makePlotTitle } from '@/util/util'
 
 
 export function useLZ2DataLoaders() {
-  const loadSignalData = async (variant, pv, signal, build, theme) => {
+  const loadSignalData = async (signal, pv, build) => {
     const { data, errorMessage, fetchData } = useFetchData()
 
     let base = `${URLS.LD_DATA}/${build}/region/`
@@ -18,7 +19,7 @@ export function useLZ2DataLoaders() {
       return
     }
 
-    base = `${URLS.SIGNALS_DATA}/${signal}/region`
+    base = `${URLS.SIGNALS_DATA}/${signal.uuid}/region`
     url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}`
     let signalData
     if(await fetchData(url, 'lz2 signal data', 'MZ')) {
@@ -43,7 +44,7 @@ export function useLZ2DataLoaders() {
       r2: row.r2,
       variant: row.variant,
       refAllele: row.ref_allele,
-      isLead: variant === row.variant,
+      isLead: signal.lead_variant.vid === row.variant,
       beta: row.t1_beta,
     }))
 
