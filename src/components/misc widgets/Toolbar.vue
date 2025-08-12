@@ -41,7 +41,6 @@
       <router-link :to="studiesPage" class="nav-link text-clcHeading">Studies</router-link>
       <!--        <router-link to="/traits" class="nav-link text-clcHeading">Traits</router-link>-->
       <router-link :to="helpPage" class="nav-link text-clcHeading">Help</router-link>
-      <router-link :to="lz2test" class="nav-link text-clcHeading">lz2</router-link>
 
     </div>
 
@@ -67,7 +66,6 @@ const isSidebarButtonVisible = computed(() => appStore.filterPanelControls.isSid
 
 const genePage = `/${PAGE_NAMES.GENE}`
 const helpPage = `/${PAGE_NAMES.HELP}`
-const lz2test = `/${PAGE_NAMES.LZ2TEST}`
 const qcStatsPage = `/${PAGE_NAMES.STATS_QC}`
 const searchPage = `/${PAGE_NAMES.SEARCH}`
 const studiesPage = `/${PAGE_NAMES.STUDIES}`

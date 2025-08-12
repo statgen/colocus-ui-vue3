@@ -11,7 +11,7 @@ export function useLZ2DataLoaders() {
     let base = `${URLS.LD_DATA}/${build}/region/`
     let url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}&variant=${pv.chr}:${pv.loc}_${pv.ref}/${pv.alt}`
     let ldData = []
-    if(await fetchData(url, 'lz2 ld data', 'lz2test')) {
+    if(await fetchData(url, 'lz2 ld data', 'MZ')) {
       ldData = toRaw(data.value)
     } else {
       console.error("Failed to fetch LD data")
@@ -21,7 +21,7 @@ export function useLZ2DataLoaders() {
     base = `${URLS.SIGNALS_DATA}/${signal}/region`
     url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}`
     let signalData
-    if(await fetchData(url, 'lz2 signal data', 'lz2test')) {
+    if(await fetchData(url, 'lz2 signal data', 'MZ')) {
       signalData = toRaw(data.value)
     } else {
       console.error("Failed to fetch signal data")
