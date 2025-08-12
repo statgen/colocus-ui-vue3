@@ -157,7 +157,7 @@ const onAddPlotIconClick = (item) => {
 
 const onExpandRow = (item, side) => {
   const colocID = item.uuid
-  console.log(`ColocID: ${colocID} Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
+  // console.log(`ColocID: ${colocID} Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
   appStore.colocID = colocID
   expanderAlignment.value = side
   if(appStore.dataTable.expandedRow.indexOf(colocID) === -1) appStore.dataTable.expandedRow = [colocID]

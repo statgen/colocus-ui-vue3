@@ -4,8 +4,8 @@
     <thead>
       <tr>
         <td colspan="2">
-          <ActionButton title="LocusZoom page" @click="onLZclick"/>
-          <ActionButton title="MultiZoom page" @click="onMZclick"/>
+          <ActionButton title="LocusZoom" @click="onLZclick"/>
+          <ActionButton title="MultiZoom" @click="onMZclick" class="ml-4"/>
         </td>
         <td>View Local Page</td>
         <td>View Page on AMP CMD Portal</td>

@@ -4,47 +4,40 @@
       <FilterPanel />
     </template>
 
-    <h1><BackButton />MultiZoom</h1>
+    <h1><BackButton />Multi Zoom</h1>
 
-    <p class="text-content-block">
-      Colocalization of {{ s1trait }} <span class="mx-1" :style="{color: s1color}">({{ formatVariantString(s1Variant) }})</span>
-      with {{ s2trait }} <span class="mx-1" :style="{color: s2color}">({{ formatVariantString(s2Variant) }})</span>.
-      The y-axis of all plots is -log<sub>10</sub> p, as is the x-axis of the LZ Compare Plot.
-      The x-axis of the LZ Region Plots is the location on the specified chromosome.
-    </p>
-
-    <div class="two-column-layout">
-      <div class="left-panel">
-        <h2>LZ Compare Plot</h2>
-        <div ref="comparePlot"></div>
-        <div class="ldpanel-wrapper">
-          <LDPanel
-            class="mt-4"
-            @onCMRadioChange="onCMRadioChange"
-            @onLDRadioChange="onLDRadioChange"
-            @onUniqueCheckboxChange="onUniqueCheckboxChange"
-            :conMarResetFlag="conMarResetFlag"
-          />
-        </div>
-      </div>
-
-      <div class="right-panel">
-        <h2>LZ Region Plots</h2>
-        <div ref="regionPlot" class="region-plot"></div>
-      </div>
+    <div class="d-flex align-center flex-wrap ga-2 mt-2">
+      <v-select
+        v-model="selectedTheme"
+        :items="themes"
+        style="max-width: 200px"
+        @update:model-value="onSelectTheme"
+        label="Select theme"
+        variant="outlined"
+        hide-details
+        density="compact"
+      ></v-select>
+      <v-btn @click="unmountAllPlots">Clear all</v-btn>
+      <v-btn @click="onBlinkButtonClick">Blink</v-btn>
     </div>
+    <LZ2Tooltip />
+    <LZ2ActionMenu
+      v-if="showMenu"
+      :menu-style="{
+        position: 'absolute',
+        top: `${menuPosition.y}px`,
+        left: `${menuPosition.x}px`
+      }"
+      @deletePlot="onDeletePlot"
+      @toggleGenSigLine="onToggleGenSig"
+      @toggleRecombLine="onToggleRecombLine"
+      @exportPlot="onExportPlot"
+      @closeMenu="showMenu = false"
+    />
+    <div ref="plotsContainer" class="plot-container mt-4"></div>
 
-    <LZSignalError />
 
     <h2>Data table</h2>
-
-    <p class="my-2 text-content-block">All colocalized signals within a 500kb window centered around the lead variants (
-      <span class="mx-1" :style="{color: s1color}">{{ formatVariantString(s1Variant) }}</span> and
-      <span class="mx-1" :style="{color: s2color}">{{ formatVariantString(s2Variant) }}</span> )
-      from the originally selected colocalized signal pair.
-      <span class="font-weight-bold bg-clcTableHighlight"> Bold highlighted text </span>
-      denotes the initial signals shown in the plots above.
-    </p>
 
     <div class="table-container mb-8">
       <DataTable
@@ -57,49 +50,36 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { colorHasher, formatVariantString } from '@/util/util'
-import { CM_DATASET, PAGE_NAMES } from '@/constants'
+import { CM_DATASET, LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { useLZPageHelpers } from '@/composables/lzPageHelpers'
+import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
 const lzPageHelpers = useLZPageHelpers()
+const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-// template variables
-const s1trait = ref({})
-const s1Variant = ref('')
-const s1color = ref('')
-
-const s2trait = ref({})
-const s2Variant = ref('')
-const s2color = ref('')
-
-// functional variables
-const conMarIndicator = ref(CM_DATASET.CONDITIONAL)
+const activePlotID = ref(0)
+const BLINK_TIME = 5
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
-const conMarResetFlag = ref(false)
+const menuPosition = ref({ x: 0, y: 0 })
+const multizoomPage = PAGE_NAMES.MULTIZOOM
+const plotsContainer = useTemplateRef('plotsContainer')
+const selectedTheme = ref()
+const showMenu = ref(false)
+const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
 const preloadGenes = ref([])
 
-// managing the refs for the plot panels
-const comparePlotRef = useTemplateRef('comparePlot')
-const regionPlotRef = useTemplateRef('regionPlot')
-
-// constants
-const multizoomPage = PAGE_NAMES.MULTIZOOM
-
-// blink control of lead ref marker(s) on lz plot(s)
-appStore[multizoomPage].lzLeadDOMIDs.length = 0
-
-console.log('multizoomPage entered')
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -111,104 +91,123 @@ provide('preloadGenes', preloadGenes)
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
 watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
-  if (newVal) initializePage()
+  if (newVal) {
+    loadFPControls.value = !loadFPControls.value
+    const s1variant = appStore[multizoomPage].colocData.signal1.lead_variant.vid
+    const s1ID = appStore[multizoomPage].colocData.signal1.uuid
+    const s2variant = appStore[multizoomPage].colocData.signal2.lead_variant.vid
+    const s2ID = appStore[multizoomPage].colocData.signal2.uuid
+    // console.log(`s1variant: ${s1variant}, s1ID: ${s1ID} s2variant: ${s2variant} s2ID: ${s2ID}`)
+    renderPlot(s1variant, s1ID, selectedTheme.value)
+    renderPlot(s2variant, s2ID, selectedTheme.value)
+  }
 })
 
 // *** Lifecycle hooks *********************************************************
+onBeforeUnmount(() => {
+  plotManager.unmountAllPlots()
+})
+
 onMounted(() => {
+  appStore.dataTable.expandedRow.length = 0
+  selectedTheme.value = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[1]
   loadPageData()
 })
 
 // *** Event handlers **********************************************************
 const onAddPlotIconClick = (item) => {
-  const {signal1, signal2} = item
-  lzPageHelpers.addPanelsForSignalPair(signal1, signal2)
-  if(conMarIndicator.value === CM_DATASET.MARGINAL) {
-    conMarResetFlag.value = !conMarResetFlag.value
-    nextTick(() => { lzPageHelpers.toggleConditionalMarginal(CM_DATASET.CONDITIONAL, CM_DATASET.MARGINAL) })
-  }
+  const { signal1, signal2 } = item
+  const s1variant = signal1.lead_variant.vid
+  const s1ID = signal1.uuid
+  renderPlot(s1variant, s1ID, selectedTheme.value)
+
+  const s2variant = signal2.lead_variant.vid
+  const s2ID = signal2.uuid
+  renderPlot(s2variant, s2ID, selectedTheme.value)
+}
+
+const onBlinkButtonClick = () => {
+  document.querySelectorAll('.lead-variant')
+    .forEach(el => {el?.classList.add('blink')})
+  setTimeout(() => {
+    document.querySelectorAll('.lead-variant')
+      .forEach(el => {el?.classList.remove('blink')})
+  }, BLINK_TIME * 1000)
 }
 
 const onDataTableRowClick = () => {
   loadPageData()
-  conMarResetFlag.value = !conMarResetFlag.value
 }
 
-const onCMRadioChange = (val) => {
-  conMarIndicator.value = val
-  const oldVal = val === CM_DATASET.CONDITIONAL ? CM_DATASET.MARGINAL : CM_DATASET.CONDITIONAL
-  nextTick(() => { lzPageHelpers.toggleConditionalMarginal(val, oldVal) })
+const onActionMenuClick = async (arg) => {
+  const rect = arg.event.target.getBoundingClientRect()
+  const scrollX = window.scrollX || window.pageXOffset
+  const scrollY = window.scrollY || window.pageYOffset
+
+  activePlotID.value = arg.plotID
+
+  const spacing = 4
+  const menuWidth = 225
+
+  menuPosition.value = {
+    x: rect.left + scrollX - menuWidth - spacing,
+    y: rect.bottom + scrollY + spacing,
+  }
+
+  showMenu.value = true
 }
 
-const onLDRadioChange = (variant) => {
-  lzPageHelpers.applyLDref(variant)
+const onSelectTheme = (newValue) => {
+  selectedTheme.value = newValue
 }
 
-const onUniqueCheckboxChange = (val) => {
-  lzPageHelpers.addUniqueRefsOnly.value = val
+const onDeletePlot = () => {
+  plotManager.unmountPlot(`plot_${activePlotID.value}`)
+}
+const onToggleRecombLine = () => {console.log('onToggleRecomb')}
+
+const onToggleGenSig = () => {console.log('onToggleGenSig')}
+
+const onExportPlot = () => {
+  plotManager.exportPlotAsPNG(`plot_${activePlotID.value}`)
+}
+
+const unmountAllPlots = () => {
+  plotManager.unmountAllPlots()
 }
 
 // *** Utility functions *******************************************************
-const initializePage = () => {
-  const signal1 = appStore[multizoomPage].colocData.signal1
-  const signal2 = appStore[multizoomPage].colocData.signal2
-
-  // set template variables
-  s1trait.value = signal1.analysis.trait.phenotype.name
-  s1Variant.value = signal1.lead_variant.vid
-  s2trait.value = signal2.analysis.trait.gene.symbol
-  s2Variant.value = signal2.lead_variant.vid
-  s1color.value = colorHasher.hex(s1Variant.value)
-  s2color.value = colorHasher.hex(s2Variant.value)
-
-  loadFPControls.value = !loadFPControls.value
-
-  // build compare and region plots
-  lzPageHelpers.assembleLayout(signal1, signal2, comparePlotRef, regionPlotRef)
-}
-
 const loadPageData = async () => {
-  lzPageHelpers.clearRefList()
   appStore[multizoomPage].tableDataLoaded = false
   appStore[multizoomPage].colocDataReady = false
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
+
+const renderPlot = async(variant, signal, theme) => {
+  await plotManager.mountPlot({
+    plotsContainer,
+    variant,
+    signal,
+    type: 'region',
+    theme,
+    onActionMenuClick,
+  })
+}
+
 // *** Configuration data ******************************************************
+
 </script>
 
 <style scoped>
+.plot-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
 .table-container {
   overflow-x: auto;
 }
 
-.region-plot {
-  overflow-x: auto;
-}
-
-/* this updates a class from locuszoom to allow multiple spaces in a string to display as such */
-:deep(.lz-panel-title) {
-  white-space: pre;
-}
-
-.two-column-layout {
-  display: flex;
-  flex-direction: row;
-  gap: 24px;
-  padding: 16px;
-}
-
-.left-panel {
-  width: 650px;
-  flex-shrink: 0;
-}
-
-.right-panel {
-  width: 650px;
-  flex-shrink: 0;
-}
-
-.ldpanel-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
 </style>
