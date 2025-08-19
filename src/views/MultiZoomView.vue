@@ -17,8 +17,20 @@
         hide-details
         density="compact"
       ></v-select>
-      <v-btn @click="unmountAllPlots">Clear all</v-btn>
+      <v-btn @click="onUnmountAllPlots">Clear all</v-btn>
       <v-btn @click="onBlinkButtonClick">Blink</v-btn>
+      <v-switch
+        label="Show/hide all recomb lines"
+        v-model="showAllRecomb"
+        @update:model-value="onToggleAllRecomb"
+        density="compact"
+        color="clcAction"/>
+      <v-switch
+        label="Show/hide all gen sig lines"
+        v-model="showAllGenSig"
+        @update:model-value="onToggleAllGenSig"
+        density="compact"
+        color="clcAction"/>
     </div>
     <LZ2Tooltip />
     <LZ2ActionMenu
@@ -68,6 +80,9 @@ const plotsContainer = useTemplateRef('plotsContainer')
 const selectedTheme = ref()
 const showMenu = ref(false)
 const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
+
+const showAllGenSig = ref(true)
+const showAllRecomb = ref(true)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
@@ -157,7 +172,15 @@ const onSelectTheme = (newValue) => {
   selectedTheme.value = newValue
 }
 
-const unmountAllPlots = () => {
+const onToggleAllGenSig = (val) => {
+  updateAllPlots('showGenSigLine', val)
+}
+
+const onToggleAllRecomb = (val) => {
+  updateAllPlots('showRecombLine', val)
+}
+
+const onUnmountAllPlots = () => {
   plotManager.unmountAllPlots()
 }
 
@@ -177,6 +200,12 @@ const renderPlot = async(signal, theme) => {
     onActionMenuClick,
   })
   appStore.addMZPlot(plotID)
+}
+
+const updateAllPlots = (key, val) => {
+  Object.keys(appStore[multizoomPage].plotSettings).forEach(k => {
+    appStore[multizoomPage].plotSettings[k][key] = val
+  })
 }
 
 // *** Configuration data ******************************************************
