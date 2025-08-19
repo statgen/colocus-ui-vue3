@@ -51,7 +51,7 @@ export function useLZ2Axes() {
     const yAxisGroup = ctr.append('g')
       .attr('transform', `translate(${dimensions.ctrWidth}, 0)`) // move to right edge
       .call(yAxis)
-      .classed('lzrp-axis', true)
+      .classed('lzrp-axis recomb-group', true)
 
     yAxisGroup.selectAll('text')
       .attr('fill', LZ2_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
@@ -63,7 +63,7 @@ export function useLZ2Axes() {
       .attr('fill', LZ2_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
       .attr('text-anchor', 'middle')
       .text('Recomb (cM/Mb)')
-      .classed('lzrp-axis', true)
+      .classed('lzrp-axis recomb-group', true)
   }
 
   return {

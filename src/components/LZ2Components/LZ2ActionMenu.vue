@@ -1,56 +1,44 @@
 <template>
   <div class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
     <ul>
-      <li @click="onToggleRecombLine"><label><input type="checkbox" checked readonly /> Show recombination line</label></li>
-      <li @click="onToggleGenSigLine"><label><input type="checkbox" checked readonly /> Show gen sig line</label></li>
-      <li @click="onExportPlot">⬇ Export PNG</li>
-      <li @click="onDeletePlot">🗑 Delete Plot</li>
+      <li><label><input type="checkbox" v-model="recombChecked"/> Show recomb line</label></li>
+      <li @click.self="onToggleGenSigLine"><label><input type="checkbox" /> Show gen sig line</label></li>
+      <li @click.self="onExportPlot">⬇ Export PNG</li>
+      <li @click.self="onDeletePlot">🗑 Delete Plot</li>
     </ul>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
+import { useAppStore } from '@/stores/AppStore'
+import {PAGE_NAMES} from "@/constants";
+
+const appStore = useAppStore()
 
 defineProps({
   menuStyle: Object
 })
 
 const emit = defineEmits([
-  'deletePlot',
-  'toggleRecombLine',
-  'toggleGenSigLine',
-  'exportPlot',
-  'closeMenu'
+  'delete-plot',
+  'toggle-recomb-line',
+  'toggle-gen-sig-line',
+  'export-plot',
+  'close-menu'
 ])
 
-const onCloseMenu = () => {
-  emit('closeMenu')
-}
-
-const onDeletePlot = () => {
-  emit('deletePlot')
-  emit('closeMenu')
-}
-
-const onExportPlot = () => {
-  emit('exportPlot')
-  emit('closeMenu')
-}
-
-const onKeydown = (event) => {
-  if (event.key === 'Escape') {
-    emit('closeMenu')
+const recombChecked = computed({
+  get: () => {
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    return appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]?.showRecombLine ?? false
+  },
+  set: (val) => {
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    // console.log(`new chk value: ${val} for plot: ${plotID}`)
+    appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showRecombLine = val
   }
-}
-
-const onToggleGenSigLine = () => {
-  emit('toggleGenSigLine')
-}
-
-const onToggleRecombLine = () => {
-  emit('toggleRecombLine')
-}
+})
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
@@ -59,6 +47,32 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown)
 })
+
+const onCloseMenu = () => {
+  emit('close-menu')
+}
+
+const onDeletePlot = () => {
+  emit('delete-plot')
+}
+
+const onExportPlot = () => {
+  emit('export-plot')
+}
+
+const onKeydown = (event) => {
+  if (event.key === 'Escape') {
+    emit('close-menu')
+  }
+}
+
+const onToggleRecombLine = () => {
+  emit('toggle-recomb-line')
+}
+
+const onToggleGenSigLine = () => {
+  emit('toggle-gen-sig-line')
+}
 </script>
 
 <style scoped>
@@ -88,5 +102,9 @@ onBeforeUnmount(() => {
 
 .plot-action-menu li:hover {
   background-color: #ffffff;
+}
+
+.plot-action-menu input[type="checkbox"] {
+  pointer-events: auto;
 }
 </style>

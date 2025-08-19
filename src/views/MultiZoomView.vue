@@ -28,11 +28,11 @@
         top: `${menuPosition.y}px`,
         left: `${menuPosition.x}px`
       }"
-      @deletePlot="onDeletePlot"
-      @toggleGenSigLine="onToggleGenSig"
-      @toggleRecombLine="onToggleRecombLine"
-      @exportPlot="onExportPlot"
-      @closeMenu="showMenu = false"
+      @delete-plot="onDeletePlot"
+      @toggle-gen-sig-line="onToggleGenSig"
+      @toggle-recomb-line="onToggleRecombLine"
+      @export-plot="onExportPlot"
+      @close-menu="showMenu = false"
     />
     <div ref="plotsContainer" class="plot-container mt-4"></div>
 
@@ -61,7 +61,6 @@ const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const activePlotID = ref(0)
 const BLINK_TIME = 5
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
@@ -106,6 +105,24 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
+const onActionMenuClick = async (arg) => {
+  const rect = arg.event.target.getBoundingClientRect()
+  const scrollX = window.scrollX || window.pageXOffset
+  const scrollY = window.scrollY || window.pageYOffset
+
+  appStore[multizoomPage].activePlot = arg.plotID
+
+  const spacing = 4
+  const menuWidth = 225
+
+  menuPosition.value = {
+    x: rect.left + scrollX - menuWidth - spacing,
+    y: rect.bottom + scrollY + spacing,
+  }
+
+  showMenu.value = true
+}
+
 const onAddPlotIconClick = (item) => {
   const { signal1, signal2 } = item
   const theme = selectedTheme.value
@@ -126,37 +143,30 @@ const onDataTableRowClick = () => {
   loadPageData()
 }
 
-const onActionMenuClick = async (arg) => {
-  const rect = arg.event.target.getBoundingClientRect()
-  const scrollX = window.scrollX || window.pageXOffset
-  const scrollY = window.scrollY || window.pageYOffset
+const onDeletePlot = () => {
+  const plotID = appStore[multizoomPage].activePlot
+  plotManager.unmountPlot(`plot_${plotID}`)
+  appStore.deleteMZPlot(plotID)
+  showMenu.value = false
+}
 
-  activePlotID.value = arg.plotID
-
-  const spacing = 4
-  const menuWidth = 225
-
-  menuPosition.value = {
-    x: rect.left + scrollX - menuWidth - spacing,
-    y: rect.bottom + scrollY + spacing,
-  }
-
-  showMenu.value = true
+const onExportPlot = () => {
+  plotManager.exportPlotAsPNG(`plot_${appStore[multizoomPage].activePlot}`)
+  showMenu.value = false
 }
 
 const onSelectTheme = (newValue) => {
   selectedTheme.value = newValue
 }
 
-const onDeletePlot = () => {
-  plotManager.unmountPlot(`plot_${activePlotID.value}`)
+const onToggleGenSig = () => {
+  console.log('onToggleGenSig')
+  showMenu.value = false
 }
-const onToggleRecombLine = () => {console.log('onToggleRecomb')}
 
-const onToggleGenSig = () => {console.log('onToggleGenSig')}
-
-const onExportPlot = () => {
-  plotManager.exportPlotAsPNG(`plot_${activePlotID.value}`)
+const onToggleRecombLine = () => {
+  console.log('onToggleRecomb')
+  showMenu.value = false
 }
 
 const unmountAllPlots = () => {
@@ -171,13 +181,14 @@ const loadPageData = async () => {
 }
 
 const renderPlot = async(signal, theme) => {
-  await plotManager.mountPlot({
+  const plotID = await plotManager.mountPlot({
     plotsContainer,
     signal,
     type: 'region',
     theme,
     onActionMenuClick,
   })
+  appStore.addMZPlot(plotID)
 }
 
 // *** Configuration data ******************************************************

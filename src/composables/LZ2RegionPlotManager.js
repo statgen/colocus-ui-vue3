@@ -75,7 +75,7 @@ export function usePlotManager() {
 
     render(vnode, mountEl)
     plotRegistry.set(plotID, { type, vnode, el: mountEl })
-    plotCounter.value++
+    return plotCounter.value++
   }
 
   const unmountPlot = (plotID) => {

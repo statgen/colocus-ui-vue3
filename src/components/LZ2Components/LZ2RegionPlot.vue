@@ -4,7 +4,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { defineEmits, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { defineEmits, nextTick, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import * as d3 from 'd3v7'
 import { useLZ2TooltipStore } from '@/stores/LZ2TooltipStore'
 import { makePlotTitle, parseVariant2 } from '@/util/util'
@@ -14,9 +14,13 @@ import { useLZ2Scales } from '@/composables/LZ2Scales'
 import { useLZ2DataLoaders  } from '@/composables/LZ2DataLoaders'
 import { useLZ2Axes  } from '@/composables/LZ2Axes'
 import { useLZ2Renders } from '@/composables/LZ2Renderers'
+import { useAppStore } from '@/stores/AppStore'
+import {PAGE_NAMES} from "@/constants";
 
 // *** Composables *************************************************************
+const appStore = useAppStore()
 const tooltipStore = useLZ2TooltipStore()
+
 const LZ2Containers = useLZ2Containers()
 const LZ2Scales = useLZ2Scales()
 const LZ2DataLoaders = useLZ2DataLoaders()
@@ -29,7 +33,7 @@ const tooltipCallbacks = {
   hide: tooltipStore.hideTooltip
 }
 
-const emit = defineEmits(['actionMenu-click'])
+const emit = defineEmits(['action-menu-click'])
 
 // *** Props *******************************************************************
 const props = defineProps({
@@ -60,11 +64,22 @@ const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch( // render when both signal and recomb data are ready
-  () => [signalData.value, recombData.value],
-  ([signalData, recombData]) => {
-    if (signalData && recombData && plotContainer.value) renderPlot(signalData, recombData)
-  },
+watch(
+  [
+      () => signalData.value,
+      () => recombData.value,
+      () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showRecombLine
+    ],
+async ([signal, recomb, showRecomb]) => {
+      if (!Array.isArray(signal) || !Array.isArray(recomb) || !plotContainer.value) return
+      plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
+        n.classList.toggle('hidden', !showRecomb)       // for screen
+        n.setAttribute('display', showRecomb ? null : 'none') // for export
+        n.style.display = showRecomb ? '' : 'none'            // for export
+      })
+      // await nextTick()
+      renderPlot(signal, recomb)
+    },
   { immediate: true }
 )
 
@@ -84,11 +99,23 @@ onMounted(async () => {
 
 // *** Event handlers **********************************************************
 const onActionMenuClick = (event) => {
-  emit('actionMenu-click', {plotID: props.ID, event})
+  emit('action-menu-click', {plotID: props.ID, event})
 }
 
 // *** Utility functions *******************************************************
 const renderPlot = (signalData, recombData) => {
+  const showingRecombLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showRecombLine
+  if(showingRecombLine) {
+    DIMENSIONS.ctrWidth = DIMENSIONS.width
+      - DIMENSIONS.margins.left
+      - DIMENSIONS.margins.right
+  } else {
+    DIMENSIONS.ctrWidth = LZ2_DISPLAY_OPTIONS.DIMENSIONS.width
+      - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.left
+      - 10
+      // - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.right
+  }
+
   d3.select(plotContainer.value).selectAll('*').remove()
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
@@ -106,14 +133,14 @@ const renderPlot = (signalData, recombData) => {
 
   LZ2Axes.renderXaxis(thePlot, xScale, DIMENSIONS, chromosome)
   LZ2Axes.renderYaxisSignal(thePlot, yScaleSignal, DIMENSIONS)
-  LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
+  if(showingRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
   const clipID = `plot-area-clip-${props.ID}`
   LZ2Renders.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
   LZ2Renders.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, props.theme)
-  LZ2Renders.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
+  if(showingRecombLine) LZ2Renders.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
   LZ2Renders.renderGenSigLine(plotGroup, xScale, yScaleSignal)
 }
 
@@ -124,5 +151,9 @@ const renderPlot = (signalData, recombData) => {
 .plot-container {
   margin-right: 1rem;
   margin-top: 0;
+}
+
+:deep(.recomb-group.hidden) {
+  display: none;
 }
 </style>

@@ -155,6 +155,7 @@ export function useLZ2Renders() {
       .attr('fill', 'none')
       .attr('stroke', LZ2_DISPLAY_OPTIONS.RECOMB_LINE_COLOR)
       .attr('stroke-width', 1)
+      .classed('recomb-group', true)
   }
 
   // clipPath prevents shapes from overplotting axes

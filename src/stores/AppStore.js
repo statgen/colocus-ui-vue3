@@ -68,7 +68,8 @@ export const useAppStore = defineStore('appStore', {
       colocDataReady: false,
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
-      plotID: 0,
+      activePlot: 0,
+      plotSettings: {},
       regionPanelRemoved: false,
       tableDataLoaded: false,
       uniqueLDrefs: [],
@@ -82,6 +83,12 @@ export const useAppStore = defineStore('appStore', {
   }),
 
   actions: {
+    addMZPlot(plotID) {
+      if(!this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {
+        this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] = { showRecombLine: true, showGenSigLine: true }
+      }
+    },
+
     addQueryString(url) {
       const parentKey = this.currentPageName
 
@@ -165,6 +172,10 @@ export const useAppStore = defineStore('appStore', {
       this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
+    },
+
+    deleteMZPlot(plotID) {
+      if(this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {delete this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] }
     },
 
     async loadFilterData() {
