@@ -13,7 +13,7 @@ import { useLZ2Containers } from '@/composables/LZ2Containers'
 import { useLZ2Scales } from '@/composables/LZ2Scales'
 import { useLZ2DataLoaders  } from '@/composables/LZ2DataLoaders'
 import { useLZ2Axes  } from '@/composables/LZ2Axes'
-import { useLZ2Renders } from '@/composables/LZ2Renderers'
+import { useLZ2Renderers } from '@/composables/LZ2Renderers'
 import { useAppStore } from '@/stores/AppStore'
 import {PAGE_NAMES} from "@/constants";
 
@@ -25,7 +25,7 @@ const LZ2Containers = useLZ2Containers()
 const LZ2Scales = useLZ2Scales()
 const LZ2DataLoaders = useLZ2DataLoaders()
 const LZ2Axes = useLZ2Axes()
-const LZ2Renders = useLZ2Renders()
+const LZ2Renderers = useLZ2Renderers()
 
 const tooltipCallbacks = {
   show: tooltipStore.showTooltip,
@@ -68,14 +68,20 @@ watch(
   [
       () => signalData.value,
       () => recombData.value,
-      () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showRecombLine
+      () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showRecombLine,
+      () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showGenSigLine,
     ],
-async ([signal, recomb, showRecomb]) => {
+async ([signal, recomb, showRecomb, showGenSig]) => {
       if (!Array.isArray(signal) || !Array.isArray(recomb) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecomb)       // for screen
         n.setAttribute('display', showRecomb ? null : 'none') // for export
         n.style.display = showRecomb ? '' : 'none'            // for export
+      })
+      plotContainer.value.querySelectorAll('.gensig-group').forEach(n => {
+        n.classList.toggle('hidden', !showGenSig)       // for screen
+        n.setAttribute('display', showGenSig ? null : 'none') // for export
+        n.style.display = showGenSig ? '' : 'none'            // for export
       })
       // await nextTick()
       renderPlot(signal, recomb)
@@ -105,6 +111,8 @@ const onActionMenuClick = (event) => {
 // *** Utility functions *******************************************************
 const renderPlot = (signalData, recombData) => {
   const showingRecombLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showRecombLine
+  const showingGenSigLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showGenSigLine
+
   if(showingRecombLine) {
     DIMENSIONS.ctrWidth = DIMENSIONS.width
       - DIMENSIONS.margins.left
@@ -119,8 +127,8 @@ const renderPlot = (signalData, recombData) => {
   d3.select(plotContainer.value).selectAll('*').remove()
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
-  LZ2Renders.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
-  LZ2Renders.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.signal.lead_variant.vid, title.value, titleColor.value, onActionMenuClick)
+  LZ2Renderers.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+  LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.signal.lead_variant.vid, title.value, titleColor.value, onActionMenuClick)
 
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 
@@ -136,12 +144,12 @@ const renderPlot = (signalData, recombData) => {
   if(showingRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
   const clipID = `plot-area-clip-${props.ID}`
-  LZ2Renders.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
+  LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
-  LZ2Renders.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, props.theme)
-  if(showingRecombLine) LZ2Renders.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
-  LZ2Renders.renderGenSigLine(plotGroup, xScale, yScaleSignal)
+  LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, props.theme)
+  if(showingRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
+  if(showingGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
 }
 
 // *** Configuration data ******************************************************

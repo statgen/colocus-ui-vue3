@@ -3,7 +3,7 @@ import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
 import { colorHasher } from '@/util/util'
 import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
-export function useLZ2Renders() {
+export function useLZ2Renderers() {
   const getColorFromR2 = (r2, colorSet) => {
     if (r2 == null) return colorSet[5]
     if (r2 > 0.8) return colorSet[4]
@@ -137,6 +137,7 @@ export function useLZ2Renders() {
       .attr('stroke', LZ2_DISPLAY_OPTIONS.SIG_LINE_COLOR)
       .attr('stroke-dasharray', '4 6')
       .attr('stroke-width', 1)
+      .classed('gensig-group', true)
   }
 
   const renderRecombLine = (plotGroup, data, xScale, yScale) => {

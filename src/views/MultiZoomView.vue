@@ -29,8 +29,6 @@
         left: `${menuPosition.x}px`
       }"
       @delete-plot="onDeletePlot"
-      @toggle-gen-sig-line="onToggleGenSig"
-      @toggle-recomb-line="onToggleRecombLine"
       @export-plot="onExportPlot"
       @close-menu="showMenu = false"
     />
@@ -157,16 +155,6 @@ const onExportPlot = () => {
 
 const onSelectTheme = (newValue) => {
   selectedTheme.value = newValue
-}
-
-const onToggleGenSig = () => {
-  console.log('onToggleGenSig')
-  showMenu.value = false
-}
-
-const onToggleRecombLine = () => {
-  console.log('onToggleRecomb')
-  showMenu.value = false
 }
 
 const unmountAllPlots = () => {

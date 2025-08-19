@@ -2,7 +2,7 @@
   <div class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
     <ul>
       <li><label><input type="checkbox" v-model="recombChecked"/> Show recomb line</label></li>
-      <li @click.self="onToggleGenSigLine"><label><input type="checkbox" /> Show gen sig line</label></li>
+      <li><label><input type="checkbox" v-model="genSignChecked"/> Show gen sig line</label></li>
       <li @click.self="onExportPlot">⬇ Export PNG</li>
       <li @click.self="onDeletePlot">🗑 Delete Plot</li>
     </ul>
@@ -22,11 +22,21 @@ defineProps({
 
 const emit = defineEmits([
   'delete-plot',
-  'toggle-recomb-line',
-  'toggle-gen-sig-line',
   'export-plot',
   'close-menu'
 ])
+
+const genSignChecked = computed({
+  get: () => {
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    return appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]?.showGenSigLine ?? false
+  },
+  set: (val) => {
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showGenSigLine = val
+    emit('close-menu')
+  }
+})
 
 const recombChecked = computed({
   get: () => {
@@ -35,8 +45,8 @@ const recombChecked = computed({
   },
   set: (val) => {
     const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
-    // console.log(`new chk value: ${val} for plot: ${plotID}`)
     appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showRecombLine = val
+    emit('close-menu')
   }
 })
 
@@ -64,14 +74,6 @@ const onKeydown = (event) => {
   if (event.key === 'Escape') {
     emit('close-menu')
   }
-}
-
-const onToggleRecombLine = () => {
-  emit('toggle-recomb-line')
-}
-
-const onToggleGenSigLine = () => {
-  emit('toggle-gen-sig-line')
 }
 </script>
 
