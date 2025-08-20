@@ -200,7 +200,6 @@ const renderPlot = async(signal, theme) => {
     plotsContainer,
     signal,
     type: 'region',
-    theme,
     onActionMenuClick,
   })
   appStore.addMZPlot(plotID)

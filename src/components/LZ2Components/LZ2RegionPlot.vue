@@ -39,7 +39,6 @@ const emit = defineEmits(['action-menu-click'])
 const props = defineProps({
   ID: Number,
   signal: Object,
-  theme: String,
 })
 
 // *** Variables ***************************************************************
