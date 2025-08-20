@@ -35,6 +35,16 @@ const LZ2_DISPLAY_OPTIONS = {
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
   LZ2_THEMES: {
+    Greyscale: {
+      colors: ['rgba(170, 170, 170, 0.2)', '#888888', '#666666', '#444444', '#222222', '#eeeeee'],
+      leadBorderColor: 'black',
+      leadShape: 'triangle',
+      sizes: {
+        circle: 4,
+        triangle: 4 * 4 * 2.5,
+        lead: 4 * 4 * 7,
+      },
+    },
     LocusZoom: {
       colors: ['#473699', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#eeeeee'],
       leadColor: '#9632b8',
@@ -49,16 +59,6 @@ const LZ2_DISPLAY_OPTIONS = {
     Modern: {
       colors: ['rgba(70, 54, 153, 0.2)', '#26bce1', '#6dfe68', '#f8c32a', '#db3d11', '#eeeeee'],
       leadBorderColor: '#11AFDB',
-      leadShape: 'triangle',
-      sizes: {
-        circle: 4,
-        triangle: 4 * 4 * 2.5,
-        lead: 4 * 4 * 7,
-      },
-    },
-    Greyscale: {
-      colors: ['rgba(170, 170, 170, 0.2)', '#888888', '#666666', '#444444', '#222222', '#eeeeee'],
-      leadBorderColor: 'black',
       leadShape: 'triangle',
       sizes: {
         circle: 4,
@@ -115,6 +115,9 @@ LZ2_DISPLAY_OPTIONS.DIMENSIONS.ctrHeight = LZ2_DISPLAY_OPTIONS.DIMENSIONS.height
   - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.top
   - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.bottom
 
+
+const MX_TOOLBOX_WIDTH = 300
+
 const NEARBY_DIST = 500e3
 
 const PAGE_NAMES = {
@@ -166,6 +169,6 @@ const THRESHOLDS = {
   R2: 0.3,
 }
 
-export { CM_DATASET, BIOMARKER_TYPES, COLORS, D3_FONT_DEFAULTS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP, LZ2_DISPLAY_OPTIONS, PAGE_NAMES,
-  REF_BUILD, REF_BUILD_PORTAL, THRESHOLDS, URLS
+export { CM_DATASET, BIOMARKER_TYPES, COLORS, D3_FONT_DEFAULTS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP,
+  LZ2_DISPLAY_OPTIONS, MX_TOOLBOX_WIDTH, PAGE_NAMES, REF_BUILD, REF_BUILD_PORTAL, THRESHOLDS, URLS
 }

@@ -38,6 +38,8 @@ const emit = defineEmits(['action-menu-click'])
 // *** Props *******************************************************************
 const props = defineProps({
   ID: Number,
+  showGenSigLine: Boolean,
+  showRecombLine: Boolean,
   signal: Object,
 })
 
@@ -71,20 +73,20 @@ watch(
       () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showGenSigLine,
       () => appStore[PAGE_NAMES.MULTIZOOM].selectedTheme,
     ],
-async ([signal, recomb, showRecomb, showGenSig, theme]) => {
-      if (!Array.isArray(signal) || !Array.isArray(recomb) || !plotContainer.value) return
+async ([signalData, recombData, showRecombLine, showGenSigLine, theme]) => {
+      if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
-        n.classList.toggle('hidden', !showRecomb)       // for screen
-        n.setAttribute('display', showRecomb ? null : 'none') // for export
-        n.style.display = showRecomb ? '' : 'none'            // for export
+        n.classList.toggle('hidden', !showRecombLine)       // for screen
+        n.setAttribute('display', showRecombLine ? null : 'none') // for export
+        n.style.display = showRecombLine ? '' : 'none'            // for export
       })
       plotContainer.value.querySelectorAll('.gensig-group').forEach(n => {
-        n.classList.toggle('hidden', !showGenSig)       // for screen
-        n.setAttribute('display', showGenSig ? null : 'none') // for export
-        n.style.display = showGenSig ? '' : 'none'            // for export
+        n.classList.toggle('hidden', !showGenSigLine)       // for screen
+        n.setAttribute('display', showGenSigLine ? null : 'none') // for export
+        n.style.display = showGenSigLine ? '' : 'none'            // for export
       })
-      // await nextTick()
-      renderPlot(signal, recomb, theme)
+      await nextTick()
+      renderPlot(signalData, recombData, showGenSigLine, showRecombLine, theme)
     },
   { immediate: true }
 )
@@ -109,11 +111,12 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
-const renderPlot = (signalData, recombData, theme) => {
-  const showingRecombLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showRecombLine
-  const showingGenSigLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showGenSigLine
+const renderPlot = (signalData, recombData, showGenSigLine, showRecombLine, theme) => {
+  // const mzPage = appStore[PAGE_NAMES.MULTIZOOM]
+  // const showingRecombLine = mzPage.showRecombLines || mzPage.plotSettings[props.ID].showRecombLine
+  // const showingGenSigLine = mzPage.showGenSigLines || mzPage.plotSettings[props.ID].showGenSigLine
 
-  if(showingRecombLine) {
+  if(showRecombLine) {
     DIMENSIONS.ctrWidth = DIMENSIONS.width
       - DIMENSIONS.margins.left
       - DIMENSIONS.margins.right
@@ -141,15 +144,15 @@ const renderPlot = (signalData, recombData, theme) => {
 
   LZ2Axes.renderXaxis(thePlot, xScale, DIMENSIONS, chromosome)
   LZ2Axes.renderYaxisSignal(thePlot, yScaleSignal, DIMENSIONS)
-  if(showingRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
+  if(showRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
   const clipID = `plot-area-clip-${props.ID}`
   LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
   LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, theme)
-  if(showingRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
-  if(showingGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
+  if(showRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
+  if(showGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
 }
 
 // *** Configuration data ******************************************************

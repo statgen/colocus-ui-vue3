@@ -60,7 +60,7 @@ export function usePlotManager() {
   }
 
   const mountPlot = async(args) => {
-    const { plotsContainer, signal, type, onActionMenuClick } = args
+    const { plotsContainer, showGenSigLine, showRecombLine, signal, type, onActionMenuClick } = args
     const plotID = `plot_${plotCounter.value}`
     const component = resolvePlotType(type)
     const mountEl = document.createElement('div')
@@ -68,6 +68,8 @@ export function usePlotManager() {
 
     const vnode = createVNode(component, {
       ID: plotCounter.value,
+      showGenSigLine,
+      showRecombLine,
       signal,
       onActionMenuClick,
     })

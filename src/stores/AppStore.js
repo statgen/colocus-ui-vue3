@@ -12,7 +12,8 @@ export const useAppStore = defineStore('appStore', {
     clearPageData: false, // trigger when need to clear data on a page, initially for gene page
     colocID: '',
     currentPageName: '',
-    isSidebarShowing: true,
+    isSidebarShowing: true,   // this refers to the filter panel
+    isToolboxShowing: false,  // refers to toolbox on MZ page
     slidersEnabled: false,
     tutorialFlag: false,
     showCellType: false, // Set this at a more "global" level; applies to all tables & only updates at app load time
@@ -72,6 +73,8 @@ export const useAppStore = defineStore('appStore', {
       plotSettings: {},
       regionPanelRemoved: false,
       selectedTheme: '',
+      showGenSigLines: true,
+      showRecombLines: true,
       tableDataLoaded: false,
       uniqueLDrefs: [],
       ...getFilterPanelSettings()
@@ -84,9 +87,9 @@ export const useAppStore = defineStore('appStore', {
   }),
 
   actions: {
-    addMZPlot(plotID) {
+    addMZPlot(plotID, showGenSigLine, showRecombLine) {
       if(!this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {
-        this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] = { showRecombLine: true, showGenSigLine: true }
+        this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] = { showRecombLine, showGenSigLine }
       }
     },
 
@@ -275,10 +278,6 @@ export const useAppStore = defineStore('appStore', {
     updateSwitch(key, value) {
       const parentKey = this.currentPageName
       this[parentKey][key] = value
-    },
-
-    toggleSidebar() {
-      this.isSidebarShowing = !this.isSidebarShowing
     },
   },
   getters: {

@@ -4,35 +4,14 @@
       <FilterPanel />
     </template>
 
+    <template #toolbox>
+      <MZToolbox />
+    </template>
+
     <h1><BackButton />Multi Zoom</h1>
 
-    <div class="d-flex align-center flex-wrap ga-2 mt-2">
-      <v-select
-        v-model="appStore[multizoomPage].selectedTheme"
-        :items="themes"
-        style="max-width: 200px"
-        @update:model-value="onSelectTheme"
-        label="Select theme"
-        variant="outlined"
-        hide-details
-        density="compact"
-      ></v-select>
-      <v-btn @click="onUnmountAllPlots">Clear all</v-btn>
-      <v-btn @click="onBlinkButtonClick">Blink</v-btn>
-      <v-switch
-        label="Show/hide all recomb lines"
-        v-model="showAllRecomb"
-        @update:model-value="onToggleAllRecomb"
-        density="compact"
-        color="clcAction"/>
-      <v-switch
-        label="Show/hide all gen sig lines"
-        v-model="showAllGenSig"
-        @update:model-value="onToggleAllGenSig"
-        density="compact"
-        color="clcAction"/>
-    </div>
     <LZ2Tooltip />
+
     <LZ2ActionMenu
       v-if="showMenu"
       :menu-style="{
@@ -71,21 +50,18 @@ const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const BLINK_TIME = 5
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const plotsContainer = useTemplateRef('plotsContainer')
 const showMenu = ref(false)
-const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
-
-const showAllGenSig = ref(true)
-const showAllRecomb = ref(true)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
 const preloadGenes = ref([])
+
+appStore.isToolboxShowing = true
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -108,11 +84,12 @@ watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
 // *** Lifecycle hooks *********************************************************
 onBeforeUnmount(() => {
   plotManager.unmountAllPlots()
+  appStore.isToolboxShowing = false
 })
 
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
-  appStore[multizoomPage].selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[1]
+  appStore[multizoomPage].selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
   loadPageData()
 })
 
@@ -142,15 +119,6 @@ const onAddPlotIconClick = (item) => {
   renderPlot(signal2, theme)
 }
 
-const onBlinkButtonClick = () => {
-  document.querySelectorAll('.lead-variant')
-    .forEach(el => {el?.classList.add('blink')})
-  setTimeout(() => {
-    document.querySelectorAll('.lead-variant')
-      .forEach(el => {el?.classList.remove('blink')})
-  }, BLINK_TIME * 1000)
-}
-
 const onCloseMenu = () => {
   showMenu.value = false
   appStore[multizoomPage].activePlot = null
@@ -172,22 +140,6 @@ const onExportPlot = () => {
   showMenu.value = false
 }
 
-const onSelectTheme = (newValue) => {
-  appStore[multizoomPage].selectedTheme = newValue
-}
-
-const onToggleAllGenSig = (val) => {
-  updateAllPlots('showGenSigLine', val)
-}
-
-const onToggleAllRecomb = (val) => {
-  updateAllPlots('showRecombLine', val)
-}
-
-const onUnmountAllPlots = () => {
-  plotManager.unmountAllPlots()
-}
-
 // *** Utility functions *******************************************************
 const loadPageData = async () => {
   appStore[multizoomPage].tableDataLoaded = false
@@ -195,20 +147,18 @@ const loadPageData = async () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
-const renderPlot = async(signal, theme) => {
+const renderPlot = async(signal) => {
+  const showGenSigLine = appStore[multizoomPage].showGenSigLines
+  const showRecombLine = appStore[multizoomPage].showRecombLines
   const plotID = await plotManager.mountPlot({
     plotsContainer,
+    showGenSigLine,
+    showRecombLine,
     signal,
     type: 'region',
     onActionMenuClick,
   })
-  appStore.addMZPlot(plotID)
-}
-
-const updateAllPlots = (key, val) => {
-  Object.keys(appStore[multizoomPage].plotSettings).forEach(k => {
-    appStore[multizoomPage].plotSettings[k][key] = val
-  })
+  appStore.addMZPlot(plotID, showGenSigLine, showRecombLine)
 }
 
 // *** Configuration data ******************************************************

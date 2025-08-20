@@ -1,6 +1,7 @@
 <template>
   <v-toolbar class="fixed-toolbar bg-clcBackground" flat density="compact" border height="72">
-    <v-icon v-if="isSidebarButtonVisible" icon="mdi-filter-outline" @click="toggleSidebar" class="text-clcAction mx-3" size="40px"/>
+    <v-icon v-if="isSidebarButtonVisible" icon="mdi-filter-outline" @click="toggleSidebar" class="text-clcAction mx-3 ml-0" size="32px"/>
+    <v-icon v-if="isToolboxVisible" icon="mdi-tools" @click="toggleToolbox" class="text-clcAction mx-3 ml-n3 mr-1" size="32px"/>
 
     <AppLogo />
 
@@ -61,8 +62,15 @@ import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 
 const appStore = useAppStore()
-const { toggleSidebar } = appStore
-const isSidebarButtonVisible = computed(() => appStore.filterPanelControls.isSidebarButtonShowing)
+// const { toggleToolbox, toggleSidebar } = appStore
+
+const toggleToolbox = () => {
+  appStore.isToolboxShowing = !appStore.isToolboxShowing
+}
+
+const toggleSidebar = () => {
+  appStore.isSidebarShowing = !appStore.isSidebarShowing
+}
 
 const genePage = `/${PAGE_NAMES.GENE}`
 const helpPage = `/${PAGE_NAMES.HELP}`
@@ -70,6 +78,9 @@ const qcStatsPage = `/${PAGE_NAMES.STATS_QC}`
 const searchPage = `/${PAGE_NAMES.SEARCH}`
 const studiesPage = `/${PAGE_NAMES.STUDIES}`
 const summaryStatsPage = `/${PAGE_NAMES.STATS_SUMMARY}`
+
+const isSidebarButtonVisible = computed(() => appStore.filterPanelControls.isSidebarButtonShowing)
+const isToolboxVisible = computed(() => appStore.currentPageName === PAGE_NAMES.MULTIZOOM)
 
 </script>
 
