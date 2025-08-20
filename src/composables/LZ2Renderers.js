@@ -57,7 +57,10 @@ export function useLZ2Renderers() {
       .attr('fill', 'black')
       .text('\u2630') // Unicode for ☰
       .style('cursor', 'pointer')
-      .on('click', onActionMenuClick)
+      .on('click', (event) => {
+        event.stopPropagation()
+        onActionMenuClick(event)
+      })
   }
 
   const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks, themeName) => {

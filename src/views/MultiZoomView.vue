@@ -42,7 +42,7 @@
       }"
       @delete-plot="onDeletePlot"
       @export-plot="onExportPlot"
-      @close-menu="showMenu = false"
+      @close-menu="onCloseMenu"
     />
     <div ref="plotsContainer" class="plot-container mt-4"></div>
 
@@ -150,6 +150,11 @@ const onBlinkButtonClick = () => {
     document.querySelectorAll('.lead-variant')
       .forEach(el => {el?.classList.remove('blink')})
   }, BLINK_TIME * 1000)
+}
+
+const onCloseMenu = () => {
+  showMenu.value = false
+  appStore[multizoomPage].activePlot = null
 }
 
 const onDataTableRowClick = () => {
