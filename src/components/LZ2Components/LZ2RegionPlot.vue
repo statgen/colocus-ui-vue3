@@ -70,8 +70,9 @@ watch(
       () => recombData.value,
       () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showRecombLine,
       () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showGenSigLine,
+      () => appStore[PAGE_NAMES.MULTIZOOM].selectedTheme,
     ],
-async ([signal, recomb, showRecomb, showGenSig]) => {
+async ([signal, recomb, showRecomb, showGenSig, theme]) => {
       if (!Array.isArray(signal) || !Array.isArray(recomb) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecomb)       // for screen
@@ -84,7 +85,7 @@ async ([signal, recomb, showRecomb, showGenSig]) => {
         n.style.display = showGenSig ? '' : 'none'            // for export
       })
       // await nextTick()
-      renderPlot(signal, recomb)
+      renderPlot(signal, recomb, theme)
     },
   { immediate: true }
 )
@@ -109,7 +110,7 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
-const renderPlot = (signalData, recombData) => {
+const renderPlot = (signalData, recombData, theme) => {
   const showingRecombLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showRecombLine
   const showingGenSigLine = appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID].showGenSigLine
 
@@ -147,7 +148,7 @@ const renderPlot = (signalData, recombData) => {
   LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
-  LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, props.theme)
+  LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, theme)
   if(showingRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
   if(showingGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
 }

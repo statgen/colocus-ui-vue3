@@ -8,7 +8,7 @@
 
     <div class="d-flex align-center flex-wrap ga-2 mt-2">
       <v-select
-        v-model="selectedTheme"
+        v-model="appStore[multizoomPage].selectedTheme"
         :items="themes"
         style="max-width: 200px"
         @update:model-value="onSelectTheme"
@@ -77,7 +77,6 @@ const loadTableDataFlag = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const plotsContainer = useTemplateRef('plotsContainer')
-const selectedTheme = ref()
 const showMenu = ref(false)
 const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 
@@ -100,7 +99,7 @@ provide('preloadGenes', preloadGenes)
 watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
-    const theme = selectedTheme.value
+    const theme = appStore[multizoomPage].selectedTheme
     renderPlot(appStore[multizoomPage].colocData.signal1, theme)
     renderPlot(appStore[multizoomPage].colocData.signal2, theme)
   }
@@ -113,7 +112,7 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
-  selectedTheme.value = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[1]
+  appStore[multizoomPage].selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[1]
   loadPageData()
 })
 
@@ -138,7 +137,7 @@ const onActionMenuClick = async (arg) => {
 
 const onAddPlotIconClick = (item) => {
   const { signal1, signal2 } = item
-  const theme = selectedTheme.value
+  const theme = appStore[multizoomPage].selectedTheme
   renderPlot(signal1, theme)
   renderPlot(signal2, theme)
 }
@@ -174,7 +173,7 @@ const onExportPlot = () => {
 }
 
 const onSelectTheme = (newValue) => {
-  selectedTheme.value = newValue
+  appStore[multizoomPage].selectedTheme = newValue
 }
 
 const onToggleAllGenSig = (val) => {

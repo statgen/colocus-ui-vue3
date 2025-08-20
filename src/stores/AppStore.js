@@ -71,6 +71,7 @@ export const useAppStore = defineStore('appStore', {
       activePlot: 0,
       plotSettings: {},
       regionPanelRemoved: false,
+      selectedTheme: '',
       tableDataLoaded: false,
       uniqueLDrefs: [],
       ...getFilterPanelSettings()
