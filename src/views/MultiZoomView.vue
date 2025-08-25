@@ -8,7 +8,7 @@
       <MZToolbox />
     </template>
 
-    <h1><BackButton />Multi Zoom</h1>
+    <h1><BackButton />MultiZoom</h1>
 
     <LZ2Tooltip />
 
@@ -23,7 +23,7 @@
       @export-plot="onExportPlot"
       @close-menu="onCloseMenu"
     />
-    <div ref="plotsContainer" class="plot-container mt-4"></div>
+    <div ref="plotsContainer" id="plotsContainer" class="plot-container mt-4"></div>
 
     <h2>Data table</h2>
 

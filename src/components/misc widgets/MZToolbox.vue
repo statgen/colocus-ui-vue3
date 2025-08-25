@@ -12,6 +12,7 @@
     ></v-select>
     <v-btn @click="onUnmountAllPlots" size="small" class="btn-class my-3">Clear all plots</v-btn>
     <v-btn @click="onBlinkButtonClick" size="small" class="btn-class my-3">Blink all lead variants (5 sec)</v-btn>
+    <v-btn @click="onExportAllClick" size="small" class="btn-class my-3">Export all plots</v-btn>
     <v-switch
       label="Recombination lines"
       v-model="showAllRecomb"
@@ -32,6 +33,7 @@
 <script setup>
 // *** Imports *****************************************************************
 import { ref } from 'vue'
+import html2canvas from 'html2canvas'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
@@ -65,6 +67,10 @@ const onBlinkButtonClick = () => {
   }, BLINK_TIME * 1000)
 }
 
+const onExportAllClick = () => {
+  exportPlotContainer('plotsContainer')
+}
+
 const onSelectTheme = (newValue) => {
   appStore[multizoomPage].selectedTheme = newValue
 }
@@ -84,6 +90,26 @@ const onUnmountAllPlots = () => {
 }
 
 // *** Utility functions *******************************************************
+function exportPlotContainer(el) {
+  const element = document.getElementById(el);
+
+  html2canvas(element, {
+    useCORS: true,
+    scale: 2, // Higher resolution
+    backgroundColor: '#ffffff'
+  }).then(canvas => {
+    // Download the image
+    canvas.toBlob(function(blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'genetic-plots.png';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+}
+
 const updateAllPlots = (key, val) => {
   Object.keys(appStore[multizoomPage].plotSettings).forEach(k => {
     appStore[multizoomPage].plotSettings[k][key] = val
