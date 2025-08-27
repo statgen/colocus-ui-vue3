@@ -1,7 +1,7 @@
 import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -65,6 +65,7 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.MULTIZOOM]: {
+      addUniqueRefsOnly: false,
       colocData: markRaw({}),
       colocDataReady: false,
       lzfilterDataChanged: false,
@@ -72,11 +73,14 @@ export const useAppStore = defineStore('appStore', {
       activePlot: 0,
       plotSettings: {},
       regionPanelRemoved: false,
+      selectedLDRef: '',
       selectedTheme: '',
       showGenSigLines: true,
       showRecombLines: true,
       tableDataLoaded: false,
-      uniqueLDrefs: [],
+      xStart: 0,
+      xEnd: 0,
+      yAxis: LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS,
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.SEARCH]: {
@@ -87,9 +91,9 @@ export const useAppStore = defineStore('appStore', {
   }),
 
   actions: {
-    addMZPlot(plotID, showGenSigLine, showRecombLine) {
+    addMZPlot(plotID, showGenSigLine, showRecombLine, variant, signalID) {
       if(!this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {
-        this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] = { showRecombLine, showGenSigLine }
+        this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] = { showRecombLine, showGenSigLine, variant, signalID }
       }
     },
 
@@ -179,7 +183,9 @@ export const useAppStore = defineStore('appStore', {
     },
 
     deleteMZPlot(plotID) {
-      if(this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {delete this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] }
+      if(this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {
+        delete this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]
+      }
     },
 
     async loadFilterData() {

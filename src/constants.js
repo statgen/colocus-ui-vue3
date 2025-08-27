@@ -25,6 +25,7 @@ const COLORS = {
 }
 
 const LZ2_DISPLAY_OPTIONS = {
+  DEFAULT_Y_AXIS: 'conditional',
   DIAMOND_MARGIN: 12, // allow extra space for lead variant diamond
   DIMENSIONS: {
     height: 230,

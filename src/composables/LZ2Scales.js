@@ -1,12 +1,9 @@
 import * as d3 from 'd3v7'
 
 export function useLZ2Scales() {
-  const createXscale = (xAccessor, data, dimensions) => {
-    const [xMin, xMax] = d3.extent(data, xAccessor)
-    const xRange = xMax - xMin
-
+  const createXscale = (xStart, xEnd, dimensions) => {
     return d3.scaleLinear()
-      .domain([xMin, xMax])
+      .domain([xStart, xEnd])
       .range([0, dimensions.ctrWidth])
   }
 

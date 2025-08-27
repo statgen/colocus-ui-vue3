@@ -8,7 +8,7 @@
       <MZToolbox />
     </template>
 
-    <h1><BackButton />MultiZoom</h1>
+    <h1><BackButton />Multizoom</h1>
 
     <LZ2Tooltip />
 
@@ -38,11 +38,12 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
+import { findPlotRegion } from '@/util/util'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -64,6 +65,11 @@ const preloadGenes = ref([])
 appStore.isToolboxShowing = true
 
 // *** Computed ****************************************************************
+const uniqueSignals = computed(() => {
+  const signals = Object.values(appStore[multizoomPage].plotSettings).map(v => v.signalID)
+  return [...new Set(signals)]
+})
+
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
 provide('loadTableDataFlag', loadTableDataFlag)
@@ -76,8 +82,15 @@ watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
     const theme = appStore[multizoomPage].selectedTheme
-    renderPlot(appStore[multizoomPage].colocData.signal1, theme)
-    renderPlot(appStore[multizoomPage].colocData.signal2, theme)
+    const signal1 = appStore[multizoomPage].colocData.signal1
+    const signal2 = appStore[multizoomPage].colocData.signal2
+    appStore[multizoomPage].selectedLDRef = signal1.lead_variant.vid
+    const x = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
+    appStore[multizoomPage].xStart = x.start
+    appStore[multizoomPage].xEnd = x.end
+
+    renderPlot(signal1, theme)
+    renderPlot(signal2, theme)
   }
 })
 
@@ -114,9 +127,12 @@ const onActionMenuClick = async (arg) => {
 
 const onAddPlotIconClick = (item) => {
   const { signal1, signal2 } = item
+  const s1ID = signal1.uuid
+  const s2ID = signal2.uuid
+  const uniques = uniqueSignals.value
   const theme = appStore[multizoomPage].selectedTheme
-  renderPlot(signal1, theme)
-  renderPlot(signal2, theme)
+  if(!appStore[multizoomPage].addUniqueRefsOnly || !uniques.includes(s1ID)) renderPlot(signal1, theme)
+  if(!appStore[multizoomPage].addUniqueRefsOnly || !uniques.includes(s2ID)) renderPlot(signal2, theme)
 }
 
 const onCloseMenu = () => {
@@ -144,6 +160,7 @@ const onExportPlot = () => {
 const loadPageData = async () => {
   appStore[multizoomPage].tableDataLoaded = false
   appStore[multizoomPage].colocDataReady = false
+  appStore[multizoomPage].plotSettings = {}
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
@@ -158,11 +175,10 @@ const renderPlot = async(signal) => {
     type: 'region',
     onActionMenuClick,
   })
-  appStore.addMZPlot(plotID, showGenSigLine, showRecombLine)
+  appStore.addMZPlot(plotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid)
 }
 
 // *** Configuration data ******************************************************
-
 </script>
 
 <style scoped>

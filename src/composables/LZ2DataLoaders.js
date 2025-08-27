@@ -2,15 +2,14 @@ import { toRaw } from 'vue'
 import * as aq from 'arquero'
 import { useFetchData } from '@/composables/fetchData'
 import { URLS } from '@/constants'
-import { makePlotTitle } from '@/util/util'
-
+import { parseVariant2 } from '@/util/util'
 
 export function useLZ2DataLoaders() {
-  const loadSignalData = async (signal, pv, build) => {
+  const loadSignalData = async (signalRef, signalUUID, LDRef, build, yAxis) => {
     const { data, errorMessage, fetchData } = useFetchData()
-
+    const pvLD = parseVariant2(LDRef)
     let base = `${URLS.LD_DATA}/${build}/region/`
-    let url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}&variant=${pv.chr}:${pv.loc}_${pv.ref}/${pv.alt}`
+    let url = `${base}?chrom=${pvLD.chr}&start=${pvLD.start}&end=${pvLD.end}&variant=${pvLD.chr}:${pvLD.loc}_${pvLD.ref}/${pvLD.alt}`
     let ldData = []
     if(await fetchData(url, 'lz2 ld data', 'MZ')) {
       ldData = toRaw(data.value)
@@ -19,8 +18,9 @@ export function useLZ2DataLoaders() {
       return
     }
 
-    base = `${URLS.SIGNALS_DATA}/${signal.uuid}/region`
-    url = `${base}?chrom=${pv.chr}&start=${pv.start}&end=${pv.end}`
+    const pvSignal = parseVariant2(signalRef)
+    base = `${URLS.SIGNALS_DATA}/${signalUUID}/region`
+    url = `${base}?chrom=${pvSignal.chr}&start=${pvSignal.start}&end=${pvSignal.end}`
     let signalData
     if(await fetchData(url, 'lz2 signal data', 'MZ')) {
       signalData = toRaw(data.value)
@@ -40,12 +40,12 @@ export function useLZ2DataLoaders() {
 
     const t6 = t5.map(row => ({
       x: row.position,
-      y: row.t1_neg_log_pvalue,
+      y: yAxis === 'marginal' ? row.t1_neg_log_pvalue : row.t2_neg_log_pvalue,
       r2: row.r2,
       variant: row.variant,
       refAllele: row.ref_allele,
-      isLead: signal.lead_variant.vid === row.variant,
-      beta: row.t1_beta,
+      isLead: signalRef === row.variant,
+      beta: yAxis === 'marginal' ? row.t1_beta : row.t2_beta,
     }))
 
     t6.sort((a, b) => {
@@ -55,8 +55,9 @@ export function useLZ2DataLoaders() {
     return t6
   }
 
-  const loadRecombData = async (pv, build) => {
+  const loadRecombData = async (leadVariant, build) => {
     const { data, errorMessage, fetchData } = useFetchData()
+    const pv = parseVariant2(leadVariant)
     const url = new URL(URLS.PORTALDEV_RECOMB)
     url.searchParams.set('filter', `chromosome eq '${pv.chr}' and position le ${pv.end} and position ge ${pv.start}`)
     url.searchParams.set('build', build)

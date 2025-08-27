@@ -44,9 +44,8 @@ const props = defineProps({
 })
 
 // *** Variables ***************************************************************
-const variant = props.signal.lead_variant.vid
-const parsedVariant = parseVariant2(variant)
-const chromosome = parsedVariant.chr
+const leadVariant = props.signal.lead_variant.vid
+const signalUUID = props.signal.uuid
 const title = ref('')
 const titleColor = ref('')
 
@@ -59,6 +58,7 @@ const recombData = ref(null)
 const DIMENSIONS = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
 const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
+const multizoomPage = PAGE_NAMES.MULTIZOOM
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -69,9 +69,9 @@ watch(
   [
       () => signalData.value,
       () => recombData.value,
-      () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showRecombLine,
-      () => appStore[PAGE_NAMES.MULTIZOOM].plotSettings[props.ID]?.showGenSigLine,
-      () => appStore[PAGE_NAMES.MULTIZOOM].selectedTheme,
+      () => appStore[multizoomPage].plotSettings[props.ID]?.showRecombLine,
+      () => appStore[multizoomPage].plotSettings[props.ID]?.showGenSigLine,
+      () => appStore[multizoomPage].selectedTheme,
     ],
 async ([signalData, recombData, showRecombLine, showGenSigLine, theme]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
@@ -86,9 +86,19 @@ async ([signalData, recombData, showRecombLine, showGenSigLine, theme]) => {
         n.style.display = showGenSigLine ? '' : 'none'            // for export
       })
       await nextTick()
-      renderPlot(signalData, recombData, showGenSigLine, showRecombLine, theme)
+      renderPlot(leadVariant, signalData, recombData, showGenSigLine, showRecombLine, theme)
     },
   { immediate: true }
+)
+
+watch(
+  () => appStore[multizoomPage].selectedLDRef,
+  async (selectedLDRef) => signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, appStore[multizoomPage].yAxis)
+)
+
+watch(
+  () => appStore[multizoomPage].yAxis,
+  async (yAxis) => signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, appStore[multizoomPage].selectedLDRef, REF_BUILD, yAxis)
 )
 
 // *** Lifecycle hooks *********************************************************
@@ -101,8 +111,8 @@ onMounted(async () => {
   title.value = t
   titleColor.value = c
 
-  signalData.value = await LZ2DataLoaders.loadSignalData(props.signal, parsedVariant, REF_BUILD)
-  recombData.value = await LZ2DataLoaders.loadRecombData(parsedVariant, REF_BUILD_PORTAL)
+  signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, appStore[multizoomPage].selectedLDRef, REF_BUILD, appStore[multizoomPage].yAxis)
+  recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL)
 })
 
 // *** Event handlers **********************************************************
@@ -111,10 +121,8 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
-const renderPlot = (signalData, recombData, showGenSigLine, showRecombLine, theme) => {
-  // const mzPage = appStore[PAGE_NAMES.MULTIZOOM]
-  // const showingRecombLine = mzPage.showRecombLines || mzPage.plotSettings[props.ID].showRecombLine
-  // const showingGenSigLine = mzPage.showGenSigLines || mzPage.plotSettings[props.ID].showGenSigLine
+const renderPlot = (leadVariant, signalData, recombData, showGenSigLine, showRecombLine, theme) => {
+  const chromosome = parseVariant2(leadVariant).chr
 
   if(showRecombLine) {
     DIMENSIONS.ctrWidth = DIMENSIONS.width
@@ -124,7 +132,6 @@ const renderPlot = (signalData, recombData, showGenSigLine, showRecombLine, them
     DIMENSIONS.ctrWidth = LZ2_DISPLAY_OPTIONS.DIMENSIONS.width
       - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.left
       - 10
-      // - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.right
   }
 
   d3.select(plotContainer.value).selectAll('*').remove()
@@ -138,7 +145,10 @@ const renderPlot = (signalData, recombData, showGenSigLine, showRecombLine, them
   const xAccessor = d => d.x
   const yAccessor = d => d.y
 
-  const xScale = LZ2Scales.createXscale(xAccessor, signalData, DIMENSIONS)
+  const xStart = appStore[multizoomPage].xStart
+  const xEnd = appStore[multizoomPage].xEnd
+  const xScale = LZ2Scales.createXscale(xStart, xEnd, DIMENSIONS)
+
   const yScaleSignal = LZ2Scales.createYscaleSignal(yAccessor, signalData, DIMENSIONS)
   const yScaleRecomb = LZ2Scales.createYscaleRecomb(DIMENSIONS)
 

@@ -83,6 +83,11 @@ export function useLZ2Renderers() {
       const el = d3.select(this)
       const x = xScale(xAccessor(d))
       const y = yScale(yAccessor(d))
+      // console.log(`x: ${x}, y: ${y}`)
+      if(!Number.isFinite(x) || !Number.isFinite(y)) {
+        console.warn(`Bad plot data, skipping: x=${x}, y=${y}`)
+        return
+      }
 
       if(d.beta === 0) {
         el
