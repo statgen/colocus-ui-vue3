@@ -132,6 +132,7 @@ const onAddBothPlotsClick = (item) => {
   const MZPage = appStore[multizoomPage]
   const s1PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal1
   const s2PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal2
+
   if(s1PlotID && s2PlotID) {
     deletePlot(s1PlotID)
     deletePlot(s2PlotID)
@@ -193,8 +194,8 @@ const loadPageData = async () => {
 async function renderPlot(colocID, signal, slot) {
   const signalID = signal.uuid
   const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
-  const uniques = MZPage.uniqueSignals
-  if(MZPage.addUniqueRefsOnly && uniques.includes(signalID)) return
+  const signals = appStore.getSignals()
+  if(MZPage.addUniqueRefsOnly && signals.includes(signalID)) return
 
   const showGenSigLine = MZPage.showGenSigLines
   const showRecombLine = MZPage.showRecombLines

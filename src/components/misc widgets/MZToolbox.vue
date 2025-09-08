@@ -140,9 +140,7 @@ const onToggleShowPlotID = (val) => {
 
 const onUnmountAllPlots = () => {
   plotManager.unmountAllPlots()
-  const MZPage = appStore[multizoomPage]
-  MZPage.plotSettings = {}
-  MZPage.rowSlotToPlotID = {}
+  appStore.deleteMZPlotsAll()
 }
 
 const onYAxisChange = (val) => {
