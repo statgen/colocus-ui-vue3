@@ -3,6 +3,7 @@ import Lz2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
 import { D3_FONT_DEFAULTS, LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 const plotCounter = ref(1)
+const reusablePlotIDs = []
 const plotRegistry = new Map()
 
 export function usePlotManager() {
@@ -59,15 +60,25 @@ export function usePlotManager() {
     image.src = url
   }
 
+  const getNextPlotID = () => {
+    if(reusablePlotIDs.length > 0){
+      const pid = Math.min(...reusablePlotIDs)
+      reusablePlotIDs.splice(reusablePlotIDs.indexOf(pid), 1)
+      return pid
+    } else {
+      return plotCounter.value++
+    }
+  }
+
   const mountPlot = async(args) => {
     const { plotsContainer, showGenSigLine, showRecombLine, signal, type, onActionMenuClick } = args
-    const plotID = `plot_${plotCounter.value}`
+    const plotID = getNextPlotID()
     const component = resolvePlotType(type)
     const mountEl = document.createElement('div')
     plotsContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
-      ID: plotCounter.value,
+      ID: plotID,
       showGenSigLine,
       showRecombLine,
       signal,
@@ -76,7 +87,7 @@ export function usePlotManager() {
 
     render(vnode, mountEl)
     plotRegistry.set(plotID, { type, vnode, el: mountEl })
-    return plotCounter.value++
+    return plotID
   }
 
   const unmountPlot = (plotID) => {
@@ -85,6 +96,9 @@ export function usePlotManager() {
       render(null, entry.el)
       entry.el.remove()
       plotRegistry.delete(plotID)
+      reusablePlotIDs.push(plotID)
+    } else {
+      console.warn(`error unmounting plot: ${plotID}`)
     }
   }
 

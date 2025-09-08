@@ -68,16 +68,19 @@ export const useAppStore = defineStore('appStore', {
       addUniqueRefsOnly: false,
       colocData: markRaw({}),
       colocDataReady: false,
+      colocsSignals: markRaw([]),
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       activePlot: 0,
       plotSettings: {},
       regionPanelRemoved: false,
+      rowSlotToPlotID: {},
       selectedLDRef: '',
       selectedTheme: '',
       showGenSigLines: true,
       showRecombLines: true,
       tableDataLoaded: false,
+      uniqueSignals: markRaw([]),
       xStart: 0,
       xEnd: 0,
       yAxis: LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS,
@@ -91,9 +94,46 @@ export const useAppStore = defineStore('appStore', {
   }),
 
   actions: {
-    addMZPlot(plotID, showGenSigLine, showRecombLine, variant, signalID) {
-      if(!this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {
-        this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID] = { showRecombLine, showGenSigLine, variant, signalID }
+     setRowSlotPlotID(colocID, slot, plotID) {
+      const MZPage = this[PAGE_NAMES.MULTIZOOM]
+      if (!MZPage.rowSlotToPlotID[colocID]) MZPage.rowSlotToPlotID[colocID] = {}
+      MZPage.rowSlotToPlotID[colocID][slot] = plotID
+     },
+
+    getPlotID(colocID, slot) {
+      const MZPage = this[PAGE_NAMES.MULTIZOOM]
+      return MZPage.rowSlotToPlotID?.[colocID]?.[slot] ?? null
+    },
+
+    makeMZColocsSignals() {
+      const MZPage = this[PAGE_NAMES.MULTIZOOM]
+      MZPage.colocsSignals = Object.values(this[PAGE_NAMES.MULTIZOOM].plotSettings).map(v => `${v.colocID}-${v.signalID}`)
+    },
+
+    makeMZUniqueSignals() {
+      const MZPage = this[PAGE_NAMES.MULTIZOOM]
+      const signals = Object.values(MZPage.plotSettings).map(v => v.signalID)
+      this[PAGE_NAMES.MULTIZOOM].uniqueSignals = [...new Set(signals)]
+    },
+
+    addMZPlot(plotID, showGenSigLine, showRecombLine, variant, signalID, colocID, slot) {
+      const MZPage = this[PAGE_NAMES.MULTIZOOM]
+      if(!MZPage.plotSettings[plotID]) {
+        MZPage.plotSettings[plotID] = { showRecombLine, showGenSigLine, variant, signalID, colocID, slot }
+        this.makeMZColocsSignals()
+        this.makeMZUniqueSignals()
+      }
+    },
+
+    deleteMZPlot(plotID) {
+      const MZPage = this[PAGE_NAMES.MULTIZOOM]
+      if(MZPage.plotSettings[plotID]) {
+        const colocID = MZPage.plotSettings[plotID].colocID
+        const slot = MZPage.plotSettings[plotID].slot
+        delete MZPage.rowSlotToPlotID[colocID][slot]
+        delete MZPage.plotSettings[plotID]
+      } else {
+        console.warn(`Error trying to delete nonexistent plot: ${plotID}`)
       }
     },
 
@@ -180,12 +220,6 @@ export const useAppStore = defineStore('appStore', {
       this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
-    },
-
-    deleteMZPlot(plotID) {
-      if(this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]) {
-        delete this[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]
-      }
     },
 
     async loadFilterData() {

@@ -33,7 +33,7 @@ export const useDataTableHelpers = () => {
 
   const allColumns= [
     { title: 'Expand', value: 'expand-left', sortable: false, visible: () => alwaysShow },
-    { title: 'Add plots', value: 'actions', sortable: false, visible: () => showAddPlotIcon() },
+    { title: 'Add plots', value: 'actions', sortable: false, minWidth: '8rem', visible: () => showAddPlotIcon() },
     { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '5rem', visible: alwaysShow },

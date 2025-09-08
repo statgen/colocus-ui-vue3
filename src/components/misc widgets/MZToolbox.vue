@@ -127,7 +127,9 @@ const onToggleAllRecomb = (val) => {
 
 const onUnmountAllPlots = () => {
   plotManager.unmountAllPlots()
-  appStore[multizoomPage].plotSettings = {}
+  const MZPage = appStore[multizoomPage]
+  MZPage.plotSettings = {}
+  MZPage.rowSlotToPlotID = {}
 }
 
 const onYAxisChange = (val) => {

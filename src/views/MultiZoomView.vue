@@ -30,7 +30,8 @@
     <div class="table-container mb-8">
       <DataTable
         @onDataTableRowClick="onDataTableRowClick"
-        @onAddPlotIconClick="onAddPlotIconClick"
+        @onAddBothPlotsClick="onAddBothPlotsClick"
+        @on-toggle-plot="onTogglePlot"
       ></DataTable>
     </div>
   </SidebarLayout>
@@ -38,12 +39,13 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { findPlotRegion } from '@/util/util'
+import DataTable from "@/components/DataTable/DataTable.vue";
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -65,11 +67,6 @@ const preloadGenes = ref([])
 appStore.isToolboxShowing = true
 
 // *** Computed ****************************************************************
-const uniqueSignals = computed(() => {
-  const signals = Object.values(appStore[multizoomPage].plotSettings).map(v => v.signalID)
-  return [...new Set(signals)]
-})
-
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
 provide('loadTableDataFlag', loadTableDataFlag)
@@ -81,16 +78,19 @@ provide('preloadGenes', preloadGenes)
 watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
-    const theme = appStore[multizoomPage].selectedTheme
+
+    const colocID = appStore[multizoomPage].colocData.uuid
     const signal1 = appStore[multizoomPage].colocData.signal1
     const signal2 = appStore[multizoomPage].colocData.signal2
+
     appStore[multizoomPage].selectedLDRef = signal1.lead_variant.vid
+
     const x = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
     appStore[multizoomPage].xStart = x.start
     appStore[multizoomPage].xEnd = x.end
 
-    renderPlot(signal1, theme)
-    renderPlot(signal2, theme)
+    renderPlot(colocID, signal1, 'signal1')
+    renderPlot(colocID, signal2, 'signal2')
   }
 })
 
@@ -103,6 +103,7 @@ onBeforeUnmount(() => {
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
   appStore[multizoomPage].selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
+  plotManager.unmountAllPlots()
   loadPageData()
 })
 
@@ -125,14 +126,23 @@ const onActionMenuClick = async (arg) => {
   showMenu.value = true
 }
 
-const onAddPlotIconClick = (item) => {
+const onAddBothPlotsClick = (item) => {
   const { signal1, signal2 } = item
-  const s1ID = signal1.uuid
-  const s2ID = signal2.uuid
-  const uniques = uniqueSignals.value
-  const theme = appStore[multizoomPage].selectedTheme
-  if(!appStore[multizoomPage].addUniqueRefsOnly || !uniques.includes(s1ID)) renderPlot(signal1, theme)
-  if(!appStore[multizoomPage].addUniqueRefsOnly || !uniques.includes(s2ID)) renderPlot(signal2, theme)
+  const colocID = item.uuid
+  const MZPage = appStore[multizoomPage]
+  const s1PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal1
+  const s2PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal2
+  if(s1PlotID && s2PlotID) {
+    deletePlot(s1PlotID)
+    deletePlot(s2PlotID)
+  } else if(s1PlotID) {
+    renderPlot(colocID, signal2, 'signal2')
+  } else if(s2PlotID) {
+    renderPlot(colocID, signal1, 'signal1')
+  } else {
+    renderPlot(colocID, signal1, 'signal1')
+    renderPlot(colocID, signal2, 'signal2')
+  }
 }
 
 const onCloseMenu = () => {
@@ -146,17 +156,33 @@ const onDataTableRowClick = () => {
 
 const onDeletePlot = () => {
   const plotID = appStore[multizoomPage].activePlot
-  plotManager.unmountPlot(`plot_${plotID}`)
-  appStore.deleteMZPlot(plotID)
+  deletePlot(plotID)
   showMenu.value = false
 }
 
 const onExportPlot = () => {
-  plotManager.exportPlotAsPNG(`plot_${appStore[multizoomPage].activePlot}`)
+  plotManager.exportPlotAsPNG(appStore[multizoomPage].activePlot)
   showMenu.value = false
 }
 
+const onTogglePlot = async (colocID, signal, slot) => {
+  const existingPlot = appStore.getPlotID(colocID, slot)
+
+  if (existingPlot) {
+    plotManager.unmountPlot(existingPlot)
+    appStore.deleteMZPlot(existingPlot)
+    appStore.setRowSlotPlotID(colocID, slot, null)
+  } else {
+    await renderPlot(colocID, signal, slot)
+  }
+}
+
 // *** Utility functions *******************************************************
+const deletePlot = (plotID) => {
+  plotManager.unmountPlot(plotID)
+  appStore.deleteMZPlot(plotID)
+}
+
 const loadPageData = async () => {
   appStore[multizoomPage].tableDataLoaded = false
   appStore[multizoomPage].colocDataReady = false
@@ -164,9 +190,14 @@ const loadPageData = async () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
-const renderPlot = async(signal) => {
-  const showGenSigLine = appStore[multizoomPage].showGenSigLines
-  const showRecombLine = appStore[multizoomPage].showRecombLines
+async function renderPlot(colocID, signal, slot) {
+  const signalID = signal.uuid
+  const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
+  const uniques = MZPage.uniqueSignals
+  if(MZPage.addUniqueRefsOnly && uniques.includes(signalID)) return
+
+  const showGenSigLine = MZPage.showGenSigLines
+  const showRecombLine = MZPage.showRecombLines
   const plotID = await plotManager.mountPlot({
     plotsContainer,
     showGenSigLine,
@@ -175,9 +206,10 @@ const renderPlot = async(signal) => {
     type: 'region',
     onActionMenuClick,
   })
-  appStore.addMZPlot(plotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid)
+  appStore.addMZPlot(plotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
+  appStore.setRowSlotPlotID(colocID, slot, plotID)
+  return plotID
 }
-
 // *** Configuration data ******************************************************
 </script>
 
