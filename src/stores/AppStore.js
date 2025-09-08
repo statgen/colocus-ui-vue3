@@ -78,6 +78,7 @@ export const useAppStore = defineStore('appStore', {
       selectedLDRef: '',
       selectedTheme: '',
       showGenSigLines: true,
+      showPlotID: true,
       showRecombLines: true,
       tableDataLoaded: false,
       uniqueSignals: markRaw([]),
@@ -116,10 +117,10 @@ export const useAppStore = defineStore('appStore', {
       this[PAGE_NAMES.MULTIZOOM].uniqueSignals = [...new Set(signals)]
     },
 
-    addMZPlot(plotID, showGenSigLine, showRecombLine, variant, signalID, colocID, slot) {
+    addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, variant, signalID, colocID, slot) {
       const MZPage = this[PAGE_NAMES.MULTIZOOM]
       if(!MZPage.plotSettings[plotID]) {
-        MZPage.plotSettings[plotID] = { showRecombLine, showGenSigLine, variant, signalID, colocID, slot }
+        MZPage.plotSettings[plotID] = { showPlotID, showRecombLine, showGenSigLine, variant, signalID, colocID, slot }
         this.makeMZColocsSignals()
         this.makeMZUniqueSignals()
       }

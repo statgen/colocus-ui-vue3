@@ -69,11 +69,12 @@ watch(
   [
       () => signalData.value,
       () => recombData.value,
+      () => appStore[multizoomPage].plotSettings[props.ID]?.showPlotID,
       () => appStore[multizoomPage].plotSettings[props.ID]?.showRecombLine,
       () => appStore[multizoomPage].plotSettings[props.ID]?.showGenSigLine,
       () => appStore[multizoomPage].selectedTheme,
     ],
-async ([signalData, recombData, showRecombLine, showGenSigLine, theme]) => {
+async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecombLine)       // for screen
@@ -86,7 +87,7 @@ async ([signalData, recombData, showRecombLine, showGenSigLine, theme]) => {
         n.style.display = showGenSigLine ? '' : 'none'            // for export
       })
       await nextTick()
-      renderPlot(leadVariant, signalData, recombData, showGenSigLine, showRecombLine, theme)
+      renderPlot(props.ID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme)
     },
   { immediate: true }
 )
@@ -121,7 +122,7 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
-const renderPlot = (leadVariant, signalData, recombData, showGenSigLine, showRecombLine, theme) => {
+const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme) => {
   const chromosome = parseVariant2(leadVariant).chr
 
   if(showRecombLine) {
@@ -163,6 +164,7 @@ const renderPlot = (leadVariant, signalData, recombData, showGenSigLine, showRec
   LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, theme)
   if(showRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
   if(showGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
+  if(showPlotID) LZ2Renderers.renderPlotIDBadge(rootSVG.value, plotID, DIMENSIONS)
 }
 
 // *** Configuration data ******************************************************

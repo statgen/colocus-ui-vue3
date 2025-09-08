@@ -63,6 +63,60 @@ export function useLZ2Renderers() {
       })
   }
 
+  function renderPlotIDBadge(svg, plotID, dimensions, opts = {}) {
+    const {
+      offsetX = 8,
+      offsetY = 8,
+      padding = 4,
+      rx = 0,
+      fontFamily = LZ2_DISPLAY_OPTIONS.PLOT_FONT_FAMILY,
+      fontSize = '0.75rem',
+      fontWeight = '600',
+      textFill = 'black',
+      rectFill = '#ffffff',  // semi-opaque white
+      rectStroke = LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR,
+      rectStrokeWidth = 1
+    } = opts
+
+    // Remove an old badge if re-rendering
+    svg.selectAll('.plot-id-badge').remove()
+
+    // Anchor group at bottom-left, draw upward from it
+    const g = svg.append('g')
+      .attr('class', 'plot-id-badge')
+      .attr('transform', `translate(${offsetX}, ${dimensions.height - offsetY})`)
+      .attr('pointer-events', 'none')
+
+    // render text first
+    const text = g.append('text')
+      .text(String(plotID))
+      .attr('x', padding)
+      // place text so that its baseline is inside the box we draw upward
+      .attr('y', -padding)
+      .attr('dominant-baseline', 'ideographic')
+      .attr('font-family', fontFamily)
+      .attr('font-size', fontSize)
+      .attr('font-weight', fontWeight)
+      .attr('fill', textFill)
+
+    // Measure text and size rect accordingly
+    const { width: tw, height: th } = text.node().getBBox()
+    const w = tw + padding * 2
+    const h = th + padding * 2
+
+    // Draw rect behind text (from the anchor upward)
+    g.insert('rect', 'text')
+      .attr('x', 0)
+      .attr('y', -h)
+      .attr('width', w)
+      .attr('height', h)
+      .attr('rx', rx)
+      .attr('ry', rx)
+      .attr('fill', rectFill)
+      .attr('stroke', rectStroke)
+      .attr('stroke-width', rectStrokeWidth)
+  }
+
   const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks, themeName) => {
     const theme = LZ2_DISPLAY_OPTIONS.LZ2_THEMES[themeName]
     const colorSet = theme.colors
@@ -182,6 +236,7 @@ export function useLZ2Renderers() {
   return {
     renderBorder,
     renderHeader,
+    renderPlotIDBadge,
     renderSignalData,
     renderRecombLine,
     renderGenSigLine,

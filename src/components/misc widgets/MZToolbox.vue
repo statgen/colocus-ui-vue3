@@ -30,6 +30,13 @@
       class="my-n1"
       color="clcAction"/>
     <v-switch
+      label="Show genetic significance lines"
+      v-model="showAllGenSig"
+      @update:model-value="onToggleAllGenSig"
+      density="compact"
+      class="my-n7"
+      color="clcAction"/>
+    <v-switch
       label="Show recombination lines"
       v-model="showAllRecomb"
       @update:model-value="onToggleAllRecomb"
@@ -37,9 +44,9 @@
       class="my-n7"
       color="clcAction"/>
     <v-switch
-      label="Show genetic significance lines"
-      v-model="showAllGenSig"
-      @update:model-value="onToggleAllGenSig"
+      label="Show plot IDs"
+      v-model="showPlotID"
+      @update:model-value="onToggleShowPlotID"
       density="compact"
       class="my-n7"
       color="clcAction"/>
@@ -78,6 +85,7 @@ const BLINK_TIME = 5
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const showAllGenSig = ref(true)
 const showAllRecomb = ref(true)
+const showPlotID = ref(true)
 const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 const yAxis = ref(LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS)
 
@@ -123,6 +131,11 @@ const onToggleAllGenSig = (val) => {
 const onToggleAllRecomb = (val) => {
   appStore[multizoomPage].showRecombLines = val
   updateAllPlots('showRecombLine', val)
+}
+
+const onToggleShowPlotID = (val) => {
+  appStore[multizoomPage].showPlotID = val
+  updateAllPlots('showPlotID', val)
 }
 
 const onUnmountAllPlots = () => {

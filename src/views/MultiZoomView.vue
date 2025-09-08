@@ -198,6 +198,8 @@ async function renderPlot(colocID, signal, slot) {
 
   const showGenSigLine = MZPage.showGenSigLines
   const showRecombLine = MZPage.showRecombLines
+  const showPlotID = MZPage.showPlotID
+
   const plotID = await plotManager.mountPlot({
     plotsContainer,
     showGenSigLine,
@@ -206,7 +208,7 @@ async function renderPlot(colocID, signal, slot) {
     type: 'region',
     onActionMenuClick,
   })
-  appStore.addMZPlot(plotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
+  appStore.addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
   appStore.setRowSlotPlotID(colocID, slot, plotID)
   return plotID
 }
