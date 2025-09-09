@@ -1,6 +1,7 @@
 import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
+import { useMZPageHelpers } from '@/composables/MZPageHelpers'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
@@ -94,52 +95,6 @@ export const useAppStore = defineStore('appStore', {
   }),
 
   actions: {
-     setRowSlotPlotID(colocID, slot, plotID) {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      if (!MZPage.rowSlotToPlotID[colocID]) MZPage.rowSlotToPlotID[colocID] = {}
-      MZPage.rowSlotToPlotID[colocID][slot] = plotID
-     },
-
-    getPlotID(colocID, slot) {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      return MZPage.rowSlotToPlotID?.[colocID]?.[slot] ?? null
-    },
-
-    makeMZColocsSignals() {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      MZPage.colocsSignals = Object.values(MZPage.plotSettings).map(v => `${v.colocID}-${v.signalID}`)
-    },
-
-      addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, variant, signalID, colocID, slot) {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      if(!MZPage.plotSettings[plotID]) {
-        MZPage.plotSettings[plotID] = { showPlotID, showRecombLine, showGenSigLine, variant, signalID, colocID, slot }
-        this.makeMZColocsSignals()
-      }
-    },
-
-    deleteMZPlot(plotID) {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      if(MZPage.plotSettings[plotID]) {
-        const colocID = MZPage.plotSettings[plotID].colocID
-        const slot = MZPage.plotSettings[plotID].slot
-        delete MZPage.rowSlotToPlotID[colocID][slot]
-        delete MZPage.plotSettings[plotID]
-      } else {
-        console.warn(`Error trying to delete nonexistent plot: ${plotID}`)
-      }
-    },
-
-    deleteMZPlotsAll() {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      MZPage.plotSettings = {}
-      MZPage.rowSlotToPlotID = {}
-    },
-
-    getSignals() {
-      const MZPage = this[PAGE_NAMES.MULTIZOOM]
-      return Object.values(MZPage.plotSettings).map(v => v.signalID)
-    },
 
     addQueryString(url) {
       const parentKey = this.currentPageName

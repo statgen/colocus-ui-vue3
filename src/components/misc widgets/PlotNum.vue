@@ -4,7 +4,9 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAppStore } from '@/stores/AppStore'
+import { useMZPageHelpers } from '@/composables/MZPageHelpers'
+
+const mzPageHelpers = useMZPageHelpers()
 
 const props = defineProps({
   rowKey: String,
@@ -12,8 +14,7 @@ const props = defineProps({
   title: String,
 })
 
-const appStore = useAppStore()
-const plotID = computed(() => props.title || appStore.getPlotID(props.rowKey, props.slot))
+const plotID = computed(() => props.title || mzPageHelpers.getMZPlotID(props.rowKey, props.slot))
 
 const emit = defineEmits(['on-toggle-plot'])
 

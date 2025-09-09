@@ -70,12 +70,14 @@ import { computed, defineEmits, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
+import { useMZPageHelpers } from '@/composables/MZPageHelpers'
 import FilterPanelSubpanel from "@/components/FilterPanel/FilterPanelSubpanel.vue"
 import { colorHasher, formatVariantString } from '@/util/util'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
 const plotManager = usePlotManager()
+const mzPageHelpers = useMZPageHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -141,7 +143,7 @@ const onToggleShowPlotID = (val) => {
 
 const onUnmountAllPlots = () => {
   plotManager.unmountAllPlots()
-  appStore.deleteMZPlotsAll()
+  mzPageHelpers.deleteMZPlotsAll()
 }
 
 const onYAxisChange = (val) => {

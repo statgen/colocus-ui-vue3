@@ -46,6 +46,7 @@ import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
+import { useMZPageHelpers } from '@/composables/MZPageHelpers'
 import { findPlotRegion } from '@/util/util'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import html2canvas from 'html2canvas'
@@ -53,6 +54,7 @@ import html2canvas from 'html2canvas'
 // *** Composables *************************************************************
 const appStore = useAppStore()
 const plotManager = usePlotManager()
+const mzPageHelpers = useMZPageHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -61,6 +63,7 @@ const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
 const multizoomPage = PAGE_NAMES.MULTIZOOM
+const MZPage = appStore[multizoomPage]
 const plotsContainer = useTemplateRef('plotsContainer')
 const showMenu = ref(false)
 
@@ -79,19 +82,19 @@ provide('preloadGenes', preloadGenes)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => appStore[multizoomPage].colocDataReady, (newVal) => {
+watch(() => MZPage.colocDataReady, (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
 
-    const colocID = appStore[multizoomPage].colocData.uuid
-    const signal1 = appStore[multizoomPage].colocData.signal1
-    const signal2 = appStore[multizoomPage].colocData.signal2
+    const colocID = MZPage.colocData.uuid
+    const signal1 = MZPage.colocData.signal1
+    const signal2 = MZPage.colocData.signal2
 
-    appStore[multizoomPage].selectedLDRef = signal1.lead_variant.vid
+    MZPage.selectedLDRef = signal1.lead_variant.vid
 
-    const x = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
-    appStore[multizoomPage].xStart = x.start
-    appStore[multizoomPage].xEnd = x.end
+    const pr = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
+    MZPage.xStart = pr.start
+    MZPage.xEnd = pr.end
 
     renderPlot(colocID, signal1, 'signal1')
     renderPlot(colocID, signal2, 'signal2')
@@ -106,7 +109,7 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
-  appStore[multizoomPage].selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
+  MZPage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
   plotManager.unmountAllPlots()
   loadPageData()
 })
@@ -117,7 +120,7 @@ const onActionMenuClick = async (arg) => {
   const scrollX = window.scrollX || window.pageXOffset
   const scrollY = window.scrollY || window.pageYOffset
 
-  appStore[multizoomPage].activePlot = arg.plotID
+  MZPage.activePlot = arg.plotID
 
   const spacing = 4
   const menuWidth = 225
@@ -133,7 +136,6 @@ const onActionMenuClick = async (arg) => {
 const onAddBothPlotsClick = (item) => {
   const { signal1, signal2 } = item
   const colocID = item.uuid
-  const MZPage = appStore[multizoomPage]
   const s1PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal1
   const s2PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal2
 
@@ -152,7 +154,7 @@ const onAddBothPlotsClick = (item) => {
 
 const onCloseMenu = () => {
   showMenu.value = false
-  appStore[multizoomPage].activePlot = null
+  MZPage.activePlot = null
 }
 
 const onDataTableRowClick = () => {
@@ -160,23 +162,23 @@ const onDataTableRowClick = () => {
 }
 
 const onDeletePlot = () => {
-  const plotID = appStore[multizoomPage].activePlot
+  const plotID = MZPage.activePlot
   deletePlot(plotID)
   showMenu.value = false
 }
 
 const onExportPlot = () => {
-  plotManager.exportPlotAsPNG(appStore[multizoomPage].activePlot)
+  plotManager.exportPlotAsPNG(MZPage.activePlot)
   showMenu.value = false
 }
 
 const onTogglePlot = async (colocID, signal, slot) => {
-  const existingPlot = appStore.getPlotID(colocID, slot)
+  const existingPlot = mzPageHelpers.getMZPlotID(colocID, slot)
 
   if (existingPlot) {
     plotManager.unmountPlot(existingPlot)
-    appStore.deleteMZPlot(existingPlot)
-    appStore.setRowSlotPlotID(colocID, slot, null)
+    mzPageHelpers.deleteMZPlot(existingPlot)
+    mzPageHelpers.setMZRowSlotPlotID(colocID, slot, null)
   } else {
     await renderPlot(colocID, signal, slot)
   }
@@ -185,11 +187,12 @@ const onTogglePlot = async (colocID, signal, slot) => {
 // *** Utility functions *******************************************************
 const deletePlot = (plotID) => {
   plotManager.unmountPlot(plotID)
-  appStore.deleteMZPlot(plotID)
+  mzPageHelpers.deleteMZPlot(plotID)
 }
 
 const onExportPlotGroup = async () => {
   // let the overlay paint, then start the export
+  if(Object.keys(MZPage.plotSettings).length < 1) return
   isExporting.value = true
   setTimeout(async () => {
     try {
@@ -222,7 +225,6 @@ const exportPlotContainer = async (elID) => {
 }
 
 const loadPageData = async () => {
-  const MZPage = appStore[multizoomPage]
   MZPage.tableDataLoaded = false
   MZPage.colocDataReady = false
   MZPage.plotSettings = {}
@@ -231,8 +233,7 @@ const loadPageData = async () => {
 
 async function renderPlot(colocID, signal, slot) {
   const signalID = signal.uuid
-  const MZPage = appStore[multizoomPage]
-  const signals = appStore.getSignals()
+  const signals = mzPageHelpers.getMZSignals()
   if(MZPage.addUniqueRefsOnly && signals.includes(signalID)) return
 
   const showGenSigLine = MZPage.showGenSigLines
@@ -247,8 +248,8 @@ async function renderPlot(colocID, signal, slot) {
     type: 'region',
     onActionMenuClick,
   })
-  appStore.addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
-  appStore.setRowSlotPlotID(colocID, slot, plotID)
+  mzPageHelpers.addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
+  mzPageHelpers.setMZRowSlotPlotID(colocID, slot, plotID)
   return plotID
 }
 // *** Configuration data ******************************************************
