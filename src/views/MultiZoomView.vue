@@ -45,7 +45,7 @@ import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { findPlotRegion } from '@/util/util'
-import DataTable from "@/components/DataTable/DataTable.vue";
+import DataTable from "@/components/DataTable/DataTable.vue"
 
 // *** Composables *************************************************************
 const appStore = useAppStore()

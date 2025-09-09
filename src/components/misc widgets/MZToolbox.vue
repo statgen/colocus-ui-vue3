@@ -161,7 +161,7 @@ function exportPlotContainer(el) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'genetic-plots.png';
+      a.download = 'Colocus-plot-group.png';
       a.click();
       URL.revokeObjectURL(url);
     });

@@ -47,7 +47,7 @@ export function usePlotManager() {
         const pngUrl = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = pngUrl
-        a.download = `LZ2-${plotID}.png`
+        a.download = `Colocus-plot-${plotID}.png`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
