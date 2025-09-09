@@ -66,8 +66,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, ref } from 'vue'
-import html2canvas from 'html2canvas'
+import { computed, defineEmits, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
@@ -103,6 +102,8 @@ const uniqueVariants = computed(() => {
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
+const emit = defineEmits(['export-plot-group'])
+
 // *** Watches *****************************************************************
 // *** Lifecycle hooks *********************************************************
 // *** Event handlers **********************************************************
@@ -116,7 +117,7 @@ const onBlinkButtonClick = () => {
 }
 
 const onExportAllClick = () => {
-  exportPlotContainer('plotsContainer')
+  emit('export-plot-group')
 }
 
 const onSelectTheme = (newValue) => {
@@ -145,27 +146,6 @@ const onUnmountAllPlots = () => {
 
 const onYAxisChange = (val) => {
   appStore[multizoomPage].yAxis = val
-}
-
-// *** Utility functions *******************************************************
-function exportPlotContainer(el) {
-  const element = document.getElementById(el);
-
-  html2canvas(element, {
-    useCORS: true,
-    scale: 2, // Higher resolution
-    backgroundColor: '#ffffff'
-  }).then(canvas => {
-    // Download the image
-    canvas.toBlob(function(blob) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Colocus-plot-group.png';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  });
 }
 
 const updateAllPlots = (key, val) => {

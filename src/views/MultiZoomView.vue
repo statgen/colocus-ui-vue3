@@ -5,10 +5,12 @@
     </template>
 
     <template #toolbox>
-      <MZToolbox />
+      <MZToolbox @export-plot-group="onExportPlotGroup"/>
     </template>
 
     <h1><BackButton />Multizoom</h1>
+
+    <BusyOverlay :show="isExporting" />
 
     <LZ2Tooltip />
 
@@ -46,6 +48,7 @@ import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { findPlotRegion } from '@/util/util'
 import DataTable from "@/components/DataTable/DataTable.vue"
+import html2canvas from 'html2canvas'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -53,6 +56,7 @@ const plotManager = usePlotManager()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
+const isExporting = ref(false)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
@@ -184,16 +188,50 @@ const deletePlot = (plotID) => {
   appStore.deleteMZPlot(plotID)
 }
 
+const onExportPlotGroup = async () => {
+  // let the overlay paint, then start the export
+  isExporting.value = true
+  setTimeout(async () => {
+    try {
+      await exportPlotContainer('plotsContainer')
+    } finally {
+      isExporting.value = false
+    }
+  }, 0)
+}
+
+const exportPlotContainer = async (elID) => {
+  const el = document.getElementById(elID)
+  if (!el) return
+  const canvas = await html2canvas(el, { useCORS: true, scale: 2, backgroundColor: '#ffffff' })
+  const blob = await new Promise(res => canvas.toBlob(res))
+  if (!blob) return
+  const url = URL.createObjectURL(blob)
+  try {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'Colocus-plot-group.png'
+    a.style.display = 'none'
+    document.body.appendChild(a)   // helps Firefox reliability
+    a.click()
+    a.remove()                      // cleanup the DOM node
+  } finally {
+    // delay revocation so some browsers don’t cancel the download
+    setTimeout(() => URL.revokeObjectURL(url), 0)
+  }
+}
+
 const loadPageData = async () => {
-  appStore[multizoomPage].tableDataLoaded = false
-  appStore[multizoomPage].colocDataReady = false
-  appStore[multizoomPage].plotSettings = {}
+  const MZPage = appStore[multizoomPage]
+  MZPage.tableDataLoaded = false
+  MZPage.colocDataReady = false
+  MZPage.plotSettings = {}
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
 async function renderPlot(colocID, signal, slot) {
   const signalID = signal.uuid
-  const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
+  const MZPage = appStore[multizoomPage]
   const signals = appStore.getSignals()
   if(MZPage.addUniqueRefsOnly && signals.includes(signalID)) return
 
