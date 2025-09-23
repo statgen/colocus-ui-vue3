@@ -16,6 +16,7 @@ import { useLZ2Axes  } from '@/composables/LZ2Axes'
 import { useLZ2Renderers } from '@/composables/LZ2Renderers'
 import { useAppStore } from '@/stores/AppStore'
 import {PAGE_NAMES} from "@/constants";
+import { debounce } from 'lodash'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -44,6 +45,7 @@ const props = defineProps({
 })
 
 // *** Variables ***************************************************************
+const PLOT_DEBOUNCE_DELAY = 50
 const leadVariant = props.signal.lead_variant.vid
 const signalUUID = props.signal.uuid
 const title = ref('')
@@ -75,7 +77,6 @@ watch([
     () => appStore[multizoomPage].selectedTheme,
   ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
-      console.log('watch 1 triggered')
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecombLine)       // for screen
@@ -89,9 +90,11 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
       })
       await nextTick()
       const region = appStore[multizoomPage].zoomRegion
-      renderPlot(props.ID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
+      const plotID = props.ID
+      // renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
+      debouncedRender({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region})
     },
-  { immediate: false }
+  { immediate: false, flush: 'post' }
 )
 
 // this watch reloads data following UI changes, depending on the other watch to rerender plot
@@ -101,7 +104,6 @@ watch([
   () => appStore[multizoomPage].zoomRegion,
 ],
   async ([selectedLDRef, yAxis, zoomRegion]) => {
-    console.log('watch 2 triggered')
     signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
     await nextTick()
   },
@@ -110,6 +112,7 @@ watch([
 
 // *** Lifecycle hooks *********************************************************
 onBeforeUnmount(() => {
+  debouncedRender.cancel() // prevent late renders after unmount
   d3.select(plotContainer.value).selectAll('*').remove()
 })
 
@@ -130,7 +133,18 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
+const debouncedRender = debounce(async (args) => {
+  const {
+    plotID, leadVariant, signalData, recombData,
+    showPlotID, showGenSigLine, showRecombLine, theme, region
+  } = args
+
+  await nextTick()
+  renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
+  }, PLOT_DEBOUNCE_DELAY, { leading: false, trailing: true, maxWait: 200 })
+
 const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region) => {
+  console.log(`Rendering plot: ${plotID}`)
   const chromosome = parseVariant2(leadVariant, region).chr
 
   DIMENSIONS.plotWidth = DIMENSIONS.width

@@ -79,12 +79,10 @@ const parseSignalData = (signal) => {
 function makePlotTitle(signal) {
   const pd = parseSignalData(signal)
   if(pd === 'unknown type') return ['unknown type', 'red']
-  console.log('pd', pd)
 
   // const title = `${pd.part1}  ${pd.analysisType} ${pd.tissue} ${pd.cellType}  ${pd.variant}  ${pd.margOnly}`
   let title = `${pd.part1}  ${pd.analysisType}  `
   if(pd.analysisType !== 'GWAS') {
-    console.log('gwas', pd.tissue)
     title += pd.tissue
   }
 

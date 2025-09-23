@@ -37,7 +37,7 @@ const LZ2_DISPLAY_OPTIONS = {
     leftAxisWidth: 45,
     rightAxisWidth: 55,
     plotWidth: 0, // computed in LZ2RegionPlot.renderPlot
-    width: 500,
+    width: 450,
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
   LZ2_THEMES: {
