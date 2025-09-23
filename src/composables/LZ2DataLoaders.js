@@ -5,9 +5,9 @@ import { URLS } from '@/constants'
 import { parseVariant2 } from '@/util/util'
 
 export function useLZ2DataLoaders() {
-  const loadSignalData = async (signalRef, signalUUID, LDRef, build, yAxis) => {
+  const loadSignalData = async (signalRef, signalUUID, LDRef, build, yAxis, region) => {
     const { data, errorMessage, fetchData } = useFetchData()
-    const pvLD = parseVariant2(LDRef)
+    const pvLD = parseVariant2(LDRef, region)
     let base = `${URLS.LD_DATA}/${build}/region/`
     let url = `${base}?chrom=${pvLD.chr}&start=${pvLD.start}&end=${pvLD.end}&variant=${pvLD.chr}:${pvLD.loc}_${pvLD.ref}/${pvLD.alt}`
     let ldData = []
@@ -18,7 +18,7 @@ export function useLZ2DataLoaders() {
       return
     }
 
-    const pvSignal = parseVariant2(signalRef)
+    const pvSignal = parseVariant2(signalRef, region)
     base = `${URLS.SIGNALS_DATA}/${signalUUID}/region`
     url = `${base}?chrom=${pvSignal.chr}&start=${pvSignal.start}&end=${pvSignal.end}`
     let signalData
@@ -55,9 +55,9 @@ export function useLZ2DataLoaders() {
     return t6
   }
 
-  const loadRecombData = async (leadVariant, build) => {
+  const loadRecombData = async (leadVariant, build, region) => {
     const { data, errorMessage, fetchData } = useFetchData()
-    const pv = parseVariant2(leadVariant)
+    const pv = parseVariant2(leadVariant, region)
     const url = new URL(URLS.PORTALDEV_RECOMB)
     url.searchParams.set('filter', `chromosome eq '${pv.chr}' and position le ${pv.end} and position ge ${pv.start}`)
     url.searchParams.set('build', build)

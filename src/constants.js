@@ -26,13 +26,18 @@ const COLORS = {
 
 const LZ2_DISPLAY_OPTIONS = {
   DEFAULT_Y_AXIS: 'conditional',
-  DIAMOND_MARGIN: 12, // allow extra space for lead variant diamond
+  LEAD_MARKER_MARGIN: 12, // allow extra space for lead variant marker
   DIMENSIONS: {
+    badgeX: 8,
+    badgeY: 8,
     height: 230,
     headerHeight: 30,
-    plotHeight: 200,
-    width: 600,
-    margins: { top: 15, right: 65, bottom: 48, left: 60 },
+    margins: { top: 15, right: 15, bottom: 48, left: 20 },
+    plotHeight: 0, // computed below
+    leftAxisWidth: 45,
+    rightAxisWidth: 55,
+    plotWidth: 0, // computed in LZ2RegionPlot.renderPlot
+    width: 500,
   },
   GEN_SIGNIFICANCE: Math.log10(5e-8), // ≈ -7.301
   LZ2_THEMES: {
@@ -90,6 +95,13 @@ const LZ2_DISPLAY_OPTIONS = {
   SIG_LINE_COLOR: '#a8a9ad',
 }
 
+const LDOD = LZ2_DISPLAY_OPTIONS.DIMENSIONS
+
+LDOD.plotHeight = LDOD.height
+  - LDOD.headerHeight
+  - LDOD.margins.top
+  - LDOD.margins.bottom
+
 const D3_FONT_DEFAULTS = `
   .D3FontDefaults {
     font-family: ${LZ2_DISPLAY_OPTIONS.PLOT_FONT_FAMILY};
@@ -108,15 +120,6 @@ const D3_FONT_DEFAULTS = `
   }
 `
 
-LZ2_DISPLAY_OPTIONS.DIMENSIONS.ctrWidth = LZ2_DISPLAY_OPTIONS.DIMENSIONS.width
-  - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.left
-  - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.right
-LZ2_DISPLAY_OPTIONS.DIMENSIONS.ctrHeight = LZ2_DISPLAY_OPTIONS.DIMENSIONS.height
-  - LZ2_DISPLAY_OPTIONS.DIMENSIONS.headerHeight
-  - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.top
-  - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.bottom
-
-
 const MX_TOOLBOX_WIDTH = 300
 
 const NEARBY_DIST = 500e3
@@ -134,6 +137,8 @@ const PAGE_NAMES = {
   STUDIES: 'studies',
   TRAITS: 'traits',
 }
+
+const PLOT_REGION_DEFAULT = 250e3
 
 const REF_BUILD = 'UKBB_GRCh37_ALL'
 const REF_BUILD_PORTAL = 'GRCh37'
@@ -171,5 +176,5 @@ const THRESHOLDS = {
 }
 
 export { CM_DATASET, BIOMARKER_TYPES, COLORS, D3_FONT_DEFAULTS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP,
-  LZ2_DISPLAY_OPTIONS, MX_TOOLBOX_WIDTH, PAGE_NAMES, REF_BUILD, REF_BUILD_PORTAL, THRESHOLDS, URLS
+  LZ2_DISPLAY_OPTIONS, MX_TOOLBOX_WIDTH, PAGE_NAMES, PLOT_REGION_DEFAULT, REF_BUILD, REF_BUILD_PORTAL, THRESHOLDS, URLS
 }

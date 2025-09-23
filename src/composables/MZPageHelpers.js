@@ -1,6 +1,6 @@
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
-
+import { parseVariant2 } from '@/util/util'
 
 export function useMZPageHelpers() {
   const appStore = useAppStore()
@@ -46,6 +46,12 @@ export function useMZPageHelpers() {
     MZPage.rowSlotToPlotID[colocID][slot] = plotID
   }
 
+  const setPlotRegion = (variant, region) => {
+    const pv = parseVariant2(variant, region)
+    MZPage.xStart = pv.start
+    MZPage.xEnd = pv.end
+  }
+
   return {
     addMZPlot,
     deleteMZPlot,
@@ -54,5 +60,6 @@ export function useMZPageHelpers() {
     getMZSignals,
     makeMZColocsSignals,
     setMZRowSlotPlotID,
+    setPlotRegion,
   }
 }

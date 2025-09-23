@@ -1,6 +1,5 @@
 import { computed, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
-import { findPlotRegion } from '@/util/util'
 import { PAGE_NAMES } from '@/constants'
 
 export const useDataTableHelpers = () => {
@@ -116,7 +115,6 @@ export const useDataTableHelpers = () => {
   ]
 
   return {
-    findPlotRegion,
     fileDownload,
     visibleColumns,
     ITEMS_PER_PAGE_OPTIONS,

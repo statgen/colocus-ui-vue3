@@ -4,7 +4,7 @@ export function useLZ2Scales() {
   const createXscale = (xStart, xEnd, dimensions) => {
     return d3.scaleLinear()
       .domain([xStart, xEnd])
-      .range([0, dimensions.ctrWidth])
+      .range([0, dimensions.plotWidth])
   }
 
   const createYscaleSignal = (yAccessor, data, dimensions) => {
@@ -12,13 +12,13 @@ export function useLZ2Scales() {
     const yRange = yMax - yMin
     return d3.scaleLinear()
       .domain([yMin, yMax])
-      .range([dimensions.ctrHeight, 0])
+      .range([dimensions.plotHeight, 0])
   }
 
   const createYscaleRecomb = (dimensions) => {
     return d3.scaleLinear()
       .domain([0, 100])
-      .range([dimensions.ctrHeight, 0])
+      .range([dimensions.plotHeight, 0])
   }
 
 

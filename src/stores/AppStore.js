@@ -2,7 +2,7 @@ import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { useMZPageHelpers } from '@/composables/MZPageHelpers'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -81,10 +81,12 @@ export const useAppStore = defineStore('appStore', {
       showGenSigLines: true,
       showPlotID: true,
       showRecombLines: true,
+      signal1Variant: '',
       tableDataLoaded: false,
       xStart: 0,
       xEnd: 0,
       yAxis: LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS,
+      zoomRegion: PLOT_REGION_DEFAULT,
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.SEARCH]: {

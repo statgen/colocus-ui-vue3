@@ -6,15 +6,15 @@ export function useLZ2Axes() {
     const xAxis = d3.axisBottom(xScale)
       .ticks(5)
       .tickSizeOuter(0)
-      .tickFormat((d) => (d/1e6).toFixed(1))
+      .tickFormat((d) => (d/1e6).toFixed(2))
 
     const xAxisGroup = ctr.append('g')
       .call(xAxis)
-      .style('transform', `translateY(${dimensions.ctrHeight}px)`)
+      .style('transform', `translateY(${dimensions.plotHeight}px)`)
       .classed('lzrp-axis', true)
 
     xAxisGroup.append('text')
-      .attr('x', dimensions.ctrWidth / 2)
+      .attr('x', dimensions.plotWidth / 2)
       .attr('y', dimensions.margins.bottom - 8)
       .attr('fill', 'black')
       .text(`Chromosome: ${chromosome} (Mb)`)
@@ -34,8 +34,8 @@ export function useLZ2Axes() {
       .classed('lzrp-axis', true)
 
     yAxisGroup.append('text')
-      .attr('x', -dimensions.ctrHeight / 2)
-      .attr('y', -dimensions.margins.left + 17)
+      .attr('x', -dimensions.plotHeight / 2)
+      .attr('y', -dimensions.leftAxisWidth)
       .attr('fill', 'black')
       .html('-log10 p-value')
       .style('transform', 'rotate(270deg)')
@@ -49,7 +49,7 @@ export function useLZ2Axes() {
       .tickSizeOuter(0)
 
     const yAxisGroup = ctr.append('g')
-      .attr('transform', `translate(${dimensions.ctrWidth}, 0)`) // move to right edge
+      .attr('transform', `translate(${dimensions.plotWidth}, 0)`) // move to right edge
       .call(yAxis)
       .classed('lzrp-axis recomb-group', true)
 
@@ -58,8 +58,8 @@ export function useLZ2Axes() {
 
     yAxisGroup.append('text')
       .attr('transform', `rotate(-90)`)
-      .attr('x', -dimensions.ctrHeight / 2)
-      .attr('y', dimensions.margins.right - 8)
+      .attr('x', -dimensions.plotHeight / 2)
+      .attr('y', dimensions.rightAxisWidth)
       .attr('fill', LZ2_DISPLAY_OPTIONS.RECOMB_AXIS_COLOR)
       .attr('text-anchor', 'middle')
       .text('Recomb (cM/Mb)')

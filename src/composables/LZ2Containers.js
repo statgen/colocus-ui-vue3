@@ -12,8 +12,9 @@ export function useLZ2Containers() {
 
   const createPlotContainer = (svg, dimensions) => {
     const verticalOffset = dimensions.headerHeight + dimensions.margins.top
+    const horizontalOffset = dimensions.margins.left + dimensions.leftAxisWidth
     return svg.append('g')
-      .attr('transform', `translate(${dimensions.margins.left}, ${verticalOffset})`)
+      .attr('transform', `translate(${horizontalOffset}, ${verticalOffset})`)
   }
 
   return {

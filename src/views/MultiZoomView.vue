@@ -47,7 +47,7 @@ import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { useMZPageHelpers } from '@/composables/MZPageHelpers'
-import { findPlotRegion } from '@/util/util'
+import { parseVariant2 } from '@/util/util'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import html2canvas from 'html2canvas'
 
@@ -92,9 +92,9 @@ watch(() => MZPage.colocDataReady, (newVal) => {
 
     MZPage.selectedLDRef = signal1.lead_variant.vid
 
-    const pr = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
-    MZPage.xStart = pr.start
-    MZPage.xEnd = pr.end
+    const variant = signal1.lead_variant.vid
+    MZPage.signal1Variant = variant
+    mzPageHelpers.setPlotRegion(variant, MZPage.zoomRegion)
 
     renderPlot(colocID, signal1, 'signal1')
     renderPlot(colocID, signal2, 'signal2')

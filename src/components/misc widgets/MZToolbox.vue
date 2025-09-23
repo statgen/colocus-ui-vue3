@@ -5,6 +5,19 @@
     <v-btn @click="onUnmountAllPlots" size="small" class="btn-class my-3">Delete all plots</v-btn>
     <v-btn @click="onExportAllClick" size="small" class="btn-class my-3">Export plot group</v-btn>
 
+    <p class="mb-n2">{{ zoomSliderLabel }}</p>
+    <v-slider
+      @end="onSliderChangeEnd"
+      v-model="zoomSlider"
+      :min="25e3"
+      :max="500e3"
+      :step="25e3"
+      class="mb-n4"
+      max-width="225"
+      show-ticks="always"
+      thumb-size="14"
+    />
+
     <h3 class="mb-n2">Y axis</h3>
     <v-radio-group v-model="yAxis" @update:model-value="onYAxisChange" inline>
       <v-radio label="Conditional" value="conditional" color="clcAction"></v-radio>
@@ -25,7 +38,7 @@
     <h3 class="mt-n2">View</h3>
     <v-switch
       label="Add unique signals only"
-      v-model="appStore[multizoomPage].addUniqueRefsOnly"
+      v-model="MZPage.addUniqueRefsOnly"
       density="compact"
       class="my-n1"
       color="clcAction"/>
@@ -51,7 +64,7 @@
       class="my-n7"
       color="clcAction"/>
     <v-select
-      v-model="appStore[multizoomPage].selectedTheme"
+      v-model="MZPage.selectedTheme"
       :items="themes"
       style="max-width: 200px"
       @update:model-value="onSelectTheme"
@@ -68,7 +81,7 @@
 // *** Imports *****************************************************************
 import { computed, defineEmits, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { useMZPageHelpers } from '@/composables/MZPageHelpers'
 import FilterPanelSubpanel from "@/components/FilterPanel/FilterPanelSubpanel.vue"
@@ -81,24 +94,30 @@ const mzPageHelpers = useMZPageHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const addUniqueRefsOnly = ref(false)
 const BLINK_TIME = 5
-const multizoomPage = PAGE_NAMES.MULTIZOOM
+const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
 const showAllGenSig = ref(true)
 const showAllRecomb = ref(true)
 const showPlotID = ref(true)
 const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 const yAxis = ref(LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS)
+const zoomSlider = ref(PLOT_REGION_DEFAULT)
+// const zoomSliderLabel = ref(`Set plot region ±${zoomSlider.value.toLocaleString()}`)
 
 // *** Computed ****************************************************************
 const selectedRef = computed({
-  get: () => appStore[multizoomPage].selectedLDRef,
-  set: (v) => { appStore[multizoomPage].selectedLDRef = v }
+  get: () => MZPage.selectedLDRef,
+  set: (v) => { MZPage.selectedLDRef = v }
 })
 
 const uniqueVariants = computed(() => {
-  const variants = Object.values(appStore[multizoomPage].plotSettings).map(v => v.variant)
+  const variants = Object.values(MZPage.plotSettings).map(v => v.variant)
   return [...new Set(variants)].sort()
+})
+
+const zoomSliderLabel = computed(() => {
+  const x = zoomSlider.value / 1000
+  return `Set plot region ±${x}k`
 })
 
 // *** Provides ****************************************************************
@@ -123,21 +142,27 @@ const onExportAllClick = () => {
 }
 
 const onSelectTheme = (newValue) => {
-  appStore[multizoomPage].selectedTheme = newValue
+  MZPage.selectedTheme = newValue
+}
+
+const onSliderChangeEnd = async (val) => {
+  const variant = MZPage.signal1Variant
+  mzPageHelpers.setPlotRegion(variant, val)
+  MZPage.zoomRegion = val
 }
 
 const onToggleAllGenSig = (val) => {
-  appStore[multizoomPage].showGenSigLines = val
+  MZPage.showGenSigLines = val
   updateAllPlots('showGenSigLine', val)
 }
 
 const onToggleAllRecomb = (val) => {
-  appStore[multizoomPage].showRecombLines = val
+  MZPage.showRecombLines = val
   updateAllPlots('showRecombLine', val)
 }
 
 const onToggleShowPlotID = (val) => {
-  appStore[multizoomPage].showPlotID = val
+  MZPage.showPlotID = val
   updateAllPlots('showPlotID', val)
 }
 
@@ -147,12 +172,12 @@ const onUnmountAllPlots = () => {
 }
 
 const onYAxisChange = (val) => {
-  appStore[multizoomPage].yAxis = val
+  MZPage.yAxis = val
 }
 
 const updateAllPlots = (key, val) => {
-  Object.keys(appStore[multizoomPage].plotSettings).forEach(k => {
-    appStore[multizoomPage].plotSettings[k][key] = val
+  Object.keys(MZPage.plotSettings).forEach(k => {
+    MZPage.plotSettings[k][key] = val
   })
 }
 

@@ -47,30 +47,48 @@ function makeAnalysisTitle(analysis) {
   return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
 }
 
-function makePlotTitle(signal) {
+const parseSignalData = (signal) => {
   let part1 = ''
   let analysisType = ''
 
-  if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
-    part1 = signal.analysis.trait.uuid
+  if (signal.analysis?.trait.phenotype) {   // This trait is a GWAS phenotype
+    part1 = signal.analysis?.trait.uuid
     analysisType = signal.analysis.analysis_type
 
-  } else if (signal.analysis.trait.exon) { // This trait is an exon expression trait
-    part1 = signal.analysis.trait.gene.symbol
-    analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
+  } else if (signal.analysis?.trait.exon) { // This trait is an exon expression trait
+    part1 = signal.analysis?.trait.gene.symbol
+    analysisType = `eQTL (${signal.analysis?.trait.biomarker_type.replace('-expression', '')})`
 
-  } else if (signal.analysis.trait.gene) { // This trait is a gene expression trait
-    part1 = signal.analysis.trait.gene.symbol
-    analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
+  } else if (signal.analysis?.trait.gene) { // This trait is a gene expression trait
+    part1 = signal.analysis?.trait.gene.symbol
+    analysisType = `eQTL (${signal.analysis?.trait.biomarker_type.replace('-expression', '')})`
 
-  } else return ['unknown type', '#000000']
+  } else return 'unknown type'
 
-  const variant = formatVariantString(signal.lead_variant.vid)
-  const study = signal.analysis.study.uuid
-  const margOnly = signal?.is_marg ? '(marginal only)' : '';
-  const tissue = signal.analysis?.tissue ? `• ${signal.analysis.tissue}` : '';
-  const cellType = signal.analysis?.cell_type ? `• ${signal.analysis.cell_type}` : '';
-  const title = `${part1}    ${analysisType} ${tissue} ${cellType}    ${study}    ${variant}    ${margOnly}`
+  return {
+    part1,
+    analysisType,
+    variant: formatVariantString(signal.lead_variant.vid),
+    study: signal.analysis.study.uuid,
+    margOnly: signal?.is_marg ? '(marginal only)' : '',
+    tissue: signal.analysis?.tissue ? `• ${signal.analysis.tissue}` : '',
+    cellType: signal.analysis?.cell_type ? `• ${signal.analysis.cell_type}` : '',
+  }
+}
+
+function makePlotTitle(signal) {
+  const pd = parseSignalData(signal)
+  if(pd === 'unknown type') return ['unknown type', 'red']
+  console.log('pd', pd)
+
+  // const title = `${pd.part1}  ${pd.analysisType} ${pd.tissue} ${pd.cellType}  ${pd.variant}  ${pd.margOnly}`
+  let title = `${pd.part1}  ${pd.analysisType}  `
+  if(pd.analysisType !== 'GWAS') {
+    console.log('gwas', pd.tissue)
+    title += pd.tissue
+  }
+
+  title += `  ${pd.variant}  ${pd.margOnly}`
   const color = colorHasher.hex(signal.lead_variant.vid)
   return [title, color]
 }
@@ -106,7 +124,7 @@ const parseVariant = (variant) => {
   }
 }
 
-const parseVariant2 = (variant) => {
+const parseVariant2 = (variant, region) => {
   const pieces = variant.split('_')
   let v = {
     chr: +pieces[0],
@@ -114,8 +132,8 @@ const parseVariant2 = (variant) => {
     ref: pieces[2],
     alt: pieces[3],
   }
-  v.start = Math.max(1, v.loc - 250e3 - 1000)
-  v.end = v.loc + 250e3 + 1000
+  v.start = Math.max(1, v.loc - region)
+  v.end = v.loc + region
   return v
 }
 
@@ -190,6 +208,6 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
-  middleTrim, parseVariant2, ppURL, scrollToHeading, scrollTop, sleeper, sortVariantArray, timeLog, titleCase,
+  middleTrim, parseSignalData, parseVariant2, ppURL, scrollToHeading, scrollTop, sleeper, sortVariantArray, timeLog, titleCase,
   truncateString, url
 }

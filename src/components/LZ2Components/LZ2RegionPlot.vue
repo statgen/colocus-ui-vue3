@@ -65,16 +65,17 @@ const multizoomPage = PAGE_NAMES.MULTIZOOM
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(
-  [
-      () => signalData.value,
-      () => recombData.value,
-      () => appStore[multizoomPage].plotSettings[props.ID]?.showPlotID,
-      () => appStore[multizoomPage].plotSettings[props.ID]?.showRecombLine,
-      () => appStore[multizoomPage].plotSettings[props.ID]?.showGenSigLine,
-      () => appStore[multizoomPage].selectedTheme,
-    ],
+// this watch rerenders following data reload or certain boolean UI changes (eg, showPlotID)
+watch([
+    () => signalData.value,
+    () => recombData.value,
+    () => appStore[multizoomPage].plotSettings[props.ID]?.showPlotID,
+    () => appStore[multizoomPage].plotSettings[props.ID]?.showRecombLine,
+    () => appStore[multizoomPage].plotSettings[props.ID]?.showGenSigLine,
+    () => appStore[multizoomPage].selectedTheme,
+  ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
+      console.log('watch 1 triggered')
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecombLine)       // for screen
@@ -87,19 +88,24 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
         n.style.display = showGenSigLine ? '' : 'none'            // for export
       })
       await nextTick()
-      renderPlot(props.ID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme)
+      const region = appStore[multizoomPage].zoomRegion
+      renderPlot(props.ID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
     },
-  { immediate: true }
+  { immediate: false }
 )
 
-watch(
+// this watch reloads data following UI changes, depending on the other watch to rerender plot
+watch([
   () => appStore[multizoomPage].selectedLDRef,
-  async (selectedLDRef) => signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, appStore[multizoomPage].yAxis)
-)
-
-watch(
   () => appStore[multizoomPage].yAxis,
-  async (yAxis) => signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, appStore[multizoomPage].selectedLDRef, REF_BUILD, yAxis)
+  () => appStore[multizoomPage].zoomRegion,
+],
+  async ([selectedLDRef, yAxis, zoomRegion]) => {
+    console.log('watch 2 triggered')
+    signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
+    await nextTick()
+  },
+  { immediate: true }
 )
 
 // *** Lifecycle hooks *********************************************************
@@ -111,9 +117,11 @@ onMounted(async () => {
   const [t, c] = makePlotTitle(props.signal)
   title.value = t
   titleColor.value = c
-
-  signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, appStore[multizoomPage].selectedLDRef, REF_BUILD, appStore[multizoomPage].yAxis)
-  recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL)
+  const ldRef = appStore[multizoomPage].selectedLDRef
+  const yAxis = appStore[multizoomPage].yAxis
+  const zoomRegion = appStore[multizoomPage].zoomRegion
+  signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, ldRef, REF_BUILD, yAxis, zoomRegion)
+  recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL, zoomRegion)
 })
 
 // *** Event handlers **********************************************************
@@ -122,25 +130,21 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
-const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme) => {
-  const chromosome = parseVariant2(leadVariant).chr
+const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region) => {
+  const chromosome = parseVariant2(leadVariant, region).chr
 
-  if(showRecombLine) {
-    DIMENSIONS.ctrWidth = DIMENSIONS.width
-      - DIMENSIONS.margins.left
-      - DIMENSIONS.margins.right
-  } else {
-    DIMENSIONS.ctrWidth = LZ2_DISPLAY_OPTIONS.DIMENSIONS.width
-      - LZ2_DISPLAY_OPTIONS.DIMENSIONS.margins.left
-      - 10
-  }
+  DIMENSIONS.plotWidth = DIMENSIONS.width
+    - DIMENSIONS.margins.left
+    - DIMENSIONS.leftAxisWidth
+    - DIMENSIONS.margins.right
+
+  if(showRecombLine) DIMENSIONS.plotWidth -= DIMENSIONS.rightAxisWidth
 
   d3.select(plotContainer.value).selectAll('*').remove()
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
   LZ2Renderers.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
   LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.signal.lead_variant.vid, title.value, titleColor.value, onActionMenuClick)
-
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 
   const xAccessor = d => d.x
@@ -158,7 +162,7 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   if(showRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
   const clipID = `plot-area-clip-${props.ID}`
-  LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.DIAMOND_MARGIN)
+  LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.LEAD_MARKER_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
   LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, theme)

@@ -1,6 +1,6 @@
 import * as d3 from 'd3v7'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
-import { colorHasher } from '@/util/util'
+import { parseSignalData, truncateString } from '@/util/util'
 import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Renderers() {
@@ -25,7 +25,7 @@ export function useLZ2Renderers() {
       .attr('stroke-dasharray', '2,2'); // dotted line effect
   }
 
-  function renderHeader(svg, dimensions, color, variant, title, titleColor, onActionMenuClick) {
+  const renderHeader = (svg, dimensions, color, variant, title, titleColor, onActionMenuClick) => {
     const headerGroup = svg.append('g')
       .attr('transform', 'translate(0, 0)')
       .attr('fill', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR)
@@ -63,17 +63,17 @@ export function useLZ2Renderers() {
       })
   }
 
-  function renderPlotIDBadge(svg, plotID, dimensions, opts = {}) {
+  const renderPlotIDBadge = (svg, plotID, dimensions, opts = {}) => {
     const {
-      offsetX = 8,
-      offsetY = 8,
+      offsetX = dimensions.badgeX,
+      offsetY = dimensions.badgeY,
       padding = 4,
       rx = 0,
       fontFamily = LZ2_DISPLAY_OPTIONS.PLOT_FONT_FAMILY,
       fontSize = '0.75rem',
       fontWeight = '600',
       textFill = 'black',
-      rectFill = '#ffffff',  // semi-opaque white
+      rectFill = '#ffffff',
       rectStroke = LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR,
       rectStrokeWidth = 1
     } = opts
@@ -81,7 +81,7 @@ export function useLZ2Renderers() {
     // Remove an old badge if re-rendering
     svg.selectAll('.plot-id-badge').remove()
 
-    // Anchor group at bottom-left, draw upward from it
+    // Anchor group at bottom, draw upward from it
     const g = svg.append('g')
       .attr('class', 'plot-id-badge')
       .attr('transform', `translate(${offsetX}, ${dimensions.height - offsetY})`)
@@ -229,8 +229,8 @@ export function useLZ2Renderers() {
       .append("rect")
       .attr("x", 0)
       .attr("y", -diamondMargin)
-      .attr("width", dimensions.ctrWidth)
-      .attr("height", dimensions.ctrHeight + diamondMargin)
+      .attr("width", dimensions.plotWidth)
+      .attr("height", dimensions.plotHeight + diamondMargin)
   }
 
   return {
