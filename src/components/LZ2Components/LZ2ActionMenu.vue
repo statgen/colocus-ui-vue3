@@ -28,11 +28,11 @@ const emit = defineEmits([
 
 const genSignChecked = computed({
   get: () => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
     return appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]?.showGenSigLine ?? false
   },
   set: (val) => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
     appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showGenSigLine = val
     emit('close-menu')
   }
@@ -40,11 +40,11 @@ const genSignChecked = computed({
 
 const recombChecked = computed({
   get: () => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
     return appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]?.showRecombLine ?? false
   },
   set: (val) => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlot
+    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
     appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showRecombLine = val
     emit('close-menu')
   }

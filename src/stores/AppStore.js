@@ -72,7 +72,7 @@ export const useAppStore = defineStore('appStore', {
       colocsSignals: markRaw([]),
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
-      activePlot: 0,
+      activePlotID: 0,
       plotSettings: {},
       regionPanelRemoved: false,
       rowSlotToPlotID: {},

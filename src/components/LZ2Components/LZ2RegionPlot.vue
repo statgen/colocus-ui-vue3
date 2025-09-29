@@ -1,10 +1,10 @@
 <template>
-    <div ref="plotContainer" class="plot-container" :style="{ backgroundColor: plotBackgroundColor }"/>
+    <div ref="plotContainer" :id="plotDOMid" class="plot-container" :style="{ backgroundColor: plotBackgroundColor }"/>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { defineEmits, nextTick, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { computed, defineEmits, nextTick, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import * as d3 from 'd3v7'
 import { useLZ2TooltipStore } from '@/stores/LZ2TooltipStore'
 import { makePlotTitle, parseVariant2 } from '@/util/util'
@@ -63,6 +63,8 @@ const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 
 // *** Computed ****************************************************************
+const plotDOMid = computed(() => `plot_${props.ID}`)
+
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
@@ -79,20 +81,15 @@ watch([
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
-        n.classList.toggle('hidden', !showRecombLine)       // for screen
-        n.setAttribute('display', showRecombLine ? null : 'none') // for export
-        n.style.display = showRecombLine ? '' : 'none'            // for export
+        n.classList.toggle('hidden', !showRecombLine)
       })
       plotContainer.value.querySelectorAll('.gensig-group').forEach(n => {
-        n.classList.toggle('hidden', !showGenSigLine)       // for screen
-        n.setAttribute('display', showGenSigLine ? null : 'none') // for export
-        n.style.display = showGenSigLine ? '' : 'none'            // for export
+        n.classList.toggle('hidden', !showGenSigLine)
       })
       await nextTick()
       const region = appStore[multizoomPage].zoomRegion
       const plotID = props.ID
-      // renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
-      debouncedRender({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region})
+      debouncedRenderPlot({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region})
     },
   { immediate: false, flush: 'post' }
 )
@@ -112,7 +109,7 @@ watch([
 
 // *** Lifecycle hooks *********************************************************
 onBeforeUnmount(() => {
-  debouncedRender.cancel() // prevent late renders after unmount
+  debouncedRenderPlot.cancel() // prevent late renders after unmount
   d3.select(plotContainer.value).selectAll('*').remove()
 })
 
@@ -133,7 +130,7 @@ const onActionMenuClick = (event) => {
 }
 
 // *** Utility functions *******************************************************
-const debouncedRender = debounce(async (args) => {
+const debouncedRenderPlot = debounce(async (args) => {
   const {plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region} = args
 
   await nextTick()

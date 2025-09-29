@@ -120,7 +120,7 @@ const onActionMenuClick = async (arg) => {
   const scrollX = window.scrollX || window.pageXOffset
   const scrollY = window.scrollY || window.pageYOffset
 
-  MZPage.activePlot = arg.plotID
+  MZPage.activePlotID = arg.plotID
 
   const spacing = 4
   const menuWidth = 225
@@ -154,7 +154,7 @@ const onAddBothPlotsClick = (item) => {
 
 const onCloseMenu = () => {
   showMenu.value = false
-  MZPage.activePlot = null
+  MZPage.activePlotID = null
 }
 
 const onDataTableRowClick = () => {
@@ -162,14 +162,19 @@ const onDataTableRowClick = () => {
 }
 
 const onDeletePlot = () => {
-  const plotID = MZPage.activePlot
+  const plotID = MZPage.activePlotID
   deletePlot(plotID)
   showMenu.value = false
 }
 
-const onExportPlot = () => {
-  plotManager.exportPlotAsPNG(MZPage.activePlot)
+const onExportPlot = async () => {
+  const plotDOMid = `plot_${MZPage.activePlotID}`
+  await exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
   showMenu.value = false
+}
+
+const onExportPlotGroup = async () => {
+  await exportPlotContainer('plotsContainer', 'Colocus_plot_group')
 }
 
 const onTogglePlot = async (colocID, signal, slot) => {
@@ -190,38 +195,34 @@ const deletePlot = (plotID) => {
   mzPageHelpers.deleteMZPlot(plotID)
 }
 
-const onExportPlotGroup = async () => {
-  // let the overlay paint, then start the export
+const exportPlotContainer = async (elID, fileName) => {
+  const el = document.getElementById(elID)
+  if (!el) return
   if(Object.keys(MZPage.plotSettings).length < 1) return
+
   isExporting.value = true
   setTimeout(async () => {
     try {
-      await exportPlotContainer('plotsContainer')
+      const canvas = await html2canvas(el, { useCORS: true, scale: 2, backgroundColor: '#ffffff' })
+      const blob = await new Promise(res => canvas.toBlob(res))
+      if (!blob) return
+      const url = URL.createObjectURL(blob)
+      try {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${fileName}.png`
+        a.style.display = 'none'
+        document.body.appendChild(a)   // helps Firefox reliability
+        a.click()
+        a.remove()                      // cleanup the DOM node
+      } finally {
+        // delay revocation so some browsers don’t cancel the download
+        setTimeout(() => URL.revokeObjectURL(url), 0)
+      }
     } finally {
       isExporting.value = false
     }
   }, 0)
-}
-
-const exportPlotContainer = async (elID) => {
-  const el = document.getElementById(elID)
-  if (!el) return
-  const canvas = await html2canvas(el, { useCORS: true, scale: 2, backgroundColor: '#ffffff' })
-  const blob = await new Promise(res => canvas.toBlob(res))
-  if (!blob) return
-  const url = URL.createObjectURL(blob)
-  try {
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'Colocus-plot-group.png'
-    a.style.display = 'none'
-    document.body.appendChild(a)   // helps Firefox reliability
-    a.click()
-    a.remove()                      // cleanup the DOM node
-  } finally {
-    // delay revocation so some browsers don’t cancel the download
-    setTimeout(() => URL.revokeObjectURL(url), 0)
-  }
 }
 
 const loadPageData = async () => {
