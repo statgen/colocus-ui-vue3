@@ -47,9 +47,9 @@ import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { useMZPageHelpers } from '@/composables/MZPageHelpers'
-import { parseVariant2 } from '@/util/util'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import html2canvas from 'html2canvas'
+import router from '@/router'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -65,11 +65,16 @@ const menuPosition = ref({ x: 0, y: 0 })
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const MZPage = appStore[multizoomPage]
 const plotsContainer = useTemplateRef('plotsContainer')
+const searchPage = PAGE_NAMES.SEARCH
 const showMenu = ref(false)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
 const preloadGenes = ref([])
+
+// awkward prevention of browser fore button after back button
+if (!appStore.colocID) router.push({ name: searchPage })
+plotManager.unmountAllPlots()
 
 appStore.isToolboxShowing = true
 
@@ -103,6 +108,7 @@ watch(() => MZPage.colocDataReady, (newVal) => {
 
 // *** Lifecycle hooks *********************************************************
 onBeforeUnmount(() => {
+  appStore.colocID = ''
   plotManager.unmountAllPlots()
   appStore.isToolboxShowing = false
 })
@@ -110,7 +116,6 @@ onBeforeUnmount(() => {
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
   MZPage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
-  plotManager.unmountAllPlots()
   loadPageData()
 })
 
@@ -182,7 +187,6 @@ const onTogglePlot = async (colocID, signal, slot) => {
 
   if (existingPlot) {
     plotManager.unmountPlot(existingPlot)
-    mzPageHelpers.deleteMZPlot(existingPlot)
     mzPageHelpers.setMZRowSlotPlotID(colocID, slot, null)
   } else {
     await renderPlot(colocID, signal, slot)
@@ -203,7 +207,11 @@ const exportPlotContainer = async (elID, fileName) => {
   isExporting.value = true
   setTimeout(async () => {
     try {
-      const canvas = await html2canvas(el, { useCORS: true, scale: LZ2_DISPLAY_OPTIONS.EXPORT_SCALE, backgroundColor: '#ffffff' })
+      const canvas = await html2canvas(el, {
+        useCORS: true,
+        scale: LZ2_DISPLAY_OPTIONS.EXPORT_SCALE,
+        backgroundColor: LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
+      })
       const blob = await new Promise(res => canvas.toBlob(res))
       if (!blob) return
       const url = URL.createObjectURL(blob)

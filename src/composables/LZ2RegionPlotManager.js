@@ -1,9 +1,11 @@
 import { createVNode, ref, render } from 'vue'
 import Lz2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
+import { useMZPageHelpers } from '@/composables/MZPageHelpers'
 
 const plotCounter = ref(1)
 const reusablePlotIDs = []
 const plotRegistry = new Map()
+const mzPageHelpers = useMZPageHelpers()
 
 export function usePlotManager() {
 
@@ -44,8 +46,9 @@ export function usePlotManager() {
       entry.el.remove()
       plotRegistry.delete(plotID)
       reusablePlotIDs.push(plotID)
+      mzPageHelpers.deleteMZPlot(plotID)
     } else {
-      console.warn(`error unmounting plot: ${plotID}`)
+      console.warn(`Error unmounting nonexistent plot: ${plotID}`)
     }
   }
 
@@ -53,6 +56,7 @@ export function usePlotManager() {
     for (const plotID of plotRegistry.keys()) {
       unmountPlot(plotID)
     }
+    mzPageHelpers.clearPlotSettings()
   }
 
   function resolvePlotType(type) {

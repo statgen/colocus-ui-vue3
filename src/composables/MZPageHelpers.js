@@ -19,12 +19,10 @@ export function useMZPageHelpers() {
       const slot = MZPage.plotSettings[plotID].slot
       delete MZPage.rowSlotToPlotID[colocID][slot]
       delete MZPage.plotSettings[plotID]
-    } else {
-      console.warn(`Error trying to delete nonexistent plot: ${plotID}`)
     }
   }
 
-  const deleteMZPlotsAll = () => {
+  const clearPlotSettings = () => {
     MZPage.plotSettings = {}
     MZPage.rowSlotToPlotID = {}
   }
@@ -55,7 +53,7 @@ export function useMZPageHelpers() {
   return {
     addMZPlot,
     deleteMZPlot,
-    deleteMZPlotsAll,
+    clearPlotSettings,
     getMZPlotID,
     getMZSignals,
     makeMZColocsSignals,

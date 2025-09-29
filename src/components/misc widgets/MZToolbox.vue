@@ -168,7 +168,6 @@ const onToggleShowPlotID = (val) => {
 
 const onUnmountAllPlots = () => {
   plotManager.unmountAllPlots()
-  mzPageHelpers.deleteMZPlotsAll()
 }
 
 const onYAxisChange = (val) => {
