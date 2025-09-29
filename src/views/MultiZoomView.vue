@@ -203,7 +203,7 @@ const exportPlotContainer = async (elID, fileName) => {
   isExporting.value = true
   setTimeout(async () => {
     try {
-      const canvas = await html2canvas(el, { useCORS: true, scale: 2, backgroundColor: '#ffffff' })
+      const canvas = await html2canvas(el, { useCORS: true, scale: LZ2_DISPLAY_OPTIONS.EXPORT_SCALE, backgroundColor: '#ffffff' })
       const blob = await new Promise(res => canvas.toBlob(res))
       if (!blob) return
       const url = URL.createObjectURL(blob)

@@ -26,6 +26,7 @@ const COLORS = {
 
 const LZ2_DISPLAY_OPTIONS = {
   DEFAULT_Y_AXIS: 'conditional',
+  EXPORT_SCALE: 3,
   LEAD_MARKER_MARGIN: 12, // allow extra space for lead variant marker
   DIMENSIONS: {
     badgeX: 8,
