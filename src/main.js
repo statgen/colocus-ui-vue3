@@ -14,7 +14,6 @@ const style = document.createElement('style')
 style.textContent = D3_FONT_DEFAULTS
 document.head.appendChild(style)
 
-
 import VueTippy from 'vue-tippy'
 import 'tippy.js/dist/tippy.css'    // Required CSS for animations
 import 'tippy.js/animations/scale.css'

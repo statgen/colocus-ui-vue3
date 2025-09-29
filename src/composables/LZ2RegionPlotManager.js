@@ -1,6 +1,5 @@
 import { createVNode, ref, render } from 'vue'
 import Lz2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
-import { D3_FONT_DEFAULTS, LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 const plotCounter = ref(1)
 const reusablePlotIDs = []

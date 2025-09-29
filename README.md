@@ -559,15 +559,10 @@ const tutorial = ref()
 
 ## LocusZoom replacement
 ### Plot styling
-Plot styling is complicated because (among other reasons) duplicate styles have to be defined for the on-screen and exported renderings.
-Both screen and export styling depend on a common style, D3FontDefaults.
-That style is built dynmically in constants.js, based on config values in LZ_DISPLAY_OPTIONS.
-That style is loaded by main.js and assign to a root style element, thus is available globally with further declaration.
-In addition, the style is applied to exported plots in the plot manager.
-Unfortunately, it is not fully acted upon, thus fonts appear bolder in export files than on-screen.
-Extensive attempts to resolve this issue using built-in broweser export functionality proved fruitless.
-Extensive attempts to resolve this issue using third-party export libraries also proved fruitless.
-The problem is not browser-specific; it appears the same in Chrome, Firefox and Safari.
+Styling depends on a common style, D3FontDefaults, which is built dynmically in constants.js, based on config values in LZ2_DISPLAY_OPTIONS. That style is loaded by main.js and assigned to a root style element, thus is available globally without further declaration.
+
+### Plot exports
+Originally I wrote a version of the plot export function for individual plots. Later, when writing the exporter for plot groups, I stumbled on a better library (html2canvas) that simplified the code and produced more accurate results. Later, I consolidated the code to use just the latter method for both individual plots and plot groups. For reference, this was done in commmit bab2c1711e469a425bb8540f18b5fd0caa0cf433, in case there is ever a need to resurrect the old method.
 
 ### Component hierarchy
 ```aiignore
