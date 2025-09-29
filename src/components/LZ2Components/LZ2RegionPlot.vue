@@ -134,17 +134,13 @@ const onActionMenuClick = (event) => {
 
 // *** Utility functions *******************************************************
 const debouncedRender = debounce(async (args) => {
-  const {
-    plotID, leadVariant, signalData, recombData,
-    showPlotID, showGenSigLine, showRecombLine, theme, region
-  } = args
+  const {plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region} = args
 
   await nextTick()
   renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
-  }, PLOT_DEBOUNCE_DELAY, { leading: false, trailing: true, maxWait: 200 })
+}, PLOT_DEBOUNCE_DELAY, { leading: false, trailing: true, maxWait: 200 })
 
 const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region) => {
-  console.log(`Rendering plot: ${plotID}`)
   const chromosome = parseVariant2(leadVariant, region).chr
 
   DIMENSIONS.plotWidth = DIMENSIONS.width

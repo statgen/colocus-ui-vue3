@@ -83,7 +83,7 @@ const LZ2_DISPLAY_OPTIONS = {
   PLOT_FONT_FAMILY: 'Helvetica, Arial, sans-serif',
   PLOT_FONT_SIZE: '1rem',
   PLOT_HEADER_FONT_FAMILY: 'Helvetica, Arial, sans-serif', // matching monospaced fonts: 'Menlo, Consolas, Monaco, monospace',
-  PLOT_HEADER_FONT_SIZE: '1.1rem',
+  PLOT_HEADER_FONT_SIZE: '1rem',
   PLOT_HEADER_FONT_WEIGHT: 400,
   PLOT_POINT_SIZES: {
     CIRCLE: 4,

@@ -1,6 +1,5 @@
 import * as d3 from 'd3v7'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
-import { parseSignalData, truncateString } from '@/util/util'
 import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Renderers() {
@@ -41,7 +40,7 @@ export function useLZ2Renderers() {
 
     // Title
     headerGroup.append('text')
-      .attr('x', 8)
+      .attr('x', 4)
       .attr('y', 20)
       .attr('fill', titleColor)
       .classed('lzrp-header', true)
