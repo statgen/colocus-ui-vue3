@@ -48,10 +48,14 @@
       </tr>
     </template>
 
-    <template #item.actions="{ item }">
+    <template v-if="appStore.currentPageName===PAGE_NAMES.MULTIZOOM" #item.actions="{ item }">
       <PlotNum title="B" @on-toggle-plot="() => onAddBothPlotsClick(item)" />
       <PlotNum :row-key="item.uuid" slot="signal1" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal1, 'signal1')" />
       <PlotNum :row-key="item.uuid" slot="signal2" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal2, 'signal2')" />
+    </template>
+
+    <template v-else-if="appStore.currentPageName===PAGE_NAMES.LOCUSZOOM" #item.actions="{ item }">
+      <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction" size="22px"/>
     </template>
 
     <!-- data columns -->
@@ -130,7 +134,7 @@ const searchPage = PAGE_NAMES.SEARCH
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['onDataTableRowClick', 'onAddBothPlotsClick', 'on-toggle-plot'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddBothPlotsClick', 'onAddPlotIconClick', 'on-toggle-plot'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
@@ -157,6 +161,10 @@ onMounted(async () => {
 // *** Event handlers **********************************************************
 const onAddBothPlotsClick = (item) => {
   emit('onAddBothPlotsClick', item)
+}
+
+const onAddPlotIconClick = (item) => {
+  emit('onAddPlotIconClick', item)
 }
 
 const onExpandRow = (item, side) => {
