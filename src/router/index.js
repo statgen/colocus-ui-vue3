@@ -10,6 +10,7 @@ const genePage = PAGE_NAMES.GENE
 const helpPage = PAGE_NAMES.HELP
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN
+const multizoomPage = PAGE_NAMES.MULTIZOOM
 const searchPage = PAGE_NAMES.SEARCH
 const studyPage = PAGE_NAMES.STUDIES
 const traitPage = PAGE_NAMES.TRAITS
@@ -69,6 +70,17 @@ const routes = [
       const appStore = useAppStore()
       appStore.copySearchFiltersToNextPage(to.name)
       // appStore.preloadTrait = to.params.trait
+      next()
+    }
+  },
+  {
+    path: `/${multizoomPage}`,
+    name: multizoomPage,
+    component: () => import('@/views/MultiZoomView.vue'),
+    beforeEnter: (to, from, next) => {
+      enableFiltering(SHOW_FILTER_PANEL)
+      const appStore = useAppStore()
+      appStore.copySearchFiltersToNextPage(to.name)
       next()
     }
   },

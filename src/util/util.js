@@ -47,29 +47,52 @@ function makeAnalysisTitle(analysis) {
   return `${analysis.study.uuid} • ${analysis.trait.uuid}`;
 }
 
-function makePlotTitle(signal) {
-  let part1 = ''
+const parseSignalDataForTitle = (signal) => {
+  let trait = ''
   let analysisType = ''
-  if (signal.analysis.trait.phenotype) {   // This trait is a GWAS phenotype
-    part1 = signal.analysis.trait.uuid
-    analysisType = signal.analysis.analysis_type
 
-  } else if (signal.analysis.trait.exon) { // This trait is an exon expression trait
-    part1 = signal.analysis.trait.gene.symbol
-    analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
+  if (signal.analysis?.trait.phenotype) {
+    analysisType = 'GWAS'
+    trait = signal.analysis?.trait.uuid
 
-  } else if (signal.analysis.trait.gene) { // This trait is a gene expression trait
-    part1 = signal.analysis.trait.gene.symbol
-    analysisType = `eQTL (${signal.analysis.trait.biomarker_type.replace('-expression', '')})`
+  } else if (signal.analysis?.trait.exon) {
+    analysisType = 'eQTL/exon'
+    trait = signal.analysis?.trait.gene.symbol
+
+  } else if (signal.analysis?.trait.gene) {
+    analysisType = 'eQTL/gene'
+    trait = signal.analysis?.trait.gene.symbol
+
+  } else return 'unknown type'
+
+  return {
+    trait,
+    analysisType,
+    variant: signal.lead_variant.vid,
+    study: signal.analysis.study.uuid,
+    margOnly: signal?.is_marg,
+    tissue: signal.analysis?.tissue,
+    cellType: signal.analysis?.cell_type,
   }
+}
 
-  const variant = formatVariantString(signal.lead_variant.vid)
-  const study = signal.analysis.study.uuid
-  const margOnly = signal?.is_marg ? '(marginal only)' : '';
-  const tissue = signal.analysis?.tissue ? `• ${signal.analysis.tissue}` : '';
-  const cellType = signal.analysis?.cell_type ? `• ${signal.analysis.cell_type}` : '';
-  const title = `${part1}    ${analysisType} ${tissue} ${cellType}    ${study}    ${variant}    ${margOnly}`
-  const color = colorHasher.hex(signal.lead_variant.vid)
+function makePlotTitle(signal) {
+  const SEP = '  '
+  const pd = parseSignalDataForTitle(signal)
+  if(pd === 'unknown type') return ['unknown type', 'red']
+
+  const variantFormatted = middleTrim(formatVariantString(pd.variant), 7, 7)
+
+  // const title = `${pd.trait}  ${pd.analysisType} ${pd.tissue} ${pd.cellType}  ${pd.variant}  ${pd.margOnly}`
+  let title = ''
+  title += `${pd.trait}${SEP}${pd.analysisType}`
+  title += pd.analysisType === 'GWAS' ? SEP : `/${pd.tissue}${SEP}`
+  title += pd.CellType ? `${pd.cellType}${SEP}` : ''
+  title += `${variantFormatted}${SEP}`
+  title += pd.margOnly ? `(marginal only)` : ''
+
+  const color = colorHasher.hex(pd.variant)
+
   return [title, color]
 }
 
@@ -104,6 +127,23 @@ const parseVariant = (variant) => {
   }
 }
 
+const parseVariant2 = (variant, region) => {
+  const pieces = variant.split('_')
+  let v = {
+    chr: +pieces[0],
+    loc: +pieces[1],
+    ref: pieces[2],
+    alt: pieces[3],
+  }
+  v.start = Math.max(1, v.loc - region)
+  v.end = v.loc + region
+  return v
+}
+
+const scrollBottom = () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+}
+
 const scrollToHeading = (id) => {
   const target = document.getElementById(id)
   if (target) {
@@ -114,6 +154,10 @@ const scrollToHeading = (id) => {
       behavior: 'smooth',
     })
   }
+}
+
+const scrollTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
@@ -172,4 +216,6 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
-  middleTrim, ppURL, scrollToHeading, sleeper, sortVariantArray, timeLog, titleCase, truncateString, url }
+  middleTrim, parseVariant2, ppURL, scrollBottom, scrollToHeading, scrollTop, sleeper, sortVariantArray, timeLog, titleCase,
+  truncateString, url
+}

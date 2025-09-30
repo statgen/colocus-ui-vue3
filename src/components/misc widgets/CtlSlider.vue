@@ -38,11 +38,11 @@ const onSliderChange = (val) => {
   controlLabel.value = `${controlSet.title} ${val}`
 }
 
-const onSliderChangeEnd = (val) => {
+const onSliderChangeEnd = async (val) => {
   controlLabel.value = `${controlSet.title} ${val}`
 
   if(controlSet.topKey === 'filter') {
-    appStore.updateFilter(controlSet.storeKey, val)
+    await appStore.updateFilter(controlSet.storeKey, val)
 
   } else if(controlSet.topKey === 'gene') {
     appStore[genePage][controlSet.storeKey] = val
@@ -54,7 +54,13 @@ const onSliderChangeEnd = (val) => {
 }
 
 watch(() => resetInput.value, () => {
+  const cpn = appStore.currentPageName
   inputValue.value = controlSet.defaultValue
+  if(cpn === PAGE_NAMES.GENE) {
+    appStore.clearPageData = !appStore.clearPageData
+  } else { // assume search, lz, lz2, manhattan
+    appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  }
 })
 
 </script>

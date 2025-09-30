@@ -1,7 +1,8 @@
-import { markRaw } from 'vue'
+import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { PAGE_NAMES, THRESHOLDS, URLS } from '@/constants'
+import { useMZPageHelpers } from '@/composables/MZPageHelpers'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -10,8 +11,10 @@ export const useAppStore = defineStore('appStore', {
 
     // global flags / variables
     clearPageData: false, // trigger when need to clear data on a page, initially for gene page
+    colocID: '',
     currentPageName: '',
-    isSidebarShowing: true,
+    isSidebarShowing: true,   // this refers to the filter panel
+    isToolboxShowing: false,  // refers to toolbox on MZ page
     slidersEnabled: false,
     tutorialFlag: false,
     showCellType: false, // Set this at a more "global" level; applies to all tables & only updates at app load time
@@ -24,7 +27,7 @@ export const useAppStore = defineStore('appStore', {
       isDirEffectReady: false,
     },
     filterPanelControls: {
-      filterDataChanged: false,
+      filterDataChanged: 0,
       isSidebarButtonShowing: true,
       isFilterDataLoaded: false,
       lastFilterUpdated: '',
@@ -47,8 +50,7 @@ export const useAppStore = defineStore('appStore', {
     [PAGE_NAMES.LOCUSZOOM]: {
       colocData: markRaw({}),
       colocDataReady: false,
-      colocID: '',
-      filterDataChanged: false,
+      lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotID: 0,
       regionPanelRemoved: false,
@@ -63,13 +65,39 @@ export const useAppStore = defineStore('appStore', {
       manhattanDataReady: false,
       ...getFilterPanelSettings()
     },
+    [PAGE_NAMES.MULTIZOOM]: {
+      addUniqueRefsOnly: false,
+      colocData: markRaw({}),
+      colocDataReady: false,
+      colocsSignals: markRaw([]),
+      lzfilterDataChanged: false,
+      lzLeadDOMIDs: [],
+      activePlotID: 0,
+      plotSettings: {},
+      regionPanelRemoved: false,
+      rowSlotToPlotID: {},
+      selectedLDRef: '',
+      selectedTheme: '',
+      showGenSigLines: true,
+      showPlotID: true,
+      showRecombLines: true,
+      signal1Variant: '',
+      tableDataLoaded: false,
+      xStart: 0,
+      xEnd: 0,
+      yAxis: LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS,
+      zoomRegion: PLOT_REGION_DEFAULT,
+      ...getFilterPanelSettings()
+    },
     [PAGE_NAMES.SEARCH]: {
       pastedGenes: null,
-      ...getFilterPanelSettings()
+      ...getFilterPanelSettings(),
+      colocID: '',
     },
   }),
 
   actions: {
+
     addQueryString(url) {
       const parentKey = this.currentPageName
 
@@ -217,7 +245,7 @@ export const useAppStore = defineStore('appStore', {
       }
     },
 
-    updateFilter(key, value) {
+    async updateFilter(key, value) {
       // following is to ignore a double hit when changing page size in <DataTable>; page num also changes and generates event
       if(this.filterPanelControls.lastFilterUpdated === 'pageSize' && key === 'pageNum' && value === 1) return
 
@@ -236,23 +264,21 @@ export const useAppStore = defineStore('appStore', {
         }
 
         this.filterPanelControls.lastFilterUpdated = key
-        this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
+        await nextTick()
+        this.filterPanelControls.filterDataChanged++
+        await nextTick()
       }
     },
 
     async updateSort(newSort) {
       const parentKey = this.currentPageName
       this[parentKey].filters.sortKeys = newSort
-      this.filterPanelControls.filterDataChanged = !this.filterPanelControls.filterDataChanged
+      this.filterPanelControls.filterDataChanged++
     },
 
     updateSwitch(key, value) {
       const parentKey = this.currentPageName
       this[parentKey][key] = value
-    },
-
-    toggleSidebar() {
-      this.isSidebarShowing = !this.isSidebarShowing
     },
   },
   getters: {

@@ -3,7 +3,10 @@
   <table>
     <thead>
       <tr>
-        <td colspan="2"><ActionButton title="Go to LocusZoom page" @click="onLZclick"/></td>
+        <td colspan="2">
+          <ActionButton title="LocusZoom" @click="onLZclick"/>
+          <ActionButton title="MultiZoom" @click="onMZclick" class="ml-4"/>
+        </td>
         <td>View Local Page</td>
         <td>View Page on AMP CMD Portal</td>
       </tr>
@@ -64,6 +67,18 @@
           }"/>
         </td>
       </tr>
+<!--      <tr>-->
+<!--        <td>signal1ID</td>-->
+<!--        <td>{{ signal1ID }}</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--      </tr>-->
+<!--      <tr>-->
+<!--        <td>signal2ID</td>-->
+<!--        <td>{{ signal2ID }}</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--      </tr>-->
     </tbody>
   </table>
   </div>
@@ -97,13 +112,17 @@ const s1TraitKPID = s1trait?.phenotype?.kp_id
 const s2TraitGene = s2trait.gene.symbol
 const s2TraitUuid = s2trait.uuid
 
+// const signal1ID = props.item.signal1.uuid
+// const signal2ID = props.item.signal2.uuid
+
 const variant1 = props.item.signal1.lead_variant.vid
 const variant2 = props.item.signal2.lead_variant.vid
 
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN
+const multizoomPage = PAGE_NAMES.MULTIZOOM
 
-const geneLink = ref(`${PAGE_NAMES.GENE}?gene=${s2TraitGene}`)
+const geneLink = ref(`/${PAGE_NAMES.GENE}?gene=${s2TraitGene}`)
 
 // *** Computed ****************************************************************
 // *** Provides ****************************************************************
@@ -125,6 +144,10 @@ const onMHclick = () => {
   } else {
     router.push({name: manhattanPage})
   }
+}
+
+const onMZclick = async () => {
+  await router.push({name: multizoomPage, params: {}})
 }
 
 // *** Utility functions *******************************************************

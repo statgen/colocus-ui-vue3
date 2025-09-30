@@ -146,7 +146,6 @@ export function useGenePageHelpers() {
       .rollup({allGenesArray: aq.op.array_agg('qtlSymbol')})
 
     const tableRollupObjects = tableRollup.objects()
-    // debugger
 
     const mapped = tableRollupObjects.map((row) => {
       const includedGenes = row.allGenesArray.filter((qtlSymbol) => qtlSymbol !== theGene)

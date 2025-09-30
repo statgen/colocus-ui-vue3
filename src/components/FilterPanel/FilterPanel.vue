@@ -18,7 +18,7 @@
       <CtlSlider :controlSet="controlConfig.r2" />
     </FilterPanelSubpanel>
 
-    <FilterPanelSubpanel title="View" id="subPanelView">
+    <FilterPanelSubpanel title="View" :resetButton="true" id="subPanelView">
       <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
       <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
       <CtlSwitch :controlSet="controlConfig.showEffects" />

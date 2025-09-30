@@ -52,22 +52,22 @@ const resetInput = inject('resetInput')
 
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => resetInput.value, () => {
+watch(() => resetInput.value, async () => {
   selectedItems.value = controlSet.defaultValue
-  appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
+  await appStore.updateFilter(controlSet.storeKey, controlSet.defaultValue)
 })
 
-watch(() => preloadGenes.value, () => {
+watch(() => preloadGenes.value, async () => {
   if(controlSet.storeKey === 'genes') {
     selectedItems.value = preloadGenes.value
-    appStore.updateFilter(controlSet.storeKey, preloadGenes.value)
+    await appStore.updateFilter(controlSet.storeKey, preloadGenes.value)
   }
 })
 
-// watch(() => preloadTrait.value, () => {
+// watch(() => preloadTrait.value, async () => {
 //   if(controlSet.storeKey === 'phenotypes') {
 //     selectedItems.value = preloadTrait.value
-//     appStore.updateFilter(controlSet.storeKey, preloadTrait.value)
+//     await appStore.updateFilter(controlSet.storeKey, preloadTrait.value)
 //   }
 // })
 
@@ -89,8 +89,9 @@ const onGenesPaste = (event) => {
   appStore[PAGE_NAMES.SEARCH].pastedGenes = pastedData
 }
 
-const onModelChanged = (newValue) => {
-  appStore.updateFilter(controlSet.storeKey, newValue)
+const onModelChanged = async (newValue) => {
+  // console.log('onModelChanged', controlSet.storeKey, newValue)
+  await appStore.updateFilter(controlSet.storeKey, newValue)
 }
 
 // *** Utility functions *******************************************************

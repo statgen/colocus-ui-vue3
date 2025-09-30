@@ -8,10 +8,18 @@ import { createPinia } from 'pinia'
 import router from './router'
 import '@/styles/global.css'
 
+import { D3_FONT_DEFAULTS } from '@/constants'
+
+const style = document.createElement('style')
+style.textContent = D3_FONT_DEFAULTS
+document.head.appendChild(style)
+
 import VueTippy from 'vue-tippy'
 import 'tippy.js/dist/tippy.css'    // Required CSS for animations
 import 'tippy.js/animations/scale.css'
 import '@/styles/tippy-theme.css'   // our custom theme
+
+import clickOutside from './directives/clickOutside'
 
 const app = createApp(App)
 
@@ -49,5 +57,7 @@ app.use(pinia)
 app.use(router)
 
 app.config.globalProperties.$log = console.log // use {{ $log(something) }} inside templates
+
+app.directive('click-outside', clickOutside)
 
 app.mount('#app')

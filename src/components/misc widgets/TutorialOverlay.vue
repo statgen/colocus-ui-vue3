@@ -12,6 +12,7 @@ import { ref } from 'vue'
 import Shepherd from 'shepherd.js'
 import 'shepherd.js/dist/css/shepherd.css'
 import { useAppStore } from '@/stores/AppStore'
+import { scrollTop } from '@/util/util'
 
 const appStore = useAppStore()
 
@@ -83,10 +84,6 @@ function initTour() {
 const onClick = () => {
   appStore.tutorialFlag = !appStore.tutorialFlag
   startTour()
-}
-
-const scrollTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const endTour = () => {

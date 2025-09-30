@@ -52,11 +52,11 @@ onMounted(() =>{
 
 // *** Event handlers **********************************************************
 // *** Utility functions *******************************************************
-const validateDebouncedInput = (newValue) => {
+const validateDebouncedInput = async (newValue) => {
   const rule = controlSet.rules[0] // assumption: there is only one rule
   // need explicit comparison to true, as the rule returns a string, the error message, which is truthy, if invalid input
   if (rule(newValue) === true) {
-    appStore.updateFilter(controlSet.storeKey, newValue)
+    await appStore.updateFilter(controlSet.storeKey, newValue)
   } else {
     // do nothing, error message is displayed by the control
   }
@@ -69,11 +69,11 @@ const populateControlData = () => {
   inputValue.value = appStore[parentKey].filters[controlSet.storeKey]
 }
 
-const trapEmpty = (focused) => {
+const trapEmpty = async (focused) => {
   const ev = controlSet.emptyValue
   if(!focused && inputValue && inputValue.value.length === 0 ) {
     inputValue.value = ev
-    appStore.updateFilter(controlSet.storeKey, ev)
+    await appStore.updateFilter(controlSet.storeKey, ev)
   }
 }
 </script>

@@ -16,6 +16,23 @@
       </div>
     </transition>
 
+    <!-- Toolbox (optional middle panel) -->
+    <transition name="sidebar-slide-fade">
+      <div
+        v-show="appStore.isToolboxShowing"
+        :style="{
+          flexBasis: `${MX_TOOLBOX_WIDTH}px`,
+          flexShrink: 0,
+          maxWidth: `${MX_TOOLBOX_WIDTH}px`,
+          width: `${MX_TOOLBOX_WIDTH}px`,
+          transition: 'all 0.3s ease'
+        }"
+        class="mr-2"
+      >
+        <slot name="toolbox" />
+      </div>
+    </transition>
+
     <!-- Main content -->
     <div class="flex-grow-1 ml-2 content-scroll" style="transition: all 0.3s ease;">
       <slot />
@@ -24,7 +41,7 @@
 </template>
 
 <script setup>
-import { SIDEBAR_WIDTH } from '@/constants'
+import { MX_TOOLBOX_WIDTH, SIDEBAR_WIDTH } from '@/constants'
 import { useAppStore } from '@/stores/AppStore'
 const appStore = useAppStore()
 </script>

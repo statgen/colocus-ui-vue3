@@ -11,7 +11,7 @@
     :loading="isLoadingData"
     :loading-text="loadingText"
     :multi-sort="true"
-    :page="currentPage"
+    :page="currentPageNum"
     :row-props="({item}) => getRowClass(item)"
     v-model:expanded="appStore.dataTable.expandedRow"
 
@@ -26,19 +26,19 @@
     show-current-page
   >
 
-    <template v-slot:[`item.expand-left`]="{ item }">
+    <template #[`item.expand-left`]="{ item }">
       <v-icon class="text-clcAction" @click.stop="onExpandRow(item, 'left')">
         {{ isRowExpanded(item) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
       </v-icon>
     </template>
 
-    <template v-slot:[`item.expand-right`]="{ item }">
+    <template #[`item.expand-right`]="{ item }">
       <v-icon class="text-clcAction" @click.stop="onExpandRow(item, 'right')">
         {{ isRowExpanded(item) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
       </v-icon>
     </template>
 
-    <template v-slot:expanded-row="{ columns, item }">
+    <template #expanded-row="{ columns, item }">
       <tr>
         <td :colspan=columns.length>
           <div class="d-flex mx-14 my-4" :class="expanderAlignment === 'left' ? 'justify-start' : 'justify-end'">
@@ -48,103 +48,41 @@
       </tr>
     </template>
 
-    <template v-slot:item.actions="{ item }">
+    <template v-if="appStore.currentPageName===PAGE_NAMES.MULTIZOOM" #item.actions="{ item }">
+      <PlotNum title="B" @on-toggle-plot="() => onAddBothPlotsClick(item)" />
+      <PlotNum :row-key="item.uuid" slot="signal1" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal1, 'signal1')" />
+      <PlotNum :row-key="item.uuid" slot="signal2" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal2, 'signal2')" />
+    </template>
+
+    <template v-else-if="appStore.currentPageName===PAGE_NAMES.LOCUSZOOM" #item.actions="{ item }">
       <v-icon icon="mdi-image-plus-outline" @click.stop="onAddPlotIconClick(item)" class="text-clcAction" size="22px"/>
     </template>
 
-    <template v-slot:item.signal1.analysis.study.uuid="{item}">
-      <StudyLabel :study="item.signal1.analysis.study.uuid" abbrev/>
-    </template>
+    <!-- data columns -->
+    <template #item.signal1.analysis.study.uuid="{item}"><StudyLabel :study="item.signal1.analysis.study.uuid" abbrev/></template>
+    <template #item.signal1.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait"/></template>
+    <template #item.signal1.analysis.analysis_type="{item}">{{ item.signal1.analysis.analysis_type }}</template>
+    <template #item.signal2.analysis.study.uuid="{item}"><StudyLabel :study="item.signal2.analysis.study.uuid" abbrev/></template>
+    <template #item.signal2.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal2.analysis.trait" :key="item.signal2.analysis.trait"/></template>
+    <template #item.signal2.analysis.trait.biomarker_type="{item}">{{ item.signal2.analysis.trait.biomarker_type.replace("-expression", "") }}</template>
+    <template #item.signal2.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal2.analysis.trait" /></template>
+    <template #item.signal2.analysis.tissue="{item}">{{ item.signal2.analysis.tissue }}</template>
+    <template #item.signal1.lead_variant.vid="{item}"><VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" /></template>
+    <template #item.signal2.lead_variant.vid="{item}"><VariantLabel :variant="item.signal2.lead_variant.vid" :showSplotch="true" /></template>
+    <template #item.signal1.neg_log_p="{item}">{{ (+item.signal1.neg_log_p).toFixed(2) }}</template>
+    <template #item.signal2.neg_log_p="{item}">{{ (+item.signal2.neg_log_p).toFixed(2) }}</template>
+    <template #item.coloc_h3="{item}">{{ item.coloc_h3.toFixed(2) }}</template>
+    <template #item.coloc_h4="{item}">{{ item.coloc_h4.toFixed(2) }}</template>
+    <template #item.r2="{item}">{{ item.r2.toFixed(2) }}</template>
+    <template #item.n_coloc_between_traits="{item}">{{ item.n_coloc_between_traits }}</template>
+    <template #item.cross_signal.effect="{item}"><ConcordanceLabel :item="item"/></template>
+    <template #item.signal1.effect_marg="{item}">{{ item.signal1.effect_marg.toFixed(2) }}</template>
+    <template #item.signal2.effect_marg="{item}">{{ item.signal2.effect_marg.toFixed(2) }}</template>
+    <template #item.signal1.effect_cond="{item}">{{ item.signal1.effect_cond.toFixed(2) }}</template>
+    <template #item.signal2.effect_cond="{item}">{{ item.signal2.effect_cond.toFixed(2) }}</template>
+    <template #item.marg_cond_flip="{item}">{{ +item.marg_cond_flip }}</template>
 
-    <template v-slot:item.signal1.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait"/>
-    </template>
-
-    <template v-slot:item.signal1.analysis.analysis_type="{item}">
-      {{ item.signal1.analysis.analysis_type }}
-    </template>
-
-    <template v-slot:item.signal2.analysis.study.uuid="{item}">
-      <StudyLabel :study="item.signal2.analysis.study.uuid" abbrev/>
-    </template>
-
-    <template v-slot:item.signal2.analysis.trait.uuid="{item}">
-      <TraitLabel :trait="item.signal2.analysis.trait" :key="item.signal2.analysis.trait"/>
-    </template>
-
-    <template v-slot:item.signal2.analysis.trait.biomarker_type="{item}">
-        {{ item.signal2.analysis.trait.biomarker_type.replace("-expression", "") }}
-    </template>
-
-    <template v-slot:item.signal2.analysis.trait.gene.ens_id="{item}">
-      <EnsgLabel :trait="item.signal2.analysis.trait" />
-    </template>
-
-    <template v-slot:item.signal2.analysis.tissue="{item}">
-      {{ item.signal2.analysis.tissue }}
-    </template>
-
-    <template v-slot:item.signal2.analysis.cell_type="{item}">
-      {{ item.signal2.analysis.cell_type }}
-    </template>
-
-    <template v-slot:item.signal1.lead_variant.vid="{item}">
-      <VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" />
-    </template>
-
-    <template v-slot:item.signal2.lead_variant.vid="{item}">
-      <VariantLabel :variant="item.signal2.lead_variant.vid" :showSplotch="true" />
-    </template>
-
-    <template v-slot:item.signal1.neg_log_p="{item}">
-      {{ (+item.signal1.neg_log_p).toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal2.neg_log_p="{item}">
-      {{ (+item.signal2.neg_log_p).toFixed(2) }}
-    </template>
-
-    <template v-slot:item.coloc_h3="{item}">
-      {{ item.coloc_h3.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.coloc_h4="{item}">
-      {{ item.coloc_h4.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.r2="{item}">
-      {{ item.r2.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.n_coloc_between_traits="{item}">
-      {{ item.n_coloc_between_traits }}
-    </template>
-
-    <template #item.cross_signal.effect="{item}">
-      <ConcordanceLabel :item="item"/>
-    </template>
-
-    <template v-slot:item.signal1.effect_marg="{item}">
-      {{ item.signal1.effect_marg.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal2.effect_marg="{item}">
-      {{ item.signal2.effect_marg.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal1.effect_cond="{item}">
-      {{ item.signal1.effect_cond.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.signal2.effect_cond="{item}">
-      {{ item.signal2.effect_cond.toFixed(2) }}
-    </template>
-
-    <template v-slot:item.marg_cond_flip="{item}">
-      {{ +item.marg_cond_flip }}
-    </template>
-
-    <template v-slot:footer.prepend>
+    <template #footer.prepend>
       <div>
         <ToolTippy>
           <v-icon icon="mdi-file-download-outline" @click="onFileDownloadClick()" class="text-clcAction mx-3" size="32px"/>
@@ -160,13 +98,15 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { inject, nextTick, ref, shallowRef, watch } from 'vue'
+import { computed, inject, onMounted, ref, shallowRef, watch } from 'vue'
 import { useDataTableHelpers } from '@/composables/DataTableHelpers'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES, URLS } from '@/constants'
+import { scrollTop } from '@/util/util'
 import { useFetchData } from '@/composables/fetchData'
 import { useDirectionOfEffect } from '@/composables/DirectionOfEffect'
 import router from '@/router'
+import PlotNum from "@/components/misc widgets/PlotNum.vue";
 
 // *** Composables ***************************************************************
 const appStore = useAppStore()
@@ -177,13 +117,15 @@ const props = defineProps(['id'])
 
 // *** Variables ***************************************************************
 const expanderAlignment = ref('left')
-const currentPage = ref()
+const currentPageName = ref('')
+const currentPageNum = ref()
 const dataItems = shallowRef([])
+let debounceTimer = null
 const isLoadingData = ref(false)
 const itemsPerPage = ref()
 const loadingText = ref('Loading data ...')
-const manhattanPage = PAGE_NAMES.MANHATTAN
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
+const multizoomPage = PAGE_NAMES.MULTIZOOM
 const searchPage = PAGE_NAMES.SEARCH
 
 // *** Computed ****************************************************************
@@ -192,12 +134,12 @@ const searchPage = PAGE_NAMES.SEARCH
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddBothPlotsClick', 'onAddPlotIconClick', 'on-toggle-plot'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
-  appStore[locuszoomPage].filterDataChanged = true;
-  await loadData()
+  appStore[currentPageName.value].lzfilterDataChanged = true;
+  await loadDataDebounced()
 })
 
 watch(() => loadTableDataFlag.value, async () => {
@@ -212,14 +154,23 @@ watch(() => appStore.tutorialFlag, async () => {
 })
 
 // *** Lifecycle hooks *********************************************************
+onMounted(async () => {
+  currentPageName.value = appStore.currentPageName
+})
+
 // *** Event handlers **********************************************************
+const onAddBothPlotsClick = (item) => {
+  emit('onAddBothPlotsClick', item)
+}
+
 const onAddPlotIconClick = (item) => {
   emit('onAddPlotIconClick', item)
 }
 
 const onExpandRow = (item, side) => {
   const colocID = item.uuid
-  appStore[locuszoomPage].colocID = colocID
+  // console.log(`ColocID: ${colocID} Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
+  appStore.colocID = colocID
   expanderAlignment.value = side
   if(appStore.dataTable.expandedRow.indexOf(colocID) === -1) appStore.dataTable.expandedRow = [colocID]
   else appStore.dataTable.expandedRow.length = 0
@@ -229,24 +180,24 @@ const onFileDownloadClick = () => {
   fileDownload(dataItems.value)
 }
 
-const onItemsPerPageChanged = (ipp) => {
-  appStore.updateFilter('pageSize', ipp)
+const onItemsPerPageChanged = async (ipp) => {
+  await appStore.updateFilter('pageSize', ipp)
   itemsPerPage.value = ipp
-  currentPage.value = 1
+  currentPageNum.value = 1
 }
 
 const onKeyDownEscape = () => {
   clearExpandedRow()
 }
 
-const onPageChanged = (newPageNum) => {
-  appStore.updateFilter('pageNum', newPageNum)
-  currentPage.value = newPageNum
+const onPageChanged = async (newPageNum) => {
+  await appStore.updateFilter('pageNum', newPageNum)
+  currentPageNum.value = newPageNum
 }
 
 const onRowClick = async (event, item) => {
   const colocID = item.item.uuid
-  appStore[locuszoomPage].colocID = colocID
+  appStore.colocID = colocID
   emit('onDataTableRowClick', item)
 }
 
@@ -254,8 +205,20 @@ const onSortUpdate = (newSort) => {
   appStore.updateSort(newSort)
 }
 
+const onTogglePlot = async (colocID, signal, slot) => {
+  emit('on-toggle-plot', colocID, signal, slot)
+}
+
 // *** Utility functions *******************************************************
 const clearExpandedRow = () => appStore.dataTable.expandedRow.length = 0
+
+// this works by scheduling a timeout for *after* the current event loop tick
+const loadDataDebounced = async () => {
+  clearTimeout(debounceTimer) // cancel pending call, if any
+  debounceTimer = setTimeout(() => {
+    loadData()
+  }, 0)
+}
 
 const isRowExpanded = item => appStore.dataTable.expandedRow.includes(item.uuid)
 
@@ -263,8 +226,8 @@ const loadColocData = async (cpn, url) => {
   const { data, errorMessage, fetchData } = useFetchData()
 
   if(await fetchData(url, 'coloc plot data', cpn)) {
-    appStore[locuszoomPage].colocData = data.value
-    appStore[locuszoomPage].colocDataReady = true
+    appStore[cpn].colocData = data.value
+    appStore[cpn].colocDataReady = true
   } else {
     throw new Error('Error loading coloc plot data:\n' + errorMessage)
   }
@@ -282,7 +245,7 @@ const loadTableData = async (cpn, url) => {
     appStore.dataTable.isDirEffectReady = true
 
     const parentKey = cpn
-    currentPage.value = appStore[parentKey].filters.pageNum
+    currentPageNum.value = appStore[parentKey].filters.pageNum
     itemsPerPage.value = appStore[parentKey].filters.pageSize
 
   } else {
@@ -291,9 +254,9 @@ const loadTableData = async (cpn, url) => {
 }
 
 const loadData = async () => {
-  const colocID = appStore[locuszoomPage].colocID
-  const cpn = appStore.currentPageName
-  if(cpn === locuszoomPage && !colocID) {
+  const cpn = currentPageName.value
+  const colocID = appStore.colocID
+  if([locuszoomPage, multizoomPage].includes(cpn) && !colocID) {
     await router.push({ name: searchPage })
     return
   }
@@ -301,19 +264,19 @@ const loadData = async () => {
   isLoadingData.value = true
 
   try {
-    if (cpn === locuszoomPage) {
-      if(!appStore[locuszoomPage].colocDataReady) {
+    if ([locuszoomPage, multizoomPage].includes(cpn)) {
+      if(!appStore[cpn].colocDataReady) {
         const colocURL = `${URLS.COLOC_DATA}/${colocID}`
         await loadColocData(cpn, colocURL)
       }
-      const signal1 = appStore[locuszoomPage].colocData.signal1
-      const signal2 = appStore[locuszoomPage].colocData.signal2
+      const signal1 = appStore[cpn].colocData.signal1
+      const signal2 = appStore[cpn].colocData.signal2
       url = appStore.buildLZdataTableURL(URLS.COLOC_DATA, signal1, signal2)
 
-      if(!appStore[locuszoomPage].tableDataLoaded || appStore[locuszoomPage].filterDataChanged) {
+      if(!appStore[cpn].tableDataLoaded || appStore[cpn].lzfilterDataChanged) {
         await loadTableData(cpn, url)
-        appStore[locuszoomPage].tableDataLoaded = true
-        appStore[locuszoomPage].filterDataChanged = false
+        appStore[cpn].tableDataLoaded = true
+        appStore[cpn].lzfilterDataChanged = false
       }
     } else { // must be search page or manhattan page
       url = appStore.buildSearchURL(URLS.COLOC_DATA)
@@ -328,22 +291,17 @@ const loadData = async () => {
 }
 
 const getRowClass = (item) => {
-  if(appStore.currentPageName !== locuszoomPage) return
-  if(!appStore[locuszoomPage].colocDataReady) return
+  const cpn = currentPageName.value
+  if(![locuszoomPage, multizoomPage].includes(cpn)) return
+  if(!appStore[cpn].colocDataReady) return
 
-  const s1 = appStore[locuszoomPage].colocData.signal1
-  const s2 = appStore[locuszoomPage].colocData.signal2
+  const s1 = appStore[cpn].colocData.signal1
+  const s2 = appStore[cpn].colocData.signal2
 
   if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
     return { class: 'bg-clcTableHighlight font-weight-bold' }
   } else {
     return {}
-  }
-}
-
-const scrollTop = () => {
-  if(appStore.currentPageName === searchPage) {
-    nextTick(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
   }
 }
 
@@ -354,5 +312,13 @@ const scrollTop = () => {
 .table-base {
   font-size: 1rem;
   line-height: 1.3;
+}
+
+.icon-placeholder {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  margin-right: 4px;
+  /*border: 2px solid black;*/
 }
 </style>

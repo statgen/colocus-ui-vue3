@@ -1,21 +1,21 @@
 import { computed, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
-import { findPlotRegion } from '@/util/util'
 import { PAGE_NAMES } from '@/constants'
 
 export const useDataTableHelpers = () => {
   const appStore = useAppStore()
 
   const locuszoomPage = PAGE_NAMES.LOCUSZOOM
-  const searchPage = PAGE_NAMES.SEARCH
+  const multizoomPage = PAGE_NAMES.MULTIZOOM
   const manhattanPage = PAGE_NAMES.MANHATTAN
+  const searchPage = PAGE_NAMES.SEARCH
 
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
   const showCellType = ref(false)
 
   const showAddPlotIcon = () => {
-    return [PAGE_NAMES.LOCUSZOOM].includes(appStore.currentPageName)
+    return [locuszoomPage, multizoomPage].includes(appStore.currentPageName)
   }
 
   watch(() => appStore[locuszoomPage].showEnsIDs, newValue => {showEnsIDs.value = newValue})
@@ -32,7 +32,7 @@ export const useDataTableHelpers = () => {
 
   const allColumns= [
     { title: 'Expand', value: 'expand-left', sortable: false, visible: () => alwaysShow },
-    { title: 'Add plots', value: 'actions', sortable: false, visible: () => showAddPlotIcon() },
+    { title: 'Add plots', value: 'actions', sortable: false, minWidth: '8rem', visible: () => showAddPlotIcon() },
     { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '5rem', visible: alwaysShow },
@@ -115,7 +115,6 @@ export const useDataTableHelpers = () => {
   ]
 
   return {
-    findPlotRegion,
     fileDownload,
     visibleColumns,
     ITEMS_PER_PAGE_OPTIONS,

@@ -35,7 +35,7 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { nextTick, onMounted, provide, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useRoute } from "vue-router";
 import { useAppStore } from '@/stores/AppStore'
@@ -76,6 +76,10 @@ watch(() => appStore[searchPage].pastedGenes, (newVal, oldVal) => {
 })
 
 // *** Lifecycle hooks *********************************************************
+onBeforeUnmount(() => {
+  appStore.dataTable.expandedRow.length = 0
+})
+
 onMounted(async () => {
   loadFilterPanelControls()
 
