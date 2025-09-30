@@ -36,12 +36,13 @@
         @on-toggle-plot="onTogglePlot"
       ></DataTable>
     </div>
+    <div id="page-bottom-sentinel" aria-hidden="true" style="height:1px;"></div>
   </SidebarLayout>
 </template>
 
 <script setup>
 // *** Imports *****************************************************************
-import { onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { onBeforeUnmount, nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
@@ -58,6 +59,7 @@ const mzPageHelpers = useMZPageHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
+const bottomSentinel = ref(null)
 const isExporting = ref(false)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
@@ -87,7 +89,7 @@ provide('preloadGenes', preloadGenes)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => MZPage.colocDataReady, (newVal) => {
+watch(() => MZPage.colocDataReady, async (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
 
@@ -101,8 +103,9 @@ watch(() => MZPage.colocDataReady, (newVal) => {
     MZPage.signal1Variant = variant
     mzPageHelpers.setPlotRegion(variant, MZPage.zoomRegion)
 
-    renderPlot(colocID, signal1, 'signal1')
-    renderPlot(colocID, signal2, 'signal2')
+    await renderPlot(colocID, signal1, 'signal1')
+    await renderPlot(colocID, signal2, 'signal2')
+    await scrollBottom()
   }
 })
 
@@ -138,7 +141,7 @@ const onActionMenuClick = async (arg) => {
   showMenu.value = true
 }
 
-const onAddBothPlotsClick = (item) => {
+const onAddBothPlotsClick = async (item) => {
   const { signal1, signal2 } = item
   const colocID = item.uuid
   const s1PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal1
@@ -148,13 +151,14 @@ const onAddBothPlotsClick = (item) => {
     deletePlot(s1PlotID)
     deletePlot(s2PlotID)
   } else if(s1PlotID) {
-    renderPlot(colocID, signal2, 'signal2')
+    await renderPlot(colocID, signal2, 'signal2')
   } else if(s2PlotID) {
-    renderPlot(colocID, signal1, 'signal1')
+    await renderPlot(colocID, signal1, 'signal1')
   } else {
-    renderPlot(colocID, signal1, 'signal1')
-    renderPlot(colocID, signal2, 'signal2')
+    await renderPlot(colocID, signal1, 'signal1')
+    await renderPlot(colocID, signal2, 'signal2')
   }
+  await scrollBottom()
 }
 
 const onCloseMenu = () => {
@@ -190,6 +194,7 @@ const onTogglePlot = async (colocID, signal, slot) => {
     mzPageHelpers.setMZRowSlotPlotID(colocID, slot, null)
   } else {
     await renderPlot(colocID, signal, slot)
+    await scrollBottom()
   }
 }
 
@@ -261,6 +266,18 @@ async function renderPlot(colocID, signal, slot) {
   mzPageHelpers.setMZRowSlotPlotID(colocID, slot, plotID)
   return plotID
 }
+
+const scrollBottom = async () => {
+  await nextTick()
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+  document.getElementById('page-bottom-sentinel')?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+
+  setTimeout(() => {
+    document.getElementById('page-bottom-sentinel')
+      ?.scrollIntoView({ behavior: 'auto', block: 'end' })
+  }, 250)
+}
+
 // *** Configuration data ******************************************************
 </script>
 

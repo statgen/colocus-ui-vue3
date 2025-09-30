@@ -140,6 +140,10 @@ const parseVariant2 = (variant, region) => {
   return v
 }
 
+const scrollBottom = () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+}
+
 const scrollToHeading = (id) => {
   const target = document.getElementById(id)
   if (target) {
@@ -155,6 +159,7 @@ const scrollToHeading = (id) => {
 const scrollTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 // call with await sleeper(n); this is only for analysis/debugging, not production use
@@ -211,6 +216,6 @@ function url(strings, ...values) {
 }
 
 export { colorHasher, findPlotRegion, formatVariantString, makeAnalysisTitle, makePlotTitle, matchLowercase,
-  middleTrim, parseVariant2, ppURL, scrollToHeading, scrollTop, sleeper, sortVariantArray, timeLog, titleCase,
+  middleTrim, parseVariant2, ppURL, scrollBottom, scrollToHeading, scrollTop, sleeper, sortVariantArray, timeLog, titleCase,
   truncateString, url
 }
