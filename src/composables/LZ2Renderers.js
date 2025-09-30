@@ -116,7 +116,7 @@ export function useLZ2Renderers() {
       .attr('stroke-width', rectStrokeWidth)
   }
 
-  const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks, themeName) => {
+  const renderSignalData = (ctr, data, xScale, yScale, xAccessor, yAccessor, tooltipCallbacks, themeName, selectedLDRef) => {
     const theme = LZ2_DISPLAY_OPTIONS.LZ2_THEMES[themeName]
     const colorSet = theme.colors
     const sizeSet = theme.sizes
@@ -147,7 +147,7 @@ export function useLZ2Renderers() {
           .attr('cx', x)
           .attr('cy', y)
           .attr('r', sizeSet.circle)
-      } else if(d.isLead) {
+      } else if(d.variant === selectedLDRef) {
         if(theme.leadShape === 'triangle') {
           el.attr('d', symbol().type(symbolTriangle).size(sizeSet.lead)())
         } else {

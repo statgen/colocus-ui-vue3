@@ -60,7 +60,7 @@ const recombData = ref(null)
 const DIMENSIONS = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
 const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
-const multizoomPage = PAGE_NAMES.MULTIZOOM
+const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
 
 // *** Computed ****************************************************************
 const plotDOMid = computed(() => `plot_${props.ID}`)
@@ -73,10 +73,10 @@ const plotDOMid = computed(() => `plot_${props.ID}`)
 watch([
     () => signalData.value,
     () => recombData.value,
-    () => appStore[multizoomPage].plotSettings[props.ID]?.showPlotID,
-    () => appStore[multizoomPage].plotSettings[props.ID]?.showRecombLine,
-    () => appStore[multizoomPage].plotSettings[props.ID]?.showGenSigLine,
-    () => appStore[multizoomPage].selectedTheme,
+    () => MZPage.plotSettings[props.ID]?.showPlotID,
+    () => MZPage.plotSettings[props.ID]?.showRecombLine,
+    () => MZPage.plotSettings[props.ID]?.showGenSigLine,
+    () => MZPage.selectedTheme,
   ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
@@ -87,18 +87,19 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
         n.classList.toggle('hidden', !showGenSigLine)
       })
       await nextTick()
-      const region = appStore[multizoomPage].zoomRegion
+      const region = MZPage.zoomRegion
       const plotID = props.ID
-      debouncedRenderPlot({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region})
+      const selectedLDRef = MZPage.selectedLDRef
+      debouncedRenderPlot({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef})
     },
   { immediate: false, flush: 'post' }
 )
 
 // this watch reloads data following UI changes, depending on the other watch to rerender plot
 watch([
-  () => appStore[multizoomPage].selectedLDRef,
-  () => appStore[multizoomPage].yAxis,
-  () => appStore[multizoomPage].zoomRegion,
+  () => MZPage.selectedLDRef,
+  () => MZPage.yAxis,
+  () => MZPage.zoomRegion,
 ],
   async ([selectedLDRef, yAxis, zoomRegion]) => {
     signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
@@ -117,9 +118,9 @@ onMounted(async () => {
   const [t, c] = makePlotTitle(props.signal)
   title.value = t
   titleColor.value = c
-  const ldRef = appStore[multizoomPage].selectedLDRef
-  const yAxis = appStore[multizoomPage].yAxis
-  const zoomRegion = appStore[multizoomPage].zoomRegion
+  const ldRef = MZPage.selectedLDRef
+  const yAxis = MZPage.yAxis
+  const zoomRegion = MZPage.zoomRegion
   signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, ldRef, REF_BUILD, yAxis, zoomRegion)
   recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL, zoomRegion)
 })
@@ -131,13 +132,13 @@ const onActionMenuClick = (event) => {
 
 // *** Utility functions *******************************************************
 const debouncedRenderPlot = debounce(async (args) => {
-  const {plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region} = args
+  const {plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef} = args
 
   await nextTick()
-  renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region)
+  renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef)
 }, PLOT_DEBOUNCE_DELAY, { leading: false, trailing: true, maxWait: 200 })
 
-const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region) => {
+const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef) => {
   const chromosome = parseVariant2(leadVariant, region).chr
 
   DIMENSIONS.plotWidth = DIMENSIONS.width
@@ -157,8 +158,8 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   const xAccessor = d => d.x
   const yAccessor = d => d.y
 
-  const xStart = appStore[multizoomPage].xStart
-  const xEnd = appStore[multizoomPage].xEnd
+  const xStart = MZPage.xStart
+  const xEnd = MZPage.xEnd
   const xScale = LZ2Scales.createXscale(xStart, xEnd, DIMENSIONS)
 
   const yScaleSignal = LZ2Scales.createYscaleSignal(yAccessor, signalData, DIMENSIONS)
@@ -172,7 +173,8 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.LEAD_MARKER_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 
-  LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, theme)
+  LZ2Renderers.renderSignalData(plotGroup, signalData, xScale, yScaleSignal, xAccessor, yAccessor, tooltipCallbacks, theme, selectedLDRef)
+
   if(showRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
   if(showGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
   if(showPlotID) LZ2Renderers.renderPlotIDBadge(rootSVG.value, plotID, DIMENSIONS)
