@@ -44,7 +44,7 @@ export function useLZ2DataLoaders() {
       r2: row.r2,
       variant: row.variant,
       refAllele: row.ref_allele,
-      isLead: signalRef === row.variant,
+      // isLead: signalRef === row.variant,
       beta: yAxis === 'marginal' ? row.t1_beta : row.t2_beta,
     }))
 

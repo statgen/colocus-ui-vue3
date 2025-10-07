@@ -262,6 +262,7 @@ async function renderPlot(colocID, signal, slot) {
     type: 'region',
     onActionMenuClick,
   })
+
   mzPageHelpers.addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
   mzPageHelpers.setMZRowSlotPlotID(colocID, slot, plotID)
   return plotID
@@ -273,8 +274,7 @@ const scrollBottom = async () => {
   document.getElementById('page-bottom-sentinel')?.scrollIntoView({ behavior: 'smooth', block: 'end' })
 
   setTimeout(() => {
-    document.getElementById('page-bottom-sentinel')
-      ?.scrollIntoView({ behavior: 'auto', block: 'end' })
+    document.getElementById('page-bottom-sentinel')?.scrollIntoView({ behavior: 'auto', block: 'end' })
   }, 250)
 }
 

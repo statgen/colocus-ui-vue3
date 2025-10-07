@@ -28,14 +28,6 @@ const LZ2DataLoaders = useLZ2DataLoaders()
 const LZ2Axes = useLZ2Axes()
 const LZ2Renderers = useLZ2Renderers()
 
-const tooltipCallbacks = {
-  show: tooltipStore.showTooltip,
-  updatePosition: tooltipStore.updatePosition,
-  hide: tooltipStore.hideTooltip
-}
-
-const emit = defineEmits(['action-menu-click'])
-
 // *** Props *******************************************************************
 const props = defineProps({
   ID: Number,
@@ -68,6 +60,8 @@ const plotDOMid = computed(() => `plot_${props.ID}`)
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
+const emit = defineEmits(['action-menu-click'])
+
 // *** Watches *****************************************************************
 // this watch rerenders following data reload or certain boolean UI changes (eg, showPlotID)
 watch([
@@ -178,6 +172,12 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   if(showRecombLine) LZ2Renderers.renderRecombLine(plotGroup, recombData, xScale, yScaleRecomb)
   if(showGenSigLine) LZ2Renderers.renderGenSigLine(plotGroup, xScale, yScaleSignal)
   if(showPlotID) LZ2Renderers.renderPlotIDBadge(rootSVG.value, plotID, DIMENSIONS)
+}
+
+const tooltipCallbacks = {
+  show: tooltipStore.showTooltip,
+  updatePosition: tooltipStore.updatePosition,
+  hide: tooltipStore.hideTooltip
 }
 
 // *** Configuration data ******************************************************
