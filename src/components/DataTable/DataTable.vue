@@ -50,8 +50,8 @@
 
     <template v-if="appStore.currentPageName===PAGE_NAMES.MULTIZOOM" #item.actions="{ item }">
       <PlotNum title="B" @on-toggle-plot="() => onAddBothPlotsClick(item)" />
-      <PlotNum :row-key="item.uuid" slot="signal1" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal1, 'signal1')" />
-      <PlotNum :row-key="item.uuid" slot="signal2" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal2, 'signal2')" />
+      <PlotNum :row-key="item.uuid" slot="slot1" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal1, 'slot1')" />
+      <PlotNum :row-key="item.uuid" slot="slot2" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal2, 'slot2')" />
     </template>
 
     <template v-else-if="appStore.currentPageName===PAGE_NAMES.LOCUSZOOM" #item.actions="{ item }">

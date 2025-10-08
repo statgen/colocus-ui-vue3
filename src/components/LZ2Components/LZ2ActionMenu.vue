@@ -16,6 +16,8 @@ import {PAGE_NAMES} from "@/constants";
 
 const appStore = useAppStore()
 
+const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
+
 defineProps({
   menuStyle: Object
 })
@@ -28,24 +30,24 @@ const emit = defineEmits([
 
 const genSignChecked = computed({
   get: () => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
-    return appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]?.showGenSigLine ?? false
+    const plotID = storeMZpage.activePlotID
+    return storeMZpage.plotRegistry[plotID]?.showGenSigLine ?? false
   },
   set: (val) => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
-    appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showGenSigLine = val
+    const plotID = storeMZpage.activePlotID
+    storeMZpage.plotRegistry[plotID].showGenSigLine = val
     emit('close-menu')
   }
 })
 
 const recombChecked = computed({
   get: () => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
-    return appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID]?.showRecombLine ?? false
+    const plotID = storeMZpage.activePlotID
+    return storeMZpage.plotRegistry[plotID]?.showRecombLine ?? false
   },
   set: (val) => {
-    const plotID = appStore[PAGE_NAMES.MULTIZOOM].activePlotID
-    appStore[PAGE_NAMES.MULTIZOOM].plotSettings[plotID].showRecombLine = val
+    const plotID = storeMZpage.activePlotID
+    storeMZpage.plotRegistry[plotID].showRecombLine = val
     emit('close-menu')
   }
 })

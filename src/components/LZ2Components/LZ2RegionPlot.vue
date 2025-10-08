@@ -52,7 +52,7 @@ const recombData = ref(null)
 const DIMENSIONS = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
 const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
-const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
+const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 
 // *** Computed ****************************************************************
 const plotDOMid = computed(() => `plot_${props.ID}`)
@@ -67,10 +67,10 @@ const emit = defineEmits(['action-menu-click'])
 watch([
     () => signalData.value,
     () => recombData.value,
-    () => MZPage.plotSettings[props.ID]?.showPlotID,
-    () => MZPage.plotSettings[props.ID]?.showRecombLine,
-    () => MZPage.plotSettings[props.ID]?.showGenSigLine,
-    () => MZPage.selectedTheme,
+    () => storeMZpage.plotRegistry[props.ID]?.showPlotID,
+    () => storeMZpage.plotRegistry[props.ID]?.showRecombLine,
+    () => storeMZpage.plotRegistry[props.ID]?.showGenSigLine,
+    () => storeMZpage.selectedTheme,
   ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
@@ -81,9 +81,9 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
         n.classList.toggle('hidden', !showGenSigLine)
       })
       await nextTick()
-      const region = MZPage.zoomRegion
+      const region = storeMZpage.zoomRegion
       const plotID = props.ID
-      const selectedLDRef = MZPage.selectedLDRef
+      const selectedLDRef = storeMZpage.selectedLDRef
       debouncedRenderPlot({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef})
     },
   { immediate: false, flush: 'post' }
@@ -91,9 +91,9 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
 
 // this watch reloads data following UI changes, depending on the other watch to rerender plot
 watch([
-  () => MZPage.selectedLDRef,
-  () => MZPage.yAxis,
-  () => MZPage.zoomRegion,
+  () => storeMZpage.selectedLDRef,
+  () => storeMZpage.yAxis,
+  () => storeMZpage.zoomRegion,
 ],
   async ([selectedLDRef, yAxis, zoomRegion]) => {
     signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
@@ -112,9 +112,9 @@ onMounted(async () => {
   const [t, c] = makePlotTitle(props.signal)
   title.value = t
   titleColor.value = c
-  const ldRef = MZPage.selectedLDRef
-  const yAxis = MZPage.yAxis
-  const zoomRegion = MZPage.zoomRegion
+  const ldRef = storeMZpage.selectedLDRef
+  const yAxis = storeMZpage.yAxis
+  const zoomRegion = storeMZpage.zoomRegion
   signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, ldRef, REF_BUILD, yAxis, zoomRegion)
   recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL, zoomRegion)
 })
@@ -152,8 +152,8 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   const xAccessor = d => d.x
   const yAccessor = d => d.y
 
-  const xStart = MZPage.xStart
-  const xEnd = MZPage.xEnd
+  const xStart = storeMZpage.xStart
+  const xEnd = storeMZpage.xEnd
   const xScale = LZ2Scales.createXscale(xStart, xEnd, DIMENSIONS)
 
   const yScaleSignal = LZ2Scales.createYscaleSignal(yAccessor, signalData, DIMENSIONS)

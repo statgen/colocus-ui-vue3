@@ -38,7 +38,7 @@
     <h3 class="mt-n2">View</h3>
     <v-switch
       label="Add unique signals only"
-      v-model="MZPage.addUniqueRefsOnly"
+      v-model="storeMZpage.addUniqueRefsOnly"
       density="compact"
       class="my-n1"
       color="clcAction"/>
@@ -64,7 +64,7 @@
       class="my-n7"
       color="clcAction"/>
     <v-select
-      v-model="MZPage.selectedTheme"
+      v-model="storeMZpage.selectedTheme"
       :items="themes"
       style="max-width: 200px"
       @update:model-value="onSelectTheme"
@@ -82,36 +82,33 @@
 import { computed, defineEmits, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT } from '@/constants'
-import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
 import { useMZPageHelpers } from '@/composables/MZPageHelpers'
 import FilterPanelSubpanel from "@/components/FilterPanel/FilterPanelSubpanel.vue"
 import { colorHasher, formatVariantString } from '@/util/util'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const plotManager = usePlotManager()
 const mzPageHelpers = useMZPageHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 const BLINK_TIME = 5
-const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
+const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 const showAllGenSig = ref(true)
 const showAllRecomb = ref(true)
 const showPlotID = ref(true)
 const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 const yAxis = ref(LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS)
 const zoomSlider = ref(PLOT_REGION_DEFAULT)
-// const zoomSliderLabel = ref(`Set plot region ±${zoomSlider.value.toLocaleString()}`)
 
 // *** Computed ****************************************************************
 const selectedRef = computed({
-  get: () => MZPage.selectedLDRef,
-  set: (v) => { MZPage.selectedLDRef = v }
+  get: () => storeMZpage.selectedLDRef,
+  set: (v) => { storeMZpage.selectedLDRef = v }
 })
 
 const uniqueVariants = computed(() => {
-  const variants = Object.values(MZPage.plotSettings).map(v => v.variant)
+  const variants = Object.values(storeMZpage.plotRegistry).map(v => v.variant)
   return [...new Set(variants)].sort()
 })
 
@@ -142,41 +139,41 @@ const onExportAllClick = () => {
 }
 
 const onSelectTheme = (newValue) => {
-  MZPage.selectedTheme = newValue
+  storeMZpage.selectedTheme = newValue
 }
 
 const onSliderChangeEnd = async (val) => {
-  const variant = MZPage.signal1Variant
+  const variant = storeMZpage.signal1Variant
   mzPageHelpers.setPlotRegion(variant, val)
-  MZPage.zoomRegion = val
+  storeMZpage.zoomRegion = val
 }
 
 const onToggleAllGenSig = (val) => {
-  MZPage.showGenSigLines = val
+  storeMZpage.showGenSigLines = val
   updateAllPlots('showGenSigLine', val)
 }
 
 const onToggleAllRecomb = (val) => {
-  MZPage.showRecombLines = val
+  storeMZpage.showRecombLines = val
   updateAllPlots('showRecombLine', val)
 }
 
 const onToggleShowPlotID = (val) => {
-  MZPage.showPlotID = val
+  storeMZpage.showPlotID = val
   updateAllPlots('showPlotID', val)
 }
 
-const onUnmountAllPlots = () => {
-  plotManager.unmountAllPlots()
+const onUnmountAllPlots = async () => {
+  await mzPageHelpers.unmountAllPlots()
 }
 
 const onYAxisChange = (val) => {
-  MZPage.yAxis = val
+  storeMZpage.yAxis = val
 }
 
 const updateAllPlots = (key, val) => {
-  Object.keys(MZPage.plotSettings).forEach(k => {
-    MZPage.plotSettings[k][key] = val
+  Object.keys(storeMZpage.plotRegistry).forEach(k => {
+    storeMZpage.plotRegistry[k][key] = val
   })
 }
 

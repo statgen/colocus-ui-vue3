@@ -14,7 +14,7 @@ const props = defineProps({
   title: String,
 })
 
-const plotID = computed(() => props.title || mzPageHelpers.getMZPlotID(props.rowKey, props.slot))
+const plotID = computed(() => props.title || mzPageHelpers.getPlotIDfromRowSlot(props.rowKey, props.slot))
 
 const emit = defineEmits(['on-toggle-plot'])
 
