@@ -82,7 +82,7 @@
 import { computed, defineEmits, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT } from '@/constants'
-import { useMZPageHelpers } from '@/composables/MZPageHelpers'
+import { useMZPageHelpers } from '@/composables/mzPageHelpers'
 import FilterPanelSubpanel from "@/components/FilterPanel/FilterPanelSubpanel.vue"
 import { colorHasher, formatVariantString } from '@/util/util'
 

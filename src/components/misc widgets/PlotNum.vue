@@ -4,7 +4,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useMZPageHelpers } from '@/composables/MZPageHelpers'
+import { useMZPageHelpers } from '@/composables/mzPageHelpers'
 
 const mzPageHelpers = useMZPageHelpers()
 

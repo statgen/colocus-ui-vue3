@@ -21,12 +21,13 @@ export function useMZPageHelpers() {
   }
 
   const exportPlotContainer = async (elID, fileName) => {
+    if(storeMZpage.plotRegistry.length < 1) return
+
     const el = document.getElementById(elID)
-    if (!el) return
-    if(Object.keys(storeMZpage.plotRegistry).length < 1) return
 
     setTimeout(async () => {
       try {
+        el.classList.add('export-mode')
         storeMZpage.isExporting = true
         const canvas = await html2canvas(el, {
           useCORS: true,
@@ -49,6 +50,7 @@ export function useMZPageHelpers() {
           setTimeout(() => URL.revokeObjectURL(url), 0)
         }
       } finally {
+        el.classList.remove('export-mode')
         storeMZpage.isExporting = false
       }
     }, 0)

@@ -1,7 +1,7 @@
 import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
+import { GRID_DISPLAY_OPTIONS, LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -67,10 +67,20 @@ export const useAppStore = defineStore('appStore', {
     [PAGE_NAMES.MULTIZOOM]: {
       activePlotID: 0,
       addUniqueRefsOnly: false,
+      cells: {},
       colocData: markRaw({}),
       colocDataReady: false,
       colocsSignals: markRaw([]),
       isExporting: false,
+      grid: {
+        cols: GRID_DISPLAY_OPTIONS.defaultCols,
+        rows: GRID_DISPLAY_OPTIONS.defaultRows,
+        gap: GRID_DISPLAY_OPTIONS.gap,
+        cellWidth: GRID_DISPLAY_OPTIONS.cellWidth,
+        cellHeight: GRID_DISPLAY_OPTIONS.cellHeight,
+        headerColWidth: GRID_DISPLAY_OPTIONS.headerColWidth,
+        headerRowHeight: GRID_DISPLAY_OPTIONS.headerRowHeight,
+      },
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode

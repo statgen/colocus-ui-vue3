@@ -25,9 +25,13 @@
       @export-plot="onExportPlot"
       @close-menu="onCloseMenu"
     />
-    <div ref="plotsContainer" id="plotsContainer" class="plot-container mt-4"></div>
 
-    <h2>Data table</h2>
+    <MZGrid
+      @column-menu="onColumnMenu"
+      @row-menu="onRowMenu"
+    />
+
+    <h2 class="mt-4">Data table</h2>
 
     <div class="table-container mb-8">
       <DataTable
@@ -46,7 +50,7 @@ import { computed, onBeforeUnmount, nextTick, onMounted, provide, ref, useTempla
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
-import { useMZPageHelpers } from '@/composables/MZPageHelpers'
+import { useMZPageHelpers } from '@/composables/mzPageHelpers'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import router from '@/router'
 
@@ -99,8 +103,8 @@ watch(() => storeMZpage.colocDataReady, async (newVal) => {
     storeMZpage.signal1Variant = variant
     mzPageHelpers.setPlotRegion(variant, storeMZpage.zoomRegion)
 
-    await renderPlot(colocID, signal1, 'slot1')
-    await renderPlot(colocID, signal2, 'slot2')
+    // await renderPlot(colocID, signal1, 'slot1')
+    // await renderPlot(colocID, signal2, 'slot2')
     await scrollBottom()
   }
 })
@@ -161,6 +165,14 @@ const onAddBothPlotsClick = async (item) => {
 const onCloseMenu = () => {
   showMenu.value = false
   storeMZpage.activePlotID = null
+}
+
+const onColumnMenu = (args) => {
+  console.log('column', args.col, args.kind, args.event)
+}
+
+const onRowMenu = (args) => {
+  console.log('row', args.row, args.kind, args.event)
 }
 
 const onDataTableRowClick = () => {
