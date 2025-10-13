@@ -14,11 +14,13 @@ export function useMZGridHelpers() {
   }
 
   const ensureCols = (n) => {
-    while (storeMZpage.grid.cols < n) storeMZpage.grid.cols += 1
+    // while (storeMZpage.grid.cols < n) storeMZpage.grid.cols += 1
+    if(storeMZpage.grid.cols < n) storeMZpage.grid.cols = n
   }
 
   const ensureRows = (n) => {
-    while (storeMZpage.grid.rows < n) storeMZpage.grid.rows += 1
+    // while (storeMZpage.grid.rows < n) storeMZpage.grid.rows += 1
+    if(storeMZpage.grid.rows < n) storeMZpage.grid.rows = n
   }
 
   const findPlotPosition = (plotId) => {

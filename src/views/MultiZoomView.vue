@@ -29,6 +29,7 @@
     <MZGrid
       @column-menu="onColumnMenu"
       @row-menu="onRowMenu"
+      @mock-menu="onMockMenu"
     />
 
     <h2 class="mt-4">Data table</h2>
@@ -169,6 +170,10 @@ const onCloseMenu = () => {
 
 const onColumnMenu = (args) => {
   console.log('column', args.col, args.kind, args.event)
+}
+
+const onMockMenu = (args) => {
+  console.log('mock', args.cell, args.kind, args.event)
 }
 
 const onRowMenu = (args) => {

@@ -12,76 +12,59 @@
     <div class="slot slot--corner" style="grid-row:1; grid-column:1;"></div>
 
     <!-- column headers -->
-    <div
-      v-for="c in grid.cols"
+    <div v-for="c in grid.cols"
+      @click.stop="onColumnHeaderClick(c, $event)"
+      @contextmenu.prevent.stop="onColumnHeaderMenu(c, $event)"
       :key="'colhdr-'+c"
-      class="slot slot--colheader"
       :style="{ gridRow: 1, gridColumn: c + 1 }"
+      class="slot slot--colheader grid-header grid-header--fill"
     >
-      <button
-        class="grid-header grid-header--fill"
-        type="button"
-        @click.stop="onColumnHeaderClick(c, $event)"
-        @contextmenu.prevent.stop="onColumnHeaderMenu(c, $event)"
-        :aria-label="`Column ${columnLabel(c)} menu`"
-      >
-        {{ columnLabel(c) }}
-      </button>
+      {{ columnLabel(c) }}
     </div>
 
     <!-- row headers -->
-    <div
-      v-for="r in grid.rows"
+    <div v-for="r in grid.rows"
+      @click.stop="onRowHeaderClick(r, $event)"
+      @contextmenu.prevent.stop="onRowHeaderMenu(r, $event)"
       :key="'rowhdr-'+r"
-      class="slot slot--rowheader"
       :style="{ gridRow: r + 1, gridColumn: 1 }"
-    >
-      <button
-        class="grid-header grid-header--fill"
-        type="button"
-        @click.stop="onRowHeaderClick(r, $event)"
-        @contextmenu.prevent.stop="onRowHeaderMenu(r, $event)"
-        :aria-label="`Row ${r} menu`"
-      >
-        {{ r }}
-      </button>
+      class="slot slot--rowheader grid-header grid-header--fill"
+    > {{ r }}
     </div>
 
     <!-- plot cells -->
-    <div
-      v-for="cell in cellList"
-      :key="cell.key"
-      class="slot slot--cell"
-      :style="{ gridRow: cell.r + 1, gridColumn: cell.c + 1 }"
-    >
-      <PlotCell
-        :r="cell.r" :c="cell.c"
-        :plot-id="cells[cell.key] || null"
-        :width="grid.cellWidth" :height="grid.cellHeight"
-      />
-    </div>
+    <template v-for="cell in cellList" :key="cell.key">
+      <div
+        @click.stop="onMockClick(cell.key, $event)"
+        @contextmenu.prevent.stop="onMockMenu(cell.key, $event)"
+        :style="{ gridRow: cell.r + 1, gridColumn: cell.c + 1 }"
+        class="slot slot--cell mock-plot"
+      >
+        {{ `${cell.r}${columnLabel(cell.c)}` }}
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
+// *** Imports *****************************************************************
 import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 import { PAGE_NAMES } from '@/constants'
 
+// *** Composables *************************************************************
 const appStore = useAppStore()
-const mzGridHelpers = useMZGridHelpers()
 
+// *** Props *******************************************************************
+// *** Variables ***************************************************************
+const cells = computed(() => storeMZpage.cells)
+const grid  = computed(() => storeMZpage.grid)
+const mzGridHelpers = useMZGridHelpers()
+// const plots = computed(() => storeMZpage.plotSettings) // available if mountPlot needs config
 const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 
-const grid  = computed(() => storeMZpage.grid)
-const cells = computed(() => storeMZpage.cells)
-// const plots = computed(() => storeMZpage.plotSettings) // available if mountPlot needs config
-
-const emit = defineEmits(['column-menu', 'row-menu'])
-
-const cellKey = (r, c) => mzGridHelpers.ck(r, c)
-
+// *** Computed ****************************************************************
 const cellList = computed(() => {
   const list = []
   for (let r = 1; r <= grid.value.rows; r++) {
@@ -89,8 +72,27 @@ const cellList = computed(() => {
       list.push({ r, c, key: cellKey(r, c) })
     }
   }
+  console.log('cellList', list)
   return list
 })
+
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
+const emit = defineEmits(['column-menu', 'mock-menu', 'row-menu'])
+
+// *** Watches *****************************************************************
+// *** Lifecycle hooks *********************************************************
+// *** Event handlers **********************************************************
+const onColumnHeaderClick = (col, event) => emit('column-menu', { col, event, kind: 'click' })
+const onColumnHeaderMenu  = (col, event) => emit('column-menu', { col, event, kind: 'contextmenu' })
+const onRowHeaderClick    = (row, event) => emit('row-menu',    { row, event, kind: 'click' })
+const onRowHeaderMenu     = (row, event) => emit('row-menu',    { row, event, kind: 'contextmenu' })
+const onMockClick         = (cell, event) => emit('mock-menu',  { cell, event, kind: 'click' })
+const onMockMenu          = (cell, event) => emit('mock-menu',  { cell, event, kind: 'contextmenu' })
+
+// *** Utility functions *******************************************************
+const cellKey = (r, c) => mzGridHelpers.ck(r, c)
 
 const columnLabel = (n) => {
   let s = ''
@@ -102,11 +104,7 @@ const columnLabel = (n) => {
   return s
 }
 
-const onColumnHeaderClick = (col, event) => emit('column-menu', { col, event, kind: 'click' })
-const onColumnHeaderMenu  = (col, event) => emit('column-menu', { col, event, kind: 'contextmenu' })
-const onRowHeaderClick    = (row, event) => emit('row-menu',    { row, event, kind: 'click' })
-const onRowHeaderMenu     = (row, event) => emit('row-menu',    { row, event, kind: 'contextmenu' })
-
+// *** Configuration data ******************************************************
   // --- PlotCell subcomponent ---
   // Mounts/unmounts plots into a cell DOM node using your LZ2RegionPlotManager
 //   const PlotCell = defineComponent({
@@ -165,21 +163,16 @@ const onRowHeaderMenu     = (row, event) => emit('row-menu',    { row, event, ki
   display: grid;
   --grid-line: rgba(0,0,0,0.28);
   position: relative;
-  overflow: visible;
+  /* gridTemplateColumns/Rows + gap come from :style */
 }
 
-/* outer border around the whole grid */
-/*.plots-grid::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: 0 0 0 1px var(--grid-line) inset;
-}*/
-
+/* Full-size wrapper for each grid slot (headers + cells) */
 .slot { position: relative; }
 
-.slot::after {
+/* Only headers get per-slot outlines */
+.slot--corner::after,
+.slot--colheader::after,
+.slot--rowheader::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -187,26 +180,29 @@ const onRowHeaderMenu     = (row, event) => emit('row-menu',    { row, event, ki
   box-shadow: 0 0 0 1px var(--grid-line) inset;
 }
 
-.grid-header--fill { width: 100%; height: 100%; box-sizing: border-box; }
-.slot--colheader { display: block; font-size: 1rem; font-weight: bold; }
-.slot--rowheader  { display: block; font-size: 1rem; font-weight: bold; }
+/* Center header buttons */
+.grid-header { background:#fafafa; border:0; cursor:pointer; font-weight: bold; font-size:1rem; }
+.grid-header--fill { display: flex; width:100%; height:100%; box-sizing:border-box; align-items: center; justify-content: center;}
 
-.slot--cell { background: #fff; }
+/* Plot cells */
+.slot--cell { background:#fff; }
 
-/* If PlotCell renders a child mount div, ensure it fills */
-.cell-mount { width: 100%; height: 100%; }
+/* Mock plot draws its own border */
+.mock-plot {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff;
+  border: 1px dashed rgba(0,0,0,.2);
+  font-size: 1rem;
+}
 
-/* When exporting, hide all grid visuals */
-.plots-grid.export-mode::after { box-shadow: none; }             /* outer border off */
-.plots-grid.export-mode .slot::after { box-shadow: none; }       /* per-cell lines off */
-.plots-grid.export-mode .empty-cell { outline: none; }
-
-/* Hide header wrappers entirely */
+/* Export mode: hide ALL grid chrome, keep plot/mock borders */
+.plots-grid.export-mode::after { box-shadow: none; }
 .plots-grid.export-mode .slot--corner,
 .plots-grid.export-mode .slot--colheader,
 .plots-grid.export-mode .slot--rowheader { display: none !important; }
-
-/* Optional: if you want gaps to remain, do nothing. If you want tighter image: */
-/* .plots-grid.export-mode { gap: 0 !important; } */
-
+.plots-grid.export-mode .slot--corner::after,
+.plots-grid.export-mode .slot--colheader::after,
+.plots-grid.export-mode .slot--rowheader::after { box-shadow: none; }
+/* Leave .mock-plot as-is so the “plot border” remains in the export */
 </style>
