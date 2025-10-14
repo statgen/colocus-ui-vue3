@@ -19,7 +19,7 @@
       :style="{ gridRow: 1, gridColumn: c + 1 }"
       class="slot slot--colheader grid-header grid-header--fill"
     >
-      {{ columnLabel(c) }}
+      {{ mzGridHelpers.columnLabel(c) }}
     </div>
 
     <!-- row headers -->
@@ -33,16 +33,12 @@
     </div>
 
     <!-- plot cells -->
-    <template v-for="cell in cellList" :key="cell.key">
-      <div
-        @click.stop="onMockClick(cell.key, $event)"
-        @contextmenu.prevent.stop="onMockMenu(cell.key, $event)"
-        :style="{ gridRow: cell.r + 1, gridColumn: cell.c + 1 }"
-        class="slot slot--cell mock-plot"
-      >
-        {{ `${cell.r}${columnLabel(cell.c)}` }}
-      </div>
-    </template>
+    <component v-for="(val, key) in gridMap"
+      :key="key"
+      :is="val === 'mock' ? MZMockPlot : MZPlot"
+      :cell="key"
+      :plotID="val !== 'mock' ? val : undefined"
+    />
   </div>
 </template>
 
@@ -52,17 +48,20 @@ import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, ref, w
 import { useAppStore } from '@/stores/AppStore'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 import { PAGE_NAMES } from '@/constants'
+import MZPlot from '@/components/misc widgets/MZPlot.vue'
+import MZMockPlot from '@/components/misc widgets/MZMockPlot.vue'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
+const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
+const mzGridHelpers = useMZGridHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 const cells = computed(() => storeMZpage.cells)
 const grid  = computed(() => storeMZpage.grid)
-const mzGridHelpers = useMZGridHelpers()
 // const plots = computed(() => storeMZpage.plotSettings) // available if mountPlot needs config
-const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
+const gridMap = storeMZpage.gridMap
 
 // *** Computed ****************************************************************
 const cellList = computed(() => {
@@ -94,15 +93,15 @@ const onMockMenu          = (cell, event) => emit('mock-menu',  { cell, event, k
 // *** Utility functions *******************************************************
 const cellKey = (r, c) => mzGridHelpers.ck(r, c)
 
-const columnLabel = (n) => {
-  let s = ''
-  while (n > 0) {
-    const rem = (n - 1) % 26
-    s = String.fromCharCode(65 + rem) + s
-    n = Math.floor((n - 1) / 26)
-  }
-  return s
-}
+// const columnLabel = (n) => {
+//   let s = ''
+//   while (n > 0) {
+//     const rem = (n - 1) % 26
+//     s = String.fromCharCode(65 + rem) + s
+//     n = Math.floor((n - 1) / 26)
+//   }
+//   return s
+// }
 
 // *** Configuration data ******************************************************
   // --- PlotCell subcomponent ---
@@ -183,18 +182,6 @@ const columnLabel = (n) => {
 /* Center header buttons */
 .grid-header { background:#fafafa; border:0; cursor:pointer; font-weight: bold; font-size:1rem; }
 .grid-header--fill { display: flex; width:100%; height:100%; box-sizing:border-box; align-items: center; justify-content: center;}
-
-/* Plot cells */
-.slot--cell { background:#fff; }
-
-/* Mock plot draws its own border */
-.mock-plot {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  background: #fff;
-  border: 1px dashed rgba(0,0,0,.2);
-  font-size: 1rem;
-}
 
 /* Export mode: hide ALL grid chrome, keep plot/mock borders */
 .plots-grid.export-mode::after { box-shadow: none; }

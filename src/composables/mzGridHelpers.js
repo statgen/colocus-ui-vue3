@@ -7,6 +7,16 @@ export function useMZGridHelpers() {
 
   const ck = (r, c) => `${r},${c}`
 
+  const columnLabel = (n) => {
+    let s = ''
+    while (n > 0) {
+      const rem = (n - 1) % 26
+      s = String.fromCharCode(65 + rem) + s
+      n = Math.floor((n - 1) / 26)
+    }
+    return s
+  }
+
   // --- core utils ---
   const inBounds = (r, c) => {
     const g = storeMZpage.grid
@@ -206,6 +216,7 @@ export function useMZGridHelpers() {
   return {
     // keys + finders
     ck,
+    columnLabel,
     findPlotPosition,
 
     // placement

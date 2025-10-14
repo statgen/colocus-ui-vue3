@@ -81,6 +81,10 @@ export const useAppStore = defineStore('appStore', {
         headerColWidth: GRID_DISPLAY_OPTIONS.headerColWidth,
         headerRowHeight: GRID_DISPLAY_OPTIONS.headerRowHeight,
       },
+      gridMap: {
+        '1,1': 'plot_1', '2,1': 'plot_2', '3,1': 'mock', '4,1': 'mock',
+        '1,2': 'mock', '2,2': 'mock', '3,2': 'mock', '4,2': 'mock',
+      },
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode
