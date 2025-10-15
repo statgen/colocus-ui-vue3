@@ -65,11 +65,13 @@ export function useMZPageHelpers() {
   }
 
   const mountPlot = async(args) => {
-    const { colocID, plotsContainer, showGenSigLine, showPlotID, showRecombLine, signal, signalID, slot, type, variant, onActionMenuClick, } = args
+    const { cell, colocID, plotsContainer, showGenSigLine, showPlotID, showRecombLine, signal, signalID, slot, type, variant, onActionMenuClick, } = args
     const plotID = getNextPlotID()
     const component = resolvePlotType(type)
-    const mountEl = document.createElement('div')
-    plotsContainer.value.appendChild(mountEl)
+    // const mountEl = document.createElement('div')
+    // await nextTick()
+    // const mountEl = document.querySelector(`cell_${cell}`)
+    // plotsContainer.value.appendChild(mountEl)
 
     const vnode = createVNode(component, {
       ID: plotID,
@@ -79,9 +81,11 @@ export function useMZPageHelpers() {
       onActionMenuClick,
     })
 
-    render(vnode, mountEl)
+    // render(vnode, mountEl)
+    const mountEl = null
     storeMZpage.plotRegistry[plotID] = { colocID, mountEl, showGenSigLine, showPlotID, showRecombLine, signalID, slot, variant, vnode }
     // console.log('smzppr', storeMZpage.plotRegistry)
+    storeMZpage.gridMap[cell] = plotID
     makeColocsSignals()
     setRowSlotPlotID(colocID, slot, plotID)
     return plotID

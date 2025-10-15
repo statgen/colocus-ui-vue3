@@ -104,8 +104,8 @@ watch(() => storeMZpage.colocDataReady, async (newVal) => {
     storeMZpage.signal1Variant = variant
     mzPageHelpers.setPlotRegion(variant, storeMZpage.zoomRegion)
 
-    // await renderPlot(colocID, signal1, 'slot1')
-    // await renderPlot(colocID, signal2, 'slot2')
+    await renderPlot(colocID, signal1, 'slot1', '1,1')
+    await renderPlot(colocID, signal2, 'slot2', '2,1')
     await scrollBottom()
   }
 })
@@ -219,12 +219,13 @@ const loadPageData = async () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
-const renderPlot = async (colocID, signal, slot) => {
+const renderPlot = async (colocID, signal, slot, cell) => {
   const signalID = signal.uuid
   const signals = mzPageHelpers.getSignals()
   if(storeMZpage.addUniqueRefsOnly && signals.includes(signalID)) return
 
   await mzPageHelpers.mountPlot({
+    cell,
     colocID,
     plotsContainer,
     showGenSigLine: storeMZpage.showGenSigLines,
