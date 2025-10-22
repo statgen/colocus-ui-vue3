@@ -2,11 +2,7 @@ import { createVNode, nextTick, ref, render } from 'vue'
 import html2canvas from 'html2canvas'
 import { useAppStore } from '@/stores/AppStore'
 import { parseVariant2 } from '@/util/util'
-import Lz2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
-
-const plotCounter = ref(1)
-const reusablePlotIDs = []
 
 export function useMZPageHelpers() {
   const appStore = useAppStore()
@@ -16,8 +12,8 @@ export function useMZPageHelpers() {
   const clearPlotRegistry = () => {
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
-    plotCounter.value = 1
-    reusablePlotIDs.length = 0
+    storeMZpage.plotCounter = 1
+    storeMZpage.reusablePlotIDs.length = 0
   }
 
   const exportPlotContainer = async (elID, fileName) => {
@@ -60,10 +56,6 @@ export function useMZPageHelpers() {
     return storeMZpage.rowSlotToPlotID?.[colocID]?.[slot] ?? null
   }
 
-  const getSignals = () => {
-    return Object.values(storeMZpage.plotRegistry).map(v => v.signalID)
-  }
-
   const mountPlot = async(args) => {
     const { cell, colocID, plotsContainer, showGenSigLine, showPlotID, showRecombLine, signal, signalID, slot, type, variant, onActionMenuClick, } = args
     const plotID = getNextPlotID()
@@ -97,6 +89,11 @@ export function useMZPageHelpers() {
     storeMZpage.xEnd = pv.end
   }
 
+  const setRowSlotPlotID = (colocID, slot, plotID) => {
+    if (!storeMZpage.rowSlotToPlotID[colocID]) storeMZpage.rowSlotToPlotID[colocID] = {}
+    storeMZpage.rowSlotToPlotID[colocID][slot] = plotID
+  }
+
   const unmountPlot = (plotID) => {
     const plot = storeMZpage.plotRegistry[plotID]
     if (plot) {
@@ -119,44 +116,13 @@ export function useMZPageHelpers() {
     clearPlotRegistry()
   }
 
-  // *** internal functions ****************************************************
-  const getNextPlotID = () => {
-    if(reusablePlotIDs.length > 0){
-      const pid = Math.min(...reusablePlotIDs)
-      reusablePlotIDs.splice(reusablePlotIDs.indexOf(pid), 1)
-      return pid
-    } else {
-      return plotCounter.value++
-    }
-  }
-
-  const makeColocsSignals = () => {
-    storeMZpage.colocsSignals = Object.values(storeMZpage.plotRegistry).map(v => `${v.colocID}-${v.signalID}`)
-  }
-
-  const resolvePlotType = (type) => {
-    switch (type) {
-      case 'region':
-        return Lz2RegionPlot
-      // case 'compare': return D3ComparePlot
-      default:
-        console.error(`Unknown plot type: ${type}`)
-    }
-  }
-
-  const setRowSlotPlotID = (colocID, slot, plotID) => {
-    if (!storeMZpage.rowSlotToPlotID[colocID]) storeMZpage.rowSlotToPlotID[colocID] = {}
-    storeMZpage.rowSlotToPlotID[colocID][slot] = plotID
-  }
-
-
   return {
     clearPlotRegistry,
     exportPlotContainer,
     getPlotIDfromRowSlot,
-    getSignals,
     mountPlot,
     setPlotRegion,
+    setRowSlotPlotID,
     unmountPlot,
     unmountAllPlots,
   }

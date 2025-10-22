@@ -47,13 +47,14 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { computed, onBeforeUnmount, nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { computed, createVNode, onBeforeUnmount, nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import { useMZPageHelpers } from '@/composables/mzPageHelpers'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import router from '@/router'
+import LZ2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -221,23 +222,25 @@ const loadPageData = async () => {
 
 const renderPlot = async (colocID, signal, slot, cell) => {
   const signalID = signal.uuid
-  const signals = mzPageHelpers.getSignals()
+  const signals = Object.values(storeMZpage.plotRegistry).map(v => v.signalID)
   if(storeMZpage.addUniqueRefsOnly && signals.includes(signalID)) return
 
-  await mzPageHelpers.mountPlot({
-    cell,
-    colocID,
-    plotsContainer,
-    showGenSigLine: storeMZpage.showGenSigLines,
-    showPlotID: storeMZpage.showPlotID,
-    showRecombLine: storeMZpage.showRecombLines,
+  const plotID = appStore.getNextPlotID()
+  const showGenSigLine = storeMZpage.showGenSigLines
+  const showPlotID = storeMZpage.showPlotID
+  const showRecombLine = storeMZpage.showRecombLines
+  const variant = signal.lead_variant.vid
+
+  const vnode = createVNode(LZ2RegionPlot, {
+    ID: plotID,
+    showGenSigLine,
+    showRecombLine,
     signal,
-    signalID,
-    slot,
-    type: 'region',
-    variant: signal.lead_variant.vid,
     onActionMenuClick,
   })
+  storeMZpage.plotRegistry[plotID] = { colocID, plotsContainer, showGenSigLine, showPlotID, showRecombLine, signalID, slot, variant, vnode }
+  storeMZpage.gridMap[cell] = plotID
+  mzPageHelpers.setRowSlotPlotID(colocID, slot, plotID)
 }
 
 const scrollBottom = async () => {
