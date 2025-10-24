@@ -30,7 +30,26 @@ export function useLZ2DataLoaders() {
     }
 
     const t1 = aq.from(signalData)
-    const t2 = aq.from(ldData).rename({ variant2: 'variant' }).rename({ correlation: 'r2' })
+
+    // Handle the case where there is no LD data returned
+    // We can create a dummy entry for the lead variant in r2 = 1.0 with itself (which is true)
+    if (!ldData || ldData.length === 0) {
+      ldData = [{
+        variant1: `${pvLD.chr}_${pvLD.loc}_${pvLD.ref}_${pvLD.alt}`,
+        variant2: `${pvLD.chr}_${pvLD.loc}_${pvLD.ref}_${pvLD.alt}`,
+        position1: pvLD.loc,
+        position2: pvLD.loc,
+        correlation: 1.0,
+      }]
+    }
+    let t2 = aq.from(ldData)
+    if (t2.columnNames().includes('variant2')) {
+      t2 = t2.rename({ variant2: 'variant' })
+    }
+    if (t2.columnNames().includes('correlation')) {
+      t2 = t2.rename({ correlation: 'r2' })
+    }
+
     const t3 = t1.join_left(t2, 'variant')
     const t4 = t3.derive ({
       variant: d => aq.op.replace(d.variant, /[:/]/g, '_'),
