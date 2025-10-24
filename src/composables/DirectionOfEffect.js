@@ -6,7 +6,7 @@ export function useDirectionOfEffect(items) {
   watchEffect(() => {
     const newResults = {}
     for (const item of items) {
-      newResults[item.uuid] = getEffectDirectBetweenTraits(item.cross_signal.effect)
+      newResults[item.uuid] = getEffectDirectBetweenTraits(item.cross_signal?.effect)
     }
     results.value = newResults
   })
@@ -18,6 +18,14 @@ const getEffectDirectBetweenTraits = ((effects) => {
   let discord = false
   let direction = null
   let hasMissing = false
+
+  if (!effects) {
+    return {
+      discord: false,
+      direction: null,
+      hasMissing: true
+    }
+  }
 
   for (let i = 0; i < effects.length; i++) {
     for (let j = 0; j < effects[i].length; j++) {

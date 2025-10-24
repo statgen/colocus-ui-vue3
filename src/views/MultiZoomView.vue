@@ -246,9 +246,10 @@ const loadPageData = async () => {
 }
 
 async function renderPlot(colocID, signal, slot) {
-  const signalID = signal.uuid
+  const signalID = signal?.uuid
   const signals = mzPageHelpers.getMZSignals()
   if(MZPage.addUniqueRefsOnly && signals.includes(signalID)) return
+  if (!signal) return
 
   const showGenSigLine = MZPage.showGenSigLines
   const showRecombLine = MZPage.showRecombLines

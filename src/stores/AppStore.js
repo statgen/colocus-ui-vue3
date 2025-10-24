@@ -130,15 +130,13 @@ export const useAppStore = defineStore('appStore', {
     buildLZdataTableURL(urlPath, signal1, signal2) {
       const url = new URL(urlPath, window.location.origin)
       const { start, end } = findPlotRegion(
-        signal1.lead_variant.pos,
-        signal2.lead_variant.pos
+        signal1?.lead_variant?.pos,
+        signal2?.lead_variant?.pos
       )
 
-      const signal1_region = `${signal1.lead_variant.chrom}:${start}-${end}`
-      const signal2_region = `${signal2.lead_variant.chrom}:${start}-${end}`
-
-      url.searchParams.set('signal1_region', signal1_region)
-      url.searchParams.set('signal2_region', signal2_region)
+      const chrom = signal1?.lead_variant?.chrom || signal2?.lead_variant?.chrom
+      const region = `${chrom}:${start}-${end}`
+      url.searchParams.set('region', region)
 
       this.addQueryString(url)
 
@@ -316,7 +314,7 @@ function getFilterPanelSettings() {
 const dataMapAPI = {
   studies: 'studies',
   genes: 'genes',
-  region: 'signal1_region',
+  region: 'region',
   phenotypes: 'phenotypes',
   tissues: 'tissues',
   cell_types: 'cell_types',

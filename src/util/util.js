@@ -7,7 +7,9 @@ const VARIANT_COLOR_MAP = [0.475]
 const colorHasher = new ColorHash({ lightness: VARIANT_COLOR_MAP })
 
 const findPlotRegion = (pos1, pos2) => {
-  // console.log('p1, p2:',pos1, pos2)
+  if (pos1 == null) pos1 = pos2
+  if (pos2 == null) pos2 = pos1
+
   const min = Math.min(pos1, pos2)
   const max = Math.max(pos1, pos2)
   const between = max - min
@@ -77,6 +79,10 @@ const parseSignalDataForTitle = (signal) => {
 }
 
 function makePlotTitle(signal) {
+  if (!signal) {
+    return ['signal is null', 'red']
+  }
+
   const SEP = '  '
   const pd = parseSignalDataForTitle(signal)
   if(pd === 'unknown type') return ['unknown type', 'red']

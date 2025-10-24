@@ -33,9 +33,9 @@ const uuid = ref(item.uuid)
 const setCellLabel = ((dirEffect) => {
   if(!appStore.dataTable.isDirEffectReady) return
 
-  const dir = dirEffect.direction
-  const missing = dirEffect.hasMissing
-  const discord = dirEffect.discord
+  const dir = dirEffect?.direction
+  const missing = dirEffect?.hasMissing
+  const discord = dirEffect?.discord
 
   if(discord) {
     cellClass.value = 'text-red'
@@ -54,6 +54,9 @@ const setCellLabel = ((dirEffect) => {
     } else {
       cellLabel.value = 'DIS'
     }
+  } else {
+    cellClass.value = ''
+    cellLabel.value = ''
   }
 })
 

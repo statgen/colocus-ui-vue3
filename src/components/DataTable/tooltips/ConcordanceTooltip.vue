@@ -13,13 +13,13 @@
       <tbody>
         <tr>
           <td class="rpad">Variant 1</td>
-          <td :class="getClass(effect[0][0])">{{ formatEffect(effect[0][0]) }}</td>
-          <td :class="getClass(effect[0][1])">{{ formatEffect(effect[0][1]) }}</td>
+          <td :class="getClass(effect?.[0][0])">{{ formatEffect(effect?.[0][0]) }}</td>
+          <td :class="getClass(effect?.[0][1])">{{ formatEffect(effect?.[0][1]) }}</td>
         </tr>
         <tr>
           <td class="rpad">Variant 2</td>
-          <td :class="getClass(effect[1][0])">{{ formatEffect(effect[1][0]) }}</td>
-          <td :class="getClass(effect[1][1])">{{ formatEffect(effect[1][1]) }}</td>
+          <td :class="getClass(effect?.[1][0])">{{ formatEffect(effect?.[1][0]) }}</td>
+          <td :class="getClass(effect?.[1][1])">{{ formatEffect(effect?.[1][1]) }}</td>
         </tr>
       </tbody>
     </table>
@@ -43,7 +43,7 @@ const props = defineProps({
 const dirEffect = appStore.dataTable.dirEffect
 const discord = ref(Boolean)
 const item = props.item
-const effect = item.cross_signal.effect
+const effect = item.cross_signal?.effect ?? null
 const missing = ref(Boolean)
 const showValues = false // for debugging, set to true
 const uuid = ref(item.uuid)

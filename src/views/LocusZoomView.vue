@@ -4,7 +4,7 @@
       <FilterPanel />
     </template>
 
-    <h1><BackButton />Locus Zoom</h1>
+    <h1><BackButton />LocusZoom (LZ)</h1>
 
     <p class="text-content-block">
       Colocalization of {{ s1trait }} <span class="mx-1" :style="{color: s1color}">({{ formatVariantString(s1Variant) }})</span>
@@ -16,6 +16,12 @@
     <div class="two-column-layout">
       <div class="left-panel">
         <h2>LZ Compare Plot</h2>
+        <div v-if="!s1Variant || !s2Variant" class="alert alert-warning" role="alert">
+          <v-spacer class="mb-2" />
+          <p>
+            ⚠️ No LocusCompare plot will be displayed because we arrived at this page with only one signal available to plot.
+          </p>
+        </div>
         <div ref="comparePlot"></div>
         <div class="ldpanel-wrapper">
           <LDPanel
@@ -152,12 +158,12 @@ const initializePage = () => {
   const signal2 = appStore[locuszoomPage].colocData.signal2
 
   // set template variables
-  s1trait.value = signal1.analysis.trait.phenotype.name
-  s1Variant.value = signal1.lead_variant.vid
-  s2trait.value = signal2.analysis.trait.gene.symbol
-  s2Variant.value = signal2.lead_variant.vid
-  s1color.value = colorHasher.hex(s1Variant.value)
-  s2color.value = colorHasher.hex(s2Variant.value)
+  s1trait.value = signal1?.analysis?.trait?.phenotype?.name ?? signal1?.analysis?.trait?.gene?.symbol
+  s1Variant.value = signal1?.lead_variant?.vid
+  s2trait.value = signal2?.analysis?.trait?.phenotype?.name ?? signal2?.analysis?.trait?.gene?.symbol
+  s2Variant.value = signal2?.lead_variant?.vid
+  s1color.value = colorHasher.hex(s1Variant.value ?? '')
+  s2color.value = colorHasher.hex(s2Variant.value ?? '')
 
   loadFPControls.value = !loadFPControls.value
 
