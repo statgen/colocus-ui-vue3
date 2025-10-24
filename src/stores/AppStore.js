@@ -32,6 +32,7 @@ export const useAppStore = defineStore('appStore', {
       isFilterDataLoaded: false,
       lastFilterUpdated: '',
       analysisTypes: markRaw([]),
+      analysisTypePriority: markRaw([]),
       genes: markRaw([]),
       phenotypes: markRaw([]),
       studies: markRaw([]),
@@ -187,6 +188,7 @@ export const useAppStore = defineStore('appStore', {
       if(await fetchData(URLS.FILTER_DATA, 'filter data', this.currentPageName)) {
         const d = data.value
         this.filterPanelControls.analysisTypes = d.analysis_types.sort()
+        this.filterPanelControls.analysisTypePriority = d.analysis_types.sort()
         this.filterPanelControls.genes = d.genes.sort()
         this.filterPanelControls.phenotypes = d.phenotypes.sort()
         this.filterPanelControls.studies = d.studies.sort()
@@ -291,6 +293,8 @@ function getFilterPanelSettings() {
     filters: {
       // these are actual filters set by the user in the UI
       studies: [],
+      analysisTypes: [],
+      analysisTypePriority: [],
       genes: [],
       region: '',
       phenotypes: [],
@@ -323,6 +327,8 @@ const dataMapAPI = {
   h4: 'min_h4',
   r2: 'min_r2',
   analysisID: 'signal1_analysis', // using signal1_analysis gives the legacy behavior, using just analysis gives the desired? new behavior
+  analysisTypePriority: 'analysis_type_priority',
+  analysisTypes: 'analysis_types',
   pageNum: 'page',
   pageSize: 'page_size',
   signals: 'signals',

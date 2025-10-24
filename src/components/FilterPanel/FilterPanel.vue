@@ -2,6 +2,8 @@
   <v-sheet v-show="appStore.isSidebarShowing" class="ml-n2" >
     <FilterPanelSubpanel title="Select" resetButton id="subPanelSelect">
       <CtlAutocomplete :controlSet="controlConfig.study" />
+      <CtlAutocomplete :controlSet="controlConfig.analysisTypes" />
+      <CtlAutocomplete :controlSet="controlConfig.analysisTypePriority" />
       <CtlAutocomplete :controlSet="controlConfig.gene" />
       <CtlTextfield :controlSet="controlConfig.region" />
       <CtlAutocomplete :controlSet="controlConfig.phenotype" />
@@ -54,6 +56,8 @@ const rules = {
  */
 const controlConfig = {
   study: { title: 'Study', storeKey: 'studies', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select study(ies)' },
+  analysisTypes: { title: 'Analysis Types', storeKey: 'analysisTypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select analysis type(s)' },
+  analysisTypePriority: { title: 'Analysis Type Priority', storeKey: 'analysisTypePriority', rules: null, emptyValue: null, defaultValue: ['gwas', 'eqtl'], placeholder: 'Select analysis type priority' },
   gene: { title: 'eQTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
   region: { title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], emptyValue: null, defaultValue: '', placeholder: 'chr:start-end' },
   phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
