@@ -172,8 +172,11 @@ const onExpandRow = (item, side) => {
   // console.log(`ColocID: ${colocID} Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
   appStore.colocID = colocID
   expanderAlignment.value = side
-  if(appStore.dataTable.expandedRow.indexOf(colocID) === -1) appStore.dataTable.expandedRow = [colocID]
-  else appStore.dataTable.expandedRow.length = 0
+  if (appStore.dataTable.expandedRow.indexOf(colocID) === -1) {
+    appStore.dataTable.expandedRow.splice(0, appStore.dataTable.expandedRow.length, colocID)
+  } else {
+    appStore.dataTable.expandedRow.splice(0, appStore.dataTable.expandedRow.length)
+  }
 }
 
 const onFileDownloadClick = () => {
