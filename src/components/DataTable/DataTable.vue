@@ -301,7 +301,7 @@ const getRowClass = (item) => {
   const s1 = appStore[cpn].colocData.signal1
   const s2 = appStore[cpn].colocData.signal2
 
-  if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
+  if((s1?.uuid === item.signal1?.uuid) && (s2?.uuid === item.signal2?.uuid)) {
     return { class: 'bg-clcTableHighlight font-weight-bold' }
   } else {
     return {}
