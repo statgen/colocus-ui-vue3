@@ -287,7 +287,7 @@ const loadData = async () => {
   try {
     if ([locuszoomPage, multizoomPage].includes(cpn)) {
       if(!appStore[cpn].colocDataReady) {
-        const colocURL = `${URLS.COLOC_DATA}/${colocID}`
+        const colocURL = `${URLS.COLOC_DATA}/${colocID}?include_orphans=1`
         await loadColocData(cpn, colocURL)
       }
       const signal1 = appStore[cpn].colocData.signal1

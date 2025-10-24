@@ -126,6 +126,9 @@ export const useAppStore = defineStore('appStore', {
         const p = this[parentKey].filters[key]
         if(p?.toString().length > 0) url.searchParams.set(value, p)
       })
+
+      // Always allow orphan signals to be included
+      url.searchParams.set('include_orphans', 1)
     },
 
     buildLZdataTableURL(urlPath, signal1, signal2) {
