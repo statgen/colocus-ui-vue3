@@ -12,8 +12,8 @@
     </FilterPanelSubpanel>
 
     <FilterPanelSubpanel title="Set threshold" resetButton id="subPanelThreshold">
-      <CtlTextfield :controlSet="controlConfig.trait1" />
-      <CtlTextfield :controlSet="controlConfig.trait2" />
+      <CtlTextfield :controlSet="controlConfig.gwas_log10p" />
+      <CtlTextfield :controlSet="controlConfig.eqtl_log10p" />
       <CtlSlider :controlSet="controlConfig.h4" />
       <CtlSlider :controlSet="controlConfig.r2" />
     </FilterPanelSubpanel>
@@ -59,8 +59,8 @@ const controlConfig = {
   phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
   tissue: { title: 'QTL Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
   cell_type: { title: 'QTL Cell Type', storeKey: 'cell_types', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select cell type(s)'},
-  trait1: { title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
-  trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
+  gwas_log10p: { title: 'GWAS -log<sub>10</sub> p-value ≥', storeKey: 'gwas_log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
+  eqtl_log10p: { title: 'eQTL -log<sub>10</sub> p-value ≥', storeKey: 'eqtl_log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   h4: { title: 'Colocalization PP(H4) ≥', topKey: 'filter', storeKey: 'h4', items: null, emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },
   r2: { title: 'r² ≥', topKey: 'filter', storeKey: 'r2', items: null, emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
