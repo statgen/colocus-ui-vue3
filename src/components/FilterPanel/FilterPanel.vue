@@ -54,11 +54,11 @@ const rules = {
  */
 const controlConfig = {
   study: { title: 'Study', storeKey: 'studies', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select study(ies)' },
-  gene: { title: 'QTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
+  gene: { title: 'eQTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
   region: { title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], emptyValue: null, defaultValue: '', placeholder: 'chr:start-end' },
   phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
-  tissue: { title: 'QTL Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
-  cell_type: { title: 'QTL Cell Type', storeKey: 'cell_types', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select cell type(s)'},
+  tissue: { title: 'Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
+  cell_type: { title: 'Cell Type', storeKey: 'cell_types', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select cell type(s)'},
   gwas_log10p: { title: 'GWAS -log<sub>10</sub> p-value ≥', storeKey: 'gwas_log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   eqtl_log10p: { title: 'eQTL -log<sub>10</sub> p-value ≥', storeKey: 'eqtl_log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   h4: { title: 'Colocalization PP(H4) ≥', topKey: 'filter', storeKey: 'h4', items: null, emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },
