@@ -59,7 +59,7 @@ const plotManhattanData = () => {
 // *** Configuration data ******************************************************
 const tooltip_template = `<b><%- d.chrom %>:<%- d.pos.toLocaleString() %> <%- (d.ref && d.alt) ? (d.ref + "/" + d.alt) : "" %></b><br>
   -log<sub>10</sub>(p): <%- d.neg_log_pvalue && (+d.neg_log_pvalue).toFixed(3) %><br>
-  <%- d.qtl_genes && d.qtl_genes.length ? 'QTL gene(s): ' + d.qtl_genes.map(function(gene) { return gene.symbol; }).join(", ") : "" %>
+  <%- d.qtl_genes && d.qtl_genes.length ? 'eQTL gene(s): ' + d.qtl_genes.map(function(gene) { return gene.symbol; }).join(", ") : "" %>
   <% if (d.qtl_genes && d.qtl_genes.length) { print('<br>'); } %>
   Nearest gene(s): <%- d.nearest_genes && d.nearest_genes.length && d.nearest_genes.map(function(gene) { return gene.symbol; }).join(", ") %>`
 </script>
