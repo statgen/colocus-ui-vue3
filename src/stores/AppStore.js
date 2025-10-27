@@ -82,7 +82,7 @@ export const useAppStore = defineStore('appStore', {
         headerRowHeight: GRID_DISPLAY_OPTIONS.headerRowHeight,
       },
       gridMap: {
-        '1,1': 'plot_1', '2,1': 'mock', '3,1': 'mock', '4,1': 'mock',
+        '1,1': 'mock', '2,1': 'mock', '3,1': 'mock', '4,1': 'mock',
         '1,2': 'mock', '2,2': 'mock', '3,2': 'mock', '4,2': 'mock',
       },
       lzfilterDataChanged: false,

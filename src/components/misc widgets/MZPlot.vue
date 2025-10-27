@@ -1,79 +1,153 @@
 <template>
   <div
-    :id="id"
+    :id="cellId"
+    class="plot-cell"
     :style="{ gridRow: row + 1, gridColumn: col + 1 }"
+    :data-cell="cellKey"
   >
-    <div ref="mountEl"></div>
+    <!-- +1 offset accounts for header row/column at position 1
+         Logical row 1 → CSS gridRow 2, Logical col 1 → CSS gridColumn 2 -->
+    <!-- Mock plot display -->
+    <div
+      v-if="isMock"
+      class="mock-plot"
+      @click.stop="onClick"
+      @contextmenu.prevent.stop="onContextMenu"
+    >
+      <div class="mock-content">
+        {{ cellLabel }}
+      </div>
+    </div>
+
+    <!-- Real plot display - dynamic LZ2RegionPlot component -->
+    <component
+      v-else-if="plotConfig"
+      :is="LZ2RegionPlot"
+      v-bind="plotProps"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref, watchEffect, render, cloneVNode } from 'vue'
+import { computed } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
+import LZ2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
+
+const props = defineProps({
+  row: { type: Number, required: true },
+  col: { type: Number, required: true },
+  plotId: { type: [String, Number], default: null }
+})
 
 const appStore = useAppStore()
 const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 
-const props = defineProps({
-  cell:   { type: String, required: true },          // "r,c"
-  plotID: { type: [String, Number], required: true } // 1 or "1"
+const emit = defineEmits(['mock-click', 'mock-menu'])
+
+// *** Computed ****************************************************************
+const isMock = computed(() => !props.plotId)
+
+const cellKey = computed(() => `${props.row},${props.col}`)
+
+const cellId = computed(() => `cell_${props.row}_${props.col}`)
+
+const cellLabel = computed(() => {
+  const colLabel = columnLabel(props.col)
+  return `${colLabel}${props.row}`
 })
 
-const mountEl = ref(null)
+/**
+ * Get plot configuration from registry
+ */
+const plotConfig = computed(() => {
+  if (!props.plotId) return null
+  return storeMZpage.plotRegistry?.[props.plotId] || null
+})
 
-const row = computed(() => Number(props.cell.split(',')[0]))
-const col = computed(() => Number(props.cell.split(',')[1]))
-const id  = computed(() => `cell_${props.cell}`)
+/**
+ * Build props to pass to LZ2RegionPlot component
+ * Maps from your plotRegistry structure to component props
+ */
+const plotProps = computed(() => {
+  if (!plotConfig.value) return {}
 
-// Keep track of what we last mounted (so we can unmount cleanly)
-let lastMountedEl = null
+  const config = plotConfig.value
 
-function doMount() {
-  const el = mountEl.value
-  if (!el) return
-
-  const key = String(props.plotID)
-  const entry = storeMZpage.plotRegistry?.[key]
-  if (!entry || !entry.vnode) {
-    // nothing to show yet
-    render(null, el)
-    return
+  return {
+    ID: props.plotId,
+    showGenSigLine: config.showGenSigLine ?? storeMZpage.showGenSigLines,
+    showRecombLine: config.showRecombLine ?? storeMZpage.showRecombLines,
+    signal: config.signal, // The signal object with lead_variant, uuid, etc.
+    // Add any other props your LZ2RegionPlot component needs
   }
+})
 
-  // If this vnode was previously mounted elsewhere, unmount it there
-  if (entry.mountEl && entry.mountEl !== el) {
-    try { render(null, entry.mountEl) } catch (_) {}
+// *** Event handlers **********************************************************
+const onClick = (event) => {
+  if (isMock.value) {
+    emit('mock-click', { row: props.row, col: props.col, event })
   }
-
-  // Clear whatever is in our target, then mount a *clone* of the vnode
-  render(null, el)
-  const vnode = cloneVNode(entry.vnode)   // fresh identity, safe to mount here
-  render(vnode, el)
-
-  entry.mountEl = el
-  lastMountedEl = el
 }
 
-onMounted(doMount)
-
-// Re-run whenever: mount target exists, plotID changes, or registry entry changes
-watchEffect(() => {
-  // read as dependencies
-  void mountEl.value
-  const key = String(props.plotID)
-  void storeMZpage.plotRegistry?.[key]
-  doMount()
-})
-
-onBeforeUnmount(() => {
-  if (lastMountedEl) {
-    try { render(null, lastMountedEl) } catch (_) {}
+const onContextMenu = (event) => {
+  if (isMock.value) {
+    emit('mock-menu', { row: props.row, col: props.col, event })
   }
-})
+}
 
+// *** Utility functions *******************************************************
+function columnLabel(n) {
+  let s = ''
+  while (n > 0) {
+    const rem = (n - 1) % 26
+    s = String.fromCharCode(65 + rem) + s
+    n = Math.floor((n - 1) / 26)
+  }
+  return s
+}
 </script>
 
-
 <style scoped>
+.plot-cell {
+  position: relative;
+  background: white;
+  overflow: hidden;
+}
+
+/* Mock plot styling */
+.mock-plot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.02),
+    rgba(0, 0, 0, 0.02) 10px,
+    rgba(0, 0, 0, 0.04) 10px,
+    rgba(0, 0, 0, 0.04) 20px
+  );
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mock-plot:hover {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.04),
+    rgba(0, 0, 0, 0.04) 10px,
+    rgba(0, 0, 0, 0.06) 10px,
+    rgba(0, 0, 0, 0.06) 20px
+  );
+}
+
+.mock-content {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
 </style>

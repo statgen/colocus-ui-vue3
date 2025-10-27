@@ -8,7 +8,8 @@
       <MZToolbox @export-plot-group="onExportPlotGroup"/>
     </template>
 
-    <h1><BackButton />Multizoom</h1>
+    <h1><BackButton />Multizoom<v-btn @click="onSwap">swap</v-btn><v-btn @click="onSwap2">swap2</v-btn>
+    </h1>
 
     <BusyOverlay :show="isExporting" />
 
@@ -26,7 +27,9 @@
       @close-menu="onCloseMenu"
     />
 
+    <!-- FIXME: add handlers for all click and menu event-->
     <MZGrid
+      ref="gridRef"
       @column-menu="onColumnMenu"
       @row-menu="onRowMenu"
       @mock-menu="onMockMenu"
@@ -55,10 +58,16 @@ import { useMZPageHelpers } from '@/composables/mzPageHelpers'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import router from '@/router'
 import LZ2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
+import { useMZGrid } from '@/composables/useMZGrid'
+import MZGrid from '@/components/misc widgets/MZGrid.vue'
+
+const gridRef = ref(null)
+let gridOps = null
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
 const mzPageHelpers = useMZPageHelpers()
+const mzg = useMZGrid()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -107,7 +116,7 @@ watch(() => storeMZpage.colocDataReady, async (newVal) => {
 
     await renderPlot(colocID, signal1, 'slot1', '1,1')
     await renderPlot(colocID, signal2, 'slot2', '2,1')
-    await scrollBottom()
+    // await scrollBottom()
   }
 })
 
@@ -122,6 +131,13 @@ onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
   storeMZpage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
   loadPageData()
+  // Get grid operations
+  gridOps = gridRef.value.gridOps
+
+  // Initialize gridMap if empty
+  if (!storeMZpage.gridMap || Object.keys(storeMZpage.gridMap).length === 0) {
+    gridOps.initializeGridMap()
+  }
 })
 
 // *** Event handlers **********************************************************
@@ -161,7 +177,7 @@ const onAddBothPlotsClick = async (item) => {
     await renderPlot(colocID, signal1, 'slot1')
     await renderPlot(colocID, signal2, 'slot2')
   }
-  await scrollBottom()
+  // await scrollBottom()
 }
 
 const onCloseMenu = () => {
@@ -201,6 +217,14 @@ const onExportPlotGroup = async () => {
   await mzPageHelpers.exportPlotContainer('plotsContainer', 'Colocus_plot_group')
 }
 
+const onSwap = async () => {
+  mzg.swapCells(1,1,2,1)
+}
+
+const onSwap2 = async () => {
+  mzg.swapCells(1,1,1,2)
+}
+
 const onTogglePlot = async (colocID, signal, slot) => {
   const existingPlot = mzPageHelpers.getPlotIDfromRowSlot(colocID, slot)
 
@@ -208,7 +232,7 @@ const onTogglePlot = async (colocID, signal, slot) => {
     mzPageHelpers.unmountPlot(existingPlot)
   } else {
     await renderPlot(colocID, signal, slot)
-    await scrollBottom()
+    // await scrollBottom()
   }
 }
 
@@ -220,27 +244,32 @@ const loadPageData = async () => {
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 
-const renderPlot = async (colocID, signal, slot, cell) => {
+const renderPlot = async (colocID, signal, slot, cell, onActionMenuClick) => {
   const signalID = signal.uuid
-  const signals = Object.values(storeMZpage.plotRegistry).map(v => v.signalID)
-  if(storeMZpage.addUniqueRefsOnly && signals.includes(signalID)) return
+
+  if (storeMZpage.addUniqueRefsOnly) {
+    const signals = Object.values(storeMZpage.plotRegistry).map(v => v.signalID)
+    if (signals.includes(signalID)) return
+  }
 
   const plotID = appStore.getNextPlotID()
-  const showGenSigLine = storeMZpage.showGenSigLines
-  const showPlotID = storeMZpage.showPlotID
-  const showRecombLine = storeMZpage.showRecombLines
   const variant = signal.lead_variant.vid
 
-  const vnode = createVNode(LZ2RegionPlot, {
-    ID: plotID,
-    showGenSigLine,
-    showRecombLine,
+  storeMZpage.plotRegistry[plotID] = {
+    colocID,
+    signalID,
+    slot,
+    variant,
     signal,
+    showGenSigLine: storeMZpage.showGenSigLines,
+    showPlotID: storeMZpage.showPlotID,
+    showRecombLine: storeMZpage.showRecombLines,
     onActionMenuClick,
-  })
-  storeMZpage.plotRegistry[plotID] = { colocID, plotsContainer, showGenSigLine, showPlotID, showRecombLine, signalID, slot, variant, vnode }
+  }
+
   storeMZpage.gridMap[cell] = plotID
   mzPageHelpers.setRowSlotPlotID(colocID, slot, plotID)
+  return plotID
 }
 
 const scrollBottom = async () => {

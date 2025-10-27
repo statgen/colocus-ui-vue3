@@ -73,6 +73,7 @@ watch([
     () => storeMZpage.selectedTheme,
   ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
+  console.log('watch 1')
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecombLine)
@@ -96,6 +97,7 @@ watch([
   () => storeMZpage.zoomRegion,
 ],
   async ([selectedLDRef, yAxis, zoomRegion]) => {
+    console.log('watch 2')
     signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
     await nextTick()
   },
