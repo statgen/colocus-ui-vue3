@@ -44,7 +44,6 @@
     <div class="table-container mb-8">
       <DataTable
         @onDataTableRowClick="onDataTableRowClick"
-        @onAddBothPlotsClick="onAddBothPlotsClick"
         @on-toggle-plot="onTogglePlot"
       ></DataTable>
     </div>
@@ -165,27 +164,6 @@ const showPlotActionMenu = (args) => {
   showMenu.value = true
 }
 
-const onAddBothPlotsClick = async (item) => {
-  const { signal1, signal2 } = item
-  const colocID = item.uuid
-  const s1PlotID = mzGridHelpers.getPlotIDfromRowSlot(colocID, 'slot1')
-  const s2PlotID = mzGridHelpers.getPlotIDfromRowSlot(colocID, 'slot2')
-  console.log(colocID, s1PlotID, s2PlotID)
-
-  if(s1PlotID && s2PlotID) {
-    mzGridHelpers.deletePlot(s1PlotID)
-    mzGridHelpers.deletePlot(s2PlotID)
-  } else if(s1PlotID) {
-    await mzGridHelpers.renderPlot(colocID, signal2, 'slot2')
-  } else if(s2PlotID) {
-    await mzGridHelpers.renderPlot(colocID, signal1, 'slot1')
-  } else {
-    await mzGridHelpers.renderPlot(colocID, signal1, 'slot1')
-    await mzGridHelpers.renderPlot(colocID, signal2, 'slot2')
-  }
-  // await scrollBottom()
-}
-
 const onCloseMenu = () => {
   showMenu.value = false
   storeMZpage.activePlotID = null
@@ -243,15 +221,17 @@ const onSwap2 = async () => {
   mzGridHelpers.swapCells(1,1,1,2)
 }
 
-const onTogglePlot = async (colocID, signal, slot) => {
-  const existingPlot = mzGridHelpers.getPlotIDfromRowSlot(colocID, slot)
+const onTogglePlot = async (args, event) => {
+  console.log('togglePlot', args, event)
 
-  if (existingPlot) {
-    mzGridHelpers.deletePlot(existingPlot)
-  } else {
-    await mzGridHelpers.renderPlot(colocID, signal, slot)
-    // await scrollBottom()
-  }
+  // const existingPlot = mzGridHelpers.getPlotIDfromRowSlot(colocID, slot)
+  //
+  // if (existingPlot) {
+  //   mzGridHelpers.deletePlot(existingPlot)
+  // } else {
+  //   await mzGridHelpers.renderPlot(colocID, signal, slot)
+  //   // await scrollBottom()
+  // }
 }
 
 // *** Utility functions *******************************************************

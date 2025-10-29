@@ -18,9 +18,7 @@ const plotID = computed(() => props.title || mzGridHelpers.getPlotIDfromRowSlot(
 
 const emit = defineEmits(['on-toggle-plot'])
 
-const onClick = () => {
-  emit('on-toggle-plot')
-}
+const onClick = (event) => { emit('on-toggle-plot', event) }
 
 </script>
 
