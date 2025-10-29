@@ -21,10 +21,10 @@ export function useLZ2Renderers() {
       .attr('fill', 'none')
       .attr('stroke', color)
       .attr('stroke-width', 1)
-      .attr('stroke-dasharray', '2,2'); // dotted line effect
+      .attr('stroke-dasharray', '3,3'); // dotted line effect
   }
 
-  const renderHeader = (svg, dimensions, color, variant, title, titleColor, onActionMenuClick) => {
+  const renderHeader = (svg, dimensions, color, variant, title, titleColor, plotID) => {
     const headerGroup = svg.append('g')
       .attr('transform', 'translate(0, 0)')
       .attr('fill', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR)
@@ -55,11 +55,9 @@ export function useLZ2Renderers() {
       .attr('font-weight', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_WEIGHT)
       .attr('fill', 'black')
       .text('\u2630') // Unicode for ☰
+      .attr('data-action', 'hamburger-menu')
+      .attr('data-plot-id', plotID)
       .style('cursor', 'pointer')
-      .on('click', (event) => {
-        event.stopPropagation()
-        onActionMenuClick(event)
-      })
   }
 
   const renderPlotIDBadge = (svg, plotID, dimensions, opts = {}) => {

@@ -82,13 +82,13 @@
 import { computed, defineEmits, ref } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT } from '@/constants'
-import { useMZPageHelpers } from '@/composables/mzPageHelpers'
 import FilterPanelSubpanel from "@/components/FilterPanel/FilterPanelSubpanel.vue"
 import { colorHasher, formatVariantString } from '@/util/util'
+import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const mzPageHelpers = useMZPageHelpers()
+const mzGridHelpers = useMZGridHelpers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
@@ -144,7 +144,7 @@ const onSelectTheme = (newValue) => {
 
 const onSliderChangeEnd = async (val) => {
   const variant = storeMZpage.signal1Variant
-  mzPageHelpers.setPlotRegion(variant, val)
+  mzGridHelpers.setPlotRegion(variant, val)
   storeMZpage.zoomRegion = val
 }
 
@@ -164,7 +164,7 @@ const onToggleShowPlotID = (val) => {
 }
 
 const onUnmountAllPlots = async () => {
-  await mzPageHelpers.unmountAllPlots()
+  await mzGridHelpers.deleteAllPlots()
 }
 
 const onYAxisChange = (val) => {

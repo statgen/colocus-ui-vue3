@@ -4,9 +4,9 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useMZPageHelpers } from '@/composables/mzPageHelpers'
+import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 
-const mzPageHelpers = useMZPageHelpers()
+const mzGridHelpers = useMZGridHelpers()
 
 const props = defineProps({
   rowKey: String,
@@ -14,7 +14,7 @@ const props = defineProps({
   title: String,
 })
 
-const plotID = computed(() => props.title || mzPageHelpers.getPlotIDfromRowSlot(props.rowKey, props.slot))
+const plotID = computed(() => props.title || mzGridHelpers.getPlotIDfromRowSlot(props.rowKey, props.slot))
 
 const emit = defineEmits(['on-toggle-plot'])
 

@@ -33,13 +33,16 @@ const props = defineProps({
   ID: Number,
   showGenSigLine: Boolean,
   showRecombLine: Boolean,
+  signalID: String,
+  variant: String,
   signal: Object,
 })
 
 // *** Variables ***************************************************************
 const PLOT_DEBOUNCE_DELAY = 50
-const leadVariant = props.signal.lead_variant.vid
-const signalUUID = props.signal.uuid
+const plotID = props.ID
+const variant = props.variant
+const signalID = props.signalID
 const title = ref('')
 const titleColor = ref('')
 
@@ -55,7 +58,7 @@ const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
 const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 
 // *** Computed ****************************************************************
-const plotDOMid = computed(() => `plot_${props.ID}`)
+const plotDOMid = computed(() => `plot_${plotID}`)
 
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
@@ -67,13 +70,12 @@ const emit = defineEmits(['action-menu-click'])
 watch([
     () => signalData.value,
     () => recombData.value,
-    () => storeMZpage.plotRegistry[props.ID]?.showPlotID,
-    () => storeMZpage.plotRegistry[props.ID]?.showRecombLine,
-    () => storeMZpage.plotRegistry[props.ID]?.showGenSigLine,
+    () => storeMZpage.plotRegistry[plotID]?.showPlotID,
+    () => storeMZpage.plotRegistry[plotID]?.showRecombLine,
+    () => storeMZpage.plotRegistry[plotID]?.showGenSigLine,
     () => storeMZpage.selectedTheme,
   ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
-  console.log('watch 1')
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecombLine)
@@ -83,9 +85,8 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
       })
       await nextTick()
       const region = storeMZpage.zoomRegion
-      const plotID = props.ID
       const selectedLDRef = storeMZpage.selectedLDRef
-      debouncedRenderPlot({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef})
+      debouncedRenderPlot({plotID, variant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef})
     },
   { immediate: false, flush: 'post' }
 )
@@ -97,8 +98,7 @@ watch([
   () => storeMZpage.zoomRegion,
 ],
   async ([selectedLDRef, yAxis, zoomRegion]) => {
-    console.log('watch 2')
-    signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
+    signalData.value = await LZ2DataLoaders.loadSignalData(variant, signalID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
     await nextTick()
   },
   { immediate: true }
@@ -117,25 +117,21 @@ onMounted(async () => {
   const ldRef = storeMZpage.selectedLDRef
   const yAxis = storeMZpage.yAxis
   const zoomRegion = storeMZpage.zoomRegion
-  signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, ldRef, REF_BUILD, yAxis, zoomRegion)
-  recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL, zoomRegion)
+  signalData.value = await LZ2DataLoaders.loadSignalData(variant, signalID, ldRef, REF_BUILD, yAxis, zoomRegion)
+  recombData.value = await LZ2DataLoaders.loadRecombData(variant, REF_BUILD_PORTAL, zoomRegion)
 })
 
 // *** Event handlers **********************************************************
-const onActionMenuClick = (event) => {
-  emit('action-menu-click', {plotID: props.ID, event})
-}
-
 // *** Utility functions *******************************************************
 const debouncedRenderPlot = debounce(async (args) => {
-  const {plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef} = args
+  const {plotID, variant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef} = args
 
   await nextTick()
-  renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef)
+  renderPlot(plotID, variant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef)
 }, PLOT_DEBOUNCE_DELAY, { leading: false, trailing: true, maxWait: 200 })
 
-const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef) => {
-  const chromosome = parseVariant2(leadVariant, region).chr
+const renderPlot = (plotID, variant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef) => {
+  const chromosome = parseVariant2(variant, region).chr
 
   DIMENSIONS.plotWidth = DIMENSIONS.width
     - DIMENSIONS.margins.left
@@ -148,7 +144,7 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
   LZ2Renderers.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
-  LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.signal.lead_variant.vid, title.value, titleColor.value, onActionMenuClick)
+  LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, variant, title.value, titleColor.value, plotID)
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 
   const xAccessor = d => d.x
@@ -165,7 +161,7 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   LZ2Axes.renderYaxisSignal(thePlot, yScaleSignal, DIMENSIONS)
   if(showRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
-  const clipID = `plot-area-clip-${props.ID}`
+  const clipID = `plot-area-clip-${plotID}`
   LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.LEAD_MARKER_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 

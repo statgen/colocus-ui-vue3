@@ -1,11 +1,11 @@
 <template>
   <div
-    id="plotsContainer"
+    :id="containerID"
     class="plots-grid"
     :style="{
-      gridTemplateColumns: `minmax(${grid.headerColWidth}px, ${grid.headerColWidth}px) repeat(${grid.cols}, ${grid.cellWidth}px)`,
-      gridTemplateRows: `minmax(${grid.headerRowHeight}px, ${grid.headerRowHeight}px) repeat(${grid.rows}, ${grid.cellHeight}px)`,
-      gap: `${grid.gap}px`
+      gridTemplateColumns: `minmax(${gridSettings.headerColWidth}px, ${gridSettings.headerColWidth}px) repeat(${gridSettings.cols}, ${gridSettings.cellWidth}px)`,
+      gridTemplateRows: `minmax(${gridSettings.headerRowHeight}px, ${gridSettings.headerRowHeight}px) repeat(${gridSettings.rows}, ${gridSettings.cellHeight}px)`,
+      gap: `${gridSettings.gap}px`
     }"
   >
     <!-- corner -->
@@ -13,19 +13,19 @@
 
     <!-- column headers -->
     <div
-      v-for="c in grid.cols"
+      v-for="c in gridSettings.cols"
       :key="'colhdr-'+c"
       :style="{ gridRow: 1, gridColumn: c + 1 }"
       class="slot slot--colheader grid-header grid-header--fill"
       @click.stop="onColumnHeaderClick(c, $event)"
       @contextmenu.prevent.stop="onColumnHeaderMenu(c, $event)"
     >
-      {{ gridOps.columnLabel(c) }}
+      {{ mzGridHelpers.columnLabel(c) }}
     </div>
 
     <!-- row headers -->
     <div
-      v-for="r in grid.rows"
+      v-for="r in gridSettings.rows"
       :key="'rowhdr-'+r"
       :style="{ gridRow: r + 1, gridColumn: 1 }"
       class="slot slot--rowheader grid-header grid-header--fill"
@@ -35,17 +35,12 @@
       {{ r }}
     </div>
 
-    <!-- plot cells - iterate through logical grid positions
-         Note: In MZPlot, CSS Grid positions are offset by +1 to account for headers:
-         - Logical row 1 → CSS gridRow 2 (gridRow 1 is for column headers)
-         - Logical col 1 → CSS gridColumn 2 (gridColumn 1 is for row headers)
-         This prevents collision with headers -->
     <MZPlot
       v-for="cell in gridCells"
       :key="cell.key"
       :row="cell.row"
       :col="cell.col"
-      :plot-id="cell.plotId"
+      :plotID="cell.plotID"
       @mock-click="onMockClick"
       @mock-menu="onMockMenu"
     />
@@ -55,50 +50,47 @@
 <script setup>
 import { computed, toRef } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
-import { useMZGrid } from '@/composables/useMZGrid'
+import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 import { PAGE_NAMES } from '@/constants'
 import MZPlot from '@/components/misc widgets/MZPlot.vue'
+import { LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 const appStore = useAppStore()
 const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
-const gridOps = useMZGrid(storeMZpage)
+const mzGridHelpers = useMZGridHelpers()
 
-const grid = computed(() => storeMZpage.grid)
+const containerID = LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID
+
+const gridSettings = computed(() => storeMZpage.gridSettings)
 
 const gridMapRef = toRef(storeMZpage, 'gridMap')
 
-
-const getPlotAt = (row, col) => {
-  return gridOps.getPlotAt(row, col)
-}
-
 const gridCells = computed(() => {
   const cells = []
-  console.log('grid', grid.value)
-  for (let r = 1; r <= grid.value.rows; r++) {
-    for (let c = 1; c <= grid.value.cols; c++) {
-      const key = `${r},${c}`
-      const val = gridMapRef.value?.[key]  // ← Vue tracks this!
-      console.log('key', key, 'val', val)
-      cells.push({ row: r, col: c, key: val, plotId: val === 'mock' ? null : val })
+  for (let r = 1; r <= gridSettings.value.rows; r++) {
+    for (let c = 1; c <= gridSettings.value.cols; c++) {
+      const cell = `${r},${c}`
+      const val = gridMapRef.value?.[cell]
+      cells.push({
+        row: r,
+        col: c,
+        key: val === 'mock' ? `cell-${cell}` : val,
+        plotID: val === 'mock' ? null : val
+      })
     }
   }
-  console.log('cells', cells)
   return cells
 })
 
-const emit = defineEmits(['column-menu', 'row-menu', 'mock-click', 'mock-menu'])
+const emit = defineEmits(['column-click', 'column-menu', 'row-click', 'row-menu', 'mock-click', 'mock-menu'])
 
-const onColumnHeaderClick = (col, event) => emit('column-menu', { col, event, kind: 'click' })
+const onColumnHeaderClick = (col, event) => emit('column-click', { col, event, kind: 'click' })
 const onColumnHeaderMenu = (col, event) => emit('column-menu', { col, event, kind: 'contextmenu' })
-const onRowHeaderClick = (row, event) => emit('row-menu', { row, event, kind: 'click' })
+const onRowHeaderClick = (row, event) => emit('row-click', { row, event, kind: 'click' })
 const onRowHeaderMenu = (row, event) => emit('row-menu', { row, event, kind: 'contextmenu' })
 const onMockClick = (payload) => emit('mock-click', payload)
 const onMockMenu = (payload) => emit('mock-menu', payload)
 
-defineExpose({
-  gridOps
-})
 </script>
 
 <style scoped>

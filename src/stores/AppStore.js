@@ -72,7 +72,7 @@ export const useAppStore = defineStore('appStore', {
       colocDataReady: false,
       colocsSignals: markRaw([]),
       isExporting: false,
-      grid: {
+      gridSettings: {
         cols: GRID_DISPLAY_OPTIONS.defaultCols,
         rows: GRID_DISPLAY_OPTIONS.defaultRows,
         gap: GRID_DISPLAY_OPTIONS.gap,
@@ -81,10 +81,7 @@ export const useAppStore = defineStore('appStore', {
         headerColWidth: GRID_DISPLAY_OPTIONS.headerColWidth,
         headerRowHeight: GRID_DISPLAY_OPTIONS.headerRowHeight,
       },
-      gridMap: {
-        '1,1': 'mock', '2,1': 'mock', '3,1': 'mock', '4,1': 'mock',
-        '1,2': 'mock', '2,2': 'mock', '3,2': 'mock', '4,2': 'mock',
-      },
+      gridMap: {},
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotCounter: 1,
