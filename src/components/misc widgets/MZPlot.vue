@@ -105,7 +105,7 @@ const onMockContextMenu = (event) => {
 }
 
 .mock-content {
-  color: #6ccbac; /* LZ2_DISPLAY_OPTIONS.RECOMB_LINE_COLOR */
+  color: rgba(var(--v-theme-clcHeading), 1.0);
   font-size: 1.25rem;
   font-weight: normal;
   user-select: none;

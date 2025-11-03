@@ -62,6 +62,14 @@ export function useMZGridHelpers() {
     return s
   }
 
+  const columnNumber = (s) => {
+    let result = 0
+    for (let i = 0; i < s.length; i++) {
+      result = result * 26 + (s.charCodeAt(i) - 65 + 1)
+    }
+    return result
+  }
+
   const deletePlot = (plotID) => {
     const cell = findPlotCell(plotID)
     setCellContent(cell.row, cell.col, 'mock')
@@ -130,7 +138,6 @@ export function useMZGridHelpers() {
   }
 
   const exportPlotContainer = async (elID, fileName) => {
-    console.log('exportPlotContainer', elID, fileName)
     const el = document.getElementById(elID)
 
     setTimeout(async () => {
@@ -414,6 +421,7 @@ export function useMZGridHelpers() {
     cellKey,
     cellLabel,
     columnLabel,
+    columnNumber,
     deleteAllPlots,
     deleteColumn,
     deletePlot,

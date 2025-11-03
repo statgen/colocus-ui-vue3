@@ -17,13 +17,15 @@
 
     <LZ2Tooltip />
 
-    <LZ2ActionMenu
-      v-if="showMenu"
+    <ActionMenu
+      v-if="menuState.visible"
+      :menu-type="menuState.type"
       :menu-style="{
         position: 'absolute',
-        top: `${menuPosition.y}px`,
-        left: `${menuPosition.x}px`
+        top: `${menuState.yPos}px`,
+        left: `${menuState.xPos}px`
       }"
+      :context="menuState.context"
       @delete-plot="onDeletePlot"
       @export-plot="onExportPlot"
       @close-menu="onCloseMenu"
@@ -70,11 +72,18 @@ const mzGridHelpers = useMZGridHelpers()
 // *** Variables ***************************************************************
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
-const menuPosition = ref({ x: 0, y: 0 })
+
+const menuState = ref({
+  visible: false,
+  type: 'hamburger',
+  context: {},
+  xPos: 0,
+  yPos: 0,
+})
+
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const storeMZpage = appStore[multizoomPage]
 const searchPage = PAGE_NAMES.SEARCH
-const showMenu = ref(false)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
@@ -140,13 +149,13 @@ const handleNativeClick = (event) => {
       showPlotActionMenu({plotID, event})
       break;
     default:
-      console.warn('Unknow click event')
+      console.warn('Unknown click event')
       break;
   }
 };
 
-
 const showPlotActionMenu = (args) => {
+
   storeMZpage.activePlotID = args.plotID
 
   const rect = args.event.target.getBoundingClientRect()
@@ -155,17 +164,21 @@ const showPlotActionMenu = (args) => {
 
   const spacing = 4
   const menuWidth = 225
+  const xPos = rect.left + scrollX - menuWidth - spacing
+  const yPos = rect.bottom + scrollY + spacing
 
-  menuPosition.value = {
-    x: rect.left + scrollX - menuWidth - spacing,
-    y: rect.bottom + scrollY + spacing,
+  menuState.value = {
+    visible: true,
+    type: 'hamburger',
+    context: { plotID: args.plotID },
+    xPos: xPos,
+    yPos: yPos,
   }
-
-  showMenu.value = true
 }
 
+
 const onCloseMenu = () => {
-  showMenu.value = false
+  menuState.value.visible = false
   storeMZpage.activePlotID = null
 }
 
@@ -200,13 +213,13 @@ const onDataTableRowClick = () => {
 const onDeletePlot = () => {
   const plotID = storeMZpage.activePlotID
   mzGridHelpers.deletePlot(plotID, true)
-  showMenu.value = false
+  menuState.value.visible = false
 }
 
 const onExportPlot = async () => {
   const plotDOMid = `plot_${storeMZpage.activePlotID}`
   await mzGridHelpers.exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
-  showMenu.value = false
+  menuState.value.visible = false
 }
 
 const onExportPlotGroup = async () => {
