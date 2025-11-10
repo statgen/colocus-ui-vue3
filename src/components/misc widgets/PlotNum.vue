@@ -27,7 +27,7 @@ const title = computed(() => {
   if (!plotID.value) return ''
 
   const cell = storeMZpage.plotRegistry[plotID.value]?.cell
-  return cell ? mzGridHelpers.cellRClabel(cell) : ''
+  return cell ? mzGridHelpers.cellCRLabel(cell) : ''
 })
 
 const emit = defineEmits(['on-plot-icon-click'])
