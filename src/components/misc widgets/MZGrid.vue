@@ -63,19 +63,17 @@ const containerID = LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID
 
 const gridSettings = computed(() => storeMZpage.gridSettings)
 
-const gridMapRef = toRef(storeMZpage, 'gridMap')
-
 const gridCells = computed(() => {
   const cells = []
   for (let r = 1; r <= gridSettings.value.rows; r++) {
     for (let c = 1; c <= gridSettings.value.cols; c++) {
-      const cell = `${r},${c}`
-      const val = gridMapRef.value?.[cell]
+      const cell = mzGridHelpers.cellKey(r,c)// `${r},${c}`
+      const plotID = storeMZpage.gridMap[cell] // gridMapRef.value?.[cell]
       cells.push({
         row: r,
         col: c,
-        key: val === 'mock' ? `cell-${cell}` : val,
-        plotID: val === 'mock' ? null : val
+        key: plotID === 'mock' ? `cell-${cell}` : plotID,
+        plotID: plotID === 'mock' ? null : plotID
       })
     }
   }

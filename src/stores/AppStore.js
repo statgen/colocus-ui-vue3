@@ -81,7 +81,7 @@ export const useAppStore = defineStore('appStore', {
         headerColWidth: GRID_DISPLAY_OPTIONS.headerColWidth,
         headerRowHeight: GRID_DISPLAY_OPTIONS.headerRowHeight,
       },
-      gridMap: {},
+      gridMap: ref({}),
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotCounter: 1,

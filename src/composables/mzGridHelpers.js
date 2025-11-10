@@ -20,7 +20,7 @@ export function useMZGridHelpers() {
   const addPlotToCell = (row, col, plotID, options = {}) => {
     const { replace = true, pushDown = false } = options
     const key = cellKey(row, col)
-    const existing = storeMZpage.gridMap[key]
+    const existing = storeMZpage.gridMap.value[key]
 
     if (pushDown && existing && existing !== 'mock') {
       pushColumnDown(col, row)
@@ -107,7 +107,7 @@ export function useMZGridHelpers() {
       for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
         const currentKey = cellKey(r, c)
         const nextKey = cellKey(r, c + 1)
-        storeMZpage.gridMap[currentKey] = storeMZpage.gridMap[nextKey] || 'mock'
+        storeMZpage.gridMap.value[currentKey] = storeMZpage.gridMap.value[nextKey] || 'mock'
       }
     }
 
@@ -209,7 +209,7 @@ export function useMZGridHelpers() {
   })
 
   const getPlotAt = (row, col) => {
-    const key = `${row},${col}`
+    const key = cellKey(row, col)
     const val = storeMZpage.gridMap?.[key]
     return val && val !== 'mock' ? val : null
   }
