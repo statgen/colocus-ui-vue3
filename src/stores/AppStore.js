@@ -1,4 +1,4 @@
-import { markRaw, nextTick } from 'vue'
+import { markRaw, nextTick, ref } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
 import { GRID_DISPLAY_OPTIONS, LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
@@ -85,6 +85,7 @@ export const useAppStore = defineStore('appStore', {
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotCounter: 1,
+      plotMoved: ref(false),
       plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode
       regionPanelRemoved: false,
       reusablePlotIDs: [],

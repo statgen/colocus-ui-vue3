@@ -1,7 +1,7 @@
 import { computed, nextTick } from 'vue'
 import html2canvas from 'html2canvas'
 import { useAppStore } from '@/stores/AppStore'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, MULTIZOOM_PAGE_OPTIONS, PAGE_NAMES } from '@/constants'
 import { parseVariant2 } from '@/util/util'
 
 export function useMZGridHelpers() {
@@ -52,6 +52,11 @@ export function useMZGridHelpers() {
 
   const cellLabel = (row, col) => `${row}${columnLabel(col)}`
 
+  const cellCRlabel = (cell) => {
+    const [row, col] = cell.split(',')
+    return `${columnLabel(col)}${row}`
+  }
+
   const columnLabel = (n) => {
     let s = ''
     while (n > 0) {
@@ -62,7 +67,8 @@ export function useMZGridHelpers() {
     return s
   }
 
-  const columnNumber = (s) => {
+  const columnNumber = (c) => {
+    const s = c.toUpperCase()
     let result = 0
     for (let i = 0; i < s.length; i++) {
       result = result * 26 + (s.charCodeAt(i) - 65 + 1)
@@ -137,6 +143,11 @@ export function useMZGridHelpers() {
     return true
   }
 
+  const ensureRowsCols = (rows, cols) => {
+    while(storeMZpage.gridSettings.rows < rows) addRow()
+    while(storeMZpage.gridSettings.cols < cols) addColumn()
+  }
+
   const exportPlotContainer = async (elID, fileName) => {
     const el = document.getElementById(elID)
 
@@ -208,18 +219,8 @@ export function useMZGridHelpers() {
   }
 
   const initializeGridMap = () => {
-    if (!storeMZpage.gridMap) {
-      storeMZpage.gridMap = {}
-    }
-
-    for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-      for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-        const key = cellKey(r, c)
-        if (!(key in storeMZpage.gridMap)) {
-          storeMZpage.gridMap[key] = 'mock'
-        }
-      }
-    }
+    if (!storeMZpage.gridMap) storeMZpage.gridMap = {}
+    ensureRowsCols(MULTIZOOM_PAGE_OPTIONS.defaultRows, MULTIZOOM_PAGE_OPTIONS.defaultCols)
   }
 
   const insertColumn = (atCol) => {
@@ -284,6 +285,7 @@ export function useMZGridHelpers() {
   }
 
   const movePlot = (plotID, toRow, toCol, replace = true) => {
+    ensureRowsCols(toRow, toCol)
     const oldLocation = findPlotCell(plotID)
     if (!oldLocation) {
       console.warn(`Plot ${plotID} not found in grid`)
@@ -300,6 +302,8 @@ export function useMZGridHelpers() {
 
     setCellContent(oldLocation.row, oldLocation.col, 'mock')
     setCellContent(toRow, toCol, plotID)
+    storeMZpage.plotRegistry[plotID].cell = cellKey(toRow, toCol)
+    storeMZpage.plotMoved = !storeMZpage.plotMoved
     return true
   }
 
@@ -335,6 +339,21 @@ export function useMZGridHelpers() {
     return { row, col }
   }
 
+  const parseCRReference = (cellRef) => {
+    const match = cellRef.toUpperCase().match(/^([A-Z]+)(\d+)$/)
+
+    if (!match) {
+      console.error(`Invalid cell reference: ${cellRef}`)
+    }
+
+    const [, colLabel, rowStr] = match
+
+    return {
+      col: columnNumber(colLabel),  // Reuse your existing function
+      row: parseInt(rowStr, 10)
+    }
+  }
+
   const prepPlotSession = () => {
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
@@ -358,7 +377,10 @@ export function useMZGridHelpers() {
     setCellContent(fromRow, col, 'mock')
   }
 
-  const renderPlot = async (colocID, signal, slot, cell) => {
+  const renderPlot = async (args) => {
+    const [r, c] = args.cell.split(',')
+    ensureRowsCols(parseInt(r), parseInt(c))
+    const { cell, colocID, signal, slot } = args
     const signalID = signal.uuid
 
     if (storeMZpage.addUniqueRefsOnly) {
@@ -370,14 +392,15 @@ export function useMZGridHelpers() {
     const variant = signal.lead_variant.vid
 
     storeMZpage.plotRegistry[plotID] = {
-      colocID,
-      signalID,
-      slot,
-      variant,
-      signal,
+      cell: args.cell,
+      colocID: colocID,
       showGenSigLine: storeMZpage.showGenSigLines,
       showPlotID: storeMZpage.showPlotID,
       showRecombLine: storeMZpage.showRecombLines,
+      signal: signal,
+      signalID,
+      slot: slot,
+      variant,
     }
 
     storeMZpage.gridMap[cell] = plotID
@@ -390,7 +413,7 @@ export function useMZGridHelpers() {
     if (plotID === null || plotID === 'mock') {
       storeMZpage.gridMap[key] = 'mock'
     } else {
-      storeMZpage.gridMap[key] = String(plotID)
+      storeMZpage.gridMap[key] = plotID
     }
   }
 
@@ -420,6 +443,7 @@ export function useMZGridHelpers() {
     addRow,
     cellKey,
     cellLabel,
+    cellRClabel: cellCRlabel,
     columnLabel,
     columnNumber,
     deleteAllPlots,
@@ -438,6 +462,7 @@ export function useMZGridHelpers() {
     movePlot,
     moveRow,
     parseCell,
+    parseCRReference,
     prepPlotSession,
     renderPlot,
     setCellContent,

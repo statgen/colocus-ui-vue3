@@ -49,8 +49,8 @@
     </template>
 
     <template v-if="appStore.currentPageName===PAGE_NAMES.MULTIZOOM" #item.actions="{ item }">
-      <PlotNum :row-key="item.uuid" slot="slot1" @on-toggle-plot="(event) => onTogglePlot(event, item.uuid, item.signal1, 'slot1')" />
-      <PlotNum :row-key="item.uuid" slot="slot2" @on-toggle-plot="(event) => onTogglePlot(event, item.uuid, item.signal2, 'slot2')" />
+      <PlotNum :row-key="item.uuid" slot="slot1" @onPlotIconClick="(args) => onPlotIconClick(args, item.uuid, item.signal1)" />
+      <PlotNum :row-key="item.uuid" slot="slot2" @onPlotIconClick="(args) => onPlotIconClick(args, item.uuid, item.signal2 )" />
     </template>
 
     <template v-else-if="appStore.currentPageName===PAGE_NAMES.LOCUSZOOM" #item.actions="{ item }">
@@ -135,7 +135,7 @@ const searchPage = PAGE_NAMES.SEARCH
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick', 'on-toggle-plot'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick', 'on-plot-icon-click'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
@@ -202,10 +202,9 @@ const onSortUpdate = (newSort) => {
   appStore.updateSort(newSort)
 }
 
-const onTogglePlot = async (event, colocID, signal, slot) => {
-  const plotID = mzGridHelpers.getPlotIDfromRowSlot(colocID, slot)
-  const args = {plotID, colocID, slot, signal}
-  emit('on-toggle-plot', args, event)
+const onPlotIconClick = async (args, colocID, signal) => {
+  const args1 = {...args, colocID, signal}
+  emit('on-plot-icon-click', args1)
 }
 
 // *** Utility functions *******************************************************

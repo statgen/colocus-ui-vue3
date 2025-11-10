@@ -588,3 +588,23 @@ plotsContainer (div on host page)
                   genSigLine
 ```
 
+## Multizoom page and components
+
+### UI plot event handling
+If user clicks hamburger menu in a plot, that generates a native click event, which bubbles up through the grid to the page, where it is handled by onNativeClick. It in turn extracts the plotID and calls showPlotActionMenu, passing plotID, menuType ('hamburger' in this case), and the event. showPlotActionMenu figures out display location of the menu, then sets menuState to visible, and sets the display parameters and the context, which includes only the plotID.
+
+Then the <ActionMenu> template kicks into gear, setting props like menuType ('hamburger' again),  menuStyle, and context.
+
+Then the component kicks in. It has a computed property, visibleMenuItems, which gets the menu items to display from ActionMenuConfig.js, based on the menuType('hamburger' again). Then ActionMenu's template iterates those items, displaying each. It then waits for events on its control, or a 'click-away' event, set up by global directive, in which case it goes hidden once again.
+
+## UI data table icon event handling
+- First the user clicks a plot icon (a PlotNum component instance) in the data table.
+- The PlotNum SFC emits on-plot-icon-click with args(plotID, slot, event).
+- The DataTable traps that event, adds in the colocID and signal, and emits its  own on-plot-icon-click with args(plotID, slot, event, colocID, signal).
+- The MZPage view traps that event, adds menuType: 'datatable' to the args, and calls showPlotActionMenu.
+- Still on MZPage: showPlotActionMenu sets visual params, then sets menuState, inserting colocID, signal, slot, and plotID (why?) into its context.
+- When menu button (eg add) in ActionMenu clicked, ActionMenu emits an event corresponding to the type specified in ActionMenuConfig, eg 'add-plot'
+- That event is trapped in MZPage, where the handler onAddPlot responds. First it extracts args.inputValue, which is what the user typed, as the value of cell, converts it, then calls mzGridHelpers.renderPlot with cell, colocID, signal, and slot.
+
+
+

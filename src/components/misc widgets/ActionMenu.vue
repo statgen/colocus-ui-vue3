@@ -13,6 +13,16 @@
           </label>
         </li>
 
+        <li v-else-if="item.type === 'input'">
+          <label>{{ item.icon }} {{ item.label }}
+            <input v-model="inputValues[item.id]" type="text" maxlength="5" size="5" style="background-color: #fbfbfb" class="ml-2"/>
+            <v-btn
+              @click="onInputBtnClick(item, inputValues[item.id])" variant="tonal" size="x-small" class="ml-2 text-clcAction">
+              🔘
+            </v-btn>
+          </label>
+        </li>
+
         <li v-else-if="item.type === 'action'" @click.self="handleAction(item)">
           {{ item.icon ? item.icon + ' ' : '' }}{{ item.label }}
         </li>
@@ -24,7 +34,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount } from 'vue'
+import { computed, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { getMenuItems } from './ActionMenuConfig'
 
 const props = defineProps({
@@ -33,15 +43,19 @@ const props = defineProps({
   context: {},
 })
 
+const inputValues = reactive({})
+
 const emit = defineEmits([
-  'delete-plot',
-  'export-plot',
+  'add-plot',
   'close-menu',
   'copy-data',
-  'sort-column',
-  'hide-column',
+  'delete-plot',
+  'export-plot',
+  'filter-data',
   'freeze-column',
-  'filter-data'
+  'hide-column',
+  'move-plot',
+  'sort-column',
 ])
 
 const visibleMenuItems = computed(() => {
@@ -55,10 +69,8 @@ const handleCheckboxChange = (item, checked) => {
 }
 
 const handleAction = (item) => {
-  if (item.event) {
-    const eventData = item.data !== undefined ? item.data : props.context
-    emit(item.event, eventData)
-  }
+  const eventData = item.data !== undefined ? item.data : props.context
+  emit(item.event, eventData)
 }
 
 onMounted(() => {
@@ -78,6 +90,16 @@ const onKeydown = (event) => {
     emit('close-menu')
   }
 }
+
+const onInputBtnClick = (item, value) => {
+//  console.log('Button clicked for item:', item.id, 'with value:', value, 'with event:', item.event)
+  emit(item.event, {
+    ...props.context,
+    inputValue: value,
+    itemId: item.id
+  })
+}
+
 </script>
 
 <style scoped>
@@ -87,7 +109,7 @@ const onKeydown = (event) => {
   border: 1px solid rgba(var(--v-theme-clcTooltipBorder), 1.0);
   border-radius: 6px;
   z-index: 9999;
-  padding: 2px 4px;
+  padding: 4px 4px 8px 4px;
   min-width: 160px;
   font-size: 0.9rem;
   width: 225px;
@@ -115,10 +137,6 @@ const onKeydown = (event) => {
   margin: 4px 0;
   padding: 0;
   cursor: default;
-}
-
-.plot-action-menu li.menu-divider:hover {
-  background-color: rgba(var(--v-theme-clcTooltipBorder), 0.5);
 }
 
 .plot-action-menu input[type="checkbox"] {

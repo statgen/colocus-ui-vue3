@@ -13,7 +13,7 @@ export const actionMenuConfig = {
       checked: {
         get: () => {
           const storeMZpage = getStoreMZpage()
-          const plotID = storeMZpage.activePlotID
+          const plotID = storeMZpage.activePlotID.toString()
           return storeMZpage.plotRegistry[plotID].showRecombLine
         },
         set: (val, emit) => {
@@ -41,16 +41,16 @@ export const actionMenuConfig = {
       }
     },
     { id: 'divider', type: 'divider', },
-    { id: 'export', type: 'action', label: 'Export PNG', icon: '⬇', event: 'export-plot' },
     { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
+    { id: 'export', type: 'action', label: 'Export PNG', icon: '⬇', event: 'export-plot' },
+    { id: 'move-plot', type: 'input', label: 'Move plot to', icon: '➤', event: 'move-plot' },
   ],
 
     // dataTable: deletePlot, insertPlot@cell, replacePlot@cell, appendToCol@col
     datatable: [
-    { id: 'copy', type: 'action', label: 'Copy Data', icon: '📋', event: 'copy-data' },
-    { id: 'export', type: 'action', label: 'Export PNG', icon: '⬇', event: 'export-plot' },
-    { id: 'divider-1', type: 'divider' },
     { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
+    { id: 'add-plot', type: 'input', label: 'Add plot at', icon: '➕', event: 'add-plot' },
+    { id: 'move-plot', type: 'input', label: 'Move plot to', icon: '➤', event: 'move-plot' },
   ],
 
   // colHeader: deleteCol, moveColTo, insertColBefore, insertColAfter?
