@@ -118,8 +118,8 @@ watch(() => storeMZpage.colocDataReady, async (newVal) => {
     storeMZpage.signal1Variant = variant
     mzGridHelpers.setPlotRegion(variant, storeMZpage.zoomRegion)
 
-    await mzGridHelpers.renderPlot({ colocID, signal: signal1, slot: 'slot1', cell: '1,1' })
-    await mzGridHelpers.renderPlot({ colocID, signal: signal2, slot: 'slot2', cell: '2,1' })
+    await mzGridHelpers.renderPlot({ colocID, signal: signal1, slot: 'slot1', cell: 'A1' })
+    await mzGridHelpers.renderPlot({ colocID, signal: signal2, slot: 'slot2', cell: 'A2' })
     // await scrollBottom()
   }
 })
@@ -140,17 +140,15 @@ onMounted(() => {
 
 // *** Event handlers **********************************************************
 const onAddPlot = async (args) => {
-  const rc = mzGridHelpers.parseCRReference(args.inputValue)
-  const cell = `${rc.row},${rc.col}`
+  const cell = args.inputValue.toUpperCase()
   await mzGridHelpers.renderPlot({ cell, colocID: args.colocID, signal: args.signal, slot: args.slot })
   menuState.value.visible = false
 }
 
 const onMovePlot = (args) => {
   const plotID = parseInt(args.plotID)
-  const cell = args.inputValue
-  const cellRefs = mzGridHelpers.parseCRReference(cell)
-  mzGridHelpers.movePlot(plotID, cellRefs.row, cellRefs.col, true)
+  const cell = args.inputValue.toUpperCase()
+  mzGridHelpers.movePlot(plotID, cell, true)
   menuState.value.visible = false
 }
 
