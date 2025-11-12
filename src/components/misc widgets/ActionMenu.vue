@@ -54,7 +54,8 @@ const emit = defineEmits([
   'filter-data',
   'freeze-column',
   'hide-column',
-  'move-plot',
+  'move-plot-insert',
+  'move-plot-replace',
   'sort-column',
 ])
 
@@ -112,7 +113,7 @@ const onInputBtnClick = (item, value) => {
   padding: 4px 4px 8px 4px;
   min-width: 160px;
   font-size: 0.9rem;
-  width: 225px;
+  width: 300px;
 }
 
 .plot-action-menu ul {

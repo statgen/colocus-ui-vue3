@@ -99,7 +99,7 @@ const LZ2_DISPLAY_OPTIONS = {
 
 const LDOD = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
-const GRID_DISPLAY_OPTIONS = {
+const MZ_GRID_DISPLAY_OPTIONS = {
   defaultCols: 2,
   defaultRows: 4,
   gap: 8,
@@ -131,11 +131,6 @@ const D3_FONT_DEFAULTS = `
     font-weight: ${LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_WEIGHT} !important;
   }
 `
-const MULTIZOOM_PAGE_OPTIONS = {
-  defaultRows: 4,
-  defaultCols: 2,
-}
-
 const MX_TOOLBOX_WIDTH = 300
 
 const NEARBY_DIST = 500e3
@@ -196,9 +191,8 @@ export {
   CM_DATASET,
   COLORS,
   D3_FONT_DEFAULTS,
-  GRID_DISPLAY_OPTIONS,
+  MZ_GRID_DISPLAY_OPTIONS,
   LZ2_DISPLAY_OPTIONS,
-  MULTIZOOM_PAGE_OPTIONS,
   MX_TOOLBOX_WIDTH,
   NEARBY_DIST,
   PAGE_NAMES,

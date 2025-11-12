@@ -23,11 +23,8 @@ const plotID = computed(() => mzGridHelpers.getPlotIDfromRowSlot(props.rowKey, p
 
 const title = computed(() => {
   const pm = storeMZpage.plotMoved // Force reactivity on plotMoved
-
   if (!plotID.value) return ''
-
-  const cell = storeMZpage.plotRegistry[plotID.value]?.cell
-  return cell ? mzGridHelpers.cellCRLabel(cell) : ''
+  return storeMZpage.plotRegistry[plotID.value]?.cell
 })
 
 const emit = defineEmits(['on-plot-icon-click'])

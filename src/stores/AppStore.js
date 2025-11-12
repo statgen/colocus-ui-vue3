@@ -1,7 +1,7 @@
-import { markRaw, nextTick, ref } from 'vue'
+import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { GRID_DISPLAY_OPTIONS, LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
+import { MZ_GRID_DISPLAY_OPTIONS, LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -72,20 +72,20 @@ export const useAppStore = defineStore('appStore', {
       colocDataReady: false,
       colocsSignals: markRaw([]),
       isExporting: false,
+      gridMap: {},
       gridSettings: {
-        cols: GRID_DISPLAY_OPTIONS.defaultCols,
-        rows: GRID_DISPLAY_OPTIONS.defaultRows,
-        gap: GRID_DISPLAY_OPTIONS.gap,
-        cellWidth: GRID_DISPLAY_OPTIONS.cellWidth,
-        cellHeight: GRID_DISPLAY_OPTIONS.cellHeight,
-        headerColWidth: GRID_DISPLAY_OPTIONS.headerColWidth,
-        headerRowHeight: GRID_DISPLAY_OPTIONS.headerRowHeight,
+        cols: 0, //MZ_GRID_DISPLAY_OPTIONS.defaultCols,
+        rows: 0, //MZ_GRID_DISPLAY_OPTIONS.defaultRows,
+        gap: MZ_GRID_DISPLAY_OPTIONS.gap,
+        cellWidth: MZ_GRID_DISPLAY_OPTIONS.cellWidth,
+        cellHeight: MZ_GRID_DISPLAY_OPTIONS.cellHeight,
+        headerColWidth: MZ_GRID_DISPLAY_OPTIONS.headerColWidth,
+        headerRowHeight: MZ_GRID_DISPLAY_OPTIONS.headerRowHeight,
       },
-      gridMap: ref({}),
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
       plotCounter: 1,
-      plotMoved: ref(false),
+      plotMoved: false,
       plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode
       regionPanelRemoved: false,
       reusablePlotIDs: [],

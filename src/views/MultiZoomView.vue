@@ -27,7 +27,8 @@
       @closeMenu="onCloseMenu"
       @deletePlot="onDeletePlot"
       @exportPlot="onExportPlot"
-      @movePlot="onMovePlot"
+      @movePlotInsert="onMovePlotInsert"
+      @movePlotReplace="onMovePlotReplace"
     />
 
     <MZGrid
@@ -145,10 +146,18 @@ const onAddPlot = async (args) => {
   menuState.value.visible = false
 }
 
-const onMovePlot = (args) => {
+const onMovePlotInsert = (args) => {
   const plotID = parseInt(args.plotID)
   const cell = args.inputValue.toUpperCase()
   mzGridHelpers.movePlot(plotID, cell, true)
+  menuState.value.visible = false
+}
+
+const onMovePlotReplace = (args) => {
+  console.log('onMovePlotReplace', args)
+  const plotID = parseInt(args.plotID)
+  const cell = args.inputValue.toUpperCase()
+  mzGridHelpers.movePlot(plotID, cell, false)
   menuState.value.visible = false
 }
 

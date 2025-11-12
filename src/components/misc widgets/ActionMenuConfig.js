@@ -43,7 +43,8 @@ export const actionMenuConfig = {
     { id: 'divider', type: 'divider', },
     { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
     { id: 'export', type: 'action', label: 'Export PNG', icon: '⬇', event: 'export-plot' },
-    { id: 'move-plot', type: 'input', label: 'Move plot to', icon: '➤', event: 'move-plot' },
+    { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert)', icon: '➤', event: 'move-plot-insert' },
+    { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace)', icon: '➤', event: 'move-plot-replace' },
   ],
 
     // dataTable: deletePlot, insertPlot@cell, replacePlot@cell, appendToCol@col
