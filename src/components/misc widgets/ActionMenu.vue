@@ -46,7 +46,8 @@ const props = defineProps({
 const inputValues = reactive({})
 
 const emit = defineEmits([
-  'add-plot',
+  'add-plot-insert',
+  'add-plot-replace',
   'close-menu',
   'copy-data',
   'delete-plot',

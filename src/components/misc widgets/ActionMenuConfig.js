@@ -47,11 +47,12 @@ export const actionMenuConfig = {
     { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace)', icon: '➤', event: 'move-plot-replace' },
   ],
 
-    // dataTable: deletePlot, insertPlot@cell, replacePlot@cell, appendToCol@col
     datatable: [
     { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
-    { id: 'add-plot', type: 'input', label: 'Add plot at', icon: '➕', event: 'add-plot' },
-    { id: 'move-plot', type: 'input', label: 'Move plot to', icon: '➤', event: 'move-plot' },
+    { id: 'add-plot-insert', type: 'input', label: 'Add plot (insert)', icon: '➕', event: 'add-plot-insert' },
+    { id: 'add-plot-replace', type: 'input', label: 'Add plot (replace)', icon: '➕', event: 'add-plot-replace' },
+    { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert)', icon: '➤', event: 'move-plot-insert' },
+    { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace)', icon: '➤', event: 'move-plot-replace' },
   ],
 
   // colHeader: deleteCol, moveColTo, insertColBefore, insertColAfter?

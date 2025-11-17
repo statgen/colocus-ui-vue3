@@ -23,7 +23,8 @@
         left: `${menuState.xPos}px`
       }"
       :context="menuState.context"
-      @addPlot="onAddPlot"
+      @addPlotInsert="onAddPlotInsert"
+      @addPlotReplace="onAddPlotReplace"
       @closeMenu="onCloseMenu"
       @deletePlot="onDeletePlot"
       @exportPlot="onExportPlot"
@@ -140,9 +141,15 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
-const onAddPlot = async (args) => {
+const onAddPlotInsert = async (args) => {
   const cell = args.inputValue.toUpperCase()
-  await mzGridHelpers.renderPlot({ cell, colocID: args.colocID, signal: args.signal, slot: args.slot })
+  await mzGridHelpers.addPlot({ cell, colocID: args.colocID, signal: args.signal, slot: args.slot, insert: true })
+  menuState.value.visible = false
+}
+
+const onAddPlotReplace = async (args) => {
+  const cell = args.inputValue.toUpperCase()
+  await mzGridHelpers.addPlot({ cell, colocID: args.colocID, signal: args.signal, slot: args.slot, insert: false })
   menuState.value.visible = false
 }
 
@@ -154,7 +161,6 @@ const onMovePlotInsert = (args) => {
 }
 
 const onMovePlotReplace = (args) => {
-  console.log('onMovePlotReplace', args)
   const plotID = parseInt(args.plotID)
   const cell = args.inputValue.toUpperCase()
   mzGridHelpers.movePlot(plotID, cell, false)
