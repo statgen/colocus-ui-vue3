@@ -137,7 +137,6 @@ onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
   storeMZpage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
   loadPageData()
-  mzGridHelpers.initializeGridMap()
 })
 
 // *** Event handlers **********************************************************
@@ -245,7 +244,7 @@ const onPlotIconClick = async (args) => {
 const loadPageData = async () => {
   storeMZpage.tableDataLoaded = false
   storeMZpage.colocDataReady = false
-  mzGridHelpers.prepPlotSession()
+  mzGridHelpers.initializePlotSession()
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 

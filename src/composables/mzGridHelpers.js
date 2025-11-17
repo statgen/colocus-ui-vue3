@@ -20,6 +20,7 @@ export function useMZGridHelpers() {
   const addPlot = async ({ cell, colocID, signal, slot, insert }) => {
     const { row, col, isValid } = parseCRReference(cell)
     if(!isValid) return
+    ensureRowsCols(row, col)
     if(insert) {
       pushColumnDown(row, col)
     } else {
@@ -67,7 +68,7 @@ export function useMZGridHelpers() {
       deletePlot(plotID)
       await nextTick()
     }
-    prepPlotSession()
+    initializePlotSession()
   }
 
   const deleteColumn = (col) => {
@@ -193,7 +194,13 @@ export function useMZGridHelpers() {
     return storeMZpage.rowSlotToPlotID?.[colocID]?.[slot] ?? null
   }
 
-  const initializeGridMap = () => {
+  const initializePlotSession = () => {
+    storeMZpage.plotRegistry = {}
+    storeMZpage.rowSlotToPlotID = {}
+    storeMZpage.plotCounter = 1
+    storeMZpage.reusablePlotIDs.length = 0
+    storeMZpage.gridSettings.rows = MZ_GRID_DISPLAY_OPTIONS.defaultRows
+    storeMZpage.gridSettings.cols = MZ_GRID_DISPLAY_OPTIONS.defaultCols
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 
@@ -269,11 +276,13 @@ export function useMZGridHelpers() {
     if(!plotID) return
     const { row, col, isValid } = parseCRReference(cell)
     if(!isValid) return
+
     const oldCell = storeMZpage.plotRegistry[plotID].cell
     storeMZpage.gridMap[oldCell] = 'mock'
 
+    ensureRowsCols(row, col)
+
     if(insert) {
-      ensureRowsCols(row, col)
       pushColumnDown(row, col)
     } else {
       const existingPlotID = storeMZpage.gridMap[cell]
@@ -325,13 +334,6 @@ export function useMZGridHelpers() {
     }
     const [, col, row] = match
     return { col: columnNumber(col), row: parseInt(row), isValid: true }
-  }
-
-  const prepPlotSession = () => {
-    storeMZpage.plotRegistry = {}
-    storeMZpage.rowSlotToPlotID = {}
-    storeMZpage.plotCounter = 1
-    storeMZpage.reusablePlotIDs.length = 0
   }
 
   const hasPlotInRow = (row) => {
@@ -431,7 +433,7 @@ export function useMZGridHelpers() {
     getAllPlots,
     getPlotCell,
     getPlotIDfromRowSlot,
-    initializeGridMap,
+    initializePlotSession,
     insertColumn,
     insertRow,
     moveColumn,
@@ -439,7 +441,6 @@ export function useMZGridHelpers() {
     moveRow,
     parseCell,
     parseCRReference,
-    prepPlotSession,
     renderPlot,
     setPlotRegion,
     setRowSlotPlotID,
