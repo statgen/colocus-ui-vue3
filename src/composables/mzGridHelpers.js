@@ -18,8 +18,9 @@ export function useMZGridHelpers() {
   }
 
   const addPlot = async ({ cell, colocID, signal, slot, insert }) => {
+    const { row, col, isValid } = parseCRReference(cell)
+    if(!isValid) return
     if(insert) {
-      const { row, col } = parseCRReference(cell)
       pushColumnDown(row, col)
     } else {
       const existingPlotID = storeMZpage.gridMap[cell]
@@ -38,7 +39,6 @@ export function useMZGridHelpers() {
     }
   }
 
-  // const cellKey = (row, col) => `${row},${col}`
   const cellKey = (row, col) => {
     return `${columnLabel(col)}${row}`.toUpperCase()
   }
@@ -95,6 +95,7 @@ export function useMZGridHelpers() {
   }
 
   const deletePlot = (plotID) => {
+    if(!plotID || plotID === 'mock') return
     const cell = storeMZpage.plotRegistry[plotID].cell
     storeMZpage.gridMap[cell] = 'mock'
 
@@ -230,6 +231,13 @@ export function useMZGridHelpers() {
     }
   }
 
+  // const isCellRefValid = (cell) => {
+  //   const { row, col } = parseCell(cell)
+  //   if(row > 0 && col > 0) return true
+  //   console.warn('Invalid cell reference', cell)
+  //   return false
+  // }
+
   const moveColumn = (fromCol, toCol) => {
     if (fromCol === toCol) return
 
@@ -257,30 +265,24 @@ export function useMZGridHelpers() {
     }
   }
 
-  const movePlot = (plotID, cell, insert = true) => {
-    const { row, col } = parseCRReference(cell)
-    ensureRowsCols(row, col)
-
-    // Mark the plot's current location as 'mock'
+  const movePlot = ({ plotID, cell, insert }) => {
+    if(!plotID) return
+    const { row, col, isValid } = parseCRReference(cell)
+    if(!isValid) return
     const oldCell = storeMZpage.plotRegistry[plotID].cell
-    if (oldCell) {
-      storeMZpage.gridMap[oldCell] = 'mock'
-    }
+    storeMZpage.gridMap[oldCell] = 'mock'
 
     if(insert) {
+      ensureRowsCols(row, col)
       pushColumnDown(row, col)
     } else {
-      // Delete whatever plot is currently at the target cell
-      const oldPlotID = storeMZpage.gridMap[cell]
-      if (oldPlotID && oldPlotID !== plotID && oldPlotID !== 'mock') {
-        deletePlot(oldPlotID)
-      }
+      const existingPlotID = storeMZpage.gridMap[cell]
+      deletePlot(existingPlotID)
     }
 
     storeMZpage.gridMap[cell] = plotID
     storeMZpage.plotRegistry[plotID].cell = cell
     storeMZpage.plotMoved = !storeMZpage.plotMoved
-    return true
   }
 
   const moveRow = (fromRow, toRow) => {
@@ -319,10 +321,10 @@ export function useMZGridHelpers() {
     const match = cellRef.toUpperCase().match(/^([A-Z]+)(\d+)$/)
     if (!match) {
       console.error(`Invalid cell reference: ${cellRef}`)
-      return
+      return { row: undefined, col: undefined, isValid: false }
     }
     const [, col, row] = match
-    return { col: columnNumber(col), row: parseInt(row) }
+    return { col: columnNumber(col), row: parseInt(row), isValid: true }
   }
 
   const prepPlotSession = () => {

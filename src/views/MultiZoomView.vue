@@ -141,30 +141,18 @@ onMounted(() => {
 })
 
 // *** Event handlers **********************************************************
-const onAddPlotInsert = async (args) => {
-  const cell = args.inputValue.toUpperCase()
-  await mzGridHelpers.addPlot({ cell, colocID: args.colocID, signal: args.signal, slot: args.slot, insert: true })
+const onAddPlotInsert = async ({ colocID, inputValue, signal, slot }) => {
   menuState.value.visible = false
+  if(!inputValue) return
+  const cell = inputValue.toUpperCase()
+  await mzGridHelpers.addPlot({ cell, colocID, signal, slot, insert: true })
 }
 
-const onAddPlotReplace = async (args) => {
-  const cell = args.inputValue.toUpperCase()
-  await mzGridHelpers.addPlot({ cell, colocID: args.colocID, signal: args.signal, slot: args.slot, insert: false })
+const onAddPlotReplace = async ({ colocID, inputValue, insert, signal, slot }) => {
   menuState.value.visible = false
-}
-
-const onMovePlotInsert = (args) => {
-  const plotID = parseInt(args.plotID)
-  const cell = args.inputValue.toUpperCase()
-  mzGridHelpers.movePlot(plotID, cell, true)
-  menuState.value.visible = false
-}
-
-const onMovePlotReplace = (args) => {
-  const plotID = parseInt(args.plotID)
-  const cell = args.inputValue.toUpperCase()
-  mzGridHelpers.movePlot(plotID, cell, false)
-  menuState.value.visible = false
+  if(!inputValue) return
+  const cell = inputValue.toUpperCase()
+  await mzGridHelpers.addPlot({ cell, colocID: colocID, signal, slot, insert: false })
 }
 
 const onCloseMenu = () => {
@@ -202,6 +190,22 @@ const onMockClick = (args) => {
 
 const onMockMenu = (args) => {
   // console.log('mock menu', args.row, args.col, args.event)
+}
+
+const onMovePlotInsert = ({inputValue, plotID }) => {
+  menuState.value.visible = false
+  if(!inputValue || !plotID) return
+  const pid = parseInt(plotID)
+  const cell = inputValue.toUpperCase()
+  mzGridHelpers.movePlot({ plotID: pid, cell, insert: true })
+}
+
+const onMovePlotReplace = ({ inputValue, plotID }) => {
+  menuState.value.visible = false
+  if(!inputValue || !plotID) return
+  const pid = parseInt(plotID)
+  const cell = inputValue.toUpperCase()
+  mzGridHelpers.movePlot({plotID: pid, cell, insert: false })
 }
 
 const onRowClick = (args) => {

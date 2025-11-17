@@ -74,5 +74,5 @@ export const actionMenuConfig = {
 }
 
 export const getMenuItems = (menuType) => {
-  return actionMenuConfig[menuType] || []
+  return actionMenuConfig[menuType]
 }
