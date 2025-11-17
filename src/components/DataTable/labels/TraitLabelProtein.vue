@@ -1,11 +1,11 @@
 <template>
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
-    <span style="font-style: italic" class="text-no-wrap">
+    <span class="text-no-wrap">
       {{ middleTrim(theGene, 6, 6) }}
     </span>
     <template #tooltipContent>
       <div @click.stop>
-        <span style="font-style: italic">{{ theGene }}</span>
+        <span>{{ theGene }}</span>
       </div>
     </template>
   </ToolTippy>

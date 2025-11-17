@@ -63,9 +63,6 @@
     <template #item.signal1.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal1?.analysis?.trait"/></template>
     <template #item.signal1.analysis.analysis_type="{item}">
       {{ item.signal1?.analysis?.analysis_type ?? '' }}
-      <div v-if="item.signal1?.analysis?.trait?.biomarker_type && item.signal1?.analysis?.trait?.biomarker_type !== 'phenotype'">
-        <span>({{ item.signal1?.analysis?.trait?.biomarker_type.replace("-expression", "") }})</span>
-      </div>
     </template>
     <template #item.signal1.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal1?.analysis?.trait ?? ''" /></template>
     <template #item.signal1.analysis.tissue="{item}">{{ item.signal1?.analysis?.tissue ?? '' }}</template>
@@ -73,9 +70,6 @@
     <template #item.signal2.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal2?.analysis?.trait"/></template>
     <template #item.signal2.analysis.analysis_type="{item}">
       {{ item.signal2?.analysis?.analysis_type ?? '' }}
-      <div v-if="item.signal2?.analysis?.trait?.biomarker_type && item.signal2?.analysis?.trait?.biomarker_type !== 'phenotype'">
-        <span>({{ item.signal2?.analysis?.trait?.biomarker_type.replace("-expression", "") }})</span>
-      </div>
     </template>
     <template #item.signal2.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal2?.analysis?.trait ?? ''" /></template>
     <template #item.signal2.analysis.tissue="{item}">{{ item.signal2?.analysis?.tissue ?? '' }}</template>

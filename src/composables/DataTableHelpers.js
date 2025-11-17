@@ -35,7 +35,7 @@ export const useDataTableHelpers = () => {
     { title: 'Add plots', value: 'actions', sortable: false, minWidth: '8rem', visible: () => showAddPlotIcon() },
     { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '7rem', visible: alwaysShow },
     { title: 'ENSG 1', sortable: true, value: 'signal1.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
     { title: 'Tissue 1', sortable: true, value: 'signal1.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
     { title: 'Cell Type 1', sortable: true, value: 'signal1.analysis.cell_type', minWidth: '5rem', visible: () => showCellType.value },

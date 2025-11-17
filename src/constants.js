@@ -5,6 +5,9 @@ const BIOMARKER_TYPES = Object.freeze({
   PHENOTYPE: 'phenotype',
   GENE_EXPRESSION: 'gene-expression',
   EXON_EXPRESSION: 'exon-expression',
+  PROTEIN_EXPRESSION: 'protein-expression',
+  METHYLATION_STATUS: 'methylation-status',
+  METABOLITE_LEVEL: 'metabolite-level',
 })
 
 const COLORS = {
