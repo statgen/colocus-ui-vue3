@@ -22,23 +22,29 @@
         left: `${menuState.xPos}px`
       }"
       :context="menuState.context"
+      @addColumn="onAddColumn"
       @addPlotInsert="onAddPlotInsert"
       @addPlotReplace="onAddPlotReplace"
+      @addRow="onAddRow"
       @closeMenu="onCloseMenu"
       @deleteCell="onDeleteCell"
+      @deleteColumn="onDeleteColumn"
       @deletePlot="onDeletePlot"
+      @deleteRow="onDeleteRow"
       @exportPlot="onExportPlot"
+      @moveColumn="onMoveColumn"
       @movePlotInsert="onMovePlotInsert"
       @movePlotReplace="onMovePlotReplace"
+      @moveRow="onMoveRow"
     />
 
     <MZGrid
-      @click="onNativeClick"
-      @columnClick="onColumnClick"
+      @columnClick="onColumnHeaderClick"
       @columnMenu="onColumnMenu"
       @mockClick="onMockClick"
       @mockMenu="onMockMenu"
-      @rowClick="onRowClick"
+      @click="onNativeClick"
+      @rowClick="onRowHeaderClick"
       @rowMenu="onRowMenu"
     />
 
@@ -140,7 +146,54 @@ onMounted(() => {
   loadPageData()
 })
 
-// *** Event handlers **********************************************************
+// *** Event handlers (grid) ***************************************************
+const onColumnHeaderClick = (args) => {
+  console.log('column click', args.col, args.kind, args.event)
+  showPlotActionMenu({ ...args, menuType: 'column-header' })
+}
+
+const onColumnMenu = (args) => {
+  // console.log('column menu', args.col, args.kind, args.event)
+}
+
+const onMockClick = (args) => {
+  showPlotActionMenu({ ...args, menuType: 'mock-cell' })
+}
+
+const onMockMenu = (args) => {
+  // console.log('mock menu', args.row, args.col, args.event)
+}
+
+const onNativeClick = (event) => {
+  const action = event.target.dataset.action;
+
+  switch(action) {
+    case 'hamburger-menu':
+      const plotID = event.target.dataset.plotId
+      storeMZpage.activePlotID = plotID
+      showPlotActionMenu({plotID, menuType: 'hamburger', event})
+      break;
+    default:
+      console.warn('Unknown click event')
+      break;
+  }
+}
+
+const onRowHeaderClick = (args) => {
+  console.log('row click', args.row, args.kind, args.event)
+  showPlotActionMenu({ ...args, menuType: 'row-header' })
+}
+
+const onRowMenu = (args) => {
+  // console.log('row menu', args.row, args.kind, args.event)
+}
+
+// *** Event handlers (action menu) ********************************************
+const onAddColumn = (args) => {
+  console.log(`onAddColumn: col: ${args.col}`, args)
+  menuState.value.visible = false
+}
+
 const onAddPlotInsert = async ({ colocID, inputValue, signal, slot }) => {
   menuState.value.visible = false
   if(!inputValue) return
@@ -155,21 +208,23 @@ const onAddPlotReplace = async ({ colocID, inputValue, insert, signal, slot }) =
   await mzGridHelpers.addPlot({ cell, colocID: colocID, signal, slot, insert: false })
 }
 
+const onAddRow = (args) => {
+  console.log(`onAddRow: row: ${args.row}`, args)
+  menuState.value.visible = false
+}
+
 const onCloseMenu = () => {
   menuState.value.visible = false
   storeMZpage.activePlotID = null
 }
 
-const onColumnClick = (args) => {
-  console.log('column click', args.col, args.kind, args.event)
-}
-
-const onColumnMenu = (args) => {
-  // console.log('column menu', args.col, args.kind, args.event)
-}
-
 const onDeleteCell = (args) => {
   mzGridHelpers.deleteMockCell(args.row, args.col)
+  menuState.value.visible = false
+}
+
+const onDeleteColumn = (args) => {
+  console.log(`onDeleteColumn: col: ${args.col}`, args)
   menuState.value.visible = false
 }
 
@@ -179,22 +234,20 @@ const onDeletePlot = () => {
   menuState.value.visible = false
 }
 
+const onDeleteRow = (args) => {
+  console.log(`onDeleteRow: row: ${args.row}`, args)
+  menuState.value.visible = false
+}
+
 const onExportPlot = async () => {
   const plotDOMid = `plot_${storeMZpage.activePlotID}`
   await mzGridHelpers.exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
   menuState.value.visible = false
 }
 
-const onExportPlotGroup = async () => {
-  await mzGridHelpers.exportPlotContainer(LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID, 'Colocus_plot_group')
-}
-
-const onMockClick = (args) => {
-  showPlotActionMenu({ ...args, menuType: 'mock-cell' })
-}
-
-const onMockMenu = (args) => {
-  // console.log('mock menu', args.row, args.col, args.event)
+const onMoveColumn = (args) => {
+  console.log(`onMoveColumn: col: ${args.col} to: ${args.inputValue}`, args)
+  menuState.value.visible = false
 }
 
 const onMovePlotInsert = ({inputValue, plotID }) => {
@@ -213,32 +266,20 @@ const onMovePlotReplace = ({ inputValue, plotID }) => {
   mzGridHelpers.movePlot({plotID: pid, cell, insert: false })
 }
 
-const onRowClick = (args) => {
-  console.log('row click', args.row, args.kind, args.event)
+const onMoveRow = (args) => {
+  console.log(`onMoveRow: row: ${args.row} to: ${args.inputValue}`, args)
+  menuState.value.visible = false
 }
 
-const onRowMenu = (args) => {
-  // console.log('row menu', args.row, args.kind, args.event)
+// *** Event handlers (misc) ***************************************************
+
+const onExportPlotGroup = async () => {
+  await mzGridHelpers.exportPlotContainer(LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID, 'Colocus_plot_group')
 }
 
 const onDataTableRowClick = () => {
   loadPageData()
 }
-
-const onNativeClick = (event) => {
-  const action = event.target.dataset.action;
-
-  switch(action) {
-    case 'hamburger-menu':
-      const plotID = event.target.dataset.plotId
-      storeMZpage.activePlotID = plotID
-      showPlotActionMenu({plotID, menuType: 'hamburger', event})
-      break;
-    default:
-      console.warn('Unknown click event')
-      break;
-  }
-};
 
 const onPlotIconClick = async (args) => {
   const plotID = args.plotID

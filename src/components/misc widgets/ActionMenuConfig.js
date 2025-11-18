@@ -48,7 +48,7 @@ export const actionMenuConfig = {
   ],
 
     datatable: [
-    { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
+    { id: 'delete-plot', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
     { id: 'add-plot-insert', type: 'input', label: 'Add plot (insert)', icon: '➕', event: 'add-plot-insert' },
     { id: 'add-plot-replace', type: 'input', label: 'Add plot (replace)', icon: '➕', event: 'add-plot-replace' },
     { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert)', icon: '➤', event: 'move-plot-insert' },
@@ -61,19 +61,16 @@ export const actionMenuConfig = {
 
   // colHeader: deleteCol, moveColTo, insertColBefore, insertColAfter?
   'column-header': [
-    { id: 'sort-asc', type: 'action', label: 'Sort Ascending', icon: '↑', event: 'sort-column', data: 'asc' },
-    { id: 'sort-desc', type: 'action', label: 'Sort Descending', icon: '↓', event: 'sort-column', data: 'desc' },
-    { id: 'divider-1', type: 'divider' },
-    { id: 'hide', type: 'action', label: 'Hide Column', icon: '👁', event: 'hide-column' },
-    { id: 'freeze', type: 'action', label: 'Freeze Column', icon: '📌', event: 'freeze-column' },
+    { id: 'add-column', type: 'action', label: 'Add column', icon: '➕', event: 'add-column' },
+    { id: 'delete-column', type: 'action', label: 'Delete column', icon: '➕', event: 'delete-column' },
+    { id: 'move-column', type: 'input', label: 'Move column', icon: '➕', event: 'move-column' },
   ],
 
   // rowHeader: deleteRow, moveRowTo, insertRowBefore, insertRowAfter?
   'row-header': [
-    { id: 'copy', type: 'action', label: 'Copy Row', icon: '📋', event: 'copy-data' },
-    { id: 'filter', type: 'action', label: 'Filter by Row', icon: '🔍', event: 'filter-data' },
-    { id: 'divider-1', type: 'divider' },
-    { id: 'export', type: 'action', label: 'Export Data', icon: '⬇', event: 'export-plot' },
+    { id: 'add-row', type: 'action', label: 'Add row', icon: '➕', event: 'add-row' },
+    { id: 'delete-row', type: 'action', label: 'Delete row', icon: '➕', event: 'delete-row' },
+    { id: 'move-row', type: 'input', label: 'Move row', icon: '➕', event: 'move-row' },
   ]
 }
 

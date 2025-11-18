@@ -47,18 +47,24 @@ const props = defineProps({
 const inputValues = reactive({})
 
 const emit = defineEmits([
+  'add-column',
   'add-plot-insert',
   'add-plot-replace',
+  'add-row',
   'close-menu',
   'copy-data',
   'delete-cell',
+  'delete-column',
   'delete-plot',
+  'delete-row',
   'export-plot',
   'filter-data',
   'freeze-column',
   'hide-column',
+  'move-column',
   'move-plot-insert',
   'move-plot-replace',
+  'move-row',
   'sort-column',
 ])
 
