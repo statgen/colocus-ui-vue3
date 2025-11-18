@@ -14,8 +14,7 @@
 
     <LZ2Tooltip />
 
-    <ActionMenu
-      v-if="menuState.visible"
+    <ActionMenu v-if="menuState.visible"
       :menu-type="menuState.type"
       :menu-style="{
         position: 'absolute',
@@ -26,6 +25,7 @@
       @addPlotInsert="onAddPlotInsert"
       @addPlotReplace="onAddPlotReplace"
       @closeMenu="onCloseMenu"
+      @deleteCell="onDeleteCell"
       @deletePlot="onDeletePlot"
       @exportPlot="onExportPlot"
       @movePlotInsert="onMovePlotInsert"
@@ -59,11 +59,12 @@
 import { computed, onBeforeUnmount, nextTick, onMounted, provide, ref, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, MZ_GRID_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import router from '@/router'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 import MZGrid from '@/components/misc widgets/MZGrid.vue'
+import ActionMenu from "@/components/misc widgets/ActionMenu.vue";
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
@@ -167,6 +168,11 @@ const onColumnMenu = (args) => {
   // console.log('column menu', args.col, args.kind, args.event)
 }
 
+const onDeleteCell = (args) => {
+  mzGridHelpers.deleteMockCell(args.row, args.col)
+  menuState.value.visible = false
+}
+
 const onDeletePlot = () => {
   const plotID = storeMZpage.activePlotID
   if(plotID) mzGridHelpers.deletePlot(plotID, true)
@@ -184,7 +190,7 @@ const onExportPlotGroup = async () => {
 }
 
 const onMockClick = (args) => {
-  console.log('mock click', args.row, args.col, args.event)
+  showPlotActionMenu({ ...args, menuType: 'mock-cell' })
 }
 
 const onMockMenu = (args) => {
@@ -259,22 +265,22 @@ const scrollBottom = async () => {
 }
 
 const showPlotActionMenu = (args) => {
-  const target = args.event.target
+  const target = args.event.target.closest('.mock-plot, .grid-header, [data-action="hamburger-menu"]') || args.event.target
   const rect = target.getBoundingClientRect()
-  const scrollX = window.scrollX
-  const scrollY = window.scrollY
 
-  const ySpace = 8
-  const menuWidth = 225
-  const xPos = rect.left + scrollX - menuWidth / 2
-  const yPos = rect.bottom + scrollY + ySpace
+  const ySpace = 32
+  const menuWidth = MZ_GRID_DISPLAY_OPTIONS.actionMenuWidth
+  const xPos = rect.left + (rect.width / 2) - (menuWidth / 2)
+  const yPos = args.event.clientY + ySpace
 
   menuState.value = {
     visible: true,
     type: args.menuType,
     context: {
+      col: args.col,
       colocID: args.colocID,
       plotID: args.plotID,
+      row: args.row,
       signal: args.signal,
       slot: args.slot,
     },

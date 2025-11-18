@@ -95,6 +95,23 @@ export function useMZGridHelpers() {
     return true
   }
 
+  const deleteMockCell = (row, col) => {
+    const maxRow = storeMZpage.gridSettings.rows
+
+    for (let r = row; r < maxRow; r++) {
+      const cellFrom = cellKey(r + 1, col)
+      const cellTo = cellKey(r, col)
+      const movedPlotID = storeMZpage.gridMap[cellFrom]
+
+      storeMZpage.gridMap[cellTo] = movedPlotID
+
+      if (movedPlotID && movedPlotID !== 'mock') {
+        storeMZpage.plotRegistry[movedPlotID].cell = cellTo
+      }
+    }
+    storeMZpage.gridMap[cellKey(maxRow, col)] = 'mock'
+  }
+
   const deletePlot = (plotID) => {
     if(!plotID || plotID === 'mock') return
     const cell = storeMZpage.plotRegistry[plotID].cell
@@ -427,6 +444,7 @@ export function useMZGridHelpers() {
     columnNumber,
     deleteAllPlots,
     deleteColumn,
+    deleteMockCell,
     deletePlot,
     deleteRow,
     exportPlotContainer,

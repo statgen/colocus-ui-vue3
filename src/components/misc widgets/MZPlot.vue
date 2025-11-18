@@ -8,8 +8,8 @@
     <div
       v-if="isMock"
       class="mock-plot"
-      @click.stop="onClick"
-      @contextmenu.prevent.stop="onContextMenu"
+      @click.stop="onMockClick"
+      @contextmenu.prevent.stop="onMockContextMenu"
     >
       <div class="mock-content">
         {{ cellLabel }}

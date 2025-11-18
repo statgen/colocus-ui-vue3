@@ -34,8 +34,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, reactive } from 'vue'
+import {computed, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { getMenuItems } from './ActionMenuConfig'
+import { MZ_GRID_DISPLAY_OPTIONS } from '@/constants'
 
 const props = defineProps({
   menuStyle: {},
@@ -50,6 +51,7 @@ const emit = defineEmits([
   'add-plot-replace',
   'close-menu',
   'copy-data',
+  'delete-cell',
   'delete-plot',
   'export-plot',
   'filter-data',
@@ -114,7 +116,7 @@ const onInputBtnClick = (item, value) => {
   padding: 4px 4px 8px 4px;
   min-width: 160px;
   font-size: 0.9rem;
-  width: 300px;
+  width: v-bind(MZ_GRID_DISPLAY_OPTIONS.actionMenuWidth + 'px');
 }
 
 .plot-action-menu ul {

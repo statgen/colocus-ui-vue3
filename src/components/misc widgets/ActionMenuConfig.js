@@ -55,6 +55,10 @@ export const actionMenuConfig = {
     { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace)', icon: '➤', event: 'move-plot-replace' },
   ],
 
+  'mock-cell': [
+    { id: 'delete-cell', type: 'action', label: 'Delete cell, move up', icon: '🗑', event: 'delete-cell' },
+  ],
+
   // colHeader: deleteCol, moveColTo, insertColBefore, insertColAfter?
   'column-header': [
     { id: 'sort-asc', type: 'action', label: 'Sort Ascending', icon: '↑', event: 'sort-column', data: 'asc' },
