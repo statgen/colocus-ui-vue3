@@ -24,6 +24,7 @@
       <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
       <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
       <CtlSwitch :controlSet="controlConfig.showEffects" />
+      <CtlSwitch :controlSet="controlConfig.showOrphans" />
     </FilterPanelSubpanel>
   </v-sheet>
 </template>
@@ -69,7 +70,8 @@ const controlConfig = {
   r2: { title: 'r² ≥', topKey: 'filter', storeKey: 'r2', items: null, emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
   showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false },
-  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false }
+  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false },
+  showOrphans: { title: 'Show single signals', storeKey: 'showOrphans', defaultValue: false },
 }
 
 </script>

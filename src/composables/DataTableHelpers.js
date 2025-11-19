@@ -13,6 +13,7 @@ export const useDataTableHelpers = () => {
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
   const showCellType = ref(false)
+  const showOrphans = ref(false)
 
   const showAddPlotIcon = () => {
     return [locuszoomPage, multizoomPage].includes(appStore.currentPageName)
@@ -25,6 +26,10 @@ export const useDataTableHelpers = () => {
   watch(() => appStore[locuszoomPage].showEffects, newValue => {showEffects.value = newValue})
   watch(() => appStore[manhattanPage].showEffects, newValue => {showEffects.value = newValue})
   watch(() => appStore[searchPage].showEffects, newValue => {showEffects.value = newValue})
+
+  watch(() => appStore[locuszoomPage].showOrphans, newValue => {showOrphans.value = newValue})
+  watch(() => appStore[manhattanPage].showOrphans, newValue => {showOrphans.value = newValue})
+  watch(() => appStore[searchPage].showOrphans, newValue => {showOrphans.value = newValue})
 
   watch(() => appStore.showCellType, newValue => {showCellType.value = newValue}, { immediate: true })
 

@@ -127,8 +127,10 @@ export const useAppStore = defineStore('appStore', {
         if(p?.toString().length > 0) url.searchParams.set(value, p)
       })
 
-      // Always allow orphan signals to be included
-      url.searchParams.set('include_orphans', 1)
+      // Check if orphan signals should be included
+      if (this[parentKey].showOrphans) {
+        url.searchParams.set('include_orphans', 1)
+      }
     },
 
     buildLZdataTableURL(urlPath, signal1, signal2) {
@@ -181,6 +183,7 @@ export const useAppStore = defineStore('appStore', {
       this[parentKey].filters.colorCodeVariants = this[PAGE_NAMES.SEARCH].filters.colorCodeVariants
       this[parentKey].filters.showEnsIDs = this[PAGE_NAMES.SEARCH].filters.showEnsIDs
       this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
+      this[parentKey].filters.showOrphans = this[PAGE_NAMES.SEARCH].filters.showOrphans
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
     },
@@ -293,6 +296,7 @@ function getFilterPanelSettings() {
     colorCodeVariants: true,
     showEnsIDs: false,
     showEffects: false,
+    showOrphans: false,
     filters: {
       // these are actual filters set by the user in the UI
       studies: [],

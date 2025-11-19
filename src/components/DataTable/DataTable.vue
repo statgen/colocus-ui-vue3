@@ -148,6 +148,10 @@ watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
   await loadDataDebounced()
 })
 
+watch(() => appStore[currentPageName.value]?.showOrphans, async () => {
+  await loadDataDebounced()
+})
+
 watch(() => loadTableDataFlag.value, async () => {
   await loadData()
 })
@@ -281,7 +285,10 @@ const loadData = async () => {
   try {
     if ([locuszoomPage, multizoomPage].includes(cpn)) {
       if(!appStore[cpn].colocDataReady) {
-        const colocURL = `${URLS.COLOC_DATA}/${colocID}?include_orphans=1`
+        let colocURL = `${URLS.COLOC_DATA}/${colocID}`
+        if (appStore[cpn].showOrphans) {
+          colocURL += `?include_orphans=1`
+        }
         await loadColocData(cpn, colocURL)
       }
       const signal1 = appStore[cpn].colocData.signal1
