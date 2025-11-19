@@ -63,6 +63,23 @@ watch(() => resetInput.value, () => {
   }
 })
 
+watch(
+  () => {
+    // Same logic as onSliderChangeEnd to get the value from the store
+    if (controlSet.topKey === 'filter') {
+      return appStore[appStore.currentPageName]?.filters?.[controlSet.storeKey]
+    }
+    return appStore[appStore.currentPageName]?.[controlSet.storeKey]
+  },
+  (newValue) => {
+    // Use inputValue (not controlValue) and check for undefined
+    if (newValue !== undefined && newValue !== inputValue.value) {
+      inputValue.value = newValue
+      controlLabel.value = `${controlSet.title} ${newValue}`
+    }
+  }
+)
+
 </script>
 
 <style scoped>

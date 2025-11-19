@@ -149,6 +149,11 @@ watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
 })
 
 watch(() => appStore[currentPageName.value]?.showOrphans, async () => {
+  let showOrphans = appStore[currentPageName.value].showOrphans
+  if (showOrphans) {
+    appStore[currentPageName.value].filters.h4 = 0
+    appStore[currentPageName.value].filters.r2 = 0
+  }
   await loadDataDebounced()
 })
 
