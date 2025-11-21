@@ -57,8 +57,8 @@ const rules = {
  */
 const controlConfig = {
   study: { title: 'Study', storeKey: 'studies', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select study(ies)' },
-  analysisTypes: { title: 'OMICS Types', storeKey: 'analysisTypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select analysis type(s)' },
-  analysisTypePriority: { title: 'OMICS Columns 1/2', storeKey: 'analysisTypePriority', limit: 2, rules: null, emptyValue: null, defaultValue: ['gwas', 'eqtl'], placeholder: 'Select analysis type priority' },
+  analysisTypes: { title: 'Analysis Types', storeKey: 'analysisTypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select analysis type(s)' },
+  analysisTypePriority: { title: 'Analysis Columns', storeKey: 'analysisTypePriority', limit: 2, rules: null, emptyValue: null, defaultValue: ['gwas', 'eqtl'], placeholder: 'Select analysis type columns' },
   gene: { title: 'eQTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
   region: { title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], emptyValue: null, defaultValue: '', placeholder: 'chr:start-end' },
   phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
