@@ -153,6 +153,15 @@ watch(() => appStore[currentPageName.value]?.showOrphans, async () => {
   if (showOrphans) {
     appStore[currentPageName.value].filters.h4 = 0
     appStore[currentPageName.value].filters.r2 = 0
+
+    appStore[locuszoomPage].filters.h4 = 0
+    appStore[locuszoomPage].filters.r2 = 0
+
+    appStore[multizoomPage].filters.h4 = 0
+    appStore[multizoomPage].filters.r2 = 0
+
+    appStore[searchPage].filters.h4 = 0
+    appStore[searchPage].filters.r2 = 0
   }
   await loadDataDebounced()
 })
