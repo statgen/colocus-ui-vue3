@@ -180,10 +180,10 @@ export const useAppStore = defineStore('appStore', {
       for (const [key, value] of Object.entries(this[PAGE_NAMES.SEARCH].filters)) {
         this[parentKey].filters[key] = value
       }
-      this[parentKey].filters.colorCodeVariants = this[PAGE_NAMES.SEARCH].filters.colorCodeVariants
-      this[parentKey].filters.showEnsIDs = this[PAGE_NAMES.SEARCH].filters.showEnsIDs
-      this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
-      this[parentKey].filters.showOrphans = this[PAGE_NAMES.SEARCH].filters.showOrphans
+      this[parentKey].colorCodeVariants = this[PAGE_NAMES.SEARCH].colorCodeVariants
+      this[parentKey].showEnsIDs = this[PAGE_NAMES.SEARCH].showEnsIDs
+      this[parentKey].showEffects = this[PAGE_NAMES.SEARCH].showEffects
+      this[parentKey].showOrphans = this[PAGE_NAMES.SEARCH].showOrphans
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
     },
