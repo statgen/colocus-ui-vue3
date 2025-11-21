@@ -25,7 +25,15 @@ const qcStore = useQCStore()
 
 const genePage = PAGE_NAMES.GENE
 
-const inputValue = ref(controlSet.defaultValue)
+const getStoreValue = () => {
+  if (controlSet.topKey === 'filter') {
+    return appStore[appStore.currentPageName]?.filters?.[controlSet.storeKey]
+  }
+  return appStore[appStore.currentPageName]?.[controlSet.storeKey]
+}
+
+const storeValue = getStoreValue()
+const inputValue = ref(storeValue ?? controlSet.defaultValue)
 const controlLabel = ref(`${controlSet.title} ${inputValue.value}`)
 
 const enabled = computed(() => {
