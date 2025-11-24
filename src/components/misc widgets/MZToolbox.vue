@@ -4,6 +4,7 @@
     <v-btn @click="onBlinkButtonClick" size="small" class="btn-class my-3">Blink all lead variants (5 sec)</v-btn>
     <v-btn @click="onUnmountAllPlots" size="small" class="btn-class my-3">Delete all plots</v-btn>
     <v-btn @click="onExportAllClick" size="small" class="btn-class my-3">Export plot group</v-btn>
+    <v-btn @click="onTrimGrid" size="small" class="btn-class my-3">Trim grid</v-btn>
 
     <p class="mb-n2">{{ zoomSliderLabel }}</p>
     <v-slider
@@ -161,6 +162,10 @@ const onToggleAllRecomb = (val) => {
 const onToggleShowPlotID = (val) => {
   storeMZpage.showPlotID = val
   updateAllPlots('showPlotID', val)
+}
+
+const onTrimGrid = () => {
+  mzGridHelpers.trimGrid()
 }
 
 const onUnmountAllPlots = async () => {

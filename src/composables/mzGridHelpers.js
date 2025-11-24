@@ -232,6 +232,18 @@ export function useMZGridHelpers() {
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 
+  const hasPlotInColumn = (col) => {
+    let hasPlot = false
+    for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
+      const cellInCol = cellKey(r, col)
+      if (storeMZpage.gridMap[cellInCol] && storeMZpage.gridMap[cellInCol] !== MOCK) {
+        hasPlot = true
+        break
+      }
+    }
+    return hasPlot
+  }
+
   const hasPlotInRow = (row) => {
     let hasPlot = false
     for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
@@ -431,6 +443,24 @@ export function useMZGridHelpers() {
     storeMZpage.rowSlotToPlotID[colocID][slot] = plotID
   }
 
+  const trimGrid = () => {
+    for (let r = storeMZpage.gridSettings.rows; r >= 1; r--) {
+      if (!hasPlotInRow(r)) {
+        deleteRow(r)
+      } else {
+        break
+      }
+    }
+
+    for (let c = storeMZpage.gridSettings.cols; c >= 1; c--) {
+      if (!hasPlotInColumn(c)) {
+        deleteColumn(c)
+      } else {
+        break
+      }
+    }
+  }
+
   return {
     addPlot,
     cellKey,
@@ -453,5 +483,6 @@ export function useMZGridHelpers() {
     moveRow,
     parseCRReference,
     setPlotRegion,
+    trimGrid,
   }
 }
