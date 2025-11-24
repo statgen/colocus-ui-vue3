@@ -22,20 +22,22 @@
         left: `${menuState.xPos}px`
       }"
       :context="menuState.context"
-      @addColumn="onAddColumn"
+      @insertColumn="onInsertColumn"
       @addPlotInsert="onAddPlotInsert"
       @addPlotReplace="onAddPlotReplace"
-      @addRow="onAddRow"
+      @insertRow="onInsertRow"
       @closeMenu="onCloseMenu"
       @deleteCell="onDeleteCell"
       @deleteColumn="onDeleteColumn"
       @deletePlot="onDeletePlot"
       @deleteRow="onDeleteRow"
       @exportPlot="onExportPlot"
-      @moveColumn="onMoveColumn"
+      @moveColumnInsert="(payload) => onMoveColumn({...payload, insert: true})"
+      @moveColumnReplace="(payload) => onMoveColumn({...payload, insert: false})"
       @movePlotInsert="onMovePlotInsert"
       @movePlotReplace="onMovePlotReplace"
-      @moveRow="onMoveRow"
+      @moveRowInsert="(payload) => onMoveRow({...payload, insert: true})"
+      @moveRowReplace="(payload) => onMoveRow({...payload, insert: false})"
     />
 
     <MZGrid
@@ -127,8 +129,8 @@ watch(() => storeMZpage.colocDataReady, async (newVal) => {
     storeMZpage.signal1Variant = variant
     mzGridHelpers.setPlotRegion(variant, storeMZpage.zoomRegion)
 
-    await mzGridHelpers.renderPlot({ colocID, signal: signal1, slot: 'slot1', cell: 'A1' })
-    await mzGridHelpers.renderPlot({ colocID, signal: signal2, slot: 'slot2', cell: 'A2' })
+    await mzGridHelpers.addPlot({ cell: 'A1', colocID, signal: signal1, slot: 'slot1' })
+    await mzGridHelpers.addPlot({ cell: 'A2', colocID, signal: signal2, slot: 'slot2' })
     // await scrollBottom()
   }
 })
@@ -148,7 +150,7 @@ onMounted(() => {
 
 // *** Event handlers (grid) ***************************************************
 const onColumnHeaderClick = (args) => {
-  console.log('column click', args.col, args.kind, args.event)
+  // console.log('column click', args.col, args.kind, args.event)
   showPlotActionMenu({ ...args, menuType: 'column-header' })
 }
 
@@ -180,7 +182,6 @@ const onNativeClick = (event) => {
 }
 
 const onRowHeaderClick = (args) => {
-  console.log('row click', args.row, args.kind, args.event)
   showPlotActionMenu({ ...args, menuType: 'row-header' })
 }
 
@@ -189,8 +190,9 @@ const onRowMenu = (args) => {
 }
 
 // *** Event handlers (action menu) ********************************************
-const onAddColumn = (args) => {
-  console.log(`onAddColumn: col: ${args.col}`, args)
+const onInsertColumn = (args) => {
+  const atCol = args.col
+  mzGridHelpers.insertColumn(atCol)
   menuState.value.visible = false
 }
 
@@ -208,8 +210,9 @@ const onAddPlotReplace = async ({ colocID, inputValue, insert, signal, slot }) =
   await mzGridHelpers.addPlot({ cell, colocID: colocID, signal, slot, insert: false })
 }
 
-const onAddRow = (args) => {
-  console.log(`onAddRow: row: ${args.row}`, args)
+const onInsertRow = (args) => {
+  const atRow = args.row
+  mzGridHelpers.insertRow(atRow)
   menuState.value.visible = false
 }
 
@@ -224,7 +227,8 @@ const onDeleteCell = (args) => {
 }
 
 const onDeleteColumn = (args) => {
-  console.log(`onDeleteColumn: col: ${args.col}`, args)
+  const atCol = args.col
+  mzGridHelpers.deleteColumn(atCol)
   menuState.value.visible = false
 }
 
@@ -235,7 +239,8 @@ const onDeletePlot = () => {
 }
 
 const onDeleteRow = (args) => {
-  console.log(`onDeleteRow: row: ${args.row}`, args)
+  const atRow = args.row
+  mzGridHelpers.deleteRow(atRow)
   menuState.value.visible = false
 }
 
@@ -246,33 +251,40 @@ const onExportPlot = async () => {
 }
 
 const onMoveColumn = (args) => {
-  console.log(`onMoveColumn: col: ${args.col} to: ${args.inputValue}`, args)
   menuState.value.visible = false
+  const iv = args.inputValue
+  if(!iv) return
+  const fromCol = args.col
+  const toCol = mzGridHelpers.columnNumber(iv)
+  const insert = args.insert
+  mzGridHelpers.moveColumn(fromCol, toCol, insert)
 }
 
 const onMovePlotInsert = ({inputValue, plotID }) => {
   menuState.value.visible = false
   if(!inputValue || !plotID) return
   const pid = parseInt(plotID)
-  const cell = inputValue.toUpperCase()
-  mzGridHelpers.movePlot({ plotID: pid, cell, insert: true })
+  const toCell = inputValue.toUpperCase()
+  mzGridHelpers.movePlot({ plotID: pid, toCell, insert: true })
 }
 
 const onMovePlotReplace = ({ inputValue, plotID }) => {
   menuState.value.visible = false
   if(!inputValue || !plotID) return
   const pid = parseInt(plotID)
-  const cell = inputValue.toUpperCase()
-  mzGridHelpers.movePlot({plotID: pid, cell, insert: false })
+  const toCell = inputValue.toUpperCase()
+  mzGridHelpers.movePlot({plotID: pid, toCell, insert: false })
 }
 
 const onMoveRow = (args) => {
-  console.log(`onMoveRow: row: ${args.row} to: ${args.inputValue}`, args)
+  const fromRow = args.row
+  const toRow = args.inputValue
+  const insert = args.insert
+  mzGridHelpers.moveRow(fromRow, toRow, insert)
   menuState.value.visible = false
 }
 
 // *** Event handlers (misc) ***************************************************
-
 const onExportPlotGroup = async () => {
   await mzGridHelpers.exportPlotContainer(LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID, 'Colocus_plot_group')
 }

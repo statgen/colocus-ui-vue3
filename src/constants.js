@@ -100,7 +100,7 @@ const LZ2_DISPLAY_OPTIONS = {
 const LDOD = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
 const MZ_GRID_DISPLAY_OPTIONS = {
-  actionMenuWidth: 300,
+  actionMenuWidth: 325,
   defaultCols: 2,
   defaultRows: 4,
   gap: 8,

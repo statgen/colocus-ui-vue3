@@ -15,7 +15,7 @@
 
         <li v-else-if="item.type === 'input'">
           <label>{{ item.icon }} {{ item.label }}
-            <input v-model="inputValues[item.id]" type="text" maxlength="5" size="5" style="background-color: #fbfbfb" class="ml-2"/>
+            <input v-model="inputValues[item.id]" type="text" maxlength="5" size="5" style="background-color: #fbfbfb" class="ml-1 pl-1"/>
             <v-btn
               @click="onInputBtnClick(item, inputValues[item.id])" variant="tonal" size="x-small" class="ml-2 text-clcAction">
               🔘
@@ -47,10 +47,8 @@ const props = defineProps({
 const inputValues = reactive({})
 
 const emit = defineEmits([
-  'add-column',
   'add-plot-insert',
   'add-plot-replace',
-  'add-row',
   'close-menu',
   'copy-data',
   'delete-cell',
@@ -61,10 +59,14 @@ const emit = defineEmits([
   'filter-data',
   'freeze-column',
   'hide-column',
-  'move-column',
+  'insert-column',
+  'insert-row',
+  'move-column-insert',
+  'move-column-replace',
   'move-plot-insert',
   'move-plot-replace',
-  'move-row',
+  'move-row-insert',
+  'move-row-replace',
   'sort-column',
 ])
 

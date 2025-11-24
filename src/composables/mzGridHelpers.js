@@ -8,10 +8,9 @@ export function useMZGridHelpers() {
   const appStore = useAppStore()
   const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 
-  const addColumn = () => {
+  const appendColumn = () => {
     const col = storeMZpage.gridSettings.cols + 1
     storeMZpage.gridSettings.cols = col
-    storeMZpage.gridSettings.rows = Math.max(1, storeMZpage.gridSettings.rows)
     for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
       storeMZpage.gridMap[cellKey(r, col)] = 'mock'
     }
@@ -20,7 +19,7 @@ export function useMZGridHelpers() {
   const addPlot = async ({ cell, colocID, signal, slot, insert }) => {
     const { row, col, isValid } = parseCRReference(cell)
     if(!isValid) return
-    ensureRowsCols(row, col)
+    ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, row), Math.max(storeMZpage.gridSettings.cols, col))
     if(insert) {
       pushColumnDown(row, col)
     } else {
@@ -31,10 +30,9 @@ export function useMZGridHelpers() {
     await renderPlot({ cell, colocID, signal, slot })
   }
 
-  const addRow = () => {
+  const appendRow = () => {
     const newRowNum = storeMZpage.gridSettings.rows + 1
     storeMZpage.gridSettings.rows = newRowNum
-    storeMZpage.gridSettings.cols = Math.max(1, storeMZpage.gridSettings.cols)
     for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
       storeMZpage.gridMap[cellKey(newRowNum, c)] = 'mock'
     }
@@ -72,43 +70,56 @@ export function useMZGridHelpers() {
   }
 
   const deleteColumn = (col) => {
-    if (storeMZpage.gridSettings.cols <= 1) {
-      console.warn('Cannot delete last column')
-      return false
-    }
-
     const maxCol = storeMZpage.gridSettings.cols
 
-    for (let c = col; c < maxCol; c++) {
+    // delete plots in column being removed
+    for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
+      const deleteKey = cellKey(r, col)
+      const plotID = storeMZpage.gridMap[deleteKey]
+      if (plotID && plotID !== 'mock') {
+        deletePlot(plotID)
+      }
+      storeMZpage.gridMap[deleteKey] = 'mock'
+    }
+
+    // shift columns left
+    for (let c = col + 1; c <= maxCol; c++) {
       for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-        const currentKey = cellKey(r, c)
-        const nextKey = cellKey(r, c + 1)
-        storeMZpage.gridMap.value[currentKey] = storeMZpage.gridMap.value[nextKey] || 'mock'
+        const fromCell = cellKey(r, c)
+        const toCell = cellKey(r, c - 1)
+        const plotID = storeMZpage.gridMap[fromCell]
+
+        if (plotID && plotID !== 'mock') {
+          movePlot({ plotID, toCell, insert: false })
+        } else {
+          storeMZpage.gridMap[toCell] = 'mock'
+        }
       }
     }
 
+    // clean up last column
     for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
       delete storeMZpage.gridMap[cellKey(r, maxCol)]
     }
 
     storeMZpage.gridSettings.cols = maxCol - 1
-    return true
   }
 
   const deleteMockCell = (row, col) => {
     const maxRow = storeMZpage.gridSettings.rows
 
-    for (let r = row; r < maxRow; r++) {
-      const cellFrom = cellKey(r + 1, col)
-      const cellTo = cellKey(r, col)
-      const movedPlotID = storeMZpage.gridMap[cellFrom]
+    for (let r = row + 1; r <= maxRow; r++) {
+      const fromCell = cellKey(r, col)
+      const toCell = cellKey(r - 1, col)
+      const plotID = storeMZpage.gridMap[fromCell]
 
-      storeMZpage.gridMap[cellTo] = movedPlotID
-
-      if (movedPlotID && movedPlotID !== 'mock') {
-        storeMZpage.plotRegistry[movedPlotID].cell = cellTo
+      if (plotID && plotID !== 'mock') {
+        movePlot({ plotID, toCell, insert: false })
+      } else {
+        storeMZpage.gridMap[toCell] = 'mock'
       }
     }
+
     storeMZpage.gridMap[cellKey(maxRow, col)] = 'mock'
   }
 
@@ -125,32 +136,46 @@ export function useMZGridHelpers() {
   }
 
   const deleteRow = (row) => {
-    if (storeMZpage.gridSettings.rows <= 1) {
-      console.warn('Cannot delete last row')
-      return false
-    }
-
     const maxRow = storeMZpage.gridSettings.rows
 
-    for (let r = row; r < maxRow; r++) {
+    // delete plots in row being removed
+    for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
+      const deleteKey = cellKey(row, c)
+      const plotID = storeMZpage.gridMap[deleteKey]
+      if (plotID && plotID !== 'mock') {
+        deletePlot(plotID)
+      }
+      storeMZpage.gridMap[deleteKey] = 'mock'
+    }
+
+    // shift rows up
+    for (let r = row + 1; r <= maxRow; r++) {
       for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-        const currentKey = cellKey(r, c)
-        const nextKey = cellKey(r + 1, c)
-        storeMZpage.gridMap[currentKey] = storeMZpage.gridMap[nextKey] || 'mock'
+        const fromCell = cellKey(r, c)
+        const toCell = cellKey(r - 1, c)
+        const plotID = storeMZpage.gridMap[fromCell]
+
+        if (plotID && plotID !== 'mock') {
+          movePlot({ plotID, toCell, insert: false })
+        } else {
+          storeMZpage.gridMap[toCell] = 'mock'
+        }
       }
     }
 
+    // clean up last row
     for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
       delete storeMZpage.gridMap[cellKey(maxRow, c)]
     }
 
     storeMZpage.gridSettings.rows = maxRow - 1
-    return true
   }
 
   const ensureRowsCols = (rows, cols) => {
-    while(storeMZpage.gridSettings.rows < rows) addRow()
-    while(storeMZpage.gridSettings.cols < cols) addColumn()
+    while(storeMZpage.gridSettings.rows < rows) appendRow()
+    while(storeMZpage.gridSettings.cols < cols) appendColumn()
+    while(storeMZpage.gridSettings.rows > rows) deleteRow(storeMZpage.gridSettings.rows)
+    while(storeMZpage.gridSettings.cols > cols) deleteColumn(storeMZpage.gridSettings.cols)
   }
 
   const exportPlotContainer = async (elID, fileName) => {
@@ -216,8 +241,6 @@ export function useMZGridHelpers() {
     storeMZpage.rowSlotToPlotID = {}
     storeMZpage.plotCounter = 1
     storeMZpage.reusablePlotIDs.length = 0
-    storeMZpage.gridSettings.rows = MZ_GRID_DISPLAY_OPTIONS.defaultRows
-    storeMZpage.gridSettings.cols = MZ_GRID_DISPLAY_OPTIONS.defaultCols
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 
@@ -229,7 +252,13 @@ export function useMZGridHelpers() {
       for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
         const oldKey = cellKey(r, c)
         const newKey = cellKey(r, c + 1)
-        storeMZpage.gridMap[newKey] = storeMZpage.gridMap[oldKey]
+        const plotID = storeMZpage.gridMap[oldKey]
+
+        storeMZpage.gridMap[newKey] = plotID
+
+        if (plotID && plotID !== 'mock' && storeMZpage.plotRegistry[plotID]) {
+          storeMZpage.plotRegistry[plotID].cell = newKey
+        }
       }
     }
 
@@ -246,7 +275,13 @@ export function useMZGridHelpers() {
       for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
         const oldKey = cellKey(r, c)
         const newKey = cellKey(r + 1, c)
-        storeMZpage.gridMap[newKey] = storeMZpage.gridMap[oldKey]
+        const plotID = storeMZpage.gridMap[oldKey]
+
+        storeMZpage.gridMap[newKey] = plotID
+
+        if (plotID && plotID !== 'mock' && storeMZpage.plotRegistry[plotID]) {
+          storeMZpage.plotRegistry[plotID].cell = newKey
+        }
       }
     }
 
@@ -255,86 +290,71 @@ export function useMZGridHelpers() {
     }
   }
 
-  // const isCellRefValid = (cell) => {
-  //   const { row, col } = parseCell(cell)
-  //   if(row > 0 && col > 0) return true
-  //   console.warn('Invalid cell reference', cell)
-  //   return false
-  // }
-
-  const moveColumn = (fromCol, toCol) => {
+  const moveColumn = (fromCol, toCol, insert) => {
     if (fromCol === toCol) return
+    let adjustedFromCol = fromCol
 
-    const tempCol = {}
-    for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-      tempCol[r] = storeMZpage.gridMap[cellKey(r, fromCol)]
-    }
+    if(insert) {
+      insertColumn(toCol)
 
-    if (fromCol < toCol) {
-      for (let c = fromCol; c < toCol; c++) {
-        for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-          storeMZpage.gridMap[cellKey(r, c)] = storeMZpage.gridMap[cellKey(r, c + 1)]
-        }
-      }
-    } else {
-      for (let c = fromCol; c > toCol; c--) {
-        for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-          storeMZpage.gridMap[cellKey(r, c)] = storeMZpage.gridMap[cellKey(r, c - 1)]
-        }
+      // After inserting at toCol, if fromCol >= toCol, the fromCol data has shifted right by 1
+      if (fromCol >= toCol) {
+        adjustedFromCol += 1
       }
     }
 
-    for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-      storeMZpage.gridMap[cellKey(r, toCol)] = tempCol[r]
+    for (let row = 1; row <= storeMZpage.gridSettings.rows; row++) {
+      const fromCell = cellKey(row, adjustedFromCol)
+      const toCell = cellKey(row, toCol)
+      const plotID = storeMZpage.gridMap[fromCell]
+      if(plotID !== 'mock') movePlot({ plotID, toCell, insert: false})
     }
   }
 
-  const movePlot = ({ plotID, cell, insert }) => {
+  const movePlot = ({ plotID, toCell, insert }) => {
     if(!plotID) return
-    const { row, col, isValid } = parseCRReference(cell)
-    if(!isValid) return
+    const { row, col, isValid } = parseCRReference(toCell)
+    if(!isValid) {
+      console.warn(`movePlot: Invalid cell reference: ${toCell}`)
+      return
+    }
 
-    const oldCell = storeMZpage.plotRegistry[plotID].cell
-    storeMZpage.gridMap[oldCell] = 'mock'
+    const fromCell = storeMZpage.plotRegistry[plotID].cell
+    storeMZpage.gridMap[fromCell] = 'mock'
 
-    ensureRowsCols(row, col)
+    ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, row), Math.max(storeMZpage.gridSettings.cols, col))
 
     if(insert) {
       pushColumnDown(row, col)
     } else {
-      const existingPlotID = storeMZpage.gridMap[cell]
+      const existingPlotID = storeMZpage.gridMap[toCell]
       deletePlot(existingPlotID)
     }
 
-    storeMZpage.gridMap[cell] = plotID
-    storeMZpage.plotRegistry[plotID].cell = cell
+    storeMZpage.gridMap[toCell] = plotID
+    storeMZpage.plotRegistry[plotID].cell = toCell
+    // await nextTick()
     storeMZpage.plotMoved = !storeMZpage.plotMoved
   }
 
-  const moveRow = (fromRow, toRow) => {
+  const moveRow = (fromRow, toRow, insert) => {
     if (fromRow === toRow) return
+    let adjustedFromRow = fromRow
 
-    const tempRow = {}
-    for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-      tempRow[c] = storeMZpage.gridMap[cellKey(fromRow, c)]
-    }
+    if(insert) {
+      insertRow(toRow)
 
-    if (fromRow < toRow) {
-      for (let r = fromRow; r < toRow; r++) {
-        for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-          storeMZpage.gridMap[cellKey(r, c)] = storeMZpage.gridMap[cellKey(r + 1, c)]
-        }
-      }
-    } else {
-      for (let r = fromRow; r > toRow; r--) {
-        for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-          storeMZpage.gridMap[cellKey(r, c)] = storeMZpage.gridMap[cellKey(r - 1, c)]
-        }
+      // After inserting at toRow, if fromRow >= toRow, the fromRow data has shifted down by 1
+      if (fromRow >= toRow) {
+        adjustedFromRow += 1
       }
     }
 
-    for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-      storeMZpage.gridMap[cellKey(toRow, c)] = tempRow[c]
+    for (let col = 1; col <= storeMZpage.gridSettings.cols; col++) {
+      const fromCell = cellKey(adjustedFromRow, col)
+      const toCell = cellKey(toRow, col)
+      const plotID = storeMZpage.gridMap[fromCell]
+      if(plotID !== 'mock') movePlot({ plotID, toCell, insert: false})
     }
   }
 
@@ -368,7 +388,7 @@ export function useMZGridHelpers() {
   const pushColumnDown = (row, col) => {
     const maxRow = storeMZpage.gridSettings.rows
     if(hasPlotInRow(maxRow)) {
-      addRow()
+      appendRow()
     }
 
     for (let r = storeMZpage.gridSettings.rows; r > row; r--) {
@@ -385,10 +405,9 @@ export function useMZGridHelpers() {
     storeMZpage.gridMap[cellKey(row, col)] = 'mock'
   }
 
-  const renderPlot = async (args) => {
-    const { cell, colocID, signal, slot } = args
+  const renderPlot = async ({ cell, colocID, signal, slot }) => {
     const { row, col } = parseCRReference(cell)
-    ensureRowsCols(row, col)
+    // ensureRowsCols(row, col)
     const signalID = signal.uuid
 
     if (storeMZpage.addUniqueRefsOnly) {
@@ -400,14 +419,14 @@ export function useMZGridHelpers() {
     const variant = signal.lead_variant.vid
 
     storeMZpage.plotRegistry[plotID] = {
-      cell: args.cell,
-      colocID: colocID,
+      cell,
+      colocID,
       showGenSigLine: storeMZpage.showGenSigLines,
       showPlotID: storeMZpage.showPlotID,
       showRecombLine: storeMZpage.showRecombLines,
-      signal: signal,
+      signal,
       signalID,
-      slot: slot,
+      slot,
       variant,
     }
 
@@ -436,9 +455,7 @@ export function useMZGridHelpers() {
   }
 
   return {
-    addColumn,
     addPlot,
-    addRow,
     cellKey,
     columnLabel,
     columnNumber,
@@ -457,9 +474,7 @@ export function useMZGridHelpers() {
     moveColumn,
     movePlot,
     moveRow,
-    parseCell,
     parseCRReference,
-    renderPlot,
     setPlotRegion,
     setRowSlotPlotID,
     swapCells,

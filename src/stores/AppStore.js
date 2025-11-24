@@ -74,8 +74,8 @@ export const useAppStore = defineStore('appStore', {
       isExporting: false,
       gridMap: {},
       gridSettings: {
-        cols: 0, //MZ_GRID_DISPLAY_OPTIONS.defaultCols,
-        rows: 0, //MZ_GRID_DISPLAY_OPTIONS.defaultRows,
+        cols: 0,
+        rows: 0,
         gap: MZ_GRID_DISPLAY_OPTIONS.gap,
         cellWidth: MZ_GRID_DISPLAY_OPTIONS.cellWidth,
         cellHeight: MZ_GRID_DISPLAY_OPTIONS.cellHeight,
