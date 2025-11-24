@@ -87,6 +87,23 @@ export const actionMenuConfig = {
   ]
 }
 
+export const getActionMenuEventNames = () => {
+  const events = new Set()
+
+  Object.values(actionMenuConfig).forEach(menuItems => {
+    menuItems.forEach(item => {
+      if (item.event) {
+        events.add(item.event)
+      }
+    })
+  })
+
+  // add 'close-menu' manually since it's used in checkbox setters
+  events.add('close-menu')
+
+  return Array.from(events).sort()
+}
+
 export const getMenuItems = (menuType) => {
   return actionMenuConfig[menuType]
 }

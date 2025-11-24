@@ -35,7 +35,7 @@
 
 <script setup>
 import {computed, onMounted, nextTick, onBeforeUnmount, reactive, ref } from 'vue'
-import { getMenuItems } from './ActionMenuConfig'
+import { getActionMenuEventNames, getMenuItems } from './ActionMenuConfig'
 import { MZ_GRID_DISPLAY_OPTIONS } from '@/constants'
 
 const props = defineProps({
@@ -47,32 +47,7 @@ const props = defineProps({
 const inputValues = reactive({})
 const menuRef = ref(null)
 
-const emit = defineEmits([
-  'add-plot-insert',
-  'add-plot-replace',
-  'append-column',
-  'append-row',
-  'close-menu',
-  'copy-data',
-  'delete-cell',
-  'delete-column',
-  'delete-plot',
-  'delete-row',
-  'export-plot',
-  'filter-data',
-  'freeze-column',
-  'hide-column',
-  'insert-column',
-  'insert-mock-cell',
-  'insert-row',
-  'move-column-insert',
-  'move-column-replace',
-  'move-plot-insert',
-  'move-plot-replace',
-  'move-row-insert',
-  'move-row-replace',
-  'sort-column',
-])
+const emit = defineEmits(getActionMenuEventNames())
 
 const visibleMenuItems = computed(() => {
   return getMenuItems(props.menuType)
