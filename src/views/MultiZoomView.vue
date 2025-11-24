@@ -8,7 +8,7 @@
       <MZToolbox @export-plot-group="onExportPlotGroup"/>
     </template>
 
-    <h1><BackButton />Multizoom</h1>
+    <h1><BackButton />Multizoom  <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
 
     <BusyOverlay :show="isExporting" />
 
@@ -108,6 +108,9 @@ appStore.isToolboxShowing = true
 
 // *** Computed ****************************************************************
 const isExporting = computed(() => storeMZpage.isExporting)
+const pageRows = computed(() => storeMZpage.gridSettings.rows)
+const pageCols = computed(() => storeMZpage.gridSettings.cols)
+
 
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
@@ -362,4 +365,7 @@ const showPlotActionMenu = (args) => {
   overflow-x: auto;
 }
 
+.rc-text {
+  font-size: 1rem;
+}
 </style>
