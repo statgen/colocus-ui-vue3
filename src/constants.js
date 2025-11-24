@@ -101,13 +101,14 @@ const LDOD = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
 const MZ_GRID_DISPLAY_OPTIONS = {
   actionMenuWidth: 325,
+  cellHeight: LDOD.height,
+  cellWidth: LDOD.width,
   defaultCols: 2,
   defaultRows: 4,
   gap: 8,
   headerRowHeight: 24,
   headerColWidth: 24,
-  cellHeight: LDOD.height,
-  cellWidth: LDOD.width,
+  mockCell: 'mock',
 }
 
 LDOD.plotHeight = LDOD.height

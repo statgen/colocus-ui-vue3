@@ -7,12 +7,13 @@ import { parseVariant2 } from '@/util/util'
 export function useMZGridHelpers() {
   const appStore = useAppStore()
   const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
+  const MOCK = MZ_GRID_DISPLAY_OPTIONS.mockCell
 
   const appendColumn = () => {
     const col = storeMZpage.gridSettings.cols + 1
     storeMZpage.gridSettings.cols = col
     for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-      storeMZpage.gridMap[cellKey(r, col)] = 'mock'
+      storeMZpage.gridMap[cellKey(r, col)] = MOCK
     }
   }
 
@@ -24,7 +25,7 @@ export function useMZGridHelpers() {
       pushColumnDown(row, col)
     } else {
       const existingPlotID = storeMZpage.gridMap[cell]
-      if (existingPlotID !== 'mock') deletePlot(existingPlotID)
+      if (existingPlotID !== MOCK) deletePlot(existingPlotID)
       await nextTick()
     }
     await renderPlot({ cell, colocID, signal, slot })
@@ -34,7 +35,7 @@ export function useMZGridHelpers() {
     const newRowNum = storeMZpage.gridSettings.rows + 1
     storeMZpage.gridSettings.rows = newRowNum
     for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-      storeMZpage.gridMap[cellKey(newRowNum, c)] = 'mock'
+      storeMZpage.gridMap[cellKey(newRowNum, c)] = MOCK
     }
   }
 
@@ -76,10 +77,10 @@ export function useMZGridHelpers() {
     for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
       const deleteKey = cellKey(r, col)
       const plotID = storeMZpage.gridMap[deleteKey]
-      if (plotID && plotID !== 'mock') {
+      if (plotID && plotID !== MOCK) {
         deletePlot(plotID)
       }
-      storeMZpage.gridMap[deleteKey] = 'mock'
+      storeMZpage.gridMap[deleteKey] = MOCK
     }
 
     // shift columns left
@@ -89,10 +90,10 @@ export function useMZGridHelpers() {
         const toCell = cellKey(r, c - 1)
         const plotID = storeMZpage.gridMap[fromCell]
 
-        if (plotID && plotID !== 'mock') {
+        if (plotID && plotID !== MOCK) {
           movePlot({ plotID, toCell, insert: false })
         } else {
-          storeMZpage.gridMap[toCell] = 'mock'
+          storeMZpage.gridMap[toCell] = MOCK
         }
       }
     }
@@ -113,25 +114,25 @@ export function useMZGridHelpers() {
       const toCell = cellKey(r - 1, col)
       const plotID = storeMZpage.gridMap[fromCell]
 
-      if (plotID && plotID !== 'mock') {
+      if (plotID && plotID !== MOCK) {
         movePlot({ plotID, toCell, insert: false })
       } else {
-        storeMZpage.gridMap[toCell] = 'mock'
+        storeMZpage.gridMap[toCell] = MOCK
       }
     }
 
-    storeMZpage.gridMap[cellKey(maxRow, col)] = 'mock'
+    storeMZpage.gridMap[cellKey(maxRow, col)] = MOCK
   }
 
   const deletePlot = (plotID) => {
-    if(!plotID || plotID === 'mock') return
-    const cell = storeMZpage.plotRegistry[plotID].cell
-    storeMZpage.gridMap[cell] = 'mock'
+    if(!plotID || plotID === MOCK) return
+    const cell = getPlotCell(plotID)
+    storeMZpage.gridMap[cell] = MOCK
 
     const slot = storeMZpage.plotRegistry[plotID].slot
     const colocID = storeMZpage.plotRegistry[plotID].colocID
     storeMZpage.reusablePlotIDs.push(plotID)
-    setRowSlotPlotID(colocID, slot, 'mock')
+    setRowSlotPlotID(colocID, slot, MOCK)
     delete storeMZpage.plotRegistry[plotID]
   }
 
@@ -142,10 +143,10 @@ export function useMZGridHelpers() {
     for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
       const deleteKey = cellKey(row, c)
       const plotID = storeMZpage.gridMap[deleteKey]
-      if (plotID && plotID !== 'mock') {
+      if (plotID && plotID !== MOCK) {
         deletePlot(plotID)
       }
-      storeMZpage.gridMap[deleteKey] = 'mock'
+      storeMZpage.gridMap[deleteKey] = MOCK
     }
 
     // shift rows up
@@ -155,10 +156,10 @@ export function useMZGridHelpers() {
         const toCell = cellKey(r - 1, c)
         const plotID = storeMZpage.gridMap[fromCell]
 
-        if (plotID && plotID !== 'mock') {
+        if (plotID && plotID !== MOCK) {
           movePlot({ plotID, toCell, insert: false })
         } else {
-          storeMZpage.gridMap[toCell] = 'mock'
+          storeMZpage.gridMap[toCell] = MOCK
         }
       }
     }
@@ -215,21 +216,8 @@ export function useMZGridHelpers() {
     }, 0)
   }
 
-  const getAllPlots = computed(() => {
-    const plots = []
-    if (!storeMZpage.gridMap) return plots
-
-    for (const [key, val] of Object.entries(storeMZpage.gridMap)) {
-      if (val !== 'mock') {
-        const { row, col } = parseCell(key)
-        plots.push({ plotID: val, row, col, key })
-      }
-    }
-    return plots
-  })
-
   const getPlotCell = (plotID) => {
-    return storeMZpage.plotRegistry[plotID].cell
+    return storeMZpage.plotRegistry[plotID].cell || undefined
   }
 
   const getPlotIDfromRowSlot = (colocID, slot) => {
@@ -244,6 +232,18 @@ export function useMZGridHelpers() {
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 
+  const hasPlotInRow = (row) => {
+    let hasPlot = false
+    for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
+      const cellInLastRow = cellKey(row, c)
+      if (storeMZpage.gridMap[cellInLastRow] && storeMZpage.gridMap[cellInLastRow] !== MOCK) {
+        hasPlot = true
+        break
+      }
+    }
+    return hasPlot
+  }
+
   const insertColumn = (atCol) => {
     const maxCol = storeMZpage.gridSettings.cols
     storeMZpage.gridSettings.cols = maxCol + 1
@@ -256,14 +256,14 @@ export function useMZGridHelpers() {
 
         storeMZpage.gridMap[newKey] = plotID
 
-        if (plotID && plotID !== 'mock' && storeMZpage.plotRegistry[plotID]) {
+        if (plotID && plotID !== MOCK && storeMZpage.plotRegistry[plotID]) {
           storeMZpage.plotRegistry[plotID].cell = newKey
         }
       }
     }
 
     for (let r = 1; r <= storeMZpage.gridSettings.rows; r++) {
-      storeMZpage.gridMap[cellKey(r, atCol)] = 'mock'
+      storeMZpage.gridMap[cellKey(r, atCol)] = MOCK
     }
   }
 
@@ -283,14 +283,14 @@ export function useMZGridHelpers() {
 
         storeMZpage.gridMap[newKey] = plotID
 
-        if (plotID && plotID !== 'mock' && storeMZpage.plotRegistry[plotID]) {
+        if (plotID && plotID !== MOCK && storeMZpage.plotRegistry[plotID]) {
           storeMZpage.plotRegistry[plotID].cell = newKey
         }
       }
     }
 
     for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-      storeMZpage.gridMap[cellKey(atRow, c)] = 'mock'
+      storeMZpage.gridMap[cellKey(atRow, c)] = MOCK
     }
   }
 
@@ -311,7 +311,7 @@ export function useMZGridHelpers() {
       const fromCell = cellKey(row, adjustedFromCol)
       const toCell = cellKey(row, toCol)
       const plotID = storeMZpage.gridMap[fromCell]
-      if(plotID !== 'mock') movePlot({ plotID, toCell, insert: false})
+      if(plotID !== MOCK) movePlot({ plotID, toCell, insert: false})
     }
   }
 
@@ -323,8 +323,8 @@ export function useMZGridHelpers() {
       return
     }
 
-    const fromCell = storeMZpage.plotRegistry[plotID].cell
-    storeMZpage.gridMap[fromCell] = 'mock'
+    const fromCell = getPlotCell(plotID)
+    storeMZpage.gridMap[fromCell] = MOCK
 
     ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, row), Math.max(storeMZpage.gridSettings.cols, col))
 
@@ -358,13 +358,8 @@ export function useMZGridHelpers() {
       const fromCell = cellKey(adjustedFromRow, col)
       const toCell = cellKey(toRow, col)
       const plotID = storeMZpage.gridMap[fromCell]
-      if(plotID !== 'mock') movePlot({ plotID, toCell, insert: false})
+      if(plotID !== MOCK) movePlot({ plotID, toCell, insert: false})
     }
-  }
-
-  const parseCell = (cellKey) => {
-    const [row, col] = cellKey.split(',').map(Number)
-    return { row, col }
   }
 
   const parseCRReference = (cellRef) => {
@@ -375,18 +370,6 @@ export function useMZGridHelpers() {
     }
     const [, col, row] = match
     return { col: columnNumber(col), row: parseInt(row), isValid: true }
-  }
-
-  const hasPlotInRow = (row) => {
-    let hasPlot = false
-    for (let c = 1; c <= storeMZpage.gridSettings.cols; c++) {
-      const cellInLastRow = cellKey(row, c)
-      if (storeMZpage.gridMap[cellInLastRow] && storeMZpage.gridMap[cellInLastRow] !== 'mock') {
-        hasPlot = true
-        break
-      }
-    }
-    return hasPlot
   }
 
   const pushColumnDown = (row, col) => {
@@ -402,16 +385,14 @@ export function useMZGridHelpers() {
 
       storeMZpage.gridMap[cellTo] = movedPlotID
 
-      if (movedPlotID && movedPlotID !== 'mock') {
+      if (movedPlotID && movedPlotID !== MOCK) {
         storeMZpage.plotRegistry[movedPlotID].cell = cellTo
       }
     }
-    storeMZpage.gridMap[cellKey(row, col)] = 'mock'
+    storeMZpage.gridMap[cellKey(row, col)] = MOCK
   }
 
   const renderPlot = async ({ cell, colocID, signal, slot }) => {
-    const { row, col } = parseCRReference(cell)
-    // ensureRowsCols(row, col)
     const signalID = signal.uuid
 
     if (storeMZpage.addUniqueRefsOnly) {
@@ -450,14 +431,6 @@ export function useMZGridHelpers() {
     storeMZpage.rowSlotToPlotID[colocID][slot] = plotID
   }
 
-  const swapCells = (row1, col1, row2, col2) => {
-    const key1 = cellKey(row1, col1)
-    const key2 = cellKey(row2, col2)
-    const temp = storeMZpage.gridMap[key1]
-    storeMZpage.gridMap[key1] = storeMZpage.gridMap[key2]
-    storeMZpage.gridMap[key2] = temp
-  }
-
   return {
     addPlot,
     cellKey,
@@ -469,7 +442,6 @@ export function useMZGridHelpers() {
     deletePlot,
     deleteRow,
     exportPlotContainer,
-    getAllPlots,
     getPlotCell,
     getPlotIDfromRowSlot,
     initializePlotSession,
@@ -481,7 +453,5 @@ export function useMZGridHelpers() {
     moveRow,
     parseCRReference,
     setPlotRegion,
-    setRowSlotPlotID,
-    swapCells,
   }
 }

@@ -53,11 +53,12 @@ import { useAppStore } from '@/stores/AppStore'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 import { PAGE_NAMES } from '@/constants'
 import MZPlot from '@/components/misc widgets/MZPlot.vue'
-import { LZ2_DISPLAY_OPTIONS } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, MZ_GRID_DISPLAY_OPTIONS } from '@/constants'
 
 const appStore = useAppStore()
 const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 const mzGridHelpers = useMZGridHelpers()
+const MOCK = MZ_GRID_DISPLAY_OPTIONS.mockCell
 
 const containerID = LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID
 
@@ -67,13 +68,13 @@ const gridCells = computed(() => {
   const cells = []
   for (let r = 1; r <= gridSettings.value.rows; r++) {
     for (let c = 1; c <= gridSettings.value.cols; c++) {
-      const cell = mzGridHelpers.cellKey(r,c)// `${r},${c}`
-      const plotID = storeMZpage.gridMap[cell] // gridMapRef.value?.[cell]
+      const cell = mzGridHelpers.cellKey(r,c)
+      const plotID = storeMZpage.gridMap[cell]
       cells.push({
         row: r,
         col: c,
-        key: plotID === 'mock' ? `cell-${cell}` : plotID,
-        plotID: plotID === 'mock' ? null : plotID
+        key: plotID === MOCK ? `cell-${cell}` : plotID,
+        plotID: plotID === MOCK ? null : plotID
       })
     }
   }

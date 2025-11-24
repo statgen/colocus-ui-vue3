@@ -23,8 +23,8 @@
       }"
       :context="menuState.context"
       @insertColumn="onInsertColumn"
-      @addPlotInsert="onAddPlotInsert"
-      @addPlotReplace="onAddPlotReplace"
+      @addPlotInsert="(payload) => onAddPlot({...payload, insert: true})"
+      @addPlotReplace="(payload) => onAddPlot({...payload, insert: false})"
       @insertRow="onInsertRow"
       @closeMenu="onCloseMenu"
       @deleteCell="onDeleteCell"
@@ -35,8 +35,8 @@
       @insertMockCell="(payload) => onInsertMockCell(payload)"
       @moveColumnInsert="(payload) => onMoveColumn({...payload, insert: true})"
       @moveColumnReplace="(payload) => onMoveColumn({...payload, insert: false})"
-      @movePlotInsert="onMovePlotInsert"
-      @movePlotReplace="onMovePlotReplace"
+      @movePlotInsert="(payload) => onMovePlot({...payload, insert: true})"
+      @movePlotReplace="(payload) => onMovePlot({...payload, insert: false})"
       @moveRowInsert="(payload) => onMoveRow({...payload, insert: true})"
       @moveRowReplace="(payload) => onMoveRow({...payload, insert: false})"
     />
@@ -200,18 +200,11 @@ const onInsertColumn = (args) => {
   menuState.value.visible = false
 }
 
-const onAddPlotInsert = async ({ colocID, inputValue, signal, slot }) => {
+const onAddPlot = async ({ colocID, inputValue, insert, signal, slot }) => {
   menuState.value.visible = false
   if(!inputValue) return
   const cell = inputValue.toUpperCase()
-  await mzGridHelpers.addPlot({ cell, colocID, signal, slot, insert: true })
-}
-
-const onAddPlotReplace = async ({ colocID, inputValue, insert, signal, slot }) => {
-  menuState.value.visible = false
-  if(!inputValue) return
-  const cell = inputValue.toUpperCase()
-  await mzGridHelpers.addPlot({ cell, colocID: colocID, signal, slot, insert: false })
+  await mzGridHelpers.addPlot({ cell, colocID, insert, signal, slot })
 }
 
 const onInsertRow = (args) => {
@@ -257,7 +250,7 @@ const onExportPlot = async () => {
 const onInsertMockCell = (args) => {
   menuState.value.visible = false
   if(args.plotID) { // user clicked hamburger menu
-    const cell = storeMZpage.plotRegistry[args.plotID].cell
+    const cell = mzGridHelpers.getPlotCell(args.plotID)// storeMZpage.plotRegistry[args.plotID].cell
     const { col, row } = mzGridHelpers.parseCRReference(cell)
     mzGridHelpers.insertMockCell(row, col)
   } else if(args.row && args.col) { // user clicked empty/mock cell
@@ -275,20 +268,12 @@ const onMoveColumn = (args) => {
   mzGridHelpers.moveColumn(fromCol, toCol, insert)
 }
 
-const onMovePlotInsert = ({inputValue, plotID }) => {
+const onMovePlot = ({ inputValue, insert, plotID }) => {
   menuState.value.visible = false
   if(!inputValue || !plotID) return
   const pid = parseInt(plotID)
   const toCell = inputValue.toUpperCase()
-  mzGridHelpers.movePlot({ plotID: pid, toCell, insert: true })
-}
-
-const onMovePlotReplace = ({ inputValue, plotID }) => {
-  menuState.value.visible = false
-  if(!inputValue || !plotID) return
-  const pid = parseInt(plotID)
-  const toCell = inputValue.toUpperCase()
-  mzGridHelpers.movePlot({plotID: pid, toCell, insert: false })
+  mzGridHelpers.movePlot({ insert, plotID: pid, toCell})
 }
 
 const onMoveRow = (args) => {
