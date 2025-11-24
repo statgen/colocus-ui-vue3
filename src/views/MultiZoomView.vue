@@ -22,9 +22,10 @@
         left: `${menuState.xPos}px`
       }"
       :context="menuState.context"
-      @insertColumn="onInsertColumn"
       @addPlotInsert="(payload) => onAddPlot({...payload, insert: true})"
       @addPlotReplace="(payload) => onAddPlot({...payload, insert: false})"
+      @appendColumn="onAppendColumn"
+      @appendRow="onAppendRow"
       @insertRow="onInsertRow"
       @closeMenu="onCloseMenu"
       @deleteCell="onDeleteCell"
@@ -32,6 +33,7 @@
       @deletePlot="onDeletePlot"
       @deleteRow="onDeleteRow"
       @exportPlot="onExportPlot"
+      @insertColumn="onInsertColumn"
       @insertMockCell="(payload) => onInsertMockCell(payload)"
       @moveColumnInsert="(payload) => onMoveColumn({...payload, insert: true})"
       @moveColumnReplace="(payload) => onMoveColumn({...payload, insert: false})"
@@ -194,10 +196,14 @@ const onRowMenu = (args) => {
 }
 
 // *** Event handlers (action menu) ********************************************
-const onInsertColumn = (args) => {
-  const atCol = args.col
-  mzGridHelpers.insertColumn(atCol)
+const onAppendColumn = () => {
   menuState.value.visible = false
+  mzGridHelpers.appendColumn()
+}
+
+const onAppendRow = () => {
+  menuState.value.visible = false
+  mzGridHelpers.appendRow()
 }
 
 const onAddPlot = async ({ colocID, inputValue, insert, signal, slot }) => {
@@ -244,6 +250,12 @@ const onDeleteRow = (args) => {
 const onExportPlot = async () => {
   const plotDOMid = `plot_${storeMZpage.activePlotID}`
   await mzGridHelpers.exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
+  menuState.value.visible = false
+}
+
+const onInsertColumn = (args) => {
+  const atCol = args.col
+  mzGridHelpers.insertColumn(atCol)
   menuState.value.visible = false
 }
 

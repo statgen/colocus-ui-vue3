@@ -67,6 +67,7 @@ export const actionMenuConfig = {
   ],
 
   'column-header': [
+    { id: 'append-column', type: 'action', label: 'Append column to end', icon: '➕', event: 'append-column' },
     { id: 'insert-column', type: 'action', label: 'Insert column before', icon: '➕', event: 'insert-column' },
     { id: 'divider', type: 'divider', },
     { id: 'move-column-insert', type: 'input', label: 'Move column (insert) to', icon: '➤', event: 'move-column-insert' },
@@ -76,6 +77,7 @@ export const actionMenuConfig = {
   ],
 
   'row-header': [
+    { id: 'append-row', type: 'action', label: 'Append row to end', icon: '➕', event: 'append-row' },
     { id: 'insert-row', type: 'action', label: 'Insert row before', icon: '➕', event: 'insert-row' },
     { id: 'divider', type: 'divider', },
     { id: 'move-row-insert', type: 'input', label: 'Move row (insert) to', icon: '➤', event: 'move-row-insert' },

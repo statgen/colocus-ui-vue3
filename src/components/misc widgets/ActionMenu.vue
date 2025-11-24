@@ -50,6 +50,8 @@ const menuRef = ref(null)
 const emit = defineEmits([
   'add-plot-insert',
   'add-plot-replace',
+  'append-column',
+  'append-row',
   'close-menu',
   'copy-data',
   'delete-cell',

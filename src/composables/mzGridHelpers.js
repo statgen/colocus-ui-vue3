@@ -463,6 +463,8 @@ export function useMZGridHelpers() {
 
   return {
     addPlot,
+    appendColumn,
+    appendRow,
     cellKey,
     columnLabel,
     columnNumber,
