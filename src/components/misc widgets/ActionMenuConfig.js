@@ -41,6 +41,8 @@ export const actionMenuConfig = {
       }
     },
     { id: 'divider', type: 'divider', },
+    { id: 'insert-mock-cell', type: 'action', label: 'Insert empty cell before', icon: '➕', event: 'insert-mock-cell' },
+    { id: 'divider', type: 'divider', },
     { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert) to', icon: '➤', event: 'move-plot-insert' },
     { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace) to', icon: '➤', event: 'move-plot-replace' },
     { id: 'divider', type: 'divider', },
@@ -59,6 +61,8 @@ export const actionMenuConfig = {
   ],
 
   'mock-cell': [
+    { id: 'insert-mock-cell', type: 'action', label: 'Insert empty cell before', icon: '➕', event: 'insert-mock-cell' },
+    { id: 'divider', type: 'divider', },
     { id: 'delete-cell', type: 'action', label: 'Delete cell, move lower cells up', icon: '🗑', event: 'delete-cell' },
   ],
 

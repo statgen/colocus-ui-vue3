@@ -267,6 +267,10 @@ export function useMZGridHelpers() {
     }
   }
 
+  const insertMockCell = (row, col) => {
+    pushColumnDown(row, col)
+  }
+
   const insertRow = (atRow) => {
     const maxRow = storeMZpage.gridSettings.rows
     storeMZpage.gridSettings.rows = maxRow + 1
@@ -470,6 +474,7 @@ export function useMZGridHelpers() {
     getPlotIDfromRowSlot,
     initializePlotSession,
     insertColumn,
+    insertMockCell,
     insertRow,
     moveColumn,
     movePlot,

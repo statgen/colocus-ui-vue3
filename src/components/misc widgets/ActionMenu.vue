@@ -61,6 +61,7 @@ const emit = defineEmits([
   'freeze-column',
   'hide-column',
   'insert-column',
+  'insert-mock-cell',
   'insert-row',
   'move-column-insert',
   'move-column-replace',

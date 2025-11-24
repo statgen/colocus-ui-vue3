@@ -32,6 +32,7 @@
       @deletePlot="onDeletePlot"
       @deleteRow="onDeleteRow"
       @exportPlot="onExportPlot"
+      @insertMockCell="(payload) => onInsertMockCell(payload)"
       @moveColumnInsert="(payload) => onMoveColumn({...payload, insert: true})"
       @moveColumnReplace="(payload) => onMoveColumn({...payload, insert: false})"
       @movePlotInsert="onMovePlotInsert"
@@ -248,6 +249,17 @@ const onExportPlot = async () => {
   const plotDOMid = `plot_${storeMZpage.activePlotID}`
   await mzGridHelpers.exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
   menuState.value.visible = false
+}
+
+const onInsertMockCell = (args) => {
+  menuState.value.visible = false
+  if(args.plotID) { // user clicked hamburger menu
+    const cell = storeMZpage.plotRegistry[args.plotID].cell
+    const { col, row } = mzGridHelpers.parseCRReference(cell)
+    mzGridHelpers.insertMockCell(row, col)
+  } else if(args.row && args.col) { // user clicked empty/mock cell
+    mzGridHelpers.insertMockCell(args.row, args.col)
+  }
 }
 
 const onMoveColumn = (args) => {
