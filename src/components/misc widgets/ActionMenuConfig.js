@@ -40,12 +40,12 @@ export const actionMenuConfig = {
         }
       }
     },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider1', type: 'divider', },
     { id: 'insert-mock-cell', type: 'action', label: 'Insert empty cell before', icon: '➕', event: 'insert-mock-cell' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider2', type: 'divider', },
     { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert) to', icon: '➤', event: 'move-plot-insert' },
     { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace) to', icon: '➤', event: 'move-plot-replace' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider3', type: 'divider', },
     { id: 'export', type: 'action', label: 'Export PNG', icon: '⬇', event: 'export-plot' },
     { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
   ],
@@ -53,10 +53,10 @@ export const actionMenuConfig = {
     datatable: [
     { id: 'add-plot-insert', type: 'input', label: 'Add plot (insert) to', icon: '➕', event: 'add-plot-insert' },
     { id: 'add-plot-replace', type: 'input', label: 'Add plot (replace) to', icon: '➕', event: 'add-plot-replace' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider1', type: 'divider', },
     { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert) to', icon: '➤', event: 'move-plot-insert' },
     { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace) to', icon: '➤', event: 'move-plot-replace' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider2', type: 'divider', },
     { id: 'delete-plot', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
   ],
 
@@ -69,20 +69,20 @@ export const actionMenuConfig = {
   'column-header': [
     { id: 'append-column', type: 'action', label: 'Append column to end', icon: '➕', event: 'append-column' },
     { id: 'insert-column', type: 'action', label: 'Insert column before', icon: '➕', event: 'insert-column' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider1', type: 'divider', },
     { id: 'move-column-insert', type: 'input', label: 'Move column (insert) to', icon: '➤', event: 'move-column-insert' },
     { id: 'move-column-replace', type: 'input', label: 'Move column (replace) to', icon: '➤', event: 'move-column-replace' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider2', type: 'divider', },
     { id: 'delete-column', type: 'action', label: 'Delete column', icon: '🗑', event: 'delete-column' },
   ],
 
   'row-header': [
     { id: 'append-row', type: 'action', label: 'Append row to end', icon: '➕', event: 'append-row' },
     { id: 'insert-row', type: 'action', label: 'Insert row before', icon: '➕', event: 'insert-row' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider1', type: 'divider', },
     { id: 'move-row-insert', type: 'input', label: 'Move row (insert) to', icon: '➤', event: 'move-row-insert' },
     { id: 'move-row-replace', type: 'input', label: 'Move row (replace) to', icon: '➤', event: 'move-row-replace' },
-    { id: 'divider', type: 'divider', },
+    { id: 'divider2', type: 'divider', },
     { id: 'delete-row', type: 'action', label: 'Delete row', icon: '🗑', event: 'delete-row' },
   ]
 }
