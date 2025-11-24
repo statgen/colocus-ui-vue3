@@ -1,5 +1,5 @@
 <template>
-  <div class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
+  <div ref="menuRef" class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
     <ul>
       <template v-for="item in visibleMenuItems" :key="item.id">
         <li v-if="item.type === 'checkbox'">
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onBeforeUnmount, reactive } from 'vue'
+import {computed, onMounted, nextTick, onBeforeUnmount, reactive, ref } from 'vue'
 import { getMenuItems } from './ActionMenuConfig'
 import { MZ_GRID_DISPLAY_OPTIONS } from '@/constants'
 
@@ -45,6 +45,7 @@ const props = defineProps({
 })
 
 const inputValues = reactive({})
+const menuRef = ref(null)
 
 const emit = defineEmits([
   'add-plot-insert',
@@ -87,6 +88,7 @@ const handleAction = (item) => {
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
+  ensureMenuVisible()
 })
 
 onBeforeUnmount(() => {
@@ -109,6 +111,48 @@ const onInputBtnClick = (item, value) => {
     ...props.context,
     inputValue: value,
     itemId: item.id
+  })
+}
+
+const ensureMenuVisible = () => {
+  if (!menuRef.value) return
+
+  nextTick(() => {
+    const menuRect = menuRef.value.getBoundingClientRect()
+    const padding = 10 // Extra padding from viewport edges
+
+    // Calculate how much to scroll
+    let scrollX = 0
+    let scrollY = 0
+
+    // Check if menu extends beyond right edge
+    if (menuRect.right > window.innerWidth - padding) {
+      scrollX = menuRect.right - window.innerWidth + padding
+    }
+
+    // Check if menu extends beyond left edge (shouldn't happen but just in case)
+    if (menuRect.left < padding) {
+      scrollX = menuRect.left - padding
+    }
+
+    // Check if menu extends beyond bottom edge
+    if (menuRect.bottom > window.innerHeight - padding) {
+      scrollY = menuRect.bottom - window.innerHeight + padding
+    }
+
+    // Check if menu extends beyond top edge (shouldn't happen but just in case)
+    if (menuRect.top < padding) {
+      scrollY = menuRect.top - padding
+    }
+
+    // Scroll if needed
+    if (scrollX !== 0 || scrollY !== 0) {
+      window.scrollBy({
+        left: scrollX,
+        top: scrollY,
+        behavior: 'smooth'
+      })
+    }
   })
 }
 
