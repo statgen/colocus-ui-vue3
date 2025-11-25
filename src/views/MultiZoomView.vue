@@ -336,7 +336,7 @@ const showPlotActionMenu = (args) => {
   const ySpace = 32
   const menuWidth = MZ_GRID_DISPLAY_OPTIONS.actionMenuWidth
   const xPos = rect.left + (rect.width / 2) - (menuWidth / 2)
-  const yPos = args.event.clientY + ySpace
+  const yPos = args.event.clientY + window.scrollY + ySpace
 
   menuState.value = {
     visible: true,
