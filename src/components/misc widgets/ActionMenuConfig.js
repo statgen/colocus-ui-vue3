@@ -98,7 +98,7 @@ export const getActionMenuEventNames = () => {
     })
   })
 
-  // add 'close-menu' manually since it's used in checkbox setters
+  // add 'close-menu' manually (used in checkbox setters)
   events.add('close-menu')
 
   return Array.from(events).sort()

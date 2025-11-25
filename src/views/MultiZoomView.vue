@@ -156,7 +156,6 @@ onMounted(() => {
 
 // *** Event handlers (grid) ***************************************************
 const onColumnHeaderClick = (args) => {
-  // console.log('column click', args.col, args.kind, args.event)
   showPlotActionMenu({ ...args, menuType: 'column-header' })
 }
 
@@ -262,7 +261,7 @@ const onInsertColumn = (args) => {
 const onInsertMockCell = (args) => {
   menuState.value.visible = false
   if(args.plotID) { // user clicked hamburger menu
-    const cell = mzGridHelpers.getPlotCell(args.plotID)// storeMZpage.plotRegistry[args.plotID].cell
+    const cell = mzGridHelpers.getPlotCell(args.plotID)
     const { col, row } = mzGridHelpers.parseCRReference(cell)
     mzGridHelpers.insertMockCell(row, col)
   } else if(args.row && args.col) { // user clicked empty/mock cell

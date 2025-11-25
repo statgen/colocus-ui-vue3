@@ -1,26 +1,9 @@
 <template>
-  <div
-    :id="cellID"
-    class="plot-cell"
-    :style="{ gridRow: row + 1, gridColumn: col + 1 }"
-    :data-cell="cellKey"
-  >
-    <div
-      v-if="isMock"
-      class="mock-plot"
-      @click.stop="onMockClick"
-      @contextmenu.prevent.stop="onMockContextMenu"
-    >
-      <div class="mock-content">
-        {{ cellLabel }}
-      </div>
+  <div :id="cellID" class="plot-cell" :style="{ gridRow: row + 1, gridColumn: col + 1 }" :data-cell="cellKey">
+    <div v-if="isMock" class="mock-plot" @click.stop="onMockClick" @contextmenu.prevent.stop="onMockContextMenu">
+      <div class="mock-content">{{ cellLabel }}</div>
     </div>
-
-    <component
-      v-else-if="plotConfig"
-      :is="LZ2RegionPlot"
-      v-bind="plotProps"
-    />
+    <component v-else-if="plotConfig" :is="LZ2RegionPlot" v-bind="plotProps"/>
   </div>
 </template>
 
