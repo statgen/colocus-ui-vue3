@@ -5,7 +5,7 @@
     </template>
 
     <template #toolbox>
-      <MZToolbox @export-plot-group="onExportPlotGroup"/>
+      <MZToolbox @export-plot-group="mzGridEventHandlers.onExportPlotGroup"/>
     </template>
 
     <h1><BackButton />Multizoom  <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
@@ -22,35 +22,35 @@
         left: `${menuState.xPos}px`
       }"
       :context="menuState.context"
-      @addPlotInsert="(payload) => onAddPlot({...payload, insert: true})"
-      @addPlotReplace="(payload) => onAddPlot({...payload, insert: false})"
-      @appendColumn="onAppendColumn"
-      @appendRow="onAppendRow"
-      @insertRow="onInsertRow"
-      @closeMenu="onCloseMenu"
-      @deleteCell="onDeleteCell"
-      @deleteColumn="onDeleteColumn"
-      @deletePlot="onDeletePlot"
-      @deleteRow="onDeleteRow"
-      @exportPlot="onExportPlot"
-      @insertColumn="onInsertColumn"
-      @insertMockCell="(payload) => onInsertMockCell(payload)"
-      @moveColumnInsert="(payload) => onMoveColumn({...payload, insert: true})"
-      @moveColumnReplace="(payload) => onMoveColumn({...payload, insert: false})"
-      @movePlotInsert="(payload) => onMovePlot({...payload, insert: true})"
-      @movePlotReplace="(payload) => onMovePlot({...payload, insert: false})"
-      @moveRowInsert="(payload) => onMoveRow({...payload, insert: true})"
-      @moveRowReplace="(payload) => onMoveRow({...payload, insert: false})"
+      @addPlotInsert="(payload) => mzGridEventHandlers.onAddPlot({...payload, insert: true})"
+      @addPlotReplace="(payload) => mzGridEventHandlers.onAddPlot({...payload, insert: false})"
+      @appendColumn="mzGridEventHandlers.onAppendColumn"
+      @appendRow="mzGridEventHandlers.onAppendRow"
+      @insertRow="mzGridEventHandlers.onInsertRow"
+      @closeMenu="mzGridEventHandlers.onCloseMenu"
+      @deleteCell="mzGridEventHandlers.onDeleteCell"
+      @deleteColumn="mzGridEventHandlers.onDeleteColumn"
+      @deletePlot="mzGridEventHandlers.onDeletePlot"
+      @deleteRow="mzGridEventHandlers.onDeleteRow"
+      @exportPlot="mzGridEventHandlers.onExportPlot"
+      @insertColumn="mzGridEventHandlers.onInsertColumn"
+      @insertMockCell="(payload) => mzGridEventHandlers.onInsertMockCell(payload)"
+      @moveColumnInsert="(payload) => mzGridEventHandlers.onMoveColumn({...payload, insert: true})"
+      @moveColumnReplace="(payload) => mzGridEventHandlers.onMoveColumn({...payload, insert: false})"
+      @movePlotInsert="(payload) => mzGridEventHandlers.onMovePlot({...payload, insert: true})"
+      @movePlotReplace="(payload) => mzGridEventHandlers.onMovePlot({...payload, insert: false})"
+      @moveRowInsert="(payload) => mzGridEventHandlers.onMoveRow({...payload, insert: true})"
+      @moveRowReplace="(payload) => mzGridEventHandlers.onMoveRow({...payload, insert: false})"
     />
 
     <MZGrid
-      @columnClick="onColumnHeaderClick"
-      @columnMenu="onColumnMenu"
-      @mockClick="onMockClick"
-      @mockMenu="onMockMenu"
-      @click="onNativeClick"
-      @rowClick="onRowHeaderClick"
-      @rowMenu="onRowMenu"
+      @columnClick="mzGridEventHandlers.onColumnHeaderClick"
+      @columnMenu="mzGridEventHandlers.onColumnMenu"
+      @mockClick="mzGridEventHandlers.onMockClick"
+      @mockMenu="mzGridEventHandlers.onMockMenu"
+      @click="mzGridEventHandlers.onNativeClick"
+      @rowClick="mzGridEventHandlers.onRowHeaderClick"
+      @rowMenu="mzGridEventHandlers.onRowMenu"
     />
 
     <h2 class="mt-4">Data table</h2>
@@ -58,7 +58,7 @@
     <div class="table-container mb-8">
       <DataTable
         @onDataTableRowClick="onDataTableRowClick"
-        @onPlotIconClick="onPlotIconClick"
+        @onPlotIconClick="mzGridEventHandlers.onPlotIconClick"
       ></DataTable>
     </div>
     <div id="page-bottom-sentinel" aria-hidden="true" style="height:1px;"></div>
@@ -74,25 +74,21 @@ import { LZ2_DISPLAY_OPTIONS, MZ_GRID_DISPLAY_OPTIONS, PAGE_NAMES } from '@/cons
 import DataTable from "@/components/DataTable/DataTable.vue"
 import router from '@/router'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
+import { useMZGridEventHandlers } from '@/composables/mzEventHandlers'
 import MZGrid from '@/components/misc widgets/MZGrid.vue'
 import ActionMenu from "@/components/misc widgets/ActionMenu.vue";
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
 const mzGridHelpers = useMZGridHelpers()
+const mzGridEventHandlers = useMZGridEventHandlers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
 
-const menuState = ref({
-  visible: false,
-  type: 'hamburger',
-  context: {},
-  xPos: 0,
-  yPos: 0,
-})
+const menuState = mzGridEventHandlers.menuState
 
 const multizoomPage = PAGE_NAMES.MULTIZOOM
 const storeMZpage = appStore[multizoomPage]
@@ -112,7 +108,6 @@ appStore.isToolboxShowing = true
 const isExporting = computed(() => storeMZpage.isExporting)
 const pageRows = computed(() => storeMZpage.gridSettings.rows)
 const pageCols = computed(() => storeMZpage.gridSettings.cols)
-
 
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
@@ -154,160 +149,10 @@ onMounted(() => {
   loadPageData()
 })
 
-// *** Event handlers (grid) ***************************************************
-const onColumnHeaderClick = (args) => {
-  showPlotActionMenu({ ...args, menuType: 'column-header' })
-}
 
-const onColumnMenu = (args) => {
-  // console.log('column menu', args.col, args.kind, args.event)
-}
-
-const onMockClick = (args) => {
-  showPlotActionMenu({ ...args, menuType: 'mock-cell' })
-}
-
-const onMockMenu = (args) => {
-  // console.log('mock menu', args.row, args.col, args.event)
-}
-
-const onNativeClick = (event) => {
-  const action = event.target.dataset.action;
-
-  switch(action) {
-    case 'hamburger-menu':
-      const plotID = event.target.dataset.plotId
-      storeMZpage.activePlotID = plotID
-      showPlotActionMenu({plotID, menuType: 'hamburger', event})
-      break;
-    default:
-      console.warn('Unknown click event')
-      break;
-  }
-}
-
-const onRowHeaderClick = (args) => {
-  showPlotActionMenu({ ...args, menuType: 'row-header' })
-}
-
-const onRowMenu = (args) => {
-  // console.log('row menu', args.row, args.kind, args.event)
-}
-
-// *** Event handlers (action menu) ********************************************
-const onAppendColumn = () => {
-  menuState.value.visible = false
-  mzGridHelpers.appendColumn()
-}
-
-const onAppendRow = () => {
-  menuState.value.visible = false
-  mzGridHelpers.appendRow()
-}
-
-const onAddPlot = async ({ colocID, inputValue, insert, signal, slot }) => {
-  menuState.value.visible = false
-  if(!inputValue) return
-  const cell = inputValue.toUpperCase()
-  await mzGridHelpers.addPlot({ cell, colocID, insert, signal, slot })
-}
-
-const onInsertRow = (args) => {
-  const atRow = args.row
-  mzGridHelpers.insertRow(atRow)
-  menuState.value.visible = false
-}
-
-const onCloseMenu = () => {
-  menuState.value.visible = false
-  storeMZpage.activePlotID = null
-}
-
-const onDeleteCell = (args) => {
-  mzGridHelpers.deleteMockCell(args.row, args.col)
-  menuState.value.visible = false
-}
-
-const onDeleteColumn = (args) => {
-  const atCol = args.col
-  mzGridHelpers.deleteColumn(atCol)
-  menuState.value.visible = false
-}
-
-const onDeletePlot = () => {
-  const plotID = storeMZpage.activePlotID
-  if(plotID) mzGridHelpers.deletePlot(plotID, true)
-  menuState.value.visible = false
-}
-
-const onDeleteRow = (args) => {
-  const atRow = args.row
-  mzGridHelpers.deleteRow(atRow)
-  menuState.value.visible = false
-}
-
-const onExportPlot = async () => {
-  const plotDOMid = `plot_${storeMZpage.activePlotID}`
-  await mzGridHelpers.exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
-  menuState.value.visible = false
-}
-
-const onInsertColumn = (args) => {
-  const atCol = args.col
-  mzGridHelpers.insertColumn(atCol)
-  menuState.value.visible = false
-}
-
-const onInsertMockCell = (args) => {
-  menuState.value.visible = false
-  if(args.plotID) { // user clicked hamburger menu
-    const cell = mzGridHelpers.getPlotCell(args.plotID)
-    const { col, row } = mzGridHelpers.parseCRReference(cell)
-    mzGridHelpers.insertMockCell(row, col)
-  } else if(args.row && args.col) { // user clicked empty/mock cell
-    mzGridHelpers.insertMockCell(args.row, args.col)
-  }
-}
-
-const onMoveColumn = (args) => {
-  menuState.value.visible = false
-  const iv = args.inputValue
-  if(!iv) return
-  const fromCol = args.col
-  const toCol = mzGridHelpers.columnNumber(iv)
-  const insert = args.insert
-  mzGridHelpers.moveColumn(fromCol, toCol, insert)
-}
-
-const onMovePlot = ({ inputValue, insert, plotID }) => {
-  menuState.value.visible = false
-  if(!inputValue || !plotID) return
-  const pid = parseInt(plotID)
-  const toCell = inputValue.toUpperCase()
-  mzGridHelpers.movePlot({ insert, plotID: pid, toCell})
-}
-
-const onMoveRow = (args) => {
-  const fromRow = args.row
-  const toRow = args.inputValue
-  const insert = args.insert
-  mzGridHelpers.moveRow(fromRow, toRow, insert)
-  menuState.value.visible = false
-}
-
-// *** Event handlers (misc) ***************************************************
-const onExportPlotGroup = async () => {
-  await mzGridHelpers.exportPlotContainer(LZ2_DISPLAY_OPTIONS.PLOTS_CONTAINER_ID, 'Colocus_plot_group')
-}
-
+// *** Event handlers **********************************************************
 const onDataTableRowClick = () => {
   loadPageData()
-}
-
-const onPlotIconClick = async (args) => {
-  const plotID = args.plotID
-  storeMZpage.activePlotID = plotID
-  showPlotActionMenu({ ...args, menuType: 'datatable' })
 }
 
 // *** Utility functions *******************************************************
@@ -326,31 +171,6 @@ const scrollBottom = async () => {
   setTimeout(() => {
     document.getElementById('page-bottom-sentinel')?.scrollIntoView({ behavior: 'auto', block: 'end' })
   }, 250)
-}
-
-const showPlotActionMenu = (args) => {
-  const target = args.event.target.closest('.mock-plot, .grid-header, [data-action="hamburger-menu"]') || args.event.target
-  const rect = target.getBoundingClientRect()
-
-  const ySpace = 32
-  const menuWidth = MZ_GRID_DISPLAY_OPTIONS.actionMenuWidth
-  const xPos = rect.left + (rect.width / 2) - (menuWidth / 2)
-  const yPos = args.event.clientY + window.scrollY + ySpace
-
-  menuState.value = {
-    visible: true,
-    type: args.menuType,
-    context: {
-      col: args.col,
-      colocID: args.colocID,
-      plotID: args.plotID,
-      row: args.row,
-      signal: args.signal,
-      slot: args.slot,
-    },
-    xPos: xPos,
-    yPos: yPos,
-  }
 }
 
 // *** Configuration data ******************************************************
