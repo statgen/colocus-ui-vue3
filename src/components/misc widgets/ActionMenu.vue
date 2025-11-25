@@ -15,7 +15,15 @@
 
         <li v-else-if="item.type === 'input'">
           <label>{{ item.icon }} {{ item.label }}
-            <input v-model="inputValues[item.id]" type="text" maxlength="5" size="5" style="background-color: #fbfbfb" class="ml-1 pl-1"/>
+            <input
+              v-model="inputValues[item.id]"
+              type="text"
+              maxlength="5"
+              size="5"
+              style="background-color: #fbfbfb"
+              class="ml-1 pl-1 menu-input"
+              @keydown.enter="onInputBtnClick(item, inputValues[item.id])"
+            />
             <v-btn
               @click="onInputBtnClick(item, inputValues[item.id])" variant="tonal" size="x-small" class="ml-2 text-clcAction">
               🔘
@@ -175,5 +183,11 @@ const ensureMenuVisible = () => {
 
 .plot-action-menu input[type="checkbox"] {
   pointer-events: auto;
+}
+
+.plot-action-menu input.menu-input:focus {
+  outline: none;
+  border: 2px solid rgba(var(--v-theme-clcAction), 0.8);
+  background-color: #ffffff;
 }
 </style>
