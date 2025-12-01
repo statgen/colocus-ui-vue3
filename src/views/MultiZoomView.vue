@@ -27,7 +27,7 @@
       @appendColumn="mzGridEventHandlers.onAppendColumn"
       @appendRow="mzGridEventHandlers.onAppendRow"
       @insertRow="mzGridEventHandlers.onInsertRow"
-      @closeMenu="mzGridEventHandlers.onCloseMenu"
+      @closeMenu="onCloseMenu"
       @deleteCell="mzGridEventHandlers.onDeleteCell"
       @deleteColumn="mzGridEventHandlers.onDeleteColumn"
       @deletePlot="mzGridEventHandlers.onDeletePlot"
@@ -151,6 +151,11 @@ onMounted(() => {
 
 
 // *** Event handlers **********************************************************
+const onCloseMenu = () => {
+  menuState.value.visible = false
+  storeMZpage.activePlotID = null
+}
+
 const onDataTableRowClick = () => {
   loadPageData()
 }
