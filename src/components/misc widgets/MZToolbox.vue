@@ -57,13 +57,13 @@
       density="compact"
       class="my-n7"
       color="clcAction"/>
-    <v-switch
-      label="Show plot IDs"
-      v-model="showPlotID"
-      @update:model-value="onToggleShowPlotID"
-      density="compact"
-      class="my-n7"
-      color="clcAction"/>
+<!--    <v-switch-->
+<!--      label="Show plot IDs"-->
+<!--      v-model="showPlotID"-->
+<!--      @update:model-value="onToggleShowPlotID"-->
+<!--      density="compact"-->
+<!--      class="my-n7"-->
+<!--      color="clcAction"/>-->
     <v-select
       v-model="storeMZpage.selectedTheme"
       :items="themes"
@@ -97,7 +97,7 @@ const BLINK_TIME = 5
 const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 const showAllGenSig = ref(true)
 const showAllRecomb = ref(true)
-const showPlotID = ref(true)
+const showPlotID = ref(false)
 const themes = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)
 const yAxis = ref(LZ2_DISPLAY_OPTIONS.DEFAULT_Y_AXIS)
 const zoomSlider = ref(PLOT_REGION_DEFAULT)

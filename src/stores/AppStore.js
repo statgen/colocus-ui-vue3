@@ -93,7 +93,7 @@ export const useAppStore = defineStore('appStore', {
       selectedLDRef: '',
       selectedTheme: '',
       showGenSigLines: true,
-      showPlotID: true,
+      showPlotID: false,
       showRecombLines: true,
       signal1Variant: '',
       tableDataLoaded: false,
