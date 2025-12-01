@@ -136,7 +136,6 @@ export function useMZGridHelpers() {
 
     const slot = storeMZpage.plotRegistry[plotID]?.slot
     const colocID = storeMZpage.plotRegistry[plotID]?.colocID
-    storeMZpage.reusablePlotIDs.push(plotID)
     setRowSlotPlotID(colocID, slot, MOCK)
     delete storeMZpage.plotRegistry[plotID]
   }
@@ -233,7 +232,6 @@ export function useMZGridHelpers() {
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
     storeMZpage.plotCounter = 1
-    storeMZpage.reusablePlotIDs.length = 0
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 

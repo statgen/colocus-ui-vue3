@@ -88,7 +88,6 @@ export const useAppStore = defineStore('appStore', {
       plotMoved: false,
       plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode
       regionPanelRemoved: false,
-      reusablePlotIDs: [],
       rowSlotToPlotID: {},
       selectedLDRef: '',
       selectedTheme: '',
@@ -199,13 +198,7 @@ export const useAppStore = defineStore('appStore', {
 
     getNextPlotID () {
       const mzPage = this[PAGE_NAMES.MULTIZOOM]
-      if(mzPage.reusablePlotIDs.length > 0){
-        const pid = Math.min(...mzPage.reusablePlotIDs)
-        mzPage.reusablePlotIDs.splice(mzPage.reusablePlotIDs.indexOf(pid), 1)
-        return pid
-      } else {
-        return mzPage.plotCounter++
-      }
+      return mzPage.plotCounter++
     },
 
     async loadFilterData() {
