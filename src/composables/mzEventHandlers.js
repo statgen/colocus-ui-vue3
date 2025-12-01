@@ -106,11 +106,6 @@ export function useMZGridEventHandlers() {
     mzGridHelpers.insertRow(atRow)
   }
 
-  const onCloseMenu = () => {
-    menuState.value.visible = false
-    storeMZpage.activePlotID = null
-  }
-
   const onDeleteCell = (args) => {
     menuState.value.visible = false
     mzGridHelpers.deleteMockCell(args.row, args.col)
@@ -208,7 +203,6 @@ export function useMZGridEventHandlers() {
     onAppendRow,
     onAddPlot,
     onInsertRow,
-    onCloseMenu,
     onDeleteCell,
     onDeleteColumn,
     onDeletePlot,

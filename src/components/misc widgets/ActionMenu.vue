@@ -81,8 +81,8 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown)
 })
 
-const onCloseMenu = () => {
-  emit('close-menu')
+const onCloseMenu = (event) => {
+  emit('close-menu', event)
 }
 
 const onKeydown = (event) => {
