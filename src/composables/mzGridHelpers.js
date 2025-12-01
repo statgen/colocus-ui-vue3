@@ -126,11 +126,16 @@ export function useMZGridHelpers() {
 
   const deletePlot = (plotID) => {
     if(!plotID || plotID === MOCK) return
-    const cell = getPlotCell(plotID)
-    storeMZpage.gridMap[cell] = MOCK
 
-    const slot = storeMZpage.plotRegistry[plotID].slot
-    const colocID = storeMZpage.plotRegistry[plotID].colocID
+    const cell = getPlotCell(plotID)
+    if(cell) {
+      storeMZpage.gridMap[cell] = MOCK
+    } else {
+      // console.warn(`Cell for plot ${plotID} not found.`)
+    }
+
+    const slot = storeMZpage.plotRegistry[plotID]?.slot
+    const colocID = storeMZpage.plotRegistry[plotID]?.colocID
     storeMZpage.reusablePlotIDs.push(plotID)
     setRowSlotPlotID(colocID, slot, MOCK)
     delete storeMZpage.plotRegistry[plotID]
@@ -181,7 +186,6 @@ export function useMZGridHelpers() {
 
   const exportPlotContainer = async (elID, fileName) => {
     const el = document.getElementById(elID)
-
     setTimeout(async () => {
       try {
         el.classList.add('export-mode')
@@ -217,7 +221,8 @@ export function useMZGridHelpers() {
   }
 
   const getPlotCell = (plotID) => {
-    return storeMZpage.plotRegistry[plotID].cell || undefined
+    if(!plotID) return undefined
+    return storeMZpage.plotRegistry[plotID]?.cell || undefined
   }
 
   const getPlotIDfromRowSlot = (colocID, slot) => {
@@ -439,6 +444,7 @@ export function useMZGridHelpers() {
   }
 
   const setRowSlotPlotID = (colocID, slot, plotID) => {
+    if(!colocID || !slot || !plotID) return
     if (!storeMZpage.rowSlotToPlotID[colocID]) storeMZpage.rowSlotToPlotID[colocID] = {}
     storeMZpage.rowSlotToPlotID[colocID][slot] = plotID
   }
