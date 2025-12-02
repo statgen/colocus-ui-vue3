@@ -49,9 +49,8 @@
     </template>
 
     <template v-if="appStore.currentPageName===PAGE_NAMES.MULTIZOOM" #item.actions="{ item }">
-      <PlotNum title="B" @on-toggle-plot="() => onAddBothPlotsClick(item)" />
-      <PlotNum :row-key="item.uuid" slot="signal1" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal1, 'signal1')" />
-      <PlotNum :row-key="item.uuid" slot="signal2" @on-toggle-plot="() => onTogglePlot(item.uuid, item.signal2, 'signal2')" />
+      <PlotNum :row-key="item.uuid" slot="slot1" @onPlotIconClick="(args) => onPlotIconClick(args, item.uuid, item.signal1)" />
+      <PlotNum :row-key="item.uuid" slot="slot2" @onPlotIconClick="(args) => onPlotIconClick(args, item.uuid, item.signal2 )" />
     </template>
 
     <template v-else-if="appStore.currentPageName===PAGE_NAMES.LOCUSZOOM" #item.actions="{ item }">
@@ -113,10 +112,12 @@ import { useFetchData } from '@/composables/fetchData'
 import { useDirectionOfEffect } from '@/composables/DirectionOfEffect'
 import router from '@/router'
 import PlotNum from "@/components/misc widgets/PlotNum.vue";
+import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 
 // *** Composables ***************************************************************
 const appStore = useAppStore()
 const { fileDownload, ITEMS_PER_PAGE_OPTIONS, visibleColumns } = useDataTableHelpers()
+const mzGridHelpers = useMZGridHelpers()
 
 // *** Props *******************************************************************
 const props = defineProps(['id'])
@@ -140,7 +141,7 @@ const searchPage = PAGE_NAMES.SEARCH
 const loadTableDataFlag = inject('loadTableDataFlag')
 
 // *** Emits *******************************************************************
-const emit = defineEmits(['onDataTableRowClick', 'onAddBothPlotsClick', 'onAddPlotIconClick', 'on-toggle-plot'])
+const emit = defineEmits(['onDataTableRowClick', 'onAddPlotIconClick', 'on-plot-icon-click'])
 
 // *** Watches *****************************************************************
 watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
@@ -183,10 +184,6 @@ onMounted(async () => {
 })
 
 // *** Event handlers **********************************************************
-const onAddBothPlotsClick = (item) => {
-  emit('onAddBothPlotsClick', item)
-}
-
 const onAddPlotIconClick = (item) => {
   emit('onAddPlotIconClick', item)
 }
@@ -232,8 +229,9 @@ const onSortUpdate = (newSort) => {
   appStore.updateSort(newSort)
 }
 
-const onTogglePlot = async (colocID, signal, slot) => {
-  emit('on-toggle-plot', colocID, signal, slot)
+const onPlotIconClick = async (args, colocID, signal) => {
+  const args1 = {...args, colocID, signal}
+  emit('on-plot-icon-click', args1)
 }
 
 // *** Utility functions *******************************************************

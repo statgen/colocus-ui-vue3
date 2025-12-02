@@ -34,7 +34,7 @@ const LZ2_DISPLAY_OPTIONS = {
   DIMENSIONS: {
     badgeX: 8,
     badgeY: 8,
-    height: 230,
+    height: 225,
     headerHeight: 30,
     margins: { top: 15, right: 15, bottom: 48, left: 20 },
     plotHeight: 0, // computed below
@@ -82,7 +82,7 @@ const LZ2_DISPLAY_OPTIONS = {
   PLOT_BACKGROUND_COLOR: '#ffffff', // '#fbfbfb'
   PLOT_BODY_FONT_SIZE: '1rem',
   PLOT_BODY_FONT_WEIGHT: 400,
-  PLOT_BORDER_COLOR: '#777777',
+  PLOT_BORDER_COLOR: '#878787',
   PLOT_HEADER_COLOR: '#fbfbfb', // 'hsl(208, 60%, 97%)', //'#F0F8FF', //'aliceblue',
   PLOT_FONT_FAMILY: 'Helvetica, Arial, sans-serif',
   PLOT_FONT_SIZE: '1rem',
@@ -94,12 +94,25 @@ const LZ2_DISPLAY_OPTIONS = {
     TRIANGLE: 4 * 4 * 2.5,  // d3.symbol uses area, not radius
     LEAD: 4 * 4 * 7,      // d3.symbol uses area, not radius
   },
+  PLOTS_CONTAINER_ID: 'plotsContainer',
   RECOMB_LINE_COLOR: '#6ccbac', // '#369979',
   RECOMB_AXIS_COLOR: '#6ccbac',
   SIG_LINE_COLOR: '#a8a9ad',
 }
 
 const LDOD = LZ2_DISPLAY_OPTIONS.DIMENSIONS
+
+const MZ_GRID_DISPLAY_OPTIONS = {
+  actionMenuWidth: 325,
+  cellHeight: LDOD.height,
+  cellWidth: LDOD.width,
+  defaultCols: 2,
+  defaultRows: 4,
+  gap: 8,
+  headerRowHeight: 24,
+  headerColWidth: 24,
+  mockCell: 'mock',
+}
 
 LDOD.plotHeight = LDOD.height
   - LDOD.headerHeight
@@ -123,7 +136,6 @@ const D3_FONT_DEFAULTS = `
     font-weight: ${LZ2_DISPLAY_OPTIONS.PLOT_HEADER_FONT_WEIGHT} !important;
   }
 `
-
 const MX_TOOLBOX_WIDTH = 300
 
 const NEARBY_DIST = 500e3
@@ -179,6 +191,21 @@ const THRESHOLDS = {
   R2: 0.3,
 }
 
-export { CM_DATASET, BIOMARKER_TYPES, COLORS, D3_FONT_DEFAULTS, NEARBY_DIST, SIDEBAR_WIDTH, STATS_PAGE_TOP,
-  LZ2_DISPLAY_OPTIONS, MX_TOOLBOX_WIDTH, PAGE_NAMES, PLOT_REGION_DEFAULT, REF_BUILD, REF_BUILD_PORTAL, THRESHOLDS, URLS
+export {
+  BIOMARKER_TYPES,
+  CM_DATASET,
+  COLORS,
+  D3_FONT_DEFAULTS,
+  MZ_GRID_DISPLAY_OPTIONS,
+  LZ2_DISPLAY_OPTIONS,
+  MX_TOOLBOX_WIDTH,
+  NEARBY_DIST,
+  PAGE_NAMES,
+  PLOT_REGION_DEFAULT,
+  REF_BUILD,
+  REF_BUILD_PORTAL,
+  SIDEBAR_WIDTH,
+  STATS_PAGE_TOP,
+  THRESHOLDS,
+  URLS,
 }

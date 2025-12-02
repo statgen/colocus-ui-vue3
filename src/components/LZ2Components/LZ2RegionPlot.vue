@@ -33,13 +33,16 @@ const props = defineProps({
   ID: Number,
   showGenSigLine: Boolean,
   showRecombLine: Boolean,
+  signalID: String,
+  variant: String,
   signal: Object,
 })
 
 // *** Variables ***************************************************************
 const PLOT_DEBOUNCE_DELAY = 50
-const leadVariant = props.signal.lead_variant.vid
-const signalUUID = props.signal.uuid
+const plotID = props.ID
+const variant = props.variant
+const signalID = props.signalID
 const title = ref('')
 const titleColor = ref('')
 
@@ -52,10 +55,10 @@ const recombData = ref(null)
 const DIMENSIONS = LZ2_DISPLAY_OPTIONS.DIMENSIONS
 
 const plotBackgroundColor = LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
-const MZPage = appStore[PAGE_NAMES.MULTIZOOM]
+const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
 
 // *** Computed ****************************************************************
-const plotDOMid = computed(() => `plot_${props.ID}`)
+const plotDOMid = computed(() => `plot_${plotID}`)
 
 // *** Provides ****************************************************************
 // *** Injects *****************************************************************
@@ -67,10 +70,10 @@ const emit = defineEmits(['action-menu-click'])
 watch([
     () => signalData.value,
     () => recombData.value,
-    () => MZPage.plotSettings[props.ID]?.showPlotID,
-    () => MZPage.plotSettings[props.ID]?.showRecombLine,
-    () => MZPage.plotSettings[props.ID]?.showGenSigLine,
-    () => MZPage.selectedTheme,
+    () => storeMZpage.plotRegistry[plotID]?.showPlotID,
+    () => storeMZpage.plotRegistry[plotID]?.showRecombLine,
+    () => storeMZpage.plotRegistry[plotID]?.showGenSigLine,
+    () => storeMZpage.selectedTheme,
   ],
 async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
@@ -81,22 +84,21 @@ async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, them
         n.classList.toggle('hidden', !showGenSigLine)
       })
       await nextTick()
-      const region = MZPage.zoomRegion
-      const plotID = props.ID
-      const selectedLDRef = MZPage.selectedLDRef
-      debouncedRenderPlot({plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef})
+      const region = storeMZpage.zoomRegion
+      const selectedLDRef = storeMZpage.selectedLDRef
+      debouncedRenderPlot({plotID, variant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef})
     },
   { immediate: false, flush: 'post' }
 )
 
 // this watch reloads data following UI changes, depending on the other watch to rerender plot
 watch([
-  () => MZPage.selectedLDRef,
-  () => MZPage.yAxis,
-  () => MZPage.zoomRegion,
+  () => storeMZpage.selectedLDRef,
+  () => storeMZpage.yAxis,
+  () => storeMZpage.zoomRegion,
 ],
   async ([selectedLDRef, yAxis, zoomRegion]) => {
-    signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
+    signalData.value = await LZ2DataLoaders.loadSignalData(variant, signalID, selectedLDRef, REF_BUILD, yAxis, zoomRegion)
     await nextTick()
   },
   { immediate: true }
@@ -112,28 +114,24 @@ onMounted(async () => {
   const [t, c] = makePlotTitle(props.signal)
   title.value = t
   titleColor.value = c
-  const ldRef = MZPage.selectedLDRef
-  const yAxis = MZPage.yAxis
-  const zoomRegion = MZPage.zoomRegion
-  signalData.value = await LZ2DataLoaders.loadSignalData(leadVariant, signalUUID, ldRef, REF_BUILD, yAxis, zoomRegion)
-  recombData.value = await LZ2DataLoaders.loadRecombData(leadVariant, REF_BUILD_PORTAL, zoomRegion)
+  const ldRef = storeMZpage.selectedLDRef
+  const yAxis = storeMZpage.yAxis
+  const zoomRegion = storeMZpage.zoomRegion
+  signalData.value = await LZ2DataLoaders.loadSignalData(variant, signalID, ldRef, REF_BUILD, yAxis, zoomRegion)
+  recombData.value = await LZ2DataLoaders.loadRecombData(variant, REF_BUILD_PORTAL, zoomRegion)
 })
 
 // *** Event handlers **********************************************************
-const onActionMenuClick = (event) => {
-  emit('action-menu-click', {plotID: props.ID, event})
-}
-
 // *** Utility functions *******************************************************
 const debouncedRenderPlot = debounce(async (args) => {
-  const {plotID, leadVariant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef} = args
+  const {plotID, variant, signalData, recombData, showPlotID, showGenSigLine, showRecombLine, theme, region, selectedLDRef} = args
 
   await nextTick()
-  renderPlot(plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef)
+  renderPlot(plotID, variant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef)
 }, PLOT_DEBOUNCE_DELAY, { leading: false, trailing: true, maxWait: 200 })
 
-const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef) => {
-  const chromosome = parseVariant2(leadVariant, region).chr
+const renderPlot = (plotID, variant, signalData, showPlotID, recombData, showGenSigLine, showRecombLine, theme, region, selectedLDRef) => {
+  const chromosome = parseVariant2(variant, region).chr
 
   DIMENSIONS.plotWidth = DIMENSIONS.width
     - DIMENSIONS.margins.left
@@ -146,14 +144,14 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
   LZ2Renderers.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
-  LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, props.signal.lead_variant.vid, title.value, titleColor.value, onActionMenuClick)
+  LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, variant, title.value, titleColor.value, plotID)
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 
   const xAccessor = d => d.x
   const yAccessor = d => d.y
 
-  const xStart = MZPage.xStart
-  const xEnd = MZPage.xEnd
+  const xStart = storeMZpage.xStart
+  const xEnd = storeMZpage.xEnd
   const xScale = LZ2Scales.createXscale(xStart, xEnd, DIMENSIONS)
 
   const yScaleSignal = LZ2Scales.createYscaleSignal(yAccessor, signalData, DIMENSIONS)
@@ -163,7 +161,7 @@ const renderPlot = (plotID, leadVariant, signalData, showPlotID, recombData, sho
   LZ2Axes.renderYaxisSignal(thePlot, yScaleSignal, DIMENSIONS)
   if(showRecombLine) LZ2Axes.renderYaxisRecomb(thePlot, yScaleRecomb, DIMENSIONS)
 
-  const clipID = `plot-area-clip-${props.ID}`
+  const clipID = `plot-area-clip-${plotID}`
   LZ2Renderers.renderPlotClipPath(rootSVG, clipID, DIMENSIONS, LZ2_DISPLAY_OPTIONS.LEAD_MARKER_MARGIN)
   const plotGroup = thePlot.append('g').attr('clip-path', `url(#${clipID})`)
 

@@ -1,8 +1,7 @@
 import { markRaw, nextTick } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { useFetchData } from '@/composables/fetchData'
-import { useMZPageHelpers } from '@/composables/MZPageHelpers'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
+import { MZ_GRID_DISPLAY_OPTIONS, LZ2_DISPLAY_OPTIONS, PAGE_NAMES, PLOT_REGION_DEFAULT, THRESHOLDS, URLS } from '@/constants'
 import { findPlotRegion } from '@/util/util'
 
 export const useAppStore = defineStore('appStore', {
@@ -67,20 +66,34 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.MULTIZOOM]: {
+      activePlotID: 0,
       addUniqueRefsOnly: false,
+      cells: {},
       colocData: markRaw({}),
       colocDataReady: false,
       colocsSignals: markRaw([]),
+      isExporting: false,
+      gridMap: {},
+      gridSettings: {
+        cols: 0,
+        rows: 0,
+        gap: MZ_GRID_DISPLAY_OPTIONS.gap,
+        cellWidth: MZ_GRID_DISPLAY_OPTIONS.cellWidth,
+        cellHeight: MZ_GRID_DISPLAY_OPTIONS.cellHeight,
+        headerColWidth: MZ_GRID_DISPLAY_OPTIONS.headerColWidth,
+        headerRowHeight: MZ_GRID_DISPLAY_OPTIONS.headerRowHeight,
+      },
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
-      activePlotID: 0,
-      plotSettings: {},
+      plotCounter: 1,
+      plotMoved: false,
+      plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode
       regionPanelRemoved: false,
       rowSlotToPlotID: {},
       selectedLDRef: '',
       selectedTheme: '',
       showGenSigLines: true,
-      showPlotID: true,
+      showPlotID: false,
       showRecombLines: true,
       signal1Variant: '',
       tableDataLoaded: false,
@@ -186,6 +199,11 @@ export const useAppStore = defineStore('appStore', {
       this[parentKey].showOrphans = this[PAGE_NAMES.SEARCH].showOrphans
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
+    },
+
+    getNextPlotID () {
+      const mzPage = this[PAGE_NAMES.MULTIZOOM]
+      return mzPage.plotCounter++
     },
 
     async loadFilterData() {

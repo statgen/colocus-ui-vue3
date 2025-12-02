@@ -5,35 +5,60 @@
     </template>
 
     <template #toolbox>
-      <MZToolbox @export-plot-group="onExportPlotGroup"/>
+      <MZToolbox @export-plot-group="mzGridEventHandlers.onExportPlotGroup"/>
     </template>
 
-    <h1><BackButton />Multizoom</h1>
+    <h1><BackButton />Multizoom  <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
 
     <BusyOverlay :show="isExporting" />
 
     <LZ2Tooltip />
 
-    <LZ2ActionMenu
-      v-if="showMenu"
+    <ActionMenu v-if="menuState.visible"
+      :menu-type="menuState.type"
       :menu-style="{
         position: 'absolute',
-        top: `${menuPosition.y}px`,
-        left: `${menuPosition.x}px`
+        top: `${menuState.yPos}px`,
+        left: `${menuState.xPos}px`
       }"
-      @delete-plot="onDeletePlot"
-      @export-plot="onExportPlot"
-      @close-menu="onCloseMenu"
+      :context="menuState.context"
+      @addPlotInsert="(payload) => mzGridEventHandlers.onAddPlot({...payload, insert: true})"
+      @addPlotReplace="(payload) => mzGridEventHandlers.onAddPlot({...payload, insert: false})"
+      @appendColumn="mzGridEventHandlers.onAppendColumn"
+      @appendRow="mzGridEventHandlers.onAppendRow"
+      @insertRow="mzGridEventHandlers.onInsertRow"
+      @closeMenu="onCloseMenu"
+      @deleteCell="mzGridEventHandlers.onDeleteCell"
+      @deleteColumn="mzGridEventHandlers.onDeleteColumn"
+      @deletePlot="mzGridEventHandlers.onDeletePlot"
+      @deleteRow="mzGridEventHandlers.onDeleteRow"
+      @exportPlot="mzGridEventHandlers.onExportPlot"
+      @insertColumn="mzGridEventHandlers.onInsertColumn"
+      @insertMockCell="(payload) => mzGridEventHandlers.onInsertMockCell(payload)"
+      @moveColumnInsert="(payload) => mzGridEventHandlers.onMoveColumn({...payload, insert: true})"
+      @moveColumnReplace="(payload) => mzGridEventHandlers.onMoveColumn({...payload, insert: false})"
+      @movePlotInsert="(payload) => mzGridEventHandlers.onMovePlot({...payload, insert: true})"
+      @movePlotReplace="(payload) => mzGridEventHandlers.onMovePlot({...payload, insert: false})"
+      @moveRowInsert="(payload) => mzGridEventHandlers.onMoveRow({...payload, insert: true})"
+      @moveRowReplace="(payload) => mzGridEventHandlers.onMoveRow({...payload, insert: false})"
     />
-    <div ref="plotsContainer" id="plotsContainer" class="plot-container mt-4"></div>
 
-    <h2>Data table</h2>
+    <MZGrid
+      @columnClick="mzGridEventHandlers.onColumnHeaderClick"
+      @columnMenu="mzGridEventHandlers.onColumnMenu"
+      @mockClick="mzGridEventHandlers.onMockClick"
+      @mockMenu="mzGridEventHandlers.onMockMenu"
+      @click="mzGridEventHandlers.onNativeClick"
+      @rowClick="mzGridEventHandlers.onRowHeaderClick"
+      @rowMenu="mzGridEventHandlers.onRowMenu"
+    />
+
+    <h2 class="mt-4">Data table</h2>
 
     <div class="table-container mb-8">
       <DataTable
         @onDataTableRowClick="onDataTableRowClick"
-        @onAddBothPlotsClick="onAddBothPlotsClick"
-        @on-toggle-plot="onTogglePlot"
+        @onPlotIconClick="mzGridEventHandlers.onPlotIconClick"
       ></DataTable>
     </div>
     <div id="page-bottom-sentinel" aria-hidden="true" style="height:1px;"></div>
@@ -42,33 +67,32 @@
 
 <script setup>
 // *** Imports *****************************************************************
-import { onBeforeUnmount, nextTick, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { computed, onBeforeUnmount, nextTick, onMounted, provide, ref, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
-import { usePlotManager } from '@/composables/LZ2RegionPlotManager'
-import { useMZPageHelpers } from '@/composables/MZPageHelpers'
+import { LZ2_DISPLAY_OPTIONS, MZ_GRID_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import DataTable from "@/components/DataTable/DataTable.vue"
-import html2canvas from 'html2canvas'
 import router from '@/router'
+import { useMZGridHelpers } from '@/composables/mzGridHelpers'
+import { useMZGridEventHandlers } from '@/composables/mzEventHandlers'
+import MZGrid from '@/components/misc widgets/MZGrid.vue'
+import ActionMenu from "@/components/misc widgets/ActionMenu.vue";
 
 // *** Composables *************************************************************
 const appStore = useAppStore()
-const plotManager = usePlotManager()
-const mzPageHelpers = useMZPageHelpers()
+const mzGridHelpers = useMZGridHelpers()
+const mzGridEventHandlers = useMZGridEventHandlers()
 
 // *** Props *******************************************************************
 // *** Variables ***************************************************************
-const bottomSentinel = ref(null)
-const isExporting = ref(false)
 const loadFPControls = ref(false)
 const loadTableDataFlag = ref(false)
-const menuPosition = ref({ x: 0, y: 0 })
+
+const menuState = mzGridEventHandlers.menuState
+
 const multizoomPage = PAGE_NAMES.MULTIZOOM
-const MZPage = appStore[multizoomPage]
-const plotsContainer = useTemplateRef('plotsContainer')
+const storeMZpage = appStore[multizoomPage]
 const searchPage = PAGE_NAMES.SEARCH
-const showMenu = ref(false)
 
 // even though we don't allow user to specify gene(s) in the url on this page,
 // still have to provide the preloadGenes variable for the underlying controls
@@ -76,11 +100,15 @@ const preloadGenes = ref([])
 
 // awkward prevention of browser fore button after back button
 if (!appStore.colocID) router.push({ name: searchPage })
-plotManager.unmountAllPlots()
+mzGridHelpers.deleteAllPlots()
 
 appStore.isToolboxShowing = true
 
 // *** Computed ****************************************************************
+const isExporting = computed(() => storeMZpage.isExporting)
+const pageRows = computed(() => storeMZpage.gridSettings.rows)
+const pageCols = computed(() => storeMZpage.gridSettings.cols)
+
 // *** Provides ****************************************************************
 provide('loadFPControls', loadFPControls)
 provide('loadTableDataFlag', loadTableDataFlag)
@@ -89,184 +117,55 @@ provide('preloadGenes', preloadGenes)
 // *** Injects *****************************************************************
 // *** Emits *******************************************************************
 // *** Watches *****************************************************************
-watch(() => MZPage.colocDataReady, async (newVal) => {
+watch(() => storeMZpage.colocDataReady, async (newVal) => {
   if (newVal) {
     loadFPControls.value = !loadFPControls.value
 
-    const colocID = MZPage.colocData.uuid
-    const signal1 = MZPage.colocData.signal1
-    const signal2 = MZPage.colocData.signal2
-
-    MZPage.selectedLDRef = signal1.lead_variant.vid
-
+    const colocID = storeMZpage.colocData.uuid
+    const signal1 = storeMZpage.colocData.signal1
+    const signal2 = storeMZpage.colocData.signal2
     const variant = signal1.lead_variant.vid
-    MZPage.signal1Variant = variant
-    mzPageHelpers.setPlotRegion(variant, MZPage.zoomRegion)
 
-    await renderPlot(colocID, signal1, 'signal1')
-    await renderPlot(colocID, signal2, 'signal2')
-    await scrollBottom()
+    storeMZpage.selectedLDRef = variant
+    storeMZpage.signal1Variant = variant
+    mzGridHelpers.setPlotRegion(variant, storeMZpage.zoomRegion)
+
+    await mzGridHelpers.addPlot({ cell: 'A1', colocID, signal: signal1, slot: 'slot1' })
+    await mzGridHelpers.addPlot({ cell: 'A2', colocID, signal: signal2, slot: 'slot2' })
+    // await scrollBottom()
   }
 })
 
 // *** Lifecycle hooks *********************************************************
-onBeforeUnmount(() => {
+onBeforeUnmount(async () => {
   appStore.colocID = ''
-  plotManager.unmountAllPlots()
+  await mzGridHelpers.deleteAllPlots()
   appStore.isToolboxShowing = false
 })
 
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
-  MZPage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
+  storeMZpage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
   loadPageData()
 })
 
+
 // *** Event handlers **********************************************************
-const onActionMenuClick = async (arg) => {
-  const rect = arg.event.target.getBoundingClientRect()
-  const scrollX = window.scrollX || window.pageXOffset
-  const scrollY = window.scrollY || window.pageYOffset
-
-  MZPage.activePlotID = arg.plotID
-
-  const spacing = 4
-  const menuWidth = 225
-
-  menuPosition.value = {
-    x: rect.left + scrollX - menuWidth - spacing,
-    y: rect.bottom + scrollY + spacing,
-  }
-
-  showMenu.value = true
-}
-
-const onAddBothPlotsClick = async (item) => {
-  const { signal1, signal2 } = item
-  const colocID = item.uuid
-  const s1PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal1
-  const s2PlotID = MZPage.rowSlotToPlotID?.[colocID]?.signal2
-
-  if(s1PlotID && s2PlotID) {
-    deletePlot(s1PlotID)
-    deletePlot(s2PlotID)
-  } else if(s1PlotID) {
-    await renderPlot(colocID, signal2, 'signal2')
-  } else if(s2PlotID) {
-    await renderPlot(colocID, signal1, 'signal1')
-  } else {
-    await renderPlot(colocID, signal1, 'signal1')
-    await renderPlot(colocID, signal2, 'signal2')
-  }
-  await scrollBottom()
-}
-
 const onCloseMenu = () => {
-  showMenu.value = false
-  MZPage.activePlotID = null
+  menuState.value.visible = false
+  storeMZpage.activePlotID = null
 }
 
 const onDataTableRowClick = () => {
   loadPageData()
 }
 
-const onDeletePlot = () => {
-  const plotID = MZPage.activePlotID
-  deletePlot(plotID)
-  showMenu.value = false
-}
-
-const onExportPlot = async () => {
-  const plotDOMid = `plot_${MZPage.activePlotID}`
-  await exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
-  showMenu.value = false
-}
-
-const onExportPlotGroup = async () => {
-  await exportPlotContainer('plotsContainer', 'Colocus_plot_group')
-}
-
-const onTogglePlot = async (colocID, signal, slot) => {
-  const existingPlot = mzPageHelpers.getMZPlotID(colocID, slot)
-
-  if (existingPlot) {
-    plotManager.unmountPlot(existingPlot)
-    mzPageHelpers.setMZRowSlotPlotID(colocID, slot, null)
-  } else {
-    await renderPlot(colocID, signal, slot)
-    await scrollBottom()
-  }
-}
-
 // *** Utility functions *******************************************************
-const deletePlot = (plotID) => {
-  plotManager.unmountPlot(plotID)
-  mzPageHelpers.deleteMZPlot(plotID)
-}
-
-const exportPlotContainer = async (elID, fileName) => {
-  const el = document.getElementById(elID)
-  if (!el) return
-  if(Object.keys(MZPage.plotSettings).length < 1) return
-
-  isExporting.value = true
-  setTimeout(async () => {
-    try {
-      const canvas = await html2canvas(el, {
-        useCORS: true,
-        scale: LZ2_DISPLAY_OPTIONS.EXPORT_SCALE,
-        backgroundColor: LZ2_DISPLAY_OPTIONS.PLOT_BACKGROUND_COLOR
-      })
-      const blob = await new Promise(res => canvas.toBlob(res))
-      if (!blob) return
-      const url = URL.createObjectURL(blob)
-      try {
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${fileName}.png`
-        a.style.display = 'none'
-        document.body.appendChild(a)   // helps Firefox reliability
-        a.click()
-        a.remove()                      // cleanup the DOM node
-      } finally {
-        // delay revocation so some browsers don’t cancel the download
-        setTimeout(() => URL.revokeObjectURL(url), 0)
-      }
-    } finally {
-      isExporting.value = false
-    }
-  }, 0)
-}
-
 const loadPageData = async () => {
-  MZPage.tableDataLoaded = false
-  MZPage.colocDataReady = false
-  MZPage.plotSettings = {}
+  storeMZpage.tableDataLoaded = false
+  storeMZpage.colocDataReady = false
+  mzGridHelpers.initializePlotSession()
   loadTableDataFlag.value = !loadTableDataFlag.value
-}
-
-async function renderPlot(colocID, signal, slot) {
-  const signalID = signal?.uuid
-  const signals = mzPageHelpers.getMZSignals()
-  if(MZPage.addUniqueRefsOnly && signals.includes(signalID)) return
-  if (!signal) return
-
-  const showGenSigLine = MZPage.showGenSigLines
-  const showRecombLine = MZPage.showRecombLines
-  const showPlotID = MZPage.showPlotID
-
-  const plotID = await plotManager.mountPlot({
-    plotsContainer,
-    showGenSigLine,
-    showRecombLine,
-    signal,
-    type: 'region',
-    onActionMenuClick,
-  })
-
-  mzPageHelpers.addMZPlot(plotID, showPlotID, showGenSigLine, showRecombLine, signal.lead_variant.vid, signal.uuid, colocID, slot)
-  mzPageHelpers.setMZRowSlotPlotID(colocID, slot, plotID)
-  return plotID
 }
 
 const scrollBottom = async () => {
@@ -283,15 +182,11 @@ const scrollBottom = async () => {
 </script>
 
 <style scoped>
-.plot-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
 .table-container {
   overflow-x: auto;
 }
 
+.rc-text {
+  font-size: 1rem;
+}
 </style>
