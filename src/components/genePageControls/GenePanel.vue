@@ -19,7 +19,7 @@ import { THRESHOLDS } from '@/constants'
 const appStore = useAppStore()
 
 const controlConfig = {
-  geneSelect: { title: 'QTL Gene', storeKey: 'selectedGene', defaultValue: '', },
+  geneSelect: { title: 'eQTL Gene', storeKey: 'selectedGene', defaultValue: '', },
   h4: { title: 'h4 ≥', topKey: 'gene', storeKey: 'h4', defaultValue: THRESHOLDS.H4, },
   r2: { title: 'r2 ≥', topKey: 'gene', storeKey: 'r2', defaultValue: THRESHOLDS.R2, },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true, },

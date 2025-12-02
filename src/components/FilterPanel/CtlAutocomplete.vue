@@ -20,7 +20,17 @@
     multiple
     persistent-clear
     variant="outlined"
-  ></v-autocomplete>
+  >
+    <template v-slot:no-data>
+        <v-list-item>
+          <v-list-item-title>
+            {{ selectedItems.length >= controlSet.limit 
+              ? `Maximum of ${controlSet.limit} items selected` 
+              : 'No data available' }}
+          </v-list-item-title>
+        </v-list-item>
+      </template>
+  </v-autocomplete>
 </template>
 
 <script setup>
@@ -90,8 +100,12 @@ const onGenesPaste = (event) => {
 }
 
 const onModelChanged = async (newValue) => {
-  // console.log('onModelChanged', controlSet.storeKey, newValue)
+  if (controlSet.limit && newValue.length > controlSet.limit) {
+    // Enforce limit
+    newValue = newValue.slice(0, controlSet.limit)
+  }
   await appStore.updateFilter(controlSet.storeKey, newValue)
+  populateControlSelectList()
 }
 
 // *** Utility functions *******************************************************
@@ -100,6 +114,11 @@ const mlc = ((itemTitle, queryText, item) => {
 })
 
 const populateControlSelectList = () => {
+  if (controlSet.limit && selectedItems.value.length >= controlSet.limit) {
+    selectListItems.value = []
+    return
+  }
+
   selectListItems.value = appStore.filterPanelControls[controlSet.storeKey]
 }
 

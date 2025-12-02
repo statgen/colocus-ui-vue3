@@ -59,27 +59,33 @@
     </template>
 
     <!-- data columns -->
-    <template #item.signal1.analysis.study.uuid="{item}"><StudyLabel :study="item.signal1.analysis.study.uuid" abbrev/></template>
-    <template #item.signal1.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal1.analysis.trait" :key="item.signal1.analysis.trait"/></template>
-    <template #item.signal1.analysis.analysis_type="{item}">{{ item.signal1.analysis.analysis_type }}</template>
-    <template #item.signal2.analysis.study.uuid="{item}"><StudyLabel :study="item.signal2.analysis.study.uuid" abbrev/></template>
-    <template #item.signal2.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal2.analysis.trait" :key="item.signal2.analysis.trait"/></template>
-    <template #item.signal2.analysis.trait.biomarker_type="{item}">{{ item.signal2.analysis.trait.biomarker_type.replace("-expression", "") }}</template>
-    <template #item.signal2.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal2.analysis.trait" /></template>
-    <template #item.signal2.analysis.tissue="{item}">{{ item.signal2.analysis.tissue }}</template>
-    <template #item.signal1.lead_variant.vid="{item}"><VariantLabel :variant="item.signal1.lead_variant.vid" :showSplotch="true" /></template>
-    <template #item.signal2.lead_variant.vid="{item}"><VariantLabel :variant="item.signal2.lead_variant.vid" :showSplotch="true" /></template>
-    <template #item.signal1.neg_log_p="{item}">{{ (+item.signal1.neg_log_p).toFixed(2) }}</template>
-    <template #item.signal2.neg_log_p="{item}">{{ (+item.signal2.neg_log_p).toFixed(2) }}</template>
-    <template #item.coloc_h3="{item}">{{ item.coloc_h3.toFixed(2) }}</template>
-    <template #item.coloc_h4="{item}">{{ item.coloc_h4.toFixed(2) }}</template>
-    <template #item.r2="{item}">{{ item.r2.toFixed(2) }}</template>
+    <template #item.signal1.analysis.study.uuid="{item}"><StudyLabel :study="item.signal1?.analysis?.study?.uuid ?? ''" abbrev/></template>
+    <template #item.signal1.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal1?.analysis?.trait"/></template>
+    <template #item.signal1.analysis.analysis_type="{item}">
+      {{ item.signal1?.analysis?.analysis_type ?? '' }}
+    </template>
+    <template #item.signal1.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal1?.analysis?.trait ?? ''" /></template>
+    <template #item.signal1.analysis.tissue="{item}">{{ item.signal1?.analysis?.tissue ?? '' }}</template>
+    <template #item.signal2.analysis.study.uuid="{item}"><StudyLabel :study="item.signal2?.analysis?.study?.uuid ?? ''" abbrev/></template>
+    <template #item.signal2.analysis.trait.uuid="{item}"><TraitLabel :trait="item.signal2?.analysis?.trait"/></template>
+    <template #item.signal2.analysis.analysis_type="{item}">
+      {{ item.signal2?.analysis?.analysis_type ?? '' }}
+    </template>
+    <template #item.signal2.analysis.trait.gene.ens_id="{item}"><EnsgLabel :trait="item.signal2?.analysis?.trait ?? ''" /></template>
+    <template #item.signal2.analysis.tissue="{item}">{{ item.signal2?.analysis?.tissue ?? '' }}</template>
+    <template #item.signal1.lead_variant.vid="{item}"><VariantLabel :variant="item.signal1?.lead_variant?.vid ?? ''" :showSplotch="true" /></template>
+    <template #item.signal2.lead_variant.vid="{item}"><VariantLabel :variant="item.signal2?.lead_variant?.vid ?? ''" :showSplotch="true" /></template>
+    <template #item.signal1.neg_log_p="{item}">{{ safeToFixed(item.signal1?.neg_log_p, 2) }}</template>
+    <template #item.signal2.neg_log_p="{item}">{{ safeToFixed(item.signal2?.neg_log_p, 2) }}</template>
+    <template #item.coloc_h3="{item}">{{ safeToFixed(item.coloc_h3, 2) }}</template>
+    <template #item.coloc_h4="{item}">{{ safeToFixed(item.coloc_h4, 2) }}</template>
+    <template #item.r2="{item}">{{ safeToFixed(item.r2, 2) }}</template>
     <template #item.n_coloc_between_traits="{item}">{{ item.n_coloc_between_traits }}</template>
     <template #item.cross_signal.effect="{item}"><ConcordanceLabel :item="item"/></template>
-    <template #item.signal1.effect_marg="{item}">{{ item.signal1.effect_marg.toFixed(2) }}</template>
-    <template #item.signal2.effect_marg="{item}">{{ item.signal2.effect_marg.toFixed(2) }}</template>
-    <template #item.signal1.effect_cond="{item}">{{ item.signal1.effect_cond.toFixed(2) }}</template>
-    <template #item.signal2.effect_cond="{item}">{{ item.signal2.effect_cond.toFixed(2) }}</template>
+    <template #item.signal1.effect_marg="{item}">{{ safeToFixed(item.signal1.effect_marg, 2) }}</template>
+    <template #item.signal2.effect_marg="{item}">{{ safeToFixed(item.signal2.effect_marg, 2) }}</template>
+    <template #item.signal1.effect_cond="{item}">{{ safeToFixed(item.signal1.effect_cond, 2) }}</template>
+    <template #item.signal2.effect_cond="{item}">{{ safeToFixed(item.signal2.effect_cond, 2) }}</template>
     <template #item.marg_cond_flip="{item}">{{ +item.marg_cond_flip }}</template>
 
     <template #footer.prepend>
@@ -142,6 +148,24 @@ watch(() => appStore.filterPanelControls.filterDataChanged, async () => {
   await loadDataDebounced()
 })
 
+watch(() => appStore[currentPageName.value]?.showOrphans, async () => {
+  let showOrphans = appStore[currentPageName.value].showOrphans
+  if (showOrphans) {
+    appStore[currentPageName.value].filters.h4 = 0
+    appStore[currentPageName.value].filters.r2 = 0
+
+    appStore[locuszoomPage].filters.h4 = 0
+    appStore[locuszoomPage].filters.r2 = 0
+
+    appStore[multizoomPage].filters.h4 = 0
+    appStore[multizoomPage].filters.r2 = 0
+
+    appStore[searchPage].filters.h4 = 0
+    appStore[searchPage].filters.r2 = 0
+  }
+  await loadDataDebounced()
+})
+
 watch(() => loadTableDataFlag.value, async () => {
   await loadData()
 })
@@ -172,8 +196,11 @@ const onExpandRow = (item, side) => {
   // console.log(`ColocID: ${colocID} Variant1: ${item.signal1.lead_variant.vid} ID: ${item.signal1.uuid} Variant2: ${item.signal2.lead_variant.vid} ID: ${item.signal2.uuid}`)
   appStore.colocID = colocID
   expanderAlignment.value = side
-  if(appStore.dataTable.expandedRow.indexOf(colocID) === -1) appStore.dataTable.expandedRow = [colocID]
-  else appStore.dataTable.expandedRow.length = 0
+  if (appStore.dataTable.expandedRow.indexOf(colocID) === -1) {
+    appStore.dataTable.expandedRow.splice(0, appStore.dataTable.expandedRow.length, colocID)
+  } else {
+    appStore.dataTable.expandedRow.splice(0, appStore.dataTable.expandedRow.length)
+  }
 }
 
 const onFileDownloadClick = () => {
@@ -211,6 +238,12 @@ const onTogglePlot = async (colocID, signal, slot) => {
 
 // *** Utility functions *******************************************************
 const clearExpandedRow = () => appStore.dataTable.expandedRow.length = 0
+
+const safeToFixed = (val, digits) => {
+  val = parseFloat(val)
+  if (val == null || Number.isNaN(val)) return ''
+  return (val).toFixed(digits)
+}
 
 // this works by scheduling a timeout for *after* the current event loop tick
 const loadDataDebounced = async () => {
@@ -266,7 +299,10 @@ const loadData = async () => {
   try {
     if ([locuszoomPage, multizoomPage].includes(cpn)) {
       if(!appStore[cpn].colocDataReady) {
-        const colocURL = `${URLS.COLOC_DATA}/${colocID}`
+        let colocURL = `${URLS.COLOC_DATA}/${colocID}`
+        if (appStore[cpn].showOrphans) {
+          colocURL += `?include_orphans=1`
+        }
         await loadColocData(cpn, colocURL)
       }
       const signal1 = appStore[cpn].colocData.signal1
@@ -298,7 +334,7 @@ const getRowClass = (item) => {
   const s1 = appStore[cpn].colocData.signal1
   const s2 = appStore[cpn].colocData.signal2
 
-  if((s1.uuid === item.signal1.uuid) && (s2.uuid === item.signal2.uuid)) {
+  if((s1?.uuid === item.signal1?.uuid) && (s2?.uuid === item.signal2?.uuid)) {
     return { class: 'bg-clcTableHighlight font-weight-bold' }
   } else {
     return {}

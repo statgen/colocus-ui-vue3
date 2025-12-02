@@ -1,7 +1,7 @@
 <template>
   <ToolTippy :isInteractive="true" @trigger="onTrigger">
     <span class="text-no-wrap" :style="variantStyle">
-      <v-icon v-if="showSplotch && appStore[cpn].colorCodeVariants" icon="mdi-square" size="x-small" class="mb-1"/>
+      <v-icon v-if="showSplotch && appStore[cpn].colorCodeVariants && theVariant" icon="mdi-square" size="x-small" class="mb-1"/>
       {{ formatVariantString(theVariant, 20) }}
       <v-icon v-if="showClose" icon="mdi-close-circle" class="text-clcAction mb-1" size="1rem" @click="onIconClick"/>
     </span>

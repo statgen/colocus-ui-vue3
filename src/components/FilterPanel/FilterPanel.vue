@@ -2,6 +2,8 @@
   <v-sheet v-show="appStore.isSidebarShowing" class="ml-n2" >
     <FilterPanelSubpanel title="Select" resetButton id="subPanelSelect">
       <CtlAutocomplete :controlSet="controlConfig.study" />
+      <CtlAutocomplete :controlSet="controlConfig.analysisTypes" />
+      <CtlAutocomplete :controlSet="controlConfig.analysisTypePriority" />
       <CtlAutocomplete :controlSet="controlConfig.gene" />
       <CtlTextfield :controlSet="controlConfig.region" />
       <CtlAutocomplete :controlSet="controlConfig.phenotype" />
@@ -12,8 +14,8 @@
     </FilterPanelSubpanel>
 
     <FilterPanelSubpanel title="Set threshold" resetButton id="subPanelThreshold">
-      <CtlTextfield :controlSet="controlConfig.trait1" />
-      <CtlTextfield :controlSet="controlConfig.trait2" />
+      <CtlTextfield :controlSet="controlConfig.gwas_log10p" />
+      <CtlTextfield :controlSet="controlConfig.eqtl_log10p" />
       <CtlSlider :controlSet="controlConfig.h4" />
       <CtlSlider :controlSet="controlConfig.r2" />
     </FilterPanelSubpanel>
@@ -22,6 +24,7 @@
       <CtlSwitch :controlSet="controlConfig.colorCodeVariants" />
       <CtlSwitch :controlSet="controlConfig.showEnsIDs" />
       <CtlSwitch :controlSet="controlConfig.showEffects" />
+      <CtlSwitch :controlSet="controlConfig.showOrphans" />
     </FilterPanelSubpanel>
   </v-sheet>
 </template>
@@ -54,18 +57,21 @@ const rules = {
  */
 const controlConfig = {
   study: { title: 'Study', storeKey: 'studies', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select study(ies)' },
-  gene: { title: 'QTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
+  analysisTypes: { title: 'Analysis Types', storeKey: 'analysisTypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select analysis type(s)' },
+  analysisTypePriority: { title: 'Analysis Columns', storeKey: 'analysisTypePriority', limit: 2, rules: null, emptyValue: null, defaultValue: ['gwas', 'eqtl'], placeholder: 'Select analysis type columns' },
+  gene: { title: 'eQTL gene', storeKey: 'genes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select gene(s)' },
   region: { title: 'Genomic Region', storeKey: 'region', items: null, rules: [rules.chrRegionRule], emptyValue: null, defaultValue: '', placeholder: 'chr:start-end' },
   phenotype: { title: 'GWAS Phenotype', storeKey: 'phenotypes', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select phenotype(s)' },
-  tissue: { title: 'QTL Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
-  cell_type: { title: 'QTL Cell Type', storeKey: 'cell_types', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select cell type(s)'},
-  trait1: { title: 'Trait 1 -log<sub>10</sub> p-value ≥', storeKey: 'trait1log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
-  trait2: { title: 'Trait 2 -log<sub>10</sub> p-value ≥', storeKey: 'trait2log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
+  tissue: { title: 'Tissue', storeKey: 'tissues', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select tissue(s)'},
+  cell_type: { title: 'Cell Type', storeKey: 'cell_types', rules: null, emptyValue: null, defaultValue: null, placeholder: 'Select cell type(s)'},
+  gwas_log10p: { title: 'GWAS -log<sub>10</sub> p-value ≥', storeKey: 'gwas_log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
+  eqtl_log10p: { title: 'eQTL -log<sub>10</sub> p-value ≥', storeKey: 'eqtl_log10p', items: null, rules: [rules.posDecRule], emptyValue: '0', defaultValue: '0', placeholder: null },
   h4: { title: 'Colocalization PP(H4) ≥', topKey: 'filter', storeKey: 'h4', items: null, emptyValue: '0', defaultValue: THRESHOLDS.H4, placeholder: null },
   r2: { title: 'r² ≥', topKey: 'filter', storeKey: 'r2', items: null, emptyValue: '0', defaultValue: THRESHOLDS.R2, placeholder: null },
   colorCodeVariants: { title: 'Color-code variants', storeKey: 'colorCodeVariants', defaultValue: true },
   showEnsIDs: { title: 'Show Ensembl IDs', storeKey: 'showEnsIDs', defaultValue: false },
-  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false }
+  showEffects: { title: 'Show effect sizes', storeKey: 'showEffects', defaultValue: false },
+  showOrphans: { title: 'Show single signals', storeKey: 'showOrphans', defaultValue: false },
 }
 
 </script>

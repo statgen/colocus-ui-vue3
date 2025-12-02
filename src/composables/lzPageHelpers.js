@@ -60,8 +60,8 @@ export function useLZPageHelpers() {
 
   // *** plot management ***********************************************************************************************
   const addPanelsForSignalPair = (signal1, signal2) => {
-    const s1id = signal1.uuid
-    const s2id = signal2.uuid
+    const s1id = signal1?.uuid
+    const s2id = signal2?.uuid
     const lzregion = regionVnodeRef.value.component.exposed
 
     if (!addUniqueRefsOnly.value || !signalExists(s1id)) {
@@ -84,12 +84,19 @@ export function useLZPageHelpers() {
 
   const assembleLayout = (signal1, signal2, comparePlotRef, regionPlotRef) => {
     const plotProps = getPlotProps(signal1, signal2)
-    buildCompareLayout(plotProps, comparePlotRef)
+    if (signal1?.uuid && signal2?.uuid) {
+      // Must have both signals available in order to build the compare plot
+      buildCompareLayout(plotProps, comparePlotRef)
+    }
     buildRegionLayout(plotProps, regionPlotRef)
 
     const lzregion = regionVnodeRef.value.component.exposed
-    lzregion.addRegionPanel(signal2)
-    lzregion.addRegionPanel(signal1)
+    if (signal2?.uuid) {
+      lzregion.addRegionPanel(signal2)
+    }
+    if (signal1?.uuid) {
+      lzregion.addRegionPanel(signal1)
+    }
     lzregion.addGenePanel()
   }
 
@@ -124,8 +131,8 @@ export function useLZPageHelpers() {
     const { signal1, signal2, initialState, s1Label, s2Label, source_configs } = plotProps
 
     const base_layout = get_region_layout(
-      {id: signal1.uuid, label: s1Label},
-      {id: signal2.uuid, label: s2Label},
+      {id: signal1?.uuid, label: s1Label},
+      {id: signal2?.uuid, label: s2Label},
       initialState
     )
 
@@ -151,8 +158,11 @@ export function useLZPageHelpers() {
 
   const getPlotProps = (signal1, signal2) => {
     const variant = normalizeMarker(signal1.lead_variant.vid)
-    const chr = signal1.lead_variant.chrom
-    const {start, end} = findPlotRegion(signal1.lead_variant.pos, signal2.lead_variant.pos)
+    const chr = signal1?.lead_variant?.chrom || signal2?.lead_variant?.chrom
+    const { start, end } = findPlotRegion(
+      signal1?.lead_variant?.pos,
+      signal2?.lead_variant?.pos
+    )
     const initialState = {
       chr,
       start,
@@ -163,8 +173,8 @@ export function useLZPageHelpers() {
     const [s2Label, s2color] = makePlotTitle(signal2)
     const source_configs = get_region_sources(
       signal1.analysis.genome_build,
-      `${URLS.SIGNALS_DATA}/${signal1.uuid}/region/`,
-      `${URLS.SIGNALS_DATA}/${signal2.uuid}/region/`,
+      `${URLS.SIGNALS_DATA}/${signal1?.uuid}/region/`,
+      `${URLS.SIGNALS_DATA}/${signal2?.uuid}/region/`,
       `${URLS.LD_DATA}/${signal1.analysis.ld}/region/`,
     )
     return {

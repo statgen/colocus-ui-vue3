@@ -19,13 +19,25 @@ const { controlSet } = defineProps({
 })
 
 const appStore = useAppStore()
-const controlValue = ref(false)
+
+const getStoreValue = () => {
+  const parentKey = appStore.currentPageName
+  return appStore[parentKey]?.[controlSet.storeKey]
+}
+
+const controlValue = ref(getStoreValue() ?? controlSet.defaultValue ?? false)
 
 const resetInput = inject('resetInput')
 
 watch(resetInput, () => {
   controlValue.value = controlSet.defaultValue
   appStore.updateSwitch(controlSet.storeKey, controlSet.defaultValue)
+})
+
+watch(getStoreValue, (newValue) => {
+  if (newValue !== undefined && newValue !== controlValue.value) {
+    controlValue.value = newValue
+  }
 })
 
 onMounted(() => {

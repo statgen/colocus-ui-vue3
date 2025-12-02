@@ -2,8 +2,16 @@
   <div v-if="theBiomarkerType === BIOMARKER_TYPES.PHENOTYPE" class="d-inline" >
     <TraitLabelPhenotype :trait="trait" :analysisID="analysisID"/>
   </div>
-  <div v-else class="d-inline">
+  <div v-else-if="[BIOMARKER_TYPES.GENE_EXPRESSION, BIOMARKER_TYPES.EXON_EXPRESSION].includes(theBiomarkerType)" class="d-inline" >
     <TraitLabelGene :trait="trait"/>
+  </div>
+  <div v-else-if="theBiomarkerType === BIOMARKER_TYPES.PROTEIN_EXPRESSION" class="d-inline" >
+    <TraitLabelProtein :trait="trait"/>
+  </div>
+  <div v-else class="d-inline">
+    <span>
+      {{ trait?.uuid }}
+    </span>
   </div>
 </template>
 

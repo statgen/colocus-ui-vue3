@@ -32,6 +32,7 @@ export const useAppStore = defineStore('appStore', {
       isFilterDataLoaded: false,
       lastFilterUpdated: '',
       analysisTypes: markRaw([]),
+      analysisTypePriority: markRaw([]),
       genes: markRaw([]),
       phenotypes: markRaw([]),
       studies: markRaw([]),
@@ -125,20 +126,23 @@ export const useAppStore = defineStore('appStore', {
         const p = this[parentKey].filters[key]
         if(p?.toString().length > 0) url.searchParams.set(value, p)
       })
+
+      // Check if orphan signals should be included
+      if (this[parentKey].showOrphans) {
+        url.searchParams.set('include_orphans', 1)
+      }
     },
 
     buildLZdataTableURL(urlPath, signal1, signal2) {
       const url = new URL(urlPath, window.location.origin)
       const { start, end } = findPlotRegion(
-        signal1.lead_variant.pos,
-        signal2.lead_variant.pos
+        signal1?.lead_variant?.pos,
+        signal2?.lead_variant?.pos
       )
 
-      const signal1_region = `${signal1.lead_variant.chrom}:${start}-${end}`
-      const signal2_region = `${signal2.lead_variant.chrom}:${start}-${end}`
-
-      url.searchParams.set('signal1_region', signal1_region)
-      url.searchParams.set('signal2_region', signal2_region)
+      const chrom = signal1?.lead_variant?.chrom || signal2?.lead_variant?.chrom
+      const region = `${chrom}:${start}-${end}`
+      url.searchParams.set('region', region)
 
       this.addQueryString(url)
 
@@ -176,9 +180,10 @@ export const useAppStore = defineStore('appStore', {
       for (const [key, value] of Object.entries(this[PAGE_NAMES.SEARCH].filters)) {
         this[parentKey].filters[key] = value
       }
-      this[parentKey].filters.colorCodeVariants = this[PAGE_NAMES.SEARCH].filters.colorCodeVariants
-      this[parentKey].filters.showEnsIDs = this[PAGE_NAMES.SEARCH].filters.showEnsIDs
-      this[parentKey].filters.showEffects = this[PAGE_NAMES.SEARCH].filters.showEffects
+      this[parentKey].colorCodeVariants = this[PAGE_NAMES.SEARCH].colorCodeVariants
+      this[parentKey].showEnsIDs = this[PAGE_NAMES.SEARCH].showEnsIDs
+      this[parentKey].showEffects = this[PAGE_NAMES.SEARCH].showEffects
+      this[parentKey].showOrphans = this[PAGE_NAMES.SEARCH].showOrphans
       this[parentKey].filters.itemsPerPage = this[PAGE_NAMES.SEARCH].filters.itemsPerPage
       this[parentKey].filters.pageNum = 1
     },
@@ -189,6 +194,7 @@ export const useAppStore = defineStore('appStore', {
       if(await fetchData(URLS.FILTER_DATA, 'filter data', this.currentPageName)) {
         const d = data.value
         this.filterPanelControls.analysisTypes = d.analysis_types.sort()
+        this.filterPanelControls.analysisTypePriority = d.analysis_types.sort()
         this.filterPanelControls.genes = d.genes.sort()
         this.filterPanelControls.phenotypes = d.phenotypes.sort()
         this.filterPanelControls.studies = d.studies.sort()
@@ -290,16 +296,19 @@ function getFilterPanelSettings() {
     colorCodeVariants: true,
     showEnsIDs: false,
     showEffects: false,
+    showOrphans: false,
     filters: {
       // these are actual filters set by the user in the UI
       studies: [],
+      analysisTypes: [],
+      analysisTypePriority: [],
       genes: [],
       region: '',
       phenotypes: [],
       tissues: [],
       cell_types: [],
-      trait1log10p: "0",
-      trait2log10p: "0",
+      gwas_log10p: "",
+      eqtl_log10p: "",
       h4: THRESHOLDS.H4,
       r2: THRESHOLDS.R2,
 
@@ -316,15 +325,17 @@ function getFilterPanelSettings() {
 const dataMapAPI = {
   studies: 'studies',
   genes: 'genes',
-  region: 'signal1_region',
+  region: 'region',
   phenotypes: 'phenotypes',
   tissues: 'tissues',
   cell_types: 'cell_types',
-  trait1log10p: 'signal1_min_logp',
-  trait2log10p: 'signal2_min_logp',
+  gwas_log10p: 'min_logp_gwas',
+  eqtl_log10p: 'min_logp_eqtl',
   h4: 'min_h4',
   r2: 'min_r2',
   analysisID: 'signal1_analysis', // using signal1_analysis gives the legacy behavior, using just analysis gives the desired? new behavior
+  analysisTypePriority: 'analysis_type_priority',
+  analysisTypes: 'analysis_types',
   pageNum: 'page',
   pageSize: 'page_size',
   signals: 'signals',

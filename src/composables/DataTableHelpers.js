@@ -13,6 +13,7 @@ export const useDataTableHelpers = () => {
   const showEnsIDs = ref(false)
   const showEffects = ref(false)
   const showCellType = ref(false)
+  const showOrphans = ref(false)
 
   const showAddPlotIcon = () => {
     return [locuszoomPage, multizoomPage].includes(appStore.currentPageName)
@@ -26,6 +27,10 @@ export const useDataTableHelpers = () => {
   watch(() => appStore[manhattanPage].showEffects, newValue => {showEffects.value = newValue})
   watch(() => appStore[searchPage].showEffects, newValue => {showEffects.value = newValue})
 
+  watch(() => appStore[locuszoomPage].showOrphans, newValue => {showOrphans.value = newValue})
+  watch(() => appStore[manhattanPage].showOrphans, newValue => {showOrphans.value = newValue})
+  watch(() => appStore[searchPage].showOrphans, newValue => {showOrphans.value = newValue})
+
   watch(() => appStore.showCellType, newValue => {showCellType.value = newValue}, { immediate: true })
 
   const alwaysShow = () => true
@@ -35,17 +40,20 @@ export const useDataTableHelpers = () => {
     { title: 'Add plots', value: 'actions', sortable: false, minWidth: '8rem', visible: () => showAddPlotIcon() },
     { title: 'Study 1', sortable: true, value: 'signal1.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 1', sortable: true, value: 'signal1.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Type 1', sortable: false, value: 'signal1.analysis.analysis_type', minWidth: '7rem', visible: alwaysShow },
+    { title: 'ENSG 1', sortable: true, value: 'signal1.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
+    { title: 'Tissue 1', sortable: true, value: 'signal1.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Cell Type 1', sortable: true, value: 'signal1.analysis.cell_type', minWidth: '5rem', visible: () => showCellType.value },
     { title: 'Study 2', sortable: true, value: 'signal2.analysis.study.uuid', minWidth: '7rem', visible: alwaysShow },
     { title: 'Trait 2', sortable: true, value: 'signal2.analysis.trait.uuid', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Type 2', sortable: false, value: 'signal2.analysis.trait.biomarker_type', minWidth: '7rem', visible: alwaysShow },
-    { title: 'Trait 2 ENSG', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
-    { title: 'Tissue', sortable: true, value: 'signal2.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
-    { title: 'Cell Type', sortable: true, value: 'signal2.analysis.cell_type', minWidth: '5rem', visible: () => showCellType.value },
-    { title: 'Trait 1 Variant', sortable: true, value: 'signal1.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
-    { title: 'Trait 2 Variant', sortable: true, value: 'signal2.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
-    { title: 'Trait 1 −log10p', sortable: true, value: 'signal1.neg_log_p', align: "end", visible: alwaysShow },
-    { title: 'Trait 2 −log10p', sortable: true, value: 'signal2.neg_log_p', align: "end", visible: alwaysShow },
+    { title: 'Type 2', sortable: false, value: 'signal2.analysis.analysis_type', minWidth: '7rem', visible: alwaysShow },
+    { title: 'ENSG 2', sortable: true, value: 'signal2.analysis.trait.gene.ens_id', minWidth: '9rem', visible: () => showEnsIDs.value },
+    { title: 'Tissue 2', sortable: true, value: 'signal2.analysis.tissue', minWidth: '5rem', visible: alwaysShow },
+    { title: 'Cell Type 2', sortable: true, value: 'signal2.analysis.cell_type', minWidth: '5rem', visible: () => showCellType.value },
+    { title: 'Variant 1', sortable: true, value: 'signal1.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
+    { title: 'Variant 2', sortable: true, value: 'signal2.lead_variant.vid', minWidth: '12rem', visible: alwaysShow },
+    { title: '−log10p 1', sortable: true, value: 'signal1.neg_log_p', align: "end", visible: alwaysShow },
+    { title: '−log10p 2', sortable: true, value: 'signal2.neg_log_p', align: "end", visible: alwaysShow },
     { title: 'H3', sortable: true, value: 'coloc_h3', align: "end", visible: alwaysShow },
     { title: 'H4', sortable: true, value: 'coloc_h4', align: "end", visible: alwaysShow },
     { title: 'R2', sortable: true, value: 'r2', visible: alwaysShow },

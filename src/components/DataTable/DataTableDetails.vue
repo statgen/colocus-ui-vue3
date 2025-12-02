@@ -46,7 +46,7 @@
         <td></td>
         <td><DataTableDetailLink :args="{
           shortName: variant1,
-          checkName: variant1.replace(/_/g, ':'),
+          checkName: variant1?.replace(/_/g, ':'),
           checkURL: URLS.PORTAL_VAR_CHECK,
           pageURL: URLS.PORTAL_VAR_PAGE,
           traitType: 'variant',
@@ -60,7 +60,7 @@
         <td></td>
         <td><DataTableDetailLink :args="{
           shortName: variant2,
-          checkName: variant2.replace(/_/g, ':'),
+          checkName: variant2?.replace(/_/g, ':'),
           checkURL: URLS.PORTAL_VAR_CHECK,
           pageURL: URLS.PORTAL_VAR_PAGE,
           traitType: 'variant',
@@ -102,21 +102,21 @@ const props = defineProps({
 })
 
 // *** Variables ***************************************************************
-const s1trait = props.item.signal1.analysis.trait
-const s2trait = props.item.signal2.analysis.trait
+const s1trait = props.item?.signal1?.analysis?.trait
+const s2trait = props.item?.signal2?.analysis?.trait
 
-const s1ShortName = s1trait.uuid
-const s1LongName = s1trait.phenotype.name
+const s1ShortName = s1trait?.uuid
+const s1LongName = s1trait?.phenotype?.name
 const s1TraitKPID = s1trait?.phenotype?.kp_id
 
-const s2TraitGene = s2trait.gene.symbol
-const s2TraitUuid = s2trait.uuid
+const s2TraitGene = s2trait?.gene?.symbol
+const s2TraitUuid = s2trait?.uuid
 
 // const signal1ID = props.item.signal1.uuid
 // const signal2ID = props.item.signal2.uuid
 
-const variant1 = props.item.signal1.lead_variant.vid
-const variant2 = props.item.signal2.lead_variant.vid
+const variant1 = props.item?.signal1?.lead_variant?.vid
+const variant2 = props.item?.signal2?.lead_variant?.vid
 
 const locuszoomPage = PAGE_NAMES.LOCUSZOOM
 const manhattanPage = PAGE_NAMES.MANHATTAN

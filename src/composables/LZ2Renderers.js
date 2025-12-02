@@ -138,7 +138,7 @@ export function useLZ2Renderers() {
       const y = yScale(yAccessor(d))
       // console.log(`x: ${x}, y: ${y}`)
       if(!Number.isFinite(x) || !Number.isFinite(y)) {
-        console.warn(`Bad plot data, skipping: x=${x}, y=${y}`)
+        // console.warn(`Bad plot data, skipping: x=${x}, y=${y}`)
         return
       }
 

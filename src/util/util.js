@@ -7,7 +7,9 @@ const VARIANT_COLOR_MAP = [0.475]
 const colorHasher = new ColorHash({ lightness: VARIANT_COLOR_MAP })
 
 const findPlotRegion = (pos1, pos2) => {
-  // console.log('p1, p2:',pos1, pos2)
+  if (pos1 == null) pos1 = pos2
+  if (pos2 == null) pos2 = pos1
+
   const min = Math.min(pos1, pos2)
   const max = Math.max(pos1, pos2)
   const between = max - min
@@ -54,15 +56,21 @@ const parseSignalDataForTitle = (signal) => {
   if (signal.analysis?.trait.phenotype) {
     analysisType = 'GWAS'
     trait = signal.analysis?.trait.uuid
-
+  } else if (signal.analysis?.trait?.protein) {
+    analysisType = 'pQTL/protein'
+    trait = signal.analysis?.trait.gene.symbol 
   } else if (signal.analysis?.trait.exon) {
     analysisType = 'eQTL/exon'
     trait = signal.analysis?.trait.gene.symbol
-
   } else if (signal.analysis?.trait.gene) {
     analysisType = 'eQTL/gene'
     trait = signal.analysis?.trait.gene.symbol
-
+  } else if (signal.analysis?.trait?.methyl_probe) {
+    analysisType = 'mQTL/probe'
+    trait = signal.analysis?.trait.methyl_probe.uuid
+  } else if (signal.analysis?.trait?.metabolite) {
+    analysisType = 'metabolite'
+    trait = signal.analysis?.trait.metabolite.uuid
   } else return 'unknown type'
 
   return {
@@ -77,6 +85,10 @@ const parseSignalDataForTitle = (signal) => {
 }
 
 function makePlotTitle(signal) {
+  if (!signal) {
+    return ['signal is null', 'red']
+  }
+
   const SEP = '  '
   const pd = parseSignalDataForTitle(signal)
   if(pd === 'unknown type') return ['unknown type', 'red']
