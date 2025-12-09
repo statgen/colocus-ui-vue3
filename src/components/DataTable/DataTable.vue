@@ -165,6 +165,7 @@ watch(() => appStore[currentPageName.value]?.showOrphans, async () => {
   //   appStore[searchPage].filters.h4 = 0
   //   appStore[searchPage].filters.r2 = 0
   // }
+  appStore[currentPageName.value].lzfilterDataChanged = true;
   await loadDataDebounced()
 })
 
