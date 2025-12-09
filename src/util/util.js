@@ -60,10 +60,10 @@ const parseSignalDataForTitle = (signal) => {
     analysisType = 'pQTL/protein'
     trait = signal.analysis?.trait.gene.symbol
   } else if (signal.analysis?.trait.exon) {
-    analysisType = 'eQTL/exon'
+    analysisType = 'exonQTL'
     trait = signal.analysis?.trait.gene.symbol
   } else if (signal.analysis?.trait.gene) {
-    analysisType = 'eQTL/gene'
+    analysisType = 'eQTL'
     trait = signal.analysis?.trait.gene.symbol
   } else if (signal.analysis?.trait?.methyl_probe) {
     analysisType = 'mQTL/probe'
@@ -98,8 +98,8 @@ function makePlotTitle(signal) {
   // const title = `${pd.trait}  ${pd.analysisType} ${pd.tissue} ${pd.cellType}  ${pd.variant}  ${pd.margOnly}`
   let title = ''
   title += `${pd.trait}${SEP}${pd.analysisType}`
-  title += pd.analysisType === 'GWAS' ? SEP : `/${pd.tissue}${SEP}`
-  title += pd.CellType ? `${pd.cellType}${SEP}` : ''
+  title += pd.analysisType === 'GWAS' ? SEP : `/${pd.tissue}`
+  title += pd.cellType ? `/${pd.cellType}${SEP}` : SEP
   title += `${variantFormatted}${SEP}`
   title += pd.margOnly ? `(marginal only)` : ''
 
