@@ -66,6 +66,7 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.MULTIZOOM]: {
+      activeGenePanelID: null,
       activePlotID: 0,
       addUniqueRefsOnly: false,
       cells: {},
@@ -73,6 +74,9 @@ export const useAppStore = defineStore('appStore', {
       colocDataReady: false,
       colocsSignals: markRaw([]),
       isExporting: false,
+      geneData: [],
+      genePanelRegistry: {},
+      genePanelCounter: 0,
       gridMap: {},
       gridSettings: {
         cols: 0,
@@ -92,6 +96,8 @@ export const useAppStore = defineStore('appStore', {
       rowSlotToPlotID: {},
       selectedLDRef: '',
       selectedTheme: '',
+      showCrosshair: false,
+      showGenePanelAxis: false,
       showGenSigLines: true,
       showPlotID: false,
       showRecombLines: true,

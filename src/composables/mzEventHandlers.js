@@ -68,6 +68,13 @@ export function useMZGridEventHandlers() {
         storeMZpage.activePlotID = plotID
         showPlotActionMenu({plotID, menuType: 'hamburger', event})
         break;
+
+      case 'gene-hamburger-menu':
+        const genePanelID = event.target.dataset.genePanelId
+        storeMZpage.activeGenePanelID = genePanelID
+        showPlotActionMenu({genePanelID, menuType: 'gene-hamburger', event})
+        break;
+
       default:
         console.warn('Unknown click event')
         break;
@@ -88,9 +95,10 @@ export function useMZGridEventHandlers() {
     mzGridHelpers.appendColumn()
   }
 
-  const onAppendRow = () => {
+  const onAddGenePanel = async (args) => {
     menuState.value.visible = false
-    mzGridHelpers.appendRow()
+    const cell = mzGridHelpers.cellKey(args.row, args.col)
+    await mzGridHelpers.addGenePanel(cell)
   }
 
   const onAddPlot = async ({ colocID, inputValue, insert, signal, slot }) => {
@@ -98,6 +106,11 @@ export function useMZGridEventHandlers() {
     if(!inputValue) return
     const cell = inputValue.toUpperCase()
     await mzGridHelpers.addPlot({ cell, colocID, insert, signal, slot })
+  }
+
+  const onAppendRow = () => {
+    menuState.value.visible = false
+    mzGridHelpers.appendRow()
   }
 
   const onInsertRow = (args) => {
@@ -115,6 +128,12 @@ export function useMZGridEventHandlers() {
     menuState.value.visible = false
     const atCol = args.col
     mzGridHelpers.deleteColumn(atCol)
+  }
+
+  const onDeleteGenePanel = () => {
+    menuState.value.visible = false
+    const genePanelID = storeMZpage.activeGenePanelID
+    if(genePanelID) mzGridHelpers.deleteGenePanel(genePanelID)
   }
 
   const onDeletePlot = () => {
@@ -199,12 +218,14 @@ export function useMZGridEventHandlers() {
     onRowHeaderClick,
     onRowMenu,
     // action menu event handlers
+    onAddGenePanel,
     onAppendColumn,
     onAppendRow,
     onAddPlot,
     onInsertRow,
     onDeleteCell,
     onDeleteColumn,
+    onDeleteGenePanel,
     onDeletePlot,
     onDeleteRow,
     onExportPlot,

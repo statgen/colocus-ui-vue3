@@ -9,6 +9,13 @@ export function useMZGridHelpers() {
   const storeMZpage = appStore[PAGE_NAMES.MULTIZOOM]
   const MOCK = MZ_GRID_DISPLAY_OPTIONS.mockCell
 
+  const addGenePanel = async (cell) => {
+    const { row, col, isValid } = parseCRReference(cell)
+    if(!isValid) return
+    ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, row), Math.max(storeMZpage.gridSettings.cols, col))
+    await renderGenePanel({ cell })
+  }
+
   const appendColumn = () => {
     const col = storeMZpage.gridSettings.cols + 1
     storeMZpage.gridSettings.cols = col
@@ -104,6 +111,17 @@ export function useMZGridHelpers() {
     }
 
     storeMZpage.gridSettings.cols = maxCol - 1
+  }
+
+  const deleteGenePanel = (genePanelID) => {
+    if(!genePanelID || genePanelID === MOCK) return
+
+    const cell = getGenePanelCell(genePanelID)
+    if(cell) {
+      storeMZpage.gridMap[cell] = MOCK
+    }
+
+    delete storeMZpage.genePanelRegistry[genePanelID]
   }
 
   const deleteMockCell = (row, col) => {
@@ -219,6 +237,11 @@ export function useMZGridHelpers() {
     }, 0)
   }
 
+  const getGenePanelCell = (genePanelID) => {
+    if(!genePanelID) return undefined
+    return storeMZpage.genePanelRegistry?.[genePanelID]?.cell || undefined
+  }
+
   const getPlotCell = (plotID) => {
     if(!plotID) return undefined
     return storeMZpage.plotRegistry[plotID]?.cell || undefined
@@ -232,6 +255,9 @@ export function useMZGridHelpers() {
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
     storeMZpage.plotCounter = 1
+    storeMZpage.geneData = []
+    storeMZpage.genePanelRegistry = {}
+    storeMZpage.genePanelCounter = 1
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 
@@ -407,6 +433,13 @@ export function useMZGridHelpers() {
     storeMZpage.gridMap[cellKey(row, col)] = MOCK
   }
 
+  const renderGenePanel = async ({ cell }) => {
+    const genePanelID = `gene_panel_${storeMZpage.genePanelCounter++}`
+    storeMZpage.genePanelRegistry[genePanelID] = { cell }
+    storeMZpage.gridMap[cell] = genePanelID
+    return genePanelID
+  }
+
   const renderPlot = async ({ cell, colocID, signal, slot }) => {
     const signalID = signal.uuid
 
@@ -466,6 +499,7 @@ export function useMZGridHelpers() {
   }
 
   return {
+    addGenePanel,
     addPlot,
     appendColumn,
     appendRow,
@@ -474,10 +508,12 @@ export function useMZGridHelpers() {
     columnNumber,
     deleteAllPlots,
     deleteColumn,
+    deleteGenePanel,
     deleteMockCell,
     deletePlot,
     deleteRow,
     exportPlotContainer,
+    getGenePanelCell,
     getPlotCell,
     getPlotIDfromRowSlot,
     initializePlotSession,

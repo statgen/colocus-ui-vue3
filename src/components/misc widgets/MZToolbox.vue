@@ -44,6 +44,12 @@
       class="my-n1"
       color="clcAction"/>
     <v-switch
+      label="Show crosshairs"
+      v-model="storeMZpage.showCrosshair"
+      density="compact"
+      class="my-n7"
+      color="clcAction"/>
+    <v-switch
       label="Show genetic significance lines"
       v-model="showAllGenSig"
       @update:model-value="onToggleAllGenSig"
