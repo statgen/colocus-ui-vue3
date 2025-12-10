@@ -20,8 +20,184 @@ export function useLZ2Renderers() {
       .attr('height', dimensions.height)
       .attr('fill', 'none')
       .attr('stroke', color)
-      .attr('stroke-width', 1)
+      .attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '3,3'); // dotted line effect
+  }
+
+  const renderRegionBorder = (svg, dimensions) => {
+    renderBorder(svg, dimensions, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+  }
+
+  const renderGeneBorder = (svg, dimensions, isOverflow = false) => {
+    const clcActionRGB = getComputedStyle(document.documentElement)
+      .getPropertyValue('--v-theme-clcAction')
+      .trim()
+    const clcActionColor = `rgba(${clcActionRGB}, 1.0)`
+
+    const borderColor = isOverflow ? clcActionColor : LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR
+    renderBorder(svg, dimensions, borderColor)
+  }
+
+  const renderGeneHeader = (svg, dimensions, title, genePanelID, isOverflow = false) => {
+    const headerColor = LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR
+    const titleColor = 'black'
+
+    const headerGroup = svg.append('g').attr('transform', 'translate(0, 0)')
+
+    headerGroup.append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', dimensions.width)
+      .attr('height', dimensions.headerHeight)
+      .attr('fill', headerColor)
+
+    headerGroup.append('text')
+      .attr('x', 4)
+      .attr('y', 20)
+      .attr('fill', titleColor)
+      .text(title)
+
+    headerGroup.append('text')
+      .attr('x', dimensions.width - 24)
+      .attr('y', 20)
+      .attr('font-size', '1.25rem')
+      .attr('fill', 'black')
+      .text('\u2630')
+      .attr('data-action', 'gene-hamburger-menu')
+      .attr('data-gene-panel-id', genePanelID)
+      .style('cursor', 'pointer')
+  }
+
+  const renderGenes = (plotGroup, genes, xScale, dimensions) => {
+    if (!genes?.length) return
+
+    const trackHeight = 25
+    const trackStart = 0
+    const exonHeight = 0.3
+    const fontSize = 12
+    const charWidth = 7
+    const minGap = 5
+
+    // Sort genes by size (larger genes get label priority)
+    const sortedGenes = [...genes].sort((a, b) => (b.end - b.start) - (a.end - a.start))
+
+    const labelRegions = {}
+
+    sortedGenes.forEach(gene => {
+      const yPos = trackStart + (gene.track * trackHeight)
+      const g = plotGroup.append('g')
+        .attr('class', 'gene-group')
+        .style('cursor', 'pointer')
+
+      // Span line
+      g.append('line')
+        .attr('x1', xScale(gene.start))
+        .attr('x2', xScale(gene.end))
+        .attr('y1', yPos)
+        .attr('y2', yPos)
+        .attr('stroke', 'black')
+        .attr('stroke-width', 1.5)
+
+      // Exons
+      gene.exons?.forEach(exon => {
+        g.append('rect')
+          .attr('x', xScale(exon.start))
+          .attr('y', yPos - trackHeight * exonHeight / 2)
+          .attr('width', Math.max(1, xScale(exon.end) - xScale(exon.start)))
+          .attr('height', trackHeight * exonHeight)
+          .attr('fill', 'RoyalBlue')
+          .attr('stroke', 'RoyalBlue')
+          .attr('stroke-width', 0.5)
+      })
+
+      // Gene name
+      const text = gene.strand === '+'
+        ? `${gene.gene_name} →`
+        : gene.strand === '-'
+          ? `← ${gene.gene_name}`
+          : gene.gene_name
+
+      const textWidth = text.length * charWidth + 4
+      const geneStartX = xScale(gene.start)
+      const geneEndX = xScale(gene.end)
+      const geneCenterX = (geneStartX + geneEndX) / 2
+
+      if (!labelRegions[gene.track]) {
+        labelRegions[gene.track] = []
+      }
+
+      const overlaps = (start, end) => {
+        return labelRegions[gene.track].some(region =>
+          (start < region.end + minGap) && (end > region.start - minGap)
+        )
+      }
+
+      // Try positions
+      const positions = [
+        { x: geneCenterX, anchor: 'middle', start: geneCenterX - textWidth / 2, end: geneCenterX + textWidth / 2 },
+        { x: geneStartX, anchor: 'start', start: geneStartX, end: geneStartX + textWidth },
+        { x: geneEndX, anchor: 'end', start: geneEndX - textWidth, end: geneEndX },
+        { x: geneEndX + 5, anchor: 'start', start: geneEndX + 5, end: geneEndX + 5 + textWidth },
+        { x: geneStartX - 5, anchor: 'end', start: geneStartX - 5 - textWidth, end: geneStartX - 5 }
+      ]
+
+      let chosen = null
+      for (const pos of positions) {
+        if (pos.start >= 0 && pos.end <= dimensions.plotWidth && !overlaps(pos.start, pos.end)) {
+          chosen = pos
+          break
+        }
+      }
+
+      if (chosen) {
+        const bgX = chosen.anchor === 'middle' ? chosen.x - textWidth / 2
+          : chosen.anchor === 'start' ? chosen.x
+            : chosen.x - textWidth
+
+        g.append('rect')
+          .attr('x', bgX - 2)
+          .attr('y', yPos + 4)
+          .attr('width', textWidth + 4)
+          .attr('height', 14)
+          .attr('fill', 'white')
+          .attr('fill-opacity', 0.85)
+
+        g.append('text')
+          .attr('x', chosen.x)
+          .attr('y', yPos + 16)
+          .attr('text-anchor', chosen.anchor)
+          .attr('font-size', `${fontSize}px`)
+          .attr('font-weight', '500')
+          .attr('fill', 'black')
+          .text(text)
+
+        labelRegions[gene.track].push({ start: chosen.start, end: chosen.end, gene: gene.gene_name })
+      } else {
+        // No room for label - add a clickable marker
+        // Invisible wider hit area for easier clicking
+        g.append('rect')
+          .attr('x', geneCenterX - 5)
+          .attr('y', yPos - 10)
+          .attr('width', 10)
+          .attr('height', 20)
+          .attr('fill', 'transparent')
+          .style('cursor', 'pointer')
+
+        // Visible red marker line
+        g.append('line')
+          .attr('x1', geneCenterX)
+          .attr('x2', geneCenterX)
+          .attr('y1', yPos - 8)
+          .attr('y2', yPos + 8)
+          .attr('stroke', 'red')
+          .attr('stroke-width', 3)  // Increased from 2 to 3
+          .style('pointer-events', 'none')  // Let the rect handle the mouse events
+      }
+
+      // Add tooltip to entire gene group
+      g.append('title')
+        .text(`${gene.gene_name} (${(gene.end - gene.start).toLocaleString()} bp)`)
+    })
   }
 
   const renderHeader = (svg, dimensions, color, variant, title, titleColor, plotID) => {
@@ -30,16 +206,14 @@ export function useLZ2Renderers() {
       .attr('fill', LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR)
       .classed('lzrp-header', true)
 
-    // Background
-    headerGroup.append('rect')
+    headerGroup.append('rect') // background
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', dimensions.width)
       .attr('height', dimensions.headerHeight)
       .attr('fill', color)
 
-    // Title
-    headerGroup.append('text')
+    headerGroup.append('text') // title
       .attr('x', 4)
       .attr('y', 20)
       .attr('fill', titleColor)
@@ -47,8 +221,7 @@ export function useLZ2Renderers() {
       .style('white-space', 'pre')
       .text(title)
 
-    // hamburger icon
-    headerGroup.append('text')
+    headerGroup.append('text') // hamburger icon
       .attr('x', dimensions.width - 24)
       .attr('y', 20)
       .attr('font-size', '1.25rem')
@@ -232,10 +405,14 @@ export function useLZ2Renderers() {
 
   return {
     renderBorder,
+    renderGenes,
+    renderGeneBorder,
+    renderGeneHeader,
     renderHeader,
     renderPlotIDBadge,
     renderSignalData,
     renderRecombLine,
+    renderRegionBorder,
     renderGenSigLine,
     renderPlotClipPath,
   }

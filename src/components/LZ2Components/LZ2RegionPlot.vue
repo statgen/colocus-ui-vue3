@@ -143,7 +143,7 @@ const renderPlot = (plotID, variant, signalData, showPlotID, recombData, showGen
   d3.select(plotContainer.value).selectAll('*').remove()
 
   rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
-  LZ2Renderers.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+  LZ2Renderers.renderRegionBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
   LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, variant, title.value, titleColor.value, plotID)
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 

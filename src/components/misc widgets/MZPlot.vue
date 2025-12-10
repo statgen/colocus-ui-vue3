@@ -3,6 +3,7 @@
     <div v-if="isMock" class="mock-plot" @click.stop="onMockClick" @contextmenu.prevent.stop="onMockContextMenu">
       <div class="mock-content">{{ cellLabel }}</div>
     </div>
+    <component v-else-if="isGenePanel" :is="LZ2GenePanel" :genePanelID="plotID"/>
     <component v-else-if="plotConfig" :is="LZ2RegionPlot" v-bind="plotProps"/>
   </div>
 </template>
@@ -12,6 +13,7 @@ import { computed } from 'vue'
 import { useAppStore } from '@/stores/AppStore'
 import { PAGE_NAMES } from '@/constants'
 import LZ2RegionPlot from '@/components/LZ2Components/LZ2RegionPlot.vue'
+import LZ2GenePanel from '@/components/LZ2Components/LZ2GenePanel.vue'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 
 const appStore = useAppStore()
@@ -37,6 +39,10 @@ const cellLabel = computed(() => {
 })
 
 const isMock = computed(() => !plotID)
+
+const isGenePanel = computed(() => {
+  return plotID && String(plotID).startsWith('gene_panel_')
+})
 
 const plotConfig = computed(() => {
   return storeMZpage.plotRegistry[plotID]

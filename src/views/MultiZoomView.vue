@@ -8,7 +8,7 @@
       <MZToolbox @export-plot-group="mzGridEventHandlers.onExportPlotGroup"/>
     </template>
 
-    <h1><BackButton />Multizoom  <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
+    <h1><BackButton />Multizoom <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
 
     <BusyOverlay :show="isExporting" />
 
@@ -22,6 +22,7 @@
         left: `${menuState.xPos}px`
       }"
       :context="menuState.context"
+      @addGenePanel="(payload) => mzGridEventHandlers.onAddGenePanel(payload)"
       @addPlotInsert="(payload) => mzGridEventHandlers.onAddPlot({...payload, insert: true})"
       @addPlotReplace="(payload) => mzGridEventHandlers.onAddPlot({...payload, insert: false})"
       @appendColumn="mzGridEventHandlers.onAppendColumn"
@@ -70,13 +71,13 @@
 import { computed, onBeforeUnmount, nextTick, onMounted, provide, ref, watch } from 'vue'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import { useAppStore } from '@/stores/AppStore'
-import { LZ2_DISPLAY_OPTIONS, MZ_GRID_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
+import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES } from '@/constants'
 import DataTable from "@/components/DataTable/DataTable.vue"
 import router from '@/router'
 import { useMZGridHelpers } from '@/composables/mzGridHelpers'
 import { useMZGridEventHandlers } from '@/composables/mzEventHandlers'
 import MZGrid from '@/components/misc widgets/MZGrid.vue'
-import ActionMenu from "@/components/misc widgets/ActionMenu.vue";
+import ActionMenu from "@/components/misc widgets/ActionMenu.vue"
 
 // *** Composables *************************************************************
 const appStore = useAppStore()

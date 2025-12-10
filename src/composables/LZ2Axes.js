@@ -43,6 +43,27 @@ export function useLZ2Axes() {
       .classed('lzrp-axis', true)
   }
 
+  const renderXaxisGenePanel = (plotGroup, xScale, dimensions) => {
+    const leftAxisWidth = LZ2_DISPLAY_OPTIONS.DIMENSIONS.leftAxisWidth
+    const rightAxisWidth = LZ2_DISPLAY_OPTIONS.DIMENSIONS.rightAxisWidth
+
+    const plotWidth = dimensions.width - leftAxisWidth - rightAxisWidth
+    const leftNudge = 9
+    const rightNudge = 25
+
+    const constrainedScale = xScale.copy().range([leftNudge, plotWidth - rightNudge])
+
+    const xAxis = d3.axisTop(constrainedScale)
+      .ticks(5)
+      .tickSizeOuter(0)
+      .tickFormat((d) => (d/1e6).toFixed(2))
+
+    const xAxisGroup = plotGroup.append('g')
+      .call(xAxis)
+      .style('transform', `translateX(${leftAxisWidth}px)`)
+      .classed('gene-scale-axis', true)
+  }
+
   const renderYaxisRecomb = (ctr, yScale, dimensions) => {
     const yAxis = d3.axisRight(yScale)
       .ticks(5)
@@ -68,6 +89,7 @@ export function useLZ2Axes() {
 
   return {
     renderXaxis,
+    renderXaxisGenePanel,
     renderYaxisSignal,
     renderYaxisRecomb,
   }

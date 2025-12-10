@@ -34,6 +34,7 @@ const LZ2_DISPLAY_OPTIONS = {
   DIMENSIONS: {
     badgeX: 8,
     badgeY: 8,
+    geneTrackHeight: 25,
     height: 225,
     headerHeight: 30,
     margins: { top: 15, right: 15, bottom: 48, left: 20 },
@@ -183,6 +184,7 @@ const URLS = {
   PORTAL_VAR_PAGE: 'https://hugeamp.org/variant.html',
 
   PORTALDEV_API: 'https://services.locuszoom.org/api/v1/',
+  PORTALDEV_GENES: 'https://portaldev.sph.umich.edu/api/v1/annotation/genes/',
   PORTALDEV_RECOMB: 'https://services.locuszoom.org/api/v1/annotation/recomb/results/',
 }
 

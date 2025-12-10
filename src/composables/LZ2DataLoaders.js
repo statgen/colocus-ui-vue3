@@ -92,7 +92,22 @@ export function useLZ2DataLoaders() {
     }
   }
 
+  const loadGeneData = async(leadVariant, build, region) => {
+    const { data, errorMessage, fetchData } = useFetchData()
+    const pv = parseVariant2(leadVariant, region)
+    const url = new URL(URLS.PORTALDEV_GENES)
+    url.searchParams.set('filter', `chrom eq '${pv.chr}' and start le ${pv.end} and end ge ${pv.start}`)
+    url.searchParams.set('build', build)
+    if(await fetchData(url, "gene data", "gene-plot")) {
+      const geneData = toRaw(data.value).data
+      return geneData
+    } else {
+      console.error("Failed to fetch gene data")
+    }
+  }
+
   return {
+    loadGeneData,
     loadSignalData,
     loadRecombData,
   }

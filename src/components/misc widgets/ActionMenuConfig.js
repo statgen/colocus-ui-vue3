@@ -61,6 +61,8 @@ export const actionMenuConfig = {
   ],
 
   'mock-cell': [
+    { id: 'add-gene-panel', type: 'action', label: 'Add gene panel', icon: '➕', event: 'add-gene-panel' },
+    { id: 'divider', type: 'divider', },
     { id: 'insert-mock-cell', type: 'action', label: 'Insert empty cell before', icon: '➕', event: 'insert-mock-cell' },
     { id: 'divider', type: 'divider', },
     { id: 'delete-cell', type: 'action', label: 'Delete cell, move lower cells up', icon: '🗑', event: 'delete-cell' },
