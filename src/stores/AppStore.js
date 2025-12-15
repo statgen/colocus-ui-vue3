@@ -209,7 +209,8 @@ export const useAppStore = defineStore('appStore', {
 
     getNextPlotID () {
       const mzPage = this[PAGE_NAMES.MULTIZOOM]
-      return mzPage.plotCounter++
+      const pid = mzPage.plotCounter++
+      return `region_plot_${pid}`
     },
 
     async loadFilterData() {
