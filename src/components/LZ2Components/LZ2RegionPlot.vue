@@ -30,7 +30,7 @@ const LZ2Renderers = useLZ2Renderers()
 
 // *** Props *******************************************************************
 const props = defineProps({
-  ID: Number,
+  ID: String,
   showGenSigLine: Boolean,
   showRecombLine: Boolean,
   signalID: String,
