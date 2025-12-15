@@ -1,7 +1,7 @@
 <template>
   <div :id="cellID" class="plot-cell" :style="{ gridRow: row + 1, gridColumn: col + 1 }" :data-cell="cellKey">
     <div v-if="isMock" class="mock-plot" @click.stop="onMockClick" @contextmenu.prevent.stop="onMockContextMenu">
-      <div class="mock-content">{{ cellLabel }}</div>
+      <div class="mock-content">{{ cellKey }}</div>
     </div>
     <component v-else-if="isGenePanel" :is="LZ2GenePanel" :genePanelID="plotID"/>
     <component v-else-if="plotConfig" :is="LZ2RegionPlot" v-bind="plotProps"/>
@@ -26,18 +26,13 @@ const props = defineProps({
   plotID: { type: [String, Number], default: null }
 })
 
+const cellKey = mzGridHelpers.cellKey(props.row, props.col)
+const cellID = `cell_${cellKey}`
 const plotID = props.plotID
 
 const emit = defineEmits(['mock-click', 'mock-menu'])
 
 // *** Computed ****************************************************************
-const cellID = computed(() => `cell_${props.row}_${props.col}`)
-const cellKey = computed(() => `${props.row},${props.col}`)
-const cellLabel = computed(() => {
-  const colLabel = mzGridHelpers.columnLabel(props.col)
-  return `${colLabel}${props.row}`
-})
-
 const isMock = computed(() => !plotID)
 
 const isGenePanel = computed(() => {
