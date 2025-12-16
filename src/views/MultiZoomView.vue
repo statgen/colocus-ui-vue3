@@ -38,6 +38,8 @@
       @insertMockCell="(payload) => mzGridEventHandlers.onInsertMockCell(payload)"
       @moveColumnInsert="(payload) => mzGridEventHandlers.onMoveColumn({...payload, insert: true})"
       @moveColumnReplace="(payload) => mzGridEventHandlers.onMoveColumn({...payload, insert: false})"
+      @move-panel-insert="(payload) => mzGridEventHandlers.onMovePanel({...payload, insert: true})"
+      @move-panel-replace="(payload) => mzGridEventHandlers.onMovePanel({...payload, insert: false})"
       @movePlotInsert="(payload) => mzGridEventHandlers.onMovePlot({...payload, insert: true})"
       @movePlotReplace="(payload) => mzGridEventHandlers.onMovePlot({...payload, insert: false})"
       @moveRowInsert="(payload) => mzGridEventHandlers.onMoveRow({...payload, insert: true})"

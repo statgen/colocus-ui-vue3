@@ -7,6 +7,37 @@ export const getStoreMZpage = () => {
 }
 
 export const actionMenuConfig = {
+  'column-header': [
+    { id: 'append-column', type: 'action', label: 'Append column to end', icon: '➕', event: 'append-column' },
+    { id: 'insert-column', type: 'action', label: 'Insert column before', icon: '➕', event: 'insert-column' },
+    { id: 'divider1', type: 'divider', },
+    { id: 'move-column-insert', type: 'input', label: 'Move column (insert) to', icon: '➤', event: 'move-column-insert' },
+    { id: 'move-column-replace', type: 'input', label: 'Move column (replace) to', icon: '➤', event: 'move-column-replace' },
+    { id: 'divider2', type: 'divider', },
+    { id: 'delete-column', type: 'action', label: 'Delete column', icon: '🗑', event: 'delete-column' },
+  ],
+
+  datatable: [
+    { id: 'add-plot-insert', type: 'input', label: 'Add plot (insert) to', icon: '➕', event: 'add-plot-insert' },
+    { id: 'add-plot-replace', type: 'input', label: 'Add plot (replace) to', icon: '➕', event: 'add-plot-replace' },
+    { id: 'divider1', type: 'divider', },
+    { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert) to', icon: '➤', event: 'move-plot-insert' },
+    { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace) to', icon: '➤', event: 'move-plot-replace' },
+    { id: 'divider2', type: 'divider', },
+    { id: 'delete-plot', type: 'action', label: 'Delete plot', icon: '🗑', event: 'delete-plot' },
+  ],
+
+  'gene-hamburger': [
+    { id: 'insert-mock-cell', type: 'action', label: 'Insert empty cell before', icon: '➕', event: 'insert-mock-cell' },
+    { id: 'divider1', type: 'divider', },
+    { id: 'move-panel-insert', type: 'input', label: 'Move panel (insert) to', icon: '➤', event: 'move-panel-insert' },
+    { id: 'move-panel-replace', type: 'input', label: 'Move panel (replace) to', icon: '➤', event: 'move-panel-replace' },
+    { id: 'divider2', type: 'divider', },
+    { id: 'clone-panel-across', type: 'action', label: 'Clone panel across', icon: '➕', event: 'clone-panel-across' },
+    { id: 'divider3', type: 'divider', },
+    { id: 'delete-panel', type: 'action', label: 'Delete panel', icon: '🗑', event: 'delete-panel' },
+  ],
+
   hamburger: [
     {
       id: 'recomb-line', type: 'checkbox', label: 'Show recomb line',
@@ -47,17 +78,7 @@ export const actionMenuConfig = {
     { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace) to', icon: '➤', event: 'move-plot-replace' },
     { id: 'divider3', type: 'divider', },
     { id: 'export', type: 'action', label: 'Export PNG', icon: '⬇', event: 'export-plot' },
-    { id: 'delete', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
-  ],
-
-    datatable: [
-    { id: 'add-plot-insert', type: 'input', label: 'Add plot (insert) to', icon: '➕', event: 'add-plot-insert' },
-    { id: 'add-plot-replace', type: 'input', label: 'Add plot (replace) to', icon: '➕', event: 'add-plot-replace' },
-    { id: 'divider1', type: 'divider', },
-    { id: 'move-plot-insert', type: 'input', label: 'Move plot (insert) to', icon: '➤', event: 'move-plot-insert' },
-    { id: 'move-plot-replace', type: 'input', label: 'Move plot (replace) to', icon: '➤', event: 'move-plot-replace' },
-    { id: 'divider2', type: 'divider', },
-    { id: 'delete-plot', type: 'action', label: 'Delete Plot', icon: '🗑', event: 'delete-plot' },
+    { id: 'delete', type: 'action', label: 'Delete plot', icon: '🗑', event: 'delete-plot' },
   ],
 
   'mock-cell': [
@@ -66,16 +87,6 @@ export const actionMenuConfig = {
     { id: 'insert-mock-cell', type: 'action', label: 'Insert empty cell before', icon: '➕', event: 'insert-mock-cell' },
     { id: 'divider', type: 'divider', },
     { id: 'delete-cell', type: 'action', label: 'Delete cell, move lower cells up', icon: '🗑', event: 'delete-cell' },
-  ],
-
-  'column-header': [
-    { id: 'append-column', type: 'action', label: 'Append column to end', icon: '➕', event: 'append-column' },
-    { id: 'insert-column', type: 'action', label: 'Insert column before', icon: '➕', event: 'insert-column' },
-    { id: 'divider1', type: 'divider', },
-    { id: 'move-column-insert', type: 'input', label: 'Move column (insert) to', icon: '➤', event: 'move-column-insert' },
-    { id: 'move-column-replace', type: 'input', label: 'Move column (replace) to', icon: '➤', event: 'move-column-replace' },
-    { id: 'divider2', type: 'divider', },
-    { id: 'delete-column', type: 'action', label: 'Delete column', icon: '🗑', event: 'delete-column' },
   ],
 
   'row-header': [

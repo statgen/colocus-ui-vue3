@@ -356,30 +356,38 @@ export function useMZGridHelpers() {
     }
   }
 
-  const movePlot = ({ plotID, toCell, insert }) => {
-    if(!plotID) return
-    const { row, col, isValid } = parseCRReference(toCell)
-    if(!isValid) {
-      console.warn(`movePlot: Invalid cell reference: ${toCell}`)
+  const movePlot = ({ plotID, toCell, insert = false }) => {
+    const fromCell = getPlotCell(plotID)
+
+    const { col: toCol, row: toRow } = parseCRReference(toCell)
+    ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, toRow), Math.max(storeMZpage.gridSettings.cols, toCol))
+
+    if (insert) {
+      pushColumnDown(toRow, toCol)
+
+      const newFromCell = getPlotCell(plotID)
+
+      storeMZpage.gridMap[toCell] = plotID
+      storeMZpage.gridMap[newFromCell] = MOCK
+      storeMZpage.plotRegistry[plotID].cell = toCell
       return
     }
 
-    const fromCell = getPlotCell(plotID)
-    storeMZpage.gridMap[fromCell] = MOCK
+    // No insert
+    const targetPlotID = storeMZpage.gridMap[toCell]
 
-    ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, row), Math.max(storeMZpage.gridSettings.cols, col))
-
-    if(insert) {
-      pushColumnDown(row, col)
+    if (!targetPlotID || targetPlotID === MOCK) {
+      // target empty, just move
+      storeMZpage.gridMap[toCell] = plotID
+      storeMZpage.gridMap[fromCell] = MOCK
+      storeMZpage.plotRegistry[plotID].cell = toCell
     } else {
-      const existingPlotID = storeMZpage.gridMap[toCell]
-      deletePlot(existingPlotID)
+      // target has plot, swap
+      storeMZpage.gridMap[toCell] = plotID
+      storeMZpage.gridMap[fromCell] = targetPlotID
+      storeMZpage.plotRegistry[plotID].cell = toCell
+      storeMZpage.plotRegistry[targetPlotID].cell = fromCell
     }
-
-    storeMZpage.gridMap[toCell] = plotID
-    storeMZpage.plotRegistry[plotID].cell = toCell
-    // await nextTick()
-    storeMZpage.plotMoved = !storeMZpage.plotMoved
   }
 
   const moveRow = (fromRow, toRow, insert) => {

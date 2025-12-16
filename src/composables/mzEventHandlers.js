@@ -32,6 +32,7 @@ export function useMZGridEventHandlers() {
       context: {
         col: args.col,
         colocID: args.colocID,
+        genePanelID: args.genePanelID,
         plotID: args.plotID,
         row: args.row,
         signal: args.signal,
@@ -48,6 +49,7 @@ export function useMZGridEventHandlers() {
   }
 
   const onColumnMenu = (args) => {
+    // right-click handler
     // console.log('column menu', args.col, args.kind, args.event)
   }
 
@@ -56,28 +58,35 @@ export function useMZGridEventHandlers() {
   }
 
   const onMockMenu = (args) => {
+    // right-click handler
     // console.log('mock menu', args.row, args.col, args.event)
   }
 
   const onNativeClick = (event) => {
-    const action = event.target.dataset.action;
+    const action = event.target.dataset.action
+    // console.log('native click:', action)
 
     switch(action) {
       case 'hamburger-menu':
         const plotID = event.target.dataset.plotId
         storeMZpage.activePlotID = plotID
         showPlotActionMenu({plotID, menuType: 'hamburger', event})
-        break;
+        break
 
       case 'gene-hamburger-menu':
         const genePanelID = event.target.dataset.genePanelId
+        console.log('gene-hamburger-menu', genePanelID, event.target.dataset)
         storeMZpage.activeGenePanelID = genePanelID
         showPlotActionMenu({genePanelID, menuType: 'gene-hamburger', event})
-        break;
+        break
+
+      case 'gene-panel-background':
+        // console.log('gene-panel-background', event)
+        break
 
       default:
         console.warn('Unknown click event')
-        break;
+        break
     }
   }
 
@@ -86,6 +95,7 @@ export function useMZGridEventHandlers() {
   }
 
   const onRowMenu = (args) => {
+    // right-click handler
     // console.log('row menu', args.row, args.kind, args.event)
   }
 
@@ -184,9 +194,16 @@ export function useMZGridEventHandlers() {
   const onMovePlot = ({ inputValue, insert, plotID }) => {
     menuState.value.visible = false
     if(!inputValue || !plotID) return
-    const pid = parseInt(plotID)
+    // const pid = parseInt(plotID)
     const toCell = inputValue.toUpperCase()
-    mzGridHelpers.movePlot({ insert, plotID: pid, toCell})
+    mzGridHelpers.movePlot({ insert, plotID, toCell})
+  }
+
+  const onMovePanel = ({ inputValue, insert, genePanelID }) => {
+    menuState.value.visible = false
+    const toCell = inputValue.toUpperCase()
+    console.log('onMovePanel', toCell, genePanelID, insert)
+    mzGridHelpers.movePlot({ insert, plotID: genePanelID, toCell})
   }
 
   const onMoveRow = (args) => {
@@ -232,6 +249,7 @@ export function useMZGridEventHandlers() {
     onInsertColumn,
     onInsertMockCell,
     onMoveColumn,
+    onMovePanel,
     onMovePlot,
     onMoveRow,
     // misc
