@@ -3,7 +3,6 @@
     :id="`geneplot_${genePanelID}`"
     ref="genePlotContainer"
     class="gene-plot-container"
-    @click.stop="onClick"
     :class="{ 'overflow-state': isOverflow }"
     :style="{
       width: `${dimensions.width}px`,
@@ -170,15 +169,6 @@ onMounted(async () => {
 })
 
 // *** Event handlers **********************************************************
-const onClick = (event) => {
-  if (!storeMZpage.showCrosshair) return
-
-  const rect = genePlotContainer.value.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-  // console.log('Gene panel click - x:', x, 'y:', y)
-}
-
 // *** Utility functions *******************************************************
 const loadGeneData = async () => {
   if (storeMZpage.geneData?.length > 0) return
@@ -189,14 +179,11 @@ const renderGenePlot = async () => {
   await nextTick()
   const svg = d3.select(geneSvg.value)
   svg.selectAll('*').remove()
+  svg.attr('data-gene-panel-id', props.genePanelID)
+    .attr('data-action', 'gene-panel-background') // click on bgnd
 
-  lz2Renderers.renderGeneHeader(
-    svg,
-    dimensions.value,
-    `Genes in region (${genesWithTracks.value?.length || 0})`,
-    props.genePanelID,
-    isOverflow.value
-  )
+  const title = `Genes in region (${genesWithTracks.value?.length || 0})`
+  lz2Renderers.renderGeneHeader(svg, dimensions.value, title, props.genePanelID, isOverflow.value)
 
   const plotGroup = svg.append('g').attr('transform', `translate(${dimensions.value.margin.left}, ${dimensions.value.headerHeight})`)
   if(storeMZpage.showGenePanelAxis) lz2Axes.renderXaxisGenePanel(plotGroup, xScale.value, dimensions.value)
