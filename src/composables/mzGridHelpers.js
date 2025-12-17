@@ -116,12 +116,12 @@ export function useMZGridHelpers() {
   const deleteGenePanel = (genePanelID) => {
     if(!genePanelID || genePanelID === MOCK) return
 
-    const cell = getGenePanelCell(genePanelID)
+    const cell = getPlotCell(genePanelID)
     if(cell) {
       storeMZpage.gridMap[cell] = MOCK
     }
 
-    delete storeMZpage.genePanelRegistry[genePanelID]
+    delete storeMZpage.plotRegistry[genePanelID]
   }
 
   const deleteMockCell = (row, col) => {
@@ -237,14 +237,8 @@ export function useMZGridHelpers() {
     }, 0)
   }
 
-  const getGenePanelCell = (genePanelID) => {
-    if(!genePanelID) return undefined
-    return storeMZpage.genePanelRegistry?.[genePanelID]?.cell || undefined
-  }
-
   const getPlotCell = (plotID) => {
-    if(!plotID) return undefined
-    return storeMZpage.plotRegistry[plotID]?.cell || undefined
+    return storeMZpage.plotRegistry?.[plotID]?.cell || undefined
   }
 
   const getPlotIDfromRowSlot = (colocID, slot) => {
@@ -256,7 +250,6 @@ export function useMZGridHelpers() {
     storeMZpage.rowSlotToPlotID = {}
     storeMZpage.plotCounter = 0
     storeMZpage.geneData = []
-    storeMZpage.genePanelRegistry = {}
     storeMZpage.genePanelCounter = 0
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
@@ -443,9 +436,8 @@ export function useMZGridHelpers() {
 
   const renderGenePanel = async ({ cell }) => {
     const genePanelID = appStore.getNextGenePanelID()
-    storeMZpage.genePanelRegistry[genePanelID] = { cell }
+    storeMZpage.plotRegistry[genePanelID] = { cell }
     storeMZpage.gridMap[cell] = genePanelID
-    return genePanelID
   }
 
   const renderPlot = async ({ cell, colocID, signal, slot }) => {
@@ -521,7 +513,6 @@ export function useMZGridHelpers() {
     deletePlot,
     deleteRow,
     exportPlotContainer,
-    getGenePanelCell,
     getPlotCell,
     getPlotIDfromRowSlot,
     initializePlotSession,

@@ -115,7 +115,9 @@ const selectedRef = computed({
 })
 
 const uniqueVariants = computed(() => {
-  const variants = Object.values(storeMZpage.plotRegistry).map(v => v.variant)
+  const variants = Object.values(storeMZpage.plotRegistry)
+    .filter(plot => plot.variant)  // Skip plots without variants (e.g., gene panels)
+    .map(plot => plot.variant)
   return [...new Set(variants)].sort()
 })
 
