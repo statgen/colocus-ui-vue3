@@ -238,6 +238,7 @@ export function useMZGridHelpers() {
   }
 
   const initializePlotSession = () => {
+    storeMZpage.activePlotID = ''
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
     storeMZpage.plotCounter = 0

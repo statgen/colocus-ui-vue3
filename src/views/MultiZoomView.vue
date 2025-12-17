@@ -31,6 +31,7 @@
       @closeMenu="onCloseMenu"
       @deleteCell="mzGridEventHandlers.onDeleteCell"
       @deleteColumn="mzGridEventHandlers.onDeleteColumn"
+      @deletePanel="mzGridEventHandlers.onDeletePlot"
       @deletePlot="mzGridEventHandlers.onDeletePlot"
       @deleteRow="mzGridEventHandlers.onDeleteRow"
       @exportPlot="mzGridEventHandlers.onExportPlot"

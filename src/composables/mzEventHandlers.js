@@ -121,12 +121,6 @@ export function useMZGridEventHandlers() {
     mzGridHelpers.appendRow()
   }
 
-  const onInsertRow = (args) => {
-    menuState.value.visible = false
-    const atRow = args.row
-    mzGridHelpers.insertRow(atRow)
-  }
-
   const onDeleteCell = (args) => {
     menuState.value.visible = false
     mzGridHelpers.deleteMockCell(args.row, args.col)
@@ -171,6 +165,12 @@ export function useMZGridEventHandlers() {
     } else if(args.row && args.col) { // user clicked empty/mock cell
       mzGridHelpers.insertMockCell(args.row, args.col)
     }
+  }
+
+  const onInsertRow = (args) => {
+    menuState.value.visible = false
+    const atRow = args.row
+    mzGridHelpers.insertRow(atRow)
   }
 
   const onMoveColumn = (args) => {
