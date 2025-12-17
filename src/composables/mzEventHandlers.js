@@ -73,7 +73,6 @@ export function useMZGridEventHandlers() {
         break
 
       case 'gene-hamburger-menu':
-        console.log('gene-hamburger-menu', plotID, event.target.dataset)
         storeMZpage.activePlotID = plotID
         showPlotActionMenu({plotID, menuType: 'gene-hamburger', event})
         break
