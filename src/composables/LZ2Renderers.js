@@ -38,7 +38,7 @@ export function useLZ2Renderers() {
     renderBorder(svg, dimensions, borderColor)
   }
 
-  const renderGeneHeader = (svg, dimensions, title, genePanelID, isOverflow = false) => {
+  const renderGeneHeader = (svg, dimensions, title, plotID, isOverflow = false) => {
     const headerColor = LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR
     const titleColor = 'black'
 
@@ -64,7 +64,7 @@ export function useLZ2Renderers() {
       .attr('fill', 'black')
       .text('\u2630')
       .attr('data-action', 'gene-hamburger-menu')
-      .attr('data-gene-panel-id', genePanelID)
+      .attr('data-plot-id', plotID)
       .style('cursor', 'pointer')
   }
 

@@ -32,7 +32,6 @@ export function useMZGridEventHandlers() {
       context: {
         col: args.col,
         colocID: args.colocID,
-        genePanelID: args.genePanelID,
         plotID: args.plotID,
         row: args.row,
         signal: args.signal,
@@ -64,20 +63,19 @@ export function useMZGridEventHandlers() {
 
   const onNativeClick = (event) => {
     const action = event.target.dataset.action
+    const plotID = event.target.dataset.plotId
     // console.log('native click:', action)
 
     switch(action) {
       case 'hamburger-menu':
-        const plotID = event.target.dataset.plotId
         storeMZpage.activePlotID = plotID
         showPlotActionMenu({plotID, menuType: 'hamburger', event})
         break
 
       case 'gene-hamburger-menu':
-        const genePanelID = event.target.dataset.genePanelId
-        console.log('gene-hamburger-menu', genePanelID, event.target.dataset)
-        storeMZpage.activeGenePanelID = genePanelID
-        showPlotActionMenu({genePanelID, menuType: 'gene-hamburger', event})
+        console.log('gene-hamburger-menu', plotID, event.target.dataset)
+        storeMZpage.activePlotID = plotID
+        showPlotActionMenu({plotID, menuType: 'gene-hamburger', event})
         break
 
       case 'gene-panel-background':
@@ -140,12 +138,6 @@ export function useMZGridEventHandlers() {
     mzGridHelpers.deleteColumn(atCol)
   }
 
-  const onDeleteGenePanel = () => {
-    menuState.value.visible = false
-    const genePanelID = storeMZpage.activeGenePanelID
-    if(genePanelID) mzGridHelpers.deleteGenePanel(genePanelID)
-  }
-
   const onDeletePlot = () => {
     menuState.value.visible = false
     const plotID = storeMZpage.activePlotID
@@ -194,16 +186,8 @@ export function useMZGridEventHandlers() {
   const onMovePlot = ({ inputValue, insert, plotID }) => {
     menuState.value.visible = false
     if(!inputValue || !plotID) return
-    // const pid = parseInt(plotID)
     const toCell = inputValue.toUpperCase()
     mzGridHelpers.movePlot({ insert, plotID, toCell})
-  }
-
-  const onMovePanel = ({ inputValue, insert, genePanelID }) => {
-    menuState.value.visible = false
-    const toCell = inputValue.toUpperCase()
-    console.log('onMovePanel', toCell, genePanelID, insert)
-    mzGridHelpers.movePlot({ insert, plotID: genePanelID, toCell})
   }
 
   const onMoveRow = (args) => {
@@ -242,14 +226,12 @@ export function useMZGridEventHandlers() {
     onInsertRow,
     onDeleteCell,
     onDeleteColumn,
-    onDeleteGenePanel,
     onDeletePlot,
     onDeleteRow,
     onExportPlot,
     onInsertColumn,
     onInsertMockCell,
     onMoveColumn,
-    onMovePanel,
     onMovePlot,
     onMoveRow,
     // misc

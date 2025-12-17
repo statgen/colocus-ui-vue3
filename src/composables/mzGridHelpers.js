@@ -113,17 +113,6 @@ export function useMZGridHelpers() {
     storeMZpage.gridSettings.cols = maxCol - 1
   }
 
-  const deleteGenePanel = (genePanelID) => {
-    if(!genePanelID || genePanelID === MOCK) return
-
-    const cell = getPlotCell(genePanelID)
-    if(cell) {
-      storeMZpage.gridMap[cell] = MOCK
-    }
-
-    delete storeMZpage.plotRegistry[genePanelID]
-  }
-
   const deleteMockCell = (row, col) => {
     const maxRow = storeMZpage.gridSettings.rows
 
@@ -152,10 +141,13 @@ export function useMZGridHelpers() {
       // console.warn(`Cell for plot ${plotID} not found.`)
     }
 
-    const slot = storeMZpage.plotRegistry[plotID]?.slot
-    const colocID = storeMZpage.plotRegistry[plotID]?.colocID
-    setRowSlotPlotID(colocID, slot, MOCK)
     delete storeMZpage.plotRegistry[plotID]
+
+    if(plotID.startsWith('region_plot')){
+      const slot = storeMZpage.plotRegistry[plotID]?.slot
+      const colocID = storeMZpage.plotRegistry[plotID]?.colocID
+      setRowSlotPlotID(colocID, slot, MOCK)
+    }
   }
 
   const deleteRow = (row) => {
@@ -508,7 +500,6 @@ export function useMZGridHelpers() {
     columnNumber,
     deleteAllPlots,
     deleteColumn,
-    deleteGenePanel,
     deleteMockCell,
     deletePlot,
     deleteRow,
