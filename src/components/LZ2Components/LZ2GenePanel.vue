@@ -1,6 +1,6 @@
 <template>
   <div
-    :id="`geneplot_${genePanelID}`"
+    :id="`geneplot_${plotID}`"
     ref="genePlotContainer"
     class="gene-plot-container"
     :class="{ 'overflow-state': isOverflow }"
@@ -40,7 +40,7 @@ const lz2DataLoaders = useLZ2DataLoaders()
 const lz2Renderers = useLZ2Renderers()
 
 // *** Props *******************************************************************
-const props = defineProps({ genePanelID: { type: String, required: true } })
+const props = defineProps({ plotID: { type: String, required: true } })
 
 // *** Variables ***************************************************************
 const geneSvg = ref(null)
@@ -179,11 +179,11 @@ const renderGenePlot = async () => {
   await nextTick()
   const svg = d3.select(geneSvg.value)
   svg.selectAll('*').remove()
-  svg.attr('data-gene-panel-id', props.genePanelID)
+  svg.attr('data-plot-id', props.plotID)
     .attr('data-action', 'gene-panel-background') // click on bgnd
 
   const title = `Genes in region (${genesWithTracks.value?.length || 0})`
-  lz2Renderers.renderGeneHeader(svg, dimensions.value, title, props.genePanelID, isOverflow.value)
+  lz2Renderers.renderGeneHeader(svg, dimensions.value, title, props.plotID, isOverflow.value)
 
   const plotGroup = svg.append('g').attr('transform', `translate(${dimensions.value.margin.left}, ${dimensions.value.headerHeight})`)
   if(storeMZpage.showGenePanelAxis) lz2Axes.renderXaxisGenePanel(plotGroup, xScale.value, dimensions.value)

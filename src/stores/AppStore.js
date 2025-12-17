@@ -66,7 +66,6 @@ export const useAppStore = defineStore('appStore', {
       ...getFilterPanelSettings()
     },
     [PAGE_NAMES.MULTIZOOM]: {
-      activeGenePanelID: null,
       activePlotID: 0,
       addUniqueRefsOnly: false,
       cells: {},

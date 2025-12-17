@@ -3,7 +3,7 @@
     <div v-if="isMock" class="mock-plot" @click.stop="onMockClick" @contextmenu.prevent.stop="onMockContextMenu">
       <div class="mock-content">{{ cellKey }}</div>
     </div>
-    <component v-else-if="isGenePanel" :is="LZ2GenePanel" :genePanelID="plotID"/>
+    <component v-else-if="isGenePanel" :is="LZ2GenePanel" :plotID/>
     <component v-else-if="plotConfig" :is="LZ2RegionPlot" v-bind="plotProps"/>
   </div>
 </template>
