@@ -349,30 +349,23 @@ export function useMZGridHelpers() {
     ensureRowsCols(Math.max(storeMZpage.gridSettings.rows, toRow), Math.max(storeMZpage.gridSettings.cols, toCol))
 
     if (insert) {
+      storeMZpage.gridMap[fromCell] = MOCK
       pushColumnDown(toRow, toCol)
-
-      const newFromCell = getPlotCell(plotID)
-
       storeMZpage.gridMap[toCell] = plotID
-      storeMZpage.gridMap[newFromCell] = MOCK
       storeMZpage.plotRegistry[plotID].cell = toCell
       return
     }
 
-    // No insert
     const targetPlotID = storeMZpage.gridMap[toCell]
-
     if (!targetPlotID || targetPlotID === MOCK) {
-      // target empty, just move
       storeMZpage.gridMap[toCell] = plotID
       storeMZpage.gridMap[fromCell] = MOCK
       storeMZpage.plotRegistry[plotID].cell = toCell
     } else {
-      // target has plot, swap
+      delete storeMZpage.plotRegistry[targetPlotID]
       storeMZpage.gridMap[toCell] = plotID
-      storeMZpage.gridMap[fromCell] = targetPlotID
+      storeMZpage.gridMap[fromCell] = MOCK
       storeMZpage.plotRegistry[plotID].cell = toCell
-      storeMZpage.plotRegistry[targetPlotID].cell = fromCell
     }
   }
 
