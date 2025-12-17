@@ -44,7 +44,7 @@ export const actionMenuConfig = {
       checked: {
         get: () => {
           const storeMZpage = getStoreMZpage()
-          const plotID = storeMZpage.activePlotID.toString()
+          const plotID = storeMZpage.activePlotID
           return storeMZpage.plotRegistry[plotID].showRecombLine
         },
         set: (val, emit) => {
