@@ -89,7 +89,7 @@ export const useAppStore = defineStore('appStore', {
       },
       lzfilterDataChanged: false,
       lzLeadDOMIDs: [],
-      plotCounter: 1,
+      plotCounter: 0,
       plotMoved: false,
       plotRegistry: {}, // plotID: colocID, mountEL, showGenSignLine, showPlotID, showRecombLine, signalID, slot, variant, vnode
       regionPanelRemoved: false,
@@ -207,10 +207,16 @@ export const useAppStore = defineStore('appStore', {
       this[parentKey].filters.pageNum = 1
     },
 
+    getNextGenePanelID () {
+      const mzPage = this[PAGE_NAMES.MULTIZOOM]
+      mzPage.genePanelCounter++
+      return `gene_panel_${mzPage.genePanelCounter}`
+    },
+
     getNextPlotID () {
       const mzPage = this[PAGE_NAMES.MULTIZOOM]
-      const pid = mzPage.plotCounter++
-      return `region_plot_${pid}`
+      mzPage.plotCounter++
+      return `region_plot_${mzPage.plotCounter}`
     },
 
     async loadFilterData() {
