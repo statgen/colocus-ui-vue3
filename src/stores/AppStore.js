@@ -75,7 +75,6 @@ export const useAppStore = defineStore('appStore', {
       colocsSignals: markRaw([]),
       isExporting: false,
       geneData: [],
-      genePanelRegistry: {},
       genePanelCounter: 0,
       gridMap: {},
       gridSettings: {
