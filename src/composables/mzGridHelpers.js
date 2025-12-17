@@ -254,10 +254,10 @@ export function useMZGridHelpers() {
   const initializePlotSession = () => {
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
-    storeMZpage.plotCounter = 1
+    storeMZpage.plotCounter = 0
     storeMZpage.geneData = []
     storeMZpage.genePanelRegistry = {}
-    storeMZpage.genePanelCounter = 1
+    storeMZpage.genePanelCounter = 0
     ensureRowsCols(MZ_GRID_DISPLAY_OPTIONS.defaultRows, MZ_GRID_DISPLAY_OPTIONS.defaultCols)
   }
 
@@ -442,7 +442,7 @@ export function useMZGridHelpers() {
   }
 
   const renderGenePanel = async ({ cell }) => {
-    const genePanelID = `gene_panel_${storeMZpage.genePanelCounter++}`
+    const genePanelID = appStore.getNextGenePanelID()
     storeMZpage.genePanelRegistry[genePanelID] = { cell }
     storeMZpage.gridMap[cell] = genePanelID
     return genePanelID

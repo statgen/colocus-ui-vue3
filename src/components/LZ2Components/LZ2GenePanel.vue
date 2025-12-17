@@ -106,7 +106,7 @@ const genesWithTracks = computed(() => {
     gene.track = row
 
     // Console log to debug overlaps
-    console.log(`Gene ${gene.gene_name}: track ${row}, position ${gene.start}-${gene.end}`)
+    // console.log(`Gene ${gene.gene_name}: track ${row}, position ${gene.start}-${gene.end}`)
 
     plotted.push({
       start: gene.start,
@@ -115,7 +115,7 @@ const genesWithTracks = computed(() => {
     })
   })
 
-  console.log('Final tracks:', genes.map(g => ({ name: g.gene_name, track: g.track, start: g.start, end: g.end })))
+  // console.log('Final tracks:', genes.map(g => ({ name: g.gene_name, track: g.track, start: g.start, end: g.end })))
 
   return genes
 })
