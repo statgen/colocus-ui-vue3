@@ -97,3 +97,7 @@ p {
 a:hover {
   font-weight: bold;
 }
+
+.export-mode [data-hide-on-export] {
+  display: none;
+}
