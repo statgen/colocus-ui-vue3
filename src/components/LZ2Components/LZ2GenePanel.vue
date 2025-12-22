@@ -27,7 +27,7 @@ import * as d3 from 'd3v7'
 import { useAppStore } from '@/stores/AppStore'
 import { useLZ2Renderers } from '@/composables/LZ2Renderers'
 import { useLZ2DataLoaders } from '@/composables/LZ2DataLoaders'
-import { LZ2_DISPLAY_OPTIONS, PAGE_NAMES, REF_BUILD_PORTAL } from '@/constants'
+import { COLORS, LZ2_DISPLAY_OPTIONS, PAGE_NAMES, REF_BUILD_PORTAL } from '@/constants'
 import { parseVariant2 } from '@/util/util'
 import { useLZ2Axes  } from '@/composables/LZ2Axes'
 
@@ -156,11 +156,12 @@ watch(
     () => storeMZpage.plotMoved,
     () => storeMZpage.selectedLDRef,
     () => storeMZpage.zoomRegion,
+    () => storeMZpage.showPlotBorders,
     () => geneData.value,
 ],
   async ([]) => {
     await renderGenePlot()
-}, {deep: true})
+}, { deep: true, immediate: false, flush: 'post' })
 
 // *** Lifecycle hooks *********************************************************
 onMounted(async () => {
@@ -182,13 +183,15 @@ const renderGenePlot = async () => {
   svg.attr('data-plot-id', props.plotID)
     .attr('data-action', 'gene-panel-background') // click on bgnd
 
+  const borderColor = isOverflow.value ? COLORS.CLC_ACTION : LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR
+  if(storeMZpage.showPlotBorders) lz2Renderers.renderBorder(svg, dimensions.value, borderColor)
+
   const title = `Genes in region (${genesWithTracks.value?.length || 0})`
-  lz2Renderers.renderGeneHeader(svg, dimensions.value, title, props.plotID, isOverflow.value)
+  lz2Renderers.renderGeneHeader(svg, dimensions.value, title, props.plotID)
 
   const plotGroup = svg.append('g').attr('transform', `translate(${dimensions.value.margin.left}, ${dimensions.value.headerHeight})`)
   if(storeMZpage.showGenePanelAxis) lz2Axes.renderXaxisGenePanel(plotGroup, xScale.value, dimensions.value)
   lz2Renderers.renderGenes(plotGroup, genesWithTracks.value, xScale.value, dimensions.value)
-  lz2Renderers.renderGeneBorder(svg, dimensions.value, isOverflow.value  )
 }
 
 // *** Configuration data ******************************************************

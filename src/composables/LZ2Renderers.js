@@ -1,6 +1,6 @@
 import * as d3 from 'd3v7'
 import { symbol, symbolTriangle, symbolDiamond } from 'd3-shape'
-import { LZ2_DISPLAY_OPTIONS } from '@/constants'
+import { COLORS, LZ2_DISPLAY_OPTIONS } from '@/constants'
 
 export function useLZ2Renderers() {
   const getColorFromR2 = (r2, colorSet) => {
@@ -24,21 +24,7 @@ export function useLZ2Renderers() {
       .attr('stroke-dasharray', '3,3'); // dotted line effect
   }
 
-  const renderRegionBorder = (svg, dimensions) => {
-    renderBorder(svg, dimensions, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
-  }
-
-  const renderGeneBorder = (svg, dimensions, isOverflow = false) => {
-    const clcActionRGB = getComputedStyle(document.documentElement)
-      .getPropertyValue('--v-theme-clcAction')
-      .trim()
-    const clcActionColor = `rgba(${clcActionRGB}, 1.0)`
-
-    const borderColor = isOverflow ? clcActionColor : LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR
-    renderBorder(svg, dimensions, borderColor)
-  }
-
-  const renderGeneHeader = (svg, dimensions, title, plotID, isOverflow = false) => {
+  const renderGeneHeader = (svg, dimensions, title, plotID = false) => {
     const headerColor = LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR
     const titleColor = 'black'
 
@@ -66,6 +52,7 @@ export function useLZ2Renderers() {
       .attr('data-action', 'gene-hamburger-menu')
       .attr('data-plot-id', plotID)
       .style('cursor', 'pointer')
+      .attr('data-hide-on-export', 'true')
   }
 
   const renderGenes = (plotGroup, genes, xScale, dimensions) => {
@@ -105,8 +92,8 @@ export function useLZ2Renderers() {
           .attr('y', yPos - trackHeight * exonHeight / 2)
           .attr('width', Math.max(1, xScale(exon.end) - xScale(exon.start)))
           .attr('height', trackHeight * exonHeight)
-          .attr('fill', 'RoyalBlue')
-          .attr('stroke', 'RoyalBlue')
+          .attr('fill', COLORS.CLC_HEADING)
+          .attr('stroke', COLORS.CLC_HEADING)
           .attr('stroke-width', 0.5)
       })
 
@@ -231,6 +218,7 @@ export function useLZ2Renderers() {
       .attr('data-action', 'hamburger-menu')
       .attr('data-plot-id', plotID)
       .style('cursor', 'pointer')
+      .attr('data-hide-on-export', 'true')
   }
 
   const renderPlotIDBadge = (svg, plotID, dimensions, opts = {}) => {
@@ -406,13 +394,11 @@ export function useLZ2Renderers() {
   return {
     renderBorder,
     renderGenes,
-    renderGeneBorder,
     renderGeneHeader,
     renderHeader,
     renderPlotIDBadge,
     renderSignalData,
     renderRecombLine,
-    renderRegionBorder,
     renderGenSigLine,
     renderPlotClipPath,
   }

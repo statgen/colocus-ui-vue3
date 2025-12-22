@@ -97,6 +97,7 @@ export const useAppStore = defineStore('appStore', {
       showCrosshair: false,
       showGenePanelAxis: false,
       showGenSigLines: true,
+      showPlotBorders: false,
       showPlotID: false,
       showRecombLines: true,
       signal1Variant: '',

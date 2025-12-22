@@ -58,7 +58,7 @@ const parseSignalDataForTitle = (signal) => {
     trait = signal.analysis?.trait.uuid
   } else if (signal.analysis?.trait?.protein) {
     analysisType = 'pQTL/protein'
-    trait = signal.analysis?.trait.gene.symbol 
+    trait = signal.analysis?.trait.gene.symbol
   } else if (signal.analysis?.trait.exon) {
     analysisType = 'eQTL/exon'
     trait = signal.analysis?.trait.gene.symbol

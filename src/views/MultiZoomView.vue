@@ -104,7 +104,6 @@ const preloadGenes = ref([])
 
 // awkward prevention of browser fore button after back button
 if (!appStore.colocID) router.push({ name: searchPage })
-mzGridHelpers.deleteAllPlots()
 
 appStore.isToolboxShowing = true
 
@@ -168,7 +167,7 @@ const onDataTableRowClick = () => {
 const loadPageData = async () => {
   storeMZpage.tableDataLoaded = false
   storeMZpage.colocDataReady = false
-  mzGridHelpers.initializePlotSession()
+  await mzGridHelpers.initializePlotSession()
   loadTableDataFlag.value = !loadTableDataFlag.value
 }
 

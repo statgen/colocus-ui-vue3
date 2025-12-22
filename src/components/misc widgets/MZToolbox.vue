@@ -57,6 +57,12 @@
       class="my-n7"
       color="clcAction"/>
     <v-switch
+      label="Show plot borders"
+      v-model="storeMZpage.showPlotBorders"
+      density="compact"
+      class="my-n7"
+      color="clcAction"/>
+    <v-switch
       label="Show recombination lines"
       v-model="showAllRecomb"
       @update:model-value="onToggleAllRecomb"
@@ -177,7 +183,7 @@ const onTrimGrid = () => {
 }
 
 const onUnmountAllPlots = async () => {
-  await mzGridHelpers.deleteAllPlots()
+  await mzGridHelpers.initializePlotSession()
 }
 
 const onYAxisChange = (val) => {

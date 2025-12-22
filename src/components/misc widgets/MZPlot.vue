@@ -1,6 +1,12 @@
 <template>
   <div :id="cellID" class="plot-cell" :style="{ gridRow: row + 1, gridColumn: col + 1 }" :data-cell="cellKey">
-    <div v-if="isMock" class="mock-plot" @click.stop="onMockClick" @contextmenu.prevent.stop="onMockContextMenu">
+    <div
+      v-if="isMock"
+      class="mock-plot"
+      :class="{ 'mock-plot-bordered': storeMZpage.showPlotBorders }"
+      @click.stop="onMockClick"
+      @contextmenu.prevent.stop="onMockContextMenu"
+    >
       <div class="mock-content">{{ cellKey }}</div>
     </div>
     <component v-else-if="isGenePanel" :is="LZ2GenePanel" :plotID/>
@@ -76,7 +82,6 @@ const onMockContextMenu = (event) => {
 
 .mock-plot {
   align-items: center;
-  border: 1px dashed rgba(0, 0, 0, 0.2);
   cursor: pointer;
   display: flex;
   height: 100%;
@@ -93,5 +98,9 @@ const onMockContextMenu = (event) => {
   font-size: 1.25rem;
   font-weight: normal;
   user-select: none;
+}
+
+.mock-plot-bordered {
+  border: 1px dashed rgba(0, 0, 0, 0.2);
 }
 </style>

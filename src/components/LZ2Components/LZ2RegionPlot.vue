@@ -74,8 +74,9 @@ watch([
     () => storeMZpage.plotRegistry[plotID]?.showRecombLine,
     () => storeMZpage.plotRegistry[plotID]?.showGenSigLine,
     () => storeMZpage.selectedTheme,
+    () => storeMZpage.showPlotBorders,
   ],
-async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme]) => {
+async ([signalData, recombData, showPlotID, showRecombLine, showGenSigLine, theme, showPlotBorders]) => {
       if (!Array.isArray(signalData) || !Array.isArray(recombData) || !plotContainer.value) return
       plotContainer.value.querySelectorAll('.recomb-group').forEach(n => {
         n.classList.toggle('hidden', !showRecombLine)
@@ -142,8 +143,9 @@ const renderPlot = (plotID, variant, signalData, showPlotID, recombData, showGen
 
   d3.select(plotContainer.value).selectAll('*').remove()
 
-  rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor.value)
-  LZ2Renderers.renderRegionBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+  rootSVG.value = LZ2Containers.createSVG(plotContainer.value, DIMENSIONS, plotBackgroundColor)
+  if(storeMZpage.showPlotBorders) LZ2Renderers.renderBorder(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_BORDER_COLOR)
+
   LZ2Renderers.renderHeader(rootSVG.value, DIMENSIONS, LZ2_DISPLAY_OPTIONS.PLOT_HEADER_COLOR, variant, title.value, titleColor.value, plotID)
   const thePlot = LZ2Containers.createPlotContainer(rootSVG.value, DIMENSIONS)
 

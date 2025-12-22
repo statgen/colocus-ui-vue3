@@ -74,7 +74,6 @@ export function useMZGridHelpers() {
       deletePlot(plotID)
       await nextTick()
     }
-    initializePlotSession()
   }
 
   const deleteColumn = (col) => {
@@ -237,7 +236,8 @@ export function useMZGridHelpers() {
     return storeMZpage.rowSlotToPlotID?.[colocID]?.[slot] ?? null
   }
 
-  const initializePlotSession = () => {
+  const initializePlotSession = async () => {
+    await deleteAllPlots()
     storeMZpage.activePlotID = ''
     storeMZpage.plotRegistry = {}
     storeMZpage.rowSlotToPlotID = {}
