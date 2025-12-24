@@ -1,9 +1,41 @@
 # Colocus V 2.0
 
-This is a Vue 3 app built using Vuetify 3. It is loosely based on the Vue 2/Vuetify 2 app.
+This is a Vue 3 app built using Vuetify 3. It is loosely based on the Vue 2/Vuetify 2 app. Approximately 90% of the code has been rewritten, except some in the LocusZoom page. There is also signficant new code that support the new pages (gene, multizoom, QC, help).
 
-## Page structure
-Overall page structure is defined in App.vue, which simply loads the toolbar, provides a <v-main> section, where router views are displayed, followed by the footer. The <v-main> section is a Vuetify <v-row>. Each page of the application pages is defined in a separate file in the src/views folder. Each view file will typically wrap their content in Vuetify <v-col> elements. 
+My overall philosophy is to make every file as concise and focused as possible, trying to limit line count to 100 or so. In many cases, this entails moving functional code to one or more composables, such that the primary view has two jobs: rendering templates and functioning as traffic cop for event handling. There are a few files where line count greatly exceeds that target, because all the functionality was logically related. For example, the mzGridHelpers composable tops out at over 500 lines.
+
+I have tried to avoid use of magic numbers and strings in code, and centralize constants in the file src/constants.js. This goal has slipped a little in the final months, so there are a number in the Multizoom page and related files.
+
+## Overview
+
+### Page architecture
+Overall page structure is defined in App.vue, which contains the toolbar, a main section, where router views are displayed, followed by the footer. Each page of the application pages is defined in a separate view file in the src/views folder. Each view is defined by a layout (see src/layouts for examples). The DefaultLayout is for 'whole-page' views, such as home, help, studies. The SidebarLayout is used by most functional pages, which have a sidebar known as the FilterPanel, plus a main content area for displaying data tables and plots.
+
+### Naming conventions
+- Prefix event handlers with 'on', eg onRowClick
+- Prefix booleans with is, eg: isLoading
+- Put destructured imports in alphabetical order, eg import { onMounted, provide, ref, watch } from 'vue'
+- Imports should be in this order: Vue, third-party libraries, app-level imports
+- List variables, props, watches, computeds, etc., within a section, in alphabetical order
+
+### Section headings in view and component files
+I find that it helps reduce cognitive load to have the sections in the same order throughout the application. There are some dependencies among them; for example, variables must be defined before watches. Very simple components don't need the overhead. This structure does not fit composables, constants, and helper files. In those cases, functions are listed alphabetically. Within the delimited sections, elements are listed alphabetically.
+
+```
+// *** Imports *****************************************************************
+// *** Composables *************************************************************
+// *** Props *******************************************************************
+// *** Variables ***************************************************************
+// *** Computed ****************************************************************
+// *** Provides ****************************************************************
+// *** Injects *****************************************************************
+// *** Emits *******************************************************************
+// *** Watches *****************************************************************
+// *** Lifecycle hooks *********************************************************
+// *** Event handlers **********************************************************
+// *** Utility functions *******************************************************
+// *** Configuration data ******************************************************
+```
 
 ## Major components
 
@@ -16,7 +48,7 @@ The <FilterPanel> component is a composite that is defined by a set of nested fi
 
 Standard Vue props pass key data elements down to the subpanels and individual controls.
 
-Each subpanel has an optional reset button, which will reset its contained controls back to a default state, which is passed to the controls via the controlSet prop, as specified in the top level <FilterPanel>. The subpanels and controls utilize Vue 3's provide/inject mechanism to dynamically pass messages. For example, when the user clicks the Reset button, it flips the value of a local ref variable, resetInput, and that variable is used by the provide mechanism. 
+Each subpanel has an optional reset button, which will reset its contained controls back to a default state, which is passed to the controls via the controlSet prop, as specified in the top level <FilterPanel>. The subpanels and controls utilize Vue 3's provide/inject mechanism to pass values through several layers of components. For example, when the user clicks the Reset button, it flips the value of a local ref variable, resetInput, and that variable is used by the provide mechanism to pass down to the actual controls. 
 
 Then, in the underlying controls, Vue's inject mechanism allows monitoring of that variable's state. When the state changes, the control reloads itself, and updates the Pinia store with the default value. For example, all the child components of a given filter sub panel respond to the same reset signal.
 
@@ -56,13 +88,15 @@ Whenever the user changes page or page size, appStore.updateFilter is again call
 
 ### Pinia store
 
-Currently, there is one Pinia store, and it holds all app state. At the top level, this includes a set of general keys, plus a set of keys for the main views (search, locuszoom, manhattan (probably, assuming it needs filter)). A function provides the data structure to ensure consistency across pages and to avoid repitition. There are also two objects that function as maps between 1) data key names in the app vs those expected by the API, and 2) sort keys expected by the back end.
+Currently, there are three Pinia store instances. The appStore is used across most if not all pages of the app. The other stores have more focused applicability. 
+
+The appStore holds all app state. At the top level, this includes a set of general keys, plus a set of keys for the main views (search, locuszoom, manhattan (probably, assuming it needs filter)). A function provides the data structure to ensure consistency across pages and to avoid repitition. There are also two objects that function as maps between 1) data key names in the app vs those expected by the API, and 2) sort keys expected by the back end.
 
 This store started off supporting data structures required by the filtering system, but has grown, and may be renamed or split into separate stores as development proceeds.
 
 The data structure includes global state variables (e.g., isDataLoaded), plus page-specific data for each page that uses a filter panel. The page-specific data includes the values of the controls, plus additional entries for page size and page number, all of which are brought together, along with the sort keys, to build the URL for the Django back end.
 
-#### Important action methods
+#### Important action methods in the appStore
 - buildSearchURL builds a URL based on all filter and sort criteria and formats it for consumption by the Django REST API back end.
 - checkGenes accepts a comma-delimited list of genes and returns an object containt two arrays, badGenes, and goodGenes. This is used in the case where an external entity (such as AMP) specifies a gene as a query string in a URL directed at the search page.
 - copySearchFilterToLZ copies the filter panel data for the search page into the corresponding keys for the LocusZoom page, and is called by the router before entering the LocusZoom page.
@@ -80,7 +114,7 @@ There is a global route guard, beforeEach, which disables the filter panel and l
 ## Colors
 A key design goal of this iteration of Colocus was to centralize style definitions as much as possible, colors in particular. Our global constants.js file has a COLORS object that is the definitive source of colors throughout the app. Each color is prefixed with CLC_, which stands for Colocus Color. Then a functional designation is appended. For example, CLC_ACTION refers to our action color, used to style components where user interaction is possible.
 
-Vuetify has an extensive color management system, based on Google's Material Design. Vuetify allows definition of custom themes.  We define a custom theme in plugins/vuetify.js. Its colors are mapped directly from the COLORS object.
+Vuetify has an extensive color management system, based on Google's Material Design. Vuetify allows definition of custom themes.  I have defined a custom theme in plugins/vuetify.js. Its colors are mapped directly from the COLORS object.
 
 However, Vuetify's themes only cover Vuetify components, not native HTML elements, such as headings, spans, etc. The solution is a css file, styles/global.css, that references variables from the custom Vuetify theme. The global css file is imported in main.js. Following is an example of how this works from global.css.
 
@@ -162,6 +196,7 @@ We also refactored almost everything except the template definitions and event h
  
 #### LZ Plots
 Placeholders for the compare plot and the region plot are defined in the template as empty divs:
+
 ```
 ...
 <div ref="comparePlot"></div>
@@ -169,7 +204,7 @@ Placeholders for the compare plot and the region plot are defined in the templat
 <div ref="regionPlot" class="region-plot"></div>
 ...
 ```
-Then the `ref` variables are populated by functions buildCompareLayout and buildRegionLayout in the composable. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build*Layout functions create Vnodes based on the underlying LZPlot library. The *VnodeRef variables maintain Vue references to these components so that we can do things with them later, such as adding additional plots.
+Then the `ref` variables are populated by functions buildCompareLayout and buildRegionLayout in the composable. Internally, each uses an advanced Vue feature called VNodes. Vnodes are virtual nodes that Vue uses to track the entire structure of an application. At the highest level, declarative templates are compiled to Vnodes and then assembled into a virtual DOM. Vue tracks changes to the virtual DOM and periodically transfers changes to the actual DOM. Our build Layout functions create Vnodes based on the underlying LZPlot library. The *VnodeRef variables maintain Vue references to these components so that we can do things with them later, such as adding additional plots.
 
 A key function in the composable, **assembleLayout()**, builds the overall containers (compare and region), then adds the initial plots to the region panel.
 
@@ -178,21 +213,16 @@ A key function in the composable, **assembleLayout()**, builds the overall conta
 Similarly, **buildCompareLayout()**, builds the container, and also creates the scatter plot directly.
 
 #### The LD panel
-The LDPanel is component that displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. The list is generated in the composable and then pushed to the appStore. Earlier, I tried supply the list directly to the LDPanel, but it would not display correctly. In different scenarios, it would display only the first two elements, or duplicate the first two elements as panels were added, or display nothing in the label slot. The functional workaround was to push the list to the appStore.
+The LDPanel is displays operational controls for the LZ page, including a list of variants to be used as LD references in the region plots. The list is generated in the composable and then pushed to the appStore. Earlier, I tried to supply the list directly to the LDPanel, but it would not display correctly. In different scenarios, it would display only the first two elements, or duplicate the first two elements as panels were added, or display nothing in the label slot. The functional workaround was to push the list to the appStore.
 
-So LDPanel  pulls the list from there for display as radio buttons. Using our VariantLabel component caused erroneous behavior. The solution was to render and format the values directly. The downside to this is that it is partially redundant with code in the VariantLabel component. My hunch is that Vue's reactivity system was failing with all the nesting. Perhaps a new version of Vue, Vuetify, or both will help. As of this writing (2024-07-22), we are using the following key libraries, which are the latest as of this date:
-
-```
-    "pinia": "^2.1.7",
-    "vue": "^3.4.33",
-    "vue-router": "^4.4.0",
-    "vuetify": "^3.6.13"
-```
+So LDPanel  pulls the list from there for display as radio buttons. Using our VariantLabel component caused erroneous behavior. The solution was to render and format the values directly.
 
 ## Misc debugging hints
 - use {{ $log() }} in templates to log local values to console. This is defined in main.js.
 
 ## Genes for testing
+The following may be copied in part or wholesale and pasted into the gene control in the filter panel
+
 A2M,AAMP,PDF
 A2M,AAMP,PDF,
 A2M,AAMP,PDF,x
@@ -203,32 +233,6 @@ A2M	A2ML1-AS1	AAGAB	AAK1	AAMP	ABCA1	ABCA8	ABCG5	ABCG8	ABHD12	ABLIM3	ABTB1	ENSG00
 z
 vv
 x1
-
-## Section headings in view and component files
-I find that it helps reduce cognitive load to have the sections in the same order throughout the application. There are some dependencies among them; for example, variables must be defined before watches. Very simple components don't need the overhead. This structure does not fit composables, constants, and helper files. In those cases, we list functions alphabetically. 
-
-```
-// *** Imports *****************************************************************
-// *** Composables *************************************************************
-// *** Props *******************************************************************
-// *** Variables ***************************************************************
-// *** Computed ****************************************************************
-// *** Provides ****************************************************************
-// *** Injects *****************************************************************
-// *** Emits *******************************************************************
-// *** Watches *****************************************************************
-// *** Lifecycle hooks *********************************************************
-// *** Event handlers **********************************************************
-// *** Utility functions *******************************************************
-// *** Configuration data ******************************************************
-```
-
-## Naming conventions
-- Name event handlers with preceding 'on', eg onRowClick
-- Prefix booleans with is, eg: isLoading
-- Put destructured imports in alphabetical order, eg import { onMounted, provide, ref, watch } from 'vue'
-- Imports should be in this order: Vue, third-party libraries, app-level imports
-- List variables, props, watches, computeds, etc., within a section, in alphabetical order
 
 ## Cypress test framework
 In the fall of 2024, we implemented the front-end testing framework, Cypress, learned a bit about it, and implemented some basic tests. The result exists in branch front-end-testing-with-cypress. It was built on Cypress 13.16.0. It includes a single file (test1.cy.js) with our tests, plus two folders of sample tests supplied by the vendor for reference.
@@ -337,9 +341,9 @@ There are also several internal functions (getColocDataForStudy, getQTLStudies) 
 This component provides the template and run-time code to instantiate plots. The component is triggered by watching a flag in the qcStore (regenPlotFlag), and when that flag changes, the component builds a new plot instance and embeds it in the containing div in the template. The flag is triggered on initial load of each of the stats page views, and on subsequent changes to the UI controls.
 
 ### Performance problems
-Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to as much as 30 seconds in some scenarios. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous.
+Early development of this functionality went smoothly, but at a certain point, the time to render plots became excessive. Initially it was nearly instantaneous, but then grew to as much as 30 seconds in some scenarios. Eventually it was determined that the slowdown only occurs in dev mode. Running in production mode, plot generation and regeneration is instantaneous, following data acquistion.
 
-Rather than having to deploy to the external platform, a server that can run locally was generated. It uses the ExpressJS library server. It requires the project to be built, then serves files from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
+Rather than having to deploy to the external platform, a server that can run locally was develoed. It uses the ExpressJS library server. It requires the project to be built, then serves files from the /dist folder. Details are in comments in /express-server.js. This file is part of the project, but its dependencies are dev only, so will not be part of a production bundle.
 
 It is possible to run `vite build --watch` and have the dist folder updated in real time as files are saved. I added two npm scripts: one to build the project, the other to serve the contents of the dist folder. Both need to be running in separate terminal windows in order to have an automated edit-save-build-serve development cycle. 
 - dev-build: this runs vite build in watch mode, regenerating the site after each save
@@ -546,13 +550,16 @@ The existing TraitLabelGene component was enhanced to provide a link from the cu
 To add a tutorial to page, 
 
 First, create file with a set of step definitions (see examples in src/tutorials):
-```import steps from '@/tutorials/tutSearchPage'```
+
+`import steps from '@/tutorials/tutSearchPage'`
 
 Second, add the tutorial component to the page template, eg:
-``` <h1>Search <TutorialOverlay ref="tutorial" :steps="steps" /></h1>```
+
+`<h1>Search <TutorialOverlay ref="tutorial" :steps="steps" /></h1>`
 
 Third, import the step file and add a ref var for the tutorial:
-```aiignore
+
+```
 import steps from '@/tutorials/tutSearchPageSteps'
 const tutorial = ref()
 ```
@@ -590,21 +597,162 @@ plotsContainer (div on host page)
 
 ## Multizoom page and components
 
-### UI plot event handling
-If user clicks hamburger menu in a plot, that generates a native click event, which bubbles up through the grid to the page, where it is handled by onNativeClick. It in turn extracts the plotID and calls showPlotActionMenu, passing plotID, menuType ('hamburger' in this case), and the event. showPlotActionMenu figures out display location of the menu, then sets menuState to visible, and sets the display parameters and the context, which includes only the plotID.
+The Multizoom page uses the standard SideBarLayout, with the standard FilterPanel. The main area also includes a separate panel of tools specific to that page, a grid component, a tooltip, and action menu, a busy overlay, and a standard data table. All runtime operational data is stored in the appStore, under the multizoom page key. In what follows, LZ2 stands for LocusZoom 2, and MZ stands for multizoom.
 
-Then the <ActionMenu> template kicks into gear, setting props like menuType ('hamburger' again),  menuStyle, and context.
+Files for this page exist in several places
+- src/components/LZ2Components: main components: action menu, gene panel, region plot, tooltip
+- src/components/misc widgets: mzGrid (grid system for displaying plots), MZPlot (overall wrapper for all plot types (region, gene, mock)), MZToolbox (tool panel)
+- src/composables: plot component renderers (overall container, axes, scales); helper functions (lzPageHelpers, mzEventHandlers, mzGridHelpers)
 
-Then the component kicks in. It has a computed property, visibleMenuItems, which gets the menu items to display from ActionMenuConfig.js, based on the menuType('hamburger' again). Then ActionMenu's template iterates those items, displaying each. It then waits for events on its control, or a 'click-away' event, set up by global directive, in which case it goes hidden once again.
+The containment hierarchy is as follows:
+```
+Multizoom page
+  Filter panel
+  Main area
+    Multizoom toolbox
+    BusyOverlay (displayed during plot export)
+    LZ2Tooltip (displayed when hovering over a data point on a plot)
+    ActionMenu (displyed in response to click events on the plot hamburger menu and plot icons in the data table)
+    MZGrid
+      Corner (upper left)
+      Column headers
+      Row headers
+      Cells
+        Mock plot
+        Gene panel
+        Region plot
+    Data table
+```
 
-## UI data table icon event handling
+### Multizoom toolbar
+This is a panel that contains a set of controls for operating the app. Generally speaking, these controls initiate actions (e.g., delete all plots) or update values in the appStore. Those values in turn are watched by the plots, which redraw themselves on changes. For example, when the value of the plot region slider changes, the plots issue calls for data within that region and then redraw themselves.
+
+### Grid system
+The grid system is defined by MZGrid.vue. It defines the overall container using CSS grid features, and it uses values from the gridSettings in the appStore for this page for setting numbers of rows and columns, height and width of cells, etc. MZGrid draws the upper left corner, then the column headers, then the row headers, and then the cells. Each cell is an instance of MZPlot. The row and column headers have event handlers that respond to clicks; these events bubble up to the page file where they are dispatched for execution.
+
+### MZPlot
+MZPlot's job is to figure out which type of plot to display in a given cell. At this point, there are three options:
+- Mock plot: empty cell that displays cell coordinates and responds to click events
+- Gene panel: plot displaying genes in the selected region
+- Region plot: plot displaying colocalization data for the selected region
+
+The mock plot is displayed by MZPlot directly; the other two by specific Vue components, LZ2RegionPlot and LZ2GenePanel.
+
+### Region plot
+The region plot is displayed by the LZ2RegionPlot component. There are two watchers that control operation. The first watcher renders a plot whenever the underlying data changes, or a UI control values change (e.g., the switches for showing the recomb line and genetic significance line). The second watcher triggers when changes occur in the selected LD reference variant, the conditional/marginal switch, or the zoom region. Then data is loaded from the back end and stored locally in the component. This then triggers the first watcher to redraw the plot. Each plot has its own watchers, so acts independently. If there are a lot of plots, then there are a lot of watchers.
+
+Plot rendering is accomplished by a debounced function, debouncedRenderPlot, to avoid multiple triggers in succession. It in turns calls the actual render function, renderPlot. It in turn sets up data structures and other elements used by D3. renderPlot creates a root SVG element in which the plot is contained. It then calls a series of functions to build up the plot piece by piece. These functions are stored in a composable, LZ2Renderers, and include the following:
+- renderBorder
+- renderHeader
+- renderXaxis
+- renderYaxisSignal (-log 10 p-value)
+- renderYaxisRecomb (recombination rate)
+- renderPlotClipPath (establishes the area within which the plot is rendered, with no leakage outside this area)
+- renderSignalData (the actual data points)
+- renderRecombLine
+- renderGenSignLine
+- renderPlotIDBadge (used in an early iteration before we displayed cell coordinates, left in for use debugging)
+
+One argument to renderSignalData is tooltipCallbacks. This is an object containing functions from the tooltip store; those functions display, update, and hide the tooltip seen when hovering over individual plot data points.
+
+Within the rendering functions is a lot of D3 code for drawing points, lines, boxes, text, etc. One point of interest is the plot header, which displays a plot title and a 'hamburger' icon (three horizontal lines). An attribute is applied thus: `.attr('data-action', 'hamburger-menu')` When the icon is clicked, this has the effect of generating a click event called hamburger-menu. This is a JavaScript native click, not a Vue event, so must be handled separately. The event bubbles up to the MZGrid component, which is instantiated in the Multizoom page view, which therefore traps the event and dispatches it to an event handler, onNativeClick. I'll discuss MZ page event handlers in more detail below.
+
+### Gene panel
+The gene panel should be viewed as an early draft product, not fully finished. Given greater time resources, it would have been more polished.
+
+The gene panel is built in an analogous fashion as the region plot. Unlike the region plot, which has fixed horizontal and vertical dimensions, the gene panel has fixed horizontal but dynamically determined vertical dimensions. There is a computed property, dimensions, that does so. The gene panel has one watcher, which watches some of the same values in the appStore as the regionPlot (e.g., selectedLDRef, zoomRegion), as well as the gene data itself. Whereas the data for the region plot is stored within the component, the gene data for the gene panel is stored in the appStore. The reason is that a planned future enhancement would allow the list of genes to be supplemented by, for example, all genes shown in the data table, and all genes across all rendered plots. So the store is used as point of centralization.
+
+The onMounted lifecycle hook has two actions: loadGeneData, and renderGenePlot. The render function is similar to the region plot's render function. A root SVG element is created, config data is computed, then render functions are called:
+- renderBorder (same as used for region plot)
+- renderGeneHeader
+- renderXaxisGenePanel
+- renderGenes
+
+All these functions exist in the same LZ2Renderers file as those for the region plot. It would make sense to move the gene-specific ones into a separate composable.
+
+The renderGenes function is at the heart of the gene panel. The code was derived from a Python Jupiter notebook proof-of-concept. First the list of genes is sorted by size, thus prioritizing labels on larger genes. Then the list is iterated, drawing in turn a span line, exons if any, the gene name, and so forth. Given more time, these would have been broken out into separate functions to aid comprehension, independence, and maintainability.
+
+### Action menu
+The action menu component displays when any of the following items is clicked:
+- hamburger icon in a region plot or gene panel title
+- row header
+- column header
+- plot icons in column 2 of the data table
+
+The content of the action menu is determined dynamically, depending on the type. See files ActionMenuConfig.js and ActionMenu.vue in src/components/misc widgets/. The config file is a plain old JavaScript object, with a key for each type (column-header, datatable, gene-hamburger, etc). Within each key is a list of menu items. Each item has an id (not really used for anything), a type (currently: action, checkbox, or input), a label, an icon, and an event name. This file also has a function, getMenuItems, that returns the menu items for a given menu type. Another function, getActionMenuEventNames, returns a list of event names.
+
+The Vue component (ActionMenu.vue) uses those functions to dynamically build and display a menu, given a user click on a particular component type. The list of event names is used to populate the defined Vue emit names (`const emit = defineEmits(getActionMenuEventNames())`). The corresponding name is then emitted as a Vue event when a button is clicked, the menu is closed, etc. The other function is used to dynamically build out the template with the associated menu item titles, icons, dividing lines, and input fields.
+
+Upon user interaction, the ActionMenu generates the corresponding event, which bubbles up through the component hierarchy to the Multizoom page.
+
+### Multizoom page event handling
+In the multizoom page, visibility of the ActionMenu is controlled by menuState.visible. menuState is an object in a composable, mzEventHandlers, which is where all the event handlers for this page live. The ActionMenu component currently has 22 event handlers to handle all the events for all the different menu elements. The names of the handlers are self-documenting (addGenePanel, exportPlot, etc.). By design, most of these are quite simple, offloading any complex functionality to helper functions. For example, here is the event handler for exporting a plot.
+
+```
+const onExportPlot = async () => {
+    menuState.value.visible = false
+    const plotDOMid = `plot_${storeMZpage.activePlotID}`
+    await mzGridHelpers.exportPlotContainer(plotDOMid, `Colocus_${plotDOMid}`)
+  }
+```
+
+First it hides the ActionMenu, then assembles the DOM ID of the plot to be exported, then calls the export function in the helpers composable.
+
+This layering helps keep the code somewhat manageable; without it, the Multizoom page would be close to 1000 lines long.
+
+The Multizoom page also includes the MZGrid component, which has its own set of events for rowClick, columnClick, and so forth. These follow the same pattern, with the handlers in mzEventHandlers, and the helpers in mzGridHelpers.
+
+There are handlers with 'menu' in the name, e.g., columnMenu. These handlers respond to right-click events; this type of event is called 'contextmenu' in JavaScript. No functionality is attached to the menu events, but they are surfaced for potential use in the future.
+
+The ActionMenu can be closed by clicking an action button on the menu, by pressing the Escape key, or by clicking anywhere outside the menu. This clicking outside is handled by a global Vue directive, clickOutside. This is defined in src/directives/clickOutside.js, and loaded in main.js for use anywhere in the app as 'click-outside'. It is used by including it in the template where it should apply, e.g., for the ActionMenu:
+
+```aiignore
+  <div class="plot-action-menu" :style="menuStyle" v-click-outside="onCloseMenu">
+```
+
+So whenever a click-outside event bubbles through the app, it is trapped by the ActionMenu, the handler onCloseMenu is called (which sets menuState.visible to false), and the menu is closed.
+
+### Plot event handling example
+
+If user clicks a hamburger icon in a plot, that generates a native click event, which bubbles up through the grid to the page, where it is handled by onNativeClick in the event handlers composable. It in turn figures out the type of event. We currently have three:
+- hamburger-menu (from region plot)
+- gene-hamburger-menu (from gene panel)
+- gene-panel-background (from gene panel) (currently not used, but surfaced for potential use)
+
+onNativeClick extracts the plotID and the event type from the underlying SVG's dataset (those 'data-*' attributes), then calls showPlotActionMenu with the plotID, menu type, and event type. showPlotActionMenu in turn figures out display location of the menu, then sets menuState to visible, and sets the display parameters and the context, which includes the plotID.
+
+Then the ActionMenu template kicks into gear. ActionMenu has a computed property, visibleMenuItems, which gets the menu items to display from ActionMenuConfig.js, based on the menuType. Then ActionMenu's template iterates those items, displaying each according to its specified type (action, checkbox, input). The component then waits for events on its controls, or a 'click-away' event, in which case it goes hidden once again.
+
+### Data table icon event handling example
 - First the user clicks a plot icon (a PlotNum component instance) in the data table.
-- The PlotNum SFC emits on-plot-icon-click with args(plotID, slot, event).
+- The PlotNum SFC emits on-plot-icon-click with args(plotID, slot, event). (The slot represents the signal and position, 1 or 2, of the icon in the row.)
 - The DataTable traps that event, adds in the colocID and signal, and emits its  own on-plot-icon-click with args(plotID, slot, event, colocID, signal).
 - The MZPage view traps that event, adds menuType: 'datatable' to the args, and calls showPlotActionMenu.
-- Still on MZPage: showPlotActionMenu sets visual params, then sets menuState, inserting colocID, signal, slot, and plotID (why?) into its context.
+- showPlotActionMenu sets visual params, then sets menuState, inserting colocID, signal, slot, and plotID into its context.
 - When menu button (eg add) in ActionMenu clicked, ActionMenu emits an event corresponding to the type specified in ActionMenuConfig, eg 'add-plot'
 - That event is trapped in MZPage, where the handler onAddPlot responds. First it extracts args.inputValue, which is what the user typed, as the value of cell, converts it, then calls mzGridHelpers.renderPlot with cell, colocID, signal, and slot.
 
+## Future enhancements
+Following are suggestions for improving functionlity and efficiency of this web application.
 
+### Multizoom page
+- Allow user editing of plot titles, with reset action to restore computed value
+- Drag-and-drop plots to move on grid
+- Add pan control slider on MZ page toolbox, with continuous values, going from -position(lead variant) to +position(lead variant), where default is centered
+- Implement a locus compare plot and display in Multizoom page
+- Add legend to display values of r^2 color codes
+- Add a data manager to track data that has been loaded and reuse when possible instead of issuing reduncant calls to back end APIs
 
+### Other pages
+- Eliminate the Locuszoom page and supporting infrastructure
+- Rewrite Vega plots on the QC pages using native D3
+- Rewrite plot on Manhattan plot page using native D3
+- Update help page to automatically generate sidebar links
+
+### Data table
+- Simplify computation of appStore.dataTable.dirEffect (compute directly without use of isDirEffectReady flag)
+- Redo the concordance hover on the data table to use a single instance (like the ActionMenu), instead of having an instance for every row in the table
+
+### Misc
+- Update key libraries (Vue, Vite, Vuetify, Pinia, Vue Router): **THIS SHOULD BE DONE REGULARLY TO KEEP UP WITH BUG AND SECURITY FIXES**
+- Update secondary libraries (most everything else, except the legacy D3 libs used by the LocusZoom page. The version of D3 used by the new functionality in this app is specified by the d3v7 key in package.json).
