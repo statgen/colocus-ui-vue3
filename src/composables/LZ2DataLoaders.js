@@ -92,11 +92,10 @@ export function useLZ2DataLoaders() {
     }
   }
 
-  const loadGeneData = async(leadVariant, build, region) => {
+  const loadGeneData = async(chrom, start, end, build) => {
     const { data, errorMessage, fetchData } = useFetchData()
-    const pv = parseVariant2(leadVariant, region)
     const url = new URL(URLS.PORTALDEV_GENES)
-    url.searchParams.set('filter', `chrom eq '${pv.chr}' and start le ${pv.end} and end ge ${pv.start}`)
+    url.searchParams.set('filter', `chrom eq '${chrom}' and start le ${end} and end ge ${start}`)
     url.searchParams.set('build', build)
     if(await fetchData(url, "gene data", "gene-plot")) {
       const geneData = toRaw(data.value).data

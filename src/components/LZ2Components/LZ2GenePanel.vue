@@ -141,12 +141,14 @@ const visibleGenes = computed(() => {
 })
 
 const xScale = computed(() => {
-  const refVariant = storeMZpage.selectedLDRef
-  const region = storeMZpage.zoomRegion
-  const pv = parseVariant2(refVariant, region)
-  if (!pv.loc) return d3.scaleLinear().domain([0, 1]).range([0, 1])
-  const center = pv.loc, range = storeMZpage.zoomRegion || 250000
-  return d3.scaleLinear().domain([center - range, center + range]).range([0, dimensions.value.plotWidth])
+  // const refVariant = storeMZpage.selectedLDRef
+  // const region = storeMZpage.zoomRegion
+  // const pv = parseVariant2(refVariant, region)
+  // if (!pv.loc) return d3.scaleLinear().domain([0, 1]).range([0, 1])
+  // const center = pv.loc, range = storeMZpage.zoomRegion || 250000
+  const start = storeMZpage.xStart
+  const end = storeMZpage.xEnd
+  return d3.scaleLinear().domain([start, end]).range([0, dimensions.value.plotWidth])
 })
 
 // *** Provides ****************************************************************
@@ -175,7 +177,10 @@ onMounted(async () => {
 // *** Utility functions *******************************************************
 const loadGeneData = async () => {
   if (storeMZpage.geneData?.length > 0) return
-  storeMZpage.geneData = await lz2DataLoaders.loadGeneData(storeMZpage.selectedLDRef, REF_BUILD_PORTAL, storeMZpage.zoomRegion)
+  const chrom = parseVariant2(storeMZpage.selectedLDRef, 0)?.chr
+  const start = storeMZpage.xStart
+  const end = storeMZpage.xEnd
+  storeMZpage.geneData = await lz2DataLoaders.loadGeneData(chrom, start, end, REF_BUILD_PORTAL)
 }
 
 const renderGenePlot = async () => {
