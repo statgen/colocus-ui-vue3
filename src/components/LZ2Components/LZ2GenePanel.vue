@@ -128,12 +128,14 @@ const trackCount = computed(() => {
 
 const visibleGenes = computed(() => {
   if (!geneData.value.length) return []
-  const refVariant = storeMZpage.selectedLDRef
-  const region = storeMZpage.zoomRegion
-  const pv = parseVariant2(refVariant, region)
-  if (!pv?.loc) return []
-  const center = pv.loc
-  const start = center - region, end = center + region
+  // const refVariant = storeMZpage.selectedLDRef
+  // const region = storeMZpage.zoomRegion
+  // const pv = parseVariant2(refVariant, region)
+  // if (!pv?.loc) return []
+  // const center = pv.loc
+  // const start = center - region, end = center + region
+  const start = storeMZpage.xStart
+  const end = storeMZpage.xEnd
   const vg = geneData.value.filter(gene => gene.end >= start && gene.start <= end)
   return vg
 })
