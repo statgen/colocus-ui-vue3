@@ -23,14 +23,39 @@
         <a href="/search" class="coLink font-weight-bold">Search page:</a> Your entryway to exploring the data in colocus.  From the Search page you can select a gene, and/or a trait of interest and set filters for data display such as the strength of the eQTL or GWAS signals and the posterior probability of colocalization.
       </p>
       <p>
+        <a href="/gene" class="coLink font-weight-bold">Gene page:</a> Contains information about a specific gene of interest, including its colocalized features and associated GWAS signals.
+      </p>
+      <p>
+        <a href="/qcstats" class="coLink font-weight-bold">QC statistics page:</a> Provides quality control statistics.
+      </p>
+      <p>
+        <a href="/summarystats" class="coLink font-weight-bold">Summary statistics page:</a> Displays plots of summary statistics over all fine-mapped signals and colocalizations.
+      </p>
+      <p>
         <a href="/studies" class="coLink font-weight-bold">Studies page:</a> Contains omic QTL and GWAS study information, including data sources and references.
       </p>
+      <p>
+        <a href="/help" class="coLink font-weight-bold">Help page:</a> Contains information about how to use Colocus and frequently asked questions.
+      </p>
+
+      <h2>Funding</h2>
+      <p>
+        <div class="markdown-body" v-html="fundingContent"></div>
+      </p>
+
+      <h2>Feedback</h2>
+      <p>
+        <div class="markdown-body" v-html="feedbackContent"></div>
+      </p>
+
     </div>
   </DefaultLayout>
 </template>
 
 <script setup>
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import fundingContent from '@/docs/funding.md'
+import feedbackContent from '@/docs/feedback.md'
 </script>
 
 <style scoped>

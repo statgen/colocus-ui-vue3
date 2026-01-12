@@ -47,11 +47,7 @@
 
     <v-spacer></v-spacer>
 
-    <a href="https://forms.gle/9idPsYcUcKDBqS8s6" target="_blank" rel="noopener noreferrer">
-      <v-btn size="small" variant="tonal" class="text-clcAction mx-2">Feedback</v-btn>
-    </a>
-
-    <AmpLogo class="mr-2"/>
+    <ProjectLogo class="mr-2"/>
 
   </v-toolbar>
 </template>

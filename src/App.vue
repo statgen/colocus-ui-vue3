@@ -4,7 +4,6 @@
     <div class="app-content">
       <router-view :key="$route.name" class="ml-2 mt-14"/>
     </div>
-    <Footer />
   </v-app>
 </template>
 
