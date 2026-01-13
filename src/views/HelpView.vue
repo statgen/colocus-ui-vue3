@@ -10,6 +10,7 @@
 
           <h6><a href="#pages" @click.prevent="scrollToHeading('views')">Pages</a></h6>
           <li class="ml-4"><a href="#search-page" @click.prevent="scrollToHeading('search-page')">Search Page</a></li>
+          <li class="ml-4"><a href="#multizoom-page" @click.prevent="scrollToHeading('multizoom-page')">MultiZoom Page</a></li>
           <li class="ml-4"><a href="#locuszoom-page" @click.prevent="scrollToHeading('locuszoom-page')">LocusZoom Page</a></li>
           <li class="ml-4"><a href="#genome-wide-trait-page" @click.prevent="scrollToHeading('genome-wide-trait-page')">Genome-wide trait page</a></li>
 
