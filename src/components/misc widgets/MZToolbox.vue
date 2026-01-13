@@ -1,5 +1,5 @@
 <template>
-  <FilterPanelSubpanel title="Multizoom Tools" :resetButton="false" id="subPanelMZToolbox" class="pb-4">
+  <FilterPanelSubpanel title="MultiZoom Tools" :resetButton="false" id="subPanelMZToolbox" class="pb-4">
     <h3 class="mb-n2">Actions</h3>
     <v-btn @click="onBlinkButtonClick" size="small" class="btn-class my-3">Blink all lead variants (5 sec)</v-btn>
     <v-btn @click="onUnmountAllPlots" size="small" class="btn-class my-3">Delete all plots</v-btn>

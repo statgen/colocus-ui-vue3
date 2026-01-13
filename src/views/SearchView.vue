@@ -9,7 +9,7 @@
       <p>Click <v-icon icon="mdi-information-outline" class="info-icon-class" /> above for a Tutorial introduction to this page.</p>
       <p>In the data table below, click <v-icon class="text-clcAction">{{ 'mdi-chevron-down' }}</v-icon>
         in the Expand column to see the Details panel with links to further resources.</p>
-      <p>To view Locus Zoom plots for a colocalized pair of interest, click on the row containing the pair,
+      <p>To view LocusZoom plots for a colocalized pair of interest, click on the row containing the pair,
         or the button in the Details panel.</p>
     </div>
 

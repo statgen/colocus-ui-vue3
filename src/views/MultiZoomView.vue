@@ -8,7 +8,7 @@
       <MZToolbox @export-plot-group="mzGridEventHandlers.onExportPlotGroup"/>
     </template>
 
-    <h1><BackButton />Multizoom <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
+    <h1><BackButton />MultiZoom <span class="rc-text">({{ pageRows}}, {{ pageCols}})</span></h1>
 
     <BusyOverlay :show="isExporting" />
 
