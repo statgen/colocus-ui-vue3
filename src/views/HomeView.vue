@@ -2,8 +2,28 @@
   <DefaultLayout>
     <div class="text-content-block">
       <h1>Home</h1>
-      <p>This is the flow of data in the Colocus application.</p>
-      <img alt="AMP Home" src="../../src/assets/app_overview.png" height="350" />
+      <p>This is the flow of data in the Colocus application. Click on the image to see a larger version.</p>
+      <br/>
+
+      <img 
+        alt="AMP Home" 
+        src="../../src/assets/colocus_big_overview.png" 
+        height="600" 
+        @click="dialog = true"
+        style="cursor: pointer;"
+      />
+
+      <v-dialog v-model="dialog" max-width="90%">
+        <v-card>
+          <v-card-text class="pa-0">
+            <img 
+              alt="AMP Home" 
+              src="../../src/assets/colocus_big_overview.png" 
+              style="width: 100%; height: auto;"
+            />
+          </v-card-text>
+        </v-card>
+      </v-dialog>
 
       <h2>Our goals</h2>
       <ul>
@@ -14,7 +34,7 @@
           To allow assessment of the specificity and quality of gene/feature-GWAS colocalizations   through display of all  colocalized genes/features for a given GWAS signal and display of genes/features with >1 colocalization with local GWAS signals.
         </li>
         <li>
-          To provide presentation-ready graphics to support findings
+          To provide presentation-ready graphics to support findings.
         </li>
       </ul>
 
@@ -53,9 +73,12 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import fundingContent from '@/docs/funding.md'
 import feedbackContent from '@/docs/feedback.md'
+
+const dialog = ref(false)
 </script>
 
 <style scoped>
