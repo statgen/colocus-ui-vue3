@@ -148,7 +148,7 @@ onBeforeUnmount(async () => {
 
 onMounted(() => {
   appStore.dataTable.expandedRow.length = 0
-  storeMZpage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[2]
+  storeMZpage.selectedTheme = Object.keys(LZ2_DISPLAY_OPTIONS.LZ2_THEMES)[1]
   loadPageData()
 })
 
