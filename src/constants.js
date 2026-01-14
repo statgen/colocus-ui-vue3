@@ -98,6 +98,7 @@ const LZ2_DISPLAY_OPTIONS = {
   PLOTS_CONTAINER_ID: 'plotsContainer',
   RECOMB_LINE_COLOR: '#6ccbac', // '#369979',
   RECOMB_AXIS_COLOR: '#6ccbac',
+  EXON_COLOR: '#363696',
   SIG_LINE_COLOR: '#a8a9ad',
 }
 

@@ -92,8 +92,8 @@ export function useLZ2Renderers() {
           .attr('y', yPos - trackHeight * exonHeight / 2)
           .attr('width', Math.max(1, xScale(exon.end) - xScale(exon.start)))
           .attr('height', trackHeight * exonHeight)
-          .attr('fill', COLORS.CLC_HEADING)
-          .attr('stroke', COLORS.CLC_HEADING)
+          .attr('fill', LZ2_DISPLAY_OPTIONS.EXON_COLOR)
+          .attr('stroke', LZ2_DISPLAY_OPTIONS.EXON_COLOR)
           .attr('stroke-width', 0.5)
       })
 
