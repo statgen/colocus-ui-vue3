@@ -1,8 +1,8 @@
-# Colocus V 2.0
+# Colocus
 
-This is a Vue 3 app built using Vuetify 3. It is loosely based on the Vue 2/Vuetify 2 app. Approximately 90% of the code has been rewritten, except some in the LocusZoom page. There is also signficant new code that support the new pages (gene, multizoom, QC, help).
+This repository contains the frontend UI code for [Colocus](https://github.com/statgen/colocus). Users will likely want to view that repository instead for information on how to deploy the app on their own server. Below is primarily documentation meant for frontend developers.
 
-My overall philosophy is to make every file as concise and focused as possible, trying to limit line count to 100 or so. In many cases, this entails moving functional code to one or more composables, such that the primary view has two jobs: rendering templates and functioning as traffic cop for event handling. There are a few files where line count greatly exceeds that target, because all the functionality was logically related. For example, the mzGridHelpers composable tops out at over 500 lines.
+The frontend is a Vue 3 app built using Vuetify 3. My overall philosophy is to make every file as concise and focused as possible, trying to limit line count to 100 or so. In many cases, this entails moving functional code to one or more composables, such that the primary view has two jobs: rendering templates and functioning as traffic cop for event handling. There are a few files where line count greatly exceeds that target, because all the functionality was logically related. For example, the mzGridHelpers composable tops out at over 500 lines.
 
 I have tried to avoid use of magic numbers and strings in code, and centralize constants in the file src/constants.js. This goal has slipped a little in the final months, so there are a number in the Multizoom page and related files.
 

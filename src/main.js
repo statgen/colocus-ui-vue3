@@ -29,7 +29,7 @@ const gaID = import.meta.env.VITE_APP_GA_ID
 if (gaID) {
   app.use(VueGtag, {
     config: { id: gaID },
-    appName: 'Colocus 2.0',
+    appName: 'Colocus',
     pageTrackerScreenviewEnabled: true,
   }, router)
 }
