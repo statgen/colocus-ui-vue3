@@ -166,6 +166,10 @@ At the top is a manhattan plot showing associations between all variants and the
 
 Each red dot corresponds to a variant that colocalizes with another trait. Clicking on the red dot will filter the colocalization results table to show only colocalizations involving that variant. By default, the table shows all colocalization results genome-wide for the trait.
 
+## Software Availability
+
+Colocus is open source software and licensed MIT. The source code is available on <a href="https://github.com/statgen/colocus" target="_blank">GitHub</a>. We provide a Docker Compose setup for easy deployment on your own server.
+
 ## FAQ
 
 * The tables can be very wide, and don't seem to scroll without a trackpad.

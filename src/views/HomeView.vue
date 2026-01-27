@@ -59,14 +59,19 @@
       </p>
 
       <h2>Funding</h2>
+      <p></p>
+      <div class="markdown-body" v-html="fundingContent"></div>
+
+      <h2>Open Source</h2>
       <p>
-        <div class="markdown-body" v-html="fundingContent"></div>
+        Colocus is open source software and licensed MIT. The source code is available on <a href="https://github.com/statgen/colocus" target="_blank" class="coLink font-weight-bold">GitHub</a>. We provide a Docker Compose setup for easy deployment on your own server.
       </p>
 
       <h2>Feedback</h2>
-      <p>
-        <div class="markdown-body" v-html="feedbackContent"></div>
-      </p>
+      <p></p>
+      <div class="markdown-body" v-html="feedbackContent"></div>
+
+      <p></p>
 
     </div>
   </DefaultLayout>
