@@ -38,6 +38,7 @@ const LZ2_DISPLAY_OPTIONS = {
     height: 225,
     headerHeight: 30,
     margins: { top: 15, right: 15, bottom: 48, left: 20 },
+    trackMargins: { top: 30, right: 10, bottom: 10, left: 10 },
     plotHeight: 0, // computed below
     leftAxisWidth: 45,
     rightAxisWidth: 55,

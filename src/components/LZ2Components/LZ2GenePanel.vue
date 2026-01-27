@@ -54,7 +54,7 @@ const dimensions = computed(() => {
   const trackHeight = LDOD.geneTrackHeight
   const minPlotHeight = 50
   const maxContainerHeight = LDOD.height
-  const margin = { top: headerHeight, right: 10, bottom: 10, left: 10 }
+  const margin = LDOD.trackMargins
 
   const numTracks = trackCount.value || 1
   const plotHeight = Math.max(minPlotHeight, numTracks * trackHeight + margin.top + margin.bottom)
@@ -83,27 +83,102 @@ const isOverflow = computed(() => {
 const genesWithTracks = computed(() => {
   if (!visibleGenes.value.length) return []
 
-  // Sort genes by start position
-  const genes = [...visibleGenes.value].sort((a, b) => a.start - b.start)
+  // Sort genes by type priority, then by length (descending)
+  const typePriority = {
+    'protein_coding': 1,
+    'processed_transcript': 2,
+    'antisense': 3,
+    'pseudogene': 4,
+    'lncRNA': 5,
+    'lincRNA': 6,
+  }
+  const getPriority = (type) => typePriority[type] || 99
+
+  let genes = [...visibleGenes.value].sort((a, b) => {
+    // Sort on type first
+    const priorityA = getPriority(a.gene_type)
+    const priorityB = getPriority(b.gene_type)
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB
+    }
+    
+    // If same priority, sort on length (descending)
+    return (b.end - b.start) - (a.end - a.start)
+  })
 
   const plotted = []
   const padding = 5000
+  const minGap = 5
+  const labelRegions = {}
 
   genes.forEach(gene => {
     let row = 1
+
+    // Gene name
+    const text = gene.strand === '+'
+      ? `${gene.gene_name} →`
+      : gene.strand === '-'
+        ? `← ${gene.gene_name}`
+        : gene.gene_name
+
+    const charWidth = 7
+    const textWidth = text.length * charWidth + 4
+    const geneStartX = xScale.value(gene.start)
+    const geneEndX = xScale.value(gene.end)
+    const geneCenterX = (geneStartX + geneEndX) / 2
+
+    const overlaps = (row, start, end) => {
+      if (!labelRegions[row]) {
+        labelRegions[row] = []
+      }
+
+      return labelRegions[row].some(region => (start < (region.end + minGap)) && (end > (region.start - minGap)))
+    }
+
+    const labelPositions = [
+      { x: geneCenterX, anchor: 'middle', start: geneCenterX - textWidth / 2, end: geneCenterX + textWidth / 2 },
+      // { x: geneStartX, anchor: 'start', start: geneStartX, end: geneStartX + textWidth },
+      // { x: geneEndX, anchor: 'end', start: geneEndX - textWidth, end: geneEndX },
+      // { x: geneEndX + 5, anchor: 'start', start: geneEndX + 5, end: geneEndX + 5 + textWidth },
+      // { x: geneStartX - 5, anchor: 'end', start: geneStartX - 5 - textWidth, end: geneStartX - 5 }
+    ]
 
     // Check against all previously plotted genes
     for (let i = 0; i < plotted.length; i++) {
       const g = plotted[i]
 
       // If this gene overlaps with a previously plotted gene
-      if ((gene.start - padding < g.end + padding) &&
-        (gene.end + padding > g.start - padding)) {
+      const overlapsPreviousGene = (gene.start - padding < g.end + padding) && (gene.end + padding > g.start - padding)
+
+      if (overlapsPreviousGene) {
         row = Math.max(row, g.row + 1)
       }
     }
 
+    // Now find a label position that works for this row
+    // If none work, increment row and try again
+    let labelChosenPos = null
+    while (!labelChosenPos) {
+      for (const pos of labelPositions) {
+        if (!overlaps(row, pos.start, pos.end)) {
+          labelChosenPos = pos
+          break
+        }
+      }
+
+      if (!labelChosenPos) {
+        row++
+      }
+    }
+
     gene.track = row
+    gene.chosen = labelChosenPos
+
+    if (!labelRegions[gene.track]) {
+      labelRegions[gene.track] = []
+    }
+
+    labelRegions[gene.track].push({ start: labelChosenPos.start, end: labelChosenPos.end })
 
     // Console log to debug overlaps
     // console.log(`Gene ${gene.gene_name}: track ${row}, position ${gene.start}-${gene.end}`)
@@ -148,7 +223,12 @@ const xScale = computed(() => {
   // const center = pv.loc, range = storeMZpage.zoomRegion || 250000
   const start = storeMZpage.xStart
   const end = storeMZpage.xEnd
-  return d3.scaleLinear().domain([start, end]).range([0, dimensions.value.plotWidth])
+
+  const LDOD = LZ2_DISPLAY_OPTIONS.DIMENSIONS
+  const width = LDOD.width
+  const plotWidth = width - LDOD.trackMargins.right - LDOD.trackMargins.left
+
+  return d3.scaleLinear().domain([start, end]).range([0, plotWidth])
 })
 
 // *** Provides ****************************************************************

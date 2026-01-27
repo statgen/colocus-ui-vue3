@@ -63,12 +63,9 @@ export function useLZ2Renderers() {
     const exonHeight = 0.3
     const fontSize = 12
     const charWidth = 7
-    const minGap = 5
 
     // Sort genes by size (larger genes get label priority)
     const sortedGenes = [...genes].sort((a, b) => (b.end - b.start) - (a.end - a.start))
-
-    const labelRegions = {}
 
     sortedGenes.forEach(gene => {
       const yPos = trackStart + (gene.track * trackHeight)
@@ -105,81 +102,33 @@ export function useLZ2Renderers() {
           : gene.gene_name
 
       const textWidth = text.length * charWidth + 4
-      const geneStartX = xScale(gene.start)
-      const geneEndX = xScale(gene.end)
-      const geneCenterX = (geneStartX + geneEndX) / 2
 
-      if (!labelRegions[gene.track]) {
-        labelRegions[gene.track] = []
+      let bgX
+      if (gene.chosen.anchor === 'middle') {
+        bgX = gene.chosen.x - textWidth / 2
+      } else if (gene.chosen.anchor === 'start') {
+        bgX = gene.chosen.x
+      } else { // 'end'
+        bgX = gene.chosen.x - textWidth
       }
 
-      const overlaps = (start, end) => {
-        return labelRegions[gene.track].some(region =>
-          (start < region.end + minGap) && (end > region.start - minGap)
-        )
-      }
+      g.append('rect')
+        .attr('x', bgX - 2)
+        .attr('y', yPos + 4)
+        .attr('width', textWidth + 4)
+        .attr('height', 14)
+        .attr('fill', 'white')
+        .attr('fill-opacity', 0.85)
 
-      // Try positions
-      const positions = [
-        { x: geneCenterX, anchor: 'middle', start: geneCenterX - textWidth / 2, end: geneCenterX + textWidth / 2 },
-        { x: geneStartX, anchor: 'start', start: geneStartX, end: geneStartX + textWidth },
-        { x: geneEndX, anchor: 'end', start: geneEndX - textWidth, end: geneEndX },
-        { x: geneEndX + 5, anchor: 'start', start: geneEndX + 5, end: geneEndX + 5 + textWidth },
-        { x: geneStartX - 5, anchor: 'end', start: geneStartX - 5 - textWidth, end: geneStartX - 5 }
-      ]
-
-      let chosen = null
-      for (const pos of positions) {
-        if (pos.start >= 0 && pos.end <= dimensions.plotWidth && !overlaps(pos.start, pos.end)) {
-          chosen = pos
-          break
-        }
-      }
-
-      if (chosen) {
-        const bgX = chosen.anchor === 'middle' ? chosen.x - textWidth / 2
-          : chosen.anchor === 'start' ? chosen.x
-            : chosen.x - textWidth
-
-        g.append('rect')
-          .attr('x', bgX - 2)
-          .attr('y', yPos + 4)
-          .attr('width', textWidth + 4)
-          .attr('height', 14)
-          .attr('fill', 'white')
-          .attr('fill-opacity', 0.85)
-
-        g.append('text')
-          .attr('x', chosen.x)
-          .attr('y', yPos + 16)
-          .attr('text-anchor', chosen.anchor)
-          .attr('font-size', `${fontSize}px`)
-          .attr('font-weight', '500')
-          .attr('fill', 'black')
-          .text(text)
-
-        labelRegions[gene.track].push({ start: chosen.start, end: chosen.end, gene: gene.gene_name })
-      } else {
-        // No room for label - add a clickable marker
-        // Invisible wider hit area for easier clicking
-        g.append('rect')
-          .attr('x', geneCenterX - 5)
-          .attr('y', yPos - 10)
-          .attr('width', 10)
-          .attr('height', 20)
-          .attr('fill', 'transparent')
-          .style('cursor', 'pointer')
-
-        // Visible red marker line
-        g.append('line')
-          .attr('x1', geneCenterX)
-          .attr('x2', geneCenterX)
-          .attr('y1', yPos - 8)
-          .attr('y2', yPos + 8)
-          .attr('stroke', 'red')
-          .attr('stroke-width', 3)  // Increased from 2 to 3
-          .style('pointer-events', 'none')  // Let the rect handle the mouse events
-      }
+      g.append('text')
+        .attr('x', gene.chosen.x)
+        .attr('y', yPos + 16)
+        .attr('text-anchor', gene.chosen.anchor)
+        .attr('font-size', `${fontSize}px`)
+        .attr('font-style', 'italic')
+        .attr('font-weight', '500')
+        .attr('fill', 'black')
+        .text(text)
 
       // Add tooltip to entire gene group
       g.append('title')
