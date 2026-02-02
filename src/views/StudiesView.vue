@@ -30,7 +30,9 @@
       <template v-slot:item.trait="{ value }">{{ value?.split(',')?.join(', ') }}</template>
       <template v-slot:item.n_traits="{ value }">{{ value?.toLocaleString() }}</template>
       <template v-slot:item.link="{ value }"><a class="coLink" :href="value" target="_blank">{{ value }}</a></template>
-      <template v-slot:item.pmid="{ value }"><a class="coLink" :href="'https://pubmed.ncbi.nlm.nih.gov/' + value" target="_blank">{{ value }}</a></template>
+      <template #item.publication.pmid="{ item }">
+        <a v-if="item.publication?.pmid" class="coLink" :href="'https://pubmed.ncbi.nlm.nih.gov/' + item.publication.pmid" target="_blank">{{ item.publication.pmid }}</a>
+      </template>
       <template v-slot:footer.prepend>
         <div>
           <ToolTippy>
