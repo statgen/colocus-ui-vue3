@@ -120,8 +120,7 @@ const studySearch = ref('')
 const submissionSearch = ref('')
 
 onMounted(async () => {
-  // Need to set URL to page 1 to begin with before fetching data or it will try to load all pages
-  if(await fetchStudyData(`${URLS.STUDY_DATA}?page=1`, 'study data', appStore.currentPageName)) {
+  if(await fetchStudyData(URLS.STUDY_DATA, 'study data', appStore.currentPageName)) {
     const apiData = toRaw(studyData.value.results)
     for (let row of apiData) {
       if (row.analysis_type == 'eQTL') {
